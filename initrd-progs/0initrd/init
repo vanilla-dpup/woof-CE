@@ -828,7 +828,7 @@ for ONE_SFS in $EXTRASFSPATHS; do
  # skip SFSs from other Puppy family distros
  case "$ONE_NAME" in
  *_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs) ;;
- puppy_*.sfs|*drv_*.sfs|kbuild-*.sfs) continue ;;
+ puppy_*.sfs|*drv_*.sfs|kbuild-*.sfs|devx_*.sfs|nlsx_*.sfs|docs_*.sfs) continue ;;
  esac
 
  stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" ""
