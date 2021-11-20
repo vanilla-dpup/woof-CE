@@ -139,9 +139,11 @@ void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 }
 
 static
-void handle(const struct ucred *cred, const int fd, char *buf, const size_t len)
+void handle(sigset_t *set, const struct ucred *cred, const int fd, char *buf, const size_t len)
 {
 	ssize_t chunk, total;
+
+	if (sigprocmask(SIG_SETMASK, set, NULL) < 0) return;
 
 	for (total = 0; total < len;) {
 		if ((chunk = recv(fd, &buf[total], len - total, 0)) < 0) {
@@ -159,7 +161,7 @@ void handle(const struct ucred *cred, const int fd, char *buf, const size_t len)
 
 int main(int argc, char *argv[])
 {
-	sigset_t set;
+	sigset_t set, old;
 	siginfo_t sig;
 	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/run/pkexecd.socket"};
 	struct ucred cred;
@@ -168,7 +170,7 @@ int main(int argc, char *argv[])
 	int s, c;
 	socklen_t len = sizeof(cred);
 
-	if (sigemptyset(&set) < 0 || sigaddset(&set, SIGIO) < 0 || sigaddset(&set, SIGCHLD) < 0 || sigaddset(&set, SIGTERM) < 0 || sigprocmask(SIG_SETMASK, &set, NULL) < 0) return EXIT_FAILURE;
+	if (sigemptyset(&set) < 0 || sigaddset(&set, SIGIO) < 0 || sigaddset(&set, SIGCHLD) < 0 || sigaddset(&set, SIGTERM) < 0 || sigprocmask(SIG_SETMASK, &set, &old) < 0) return EXIT_FAILURE;
 
 	if (!(buf = malloc(REQUEST_MAX))) return EXIT_FAILURE;
 
@@ -202,7 +204,7 @@ int main(int argc, char *argv[])
 			continue;
 		}
 
-		handle(&cred, c, buf, REQUEST_MAX);
+		handle(&old, &cred, c, buf, REQUEST_MAX);
 		close(c);
 		return EXIT_SUCCESS;
 	}
