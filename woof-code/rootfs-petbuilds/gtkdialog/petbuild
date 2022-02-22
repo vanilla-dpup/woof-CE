@@ -5,6 +5,7 @@ download() {
 build() {
     tar -xzf gtkdialog-0.8.4e.tar.gz
     patch -d gtkdialog-0.8.4e -p1 < 125.patch
+    patch -d gtkdialog-0.8.4e -p1 < 132.patch
     if [ $PETBUILD_GTK -eq 3 ]; then
         cp -r gtkdialog-0.8.4e gtk2dialog-0.8.4e
 
