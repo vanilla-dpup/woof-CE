@@ -106,6 +106,12 @@ cat ../status/findpkgs_FINAL_PKGS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSIO
 	done < $LIST
 done
 
+# impersonate the distro we're compatible with, so tools like software-properties-gtk work
+mkdir -p bdrv/usr/lib
+sed "s/^ID=.*/ID=${DISTRO_BINARY_COMPAT}/" rootfs-complete/usr/lib/os-release > bdrv/usr/lib/os-release
+echo "VERSION_CODENAME=${DISTRO_COMPAT_VERSION}" >> bdrv/usr/lib/os-release
+chmod 644 bdrv/usr/lib/os-release
+
 # open .deb files with gdebi
 if [ -e rootfs-complete/usr/local/bin/rox ]; then
 	mkdir -p bdrv/etc/xdg/rox.sourceforge.net/MIME-types
