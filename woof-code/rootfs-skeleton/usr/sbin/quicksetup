@@ -1217,9 +1217,6 @@ if [ "$SET_KEYBOARD" ];then
  if [ -f ~/.xkbrc ]; then
    sed -i "s%^XKB_DEFAULT_LAYOUT=.*%XKB_DEFAULT_LAYOUT=$XKB_LAYOUT%" ~/.xkbrc
  fi
- if [ -f "$XDG_CONFIG_HOME/labwc/environment" ]; then
-  sed -i "s%^XKB_DEFAULT_LAYOUT=.*%XKB_DEFAULT_LAYOUT=$XKB_LAYOUT%" $XDG_CONFIG_HOME/labwc/environment
- fi
  xkbconfigmanager apply
  #-
  #120224 fontmap will be handled in locale code below.

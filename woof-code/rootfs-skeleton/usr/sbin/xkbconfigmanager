@@ -7,7 +7,6 @@ export OUTPUT_CHARSET=UTF-8
 
 export XORG_CONF=/etc/X11/xorg.conf
 export XKBRC=~/.xkbrc
-export LABWCRC=$XDG_CONFIG_HOME/labwc/environment
 
 if [ -f /etc/X11/xkb/rules/xorg.lst ] ; then
 	XORG_RULES_LST='/etc/X11/xkb/rules/xorg.lst'
@@ -104,14 +103,7 @@ Requires a "third level chooser" to be used.' > /tmp/box_help
 
 function XkbApplyNow() {
 	#get all parameters
-	if [ -n "$WAYLAND_DISPLAY" -a -f "$LABWCRC" ]; then
-		. $LABWCRC
-		RULES="$XKB_DEFAULT_RULES"
-		MODEL="$XKB_DEFAULT_MODEL"
-		LAYOUT="$XKB_DEFAULT_LAYOUT"
-		VARIANT="$XKB_DEFAULT_VARIANT"
-		OPTIONS="$XKB_DEFAULT_OPTIONS"
-	elif [ -f "$XKBRC" ]; then
+	if [ -f "$XKBRC" ]; then
 		. $XKBRC
 		RULES="$XKB_DEFAULT_RULES"
 		MODEL="$XKB_DEFAULT_MODEL"
@@ -166,11 +158,7 @@ function XkbApplyLater() {
 
 
 function XkbLayoutConfig() {
-	if [ -n "$WAYLAND_DISPLAY" -a -f "$LABWCRC" ]; then
-		. $LABWCRC
-		ORIGINAL="$XKB_DEFAULT_LAYOUT"
-		CURRENT="$ORIGINAL"
-	elif [ -f "$XKBRC" ]; then
+	if [ -f "$XKBRC" ]; then
 		. $XKBRC
 		ORIGINAL="$XKB_DEFAULT_LAYOUT"
 		CURRENT="$ORIGINAL"
@@ -253,19 +241,10 @@ To add an additional layout, select it and press OK.')"
 			eval $ERRMSG
 		fi
 	fi
-
-	if [ -f "$LABWCRC" ]; then
-		sed -i "s%^XKB_DEFAULT_LAYOUT=.*%XKB_DEFAULT_LAYOUT=$NEW%" $LABWCRC
-		[ -n "$WAYLAND_DISPLAY" ] && XkbApplyLater
-	fi
 }
 
 function XkbLayoutTable() {
-	if [ -n "$WAYLAND_DISPLAY" -a -f "$LABWCRC" ]; then
-		. $LABWCRC
-		ORIGINAL="$XKB_DEFAULT_LAYOUT"
-		CURRENT="$ORIGINAL"
-	elif [ -f "$XKBRC" ]; then
+	if [ -f "$XKBRC" ]; then
 		. $XKBRC
 		ORIGINAL="$XKB_DEFAULT_LAYOUT"
 		CURRENT="$ORIGINAL"
@@ -292,10 +271,7 @@ function XkbLayoutTable() {
 
 
 function XkbModelConfig() {
-	if [ -n "$WAYLAND_DISPLAY" -a -f "$LABWCRC" ]; then
-		. $LABWCRC
-		CURRENT="$XKB_DEFAULT_MODEL"
-	elif [ -f "$XKBRC" ]; then
+	if [ -f "$XKBRC" ]; then
 		. $XKBRC
 		CURRENT="$XKB_DEFAULT_MODEL"
 	elif [ -f $XORG_CONF ]; then
@@ -342,18 +318,10 @@ To keep the current model, press cancel...')'" 30 80 0 \'
 			eval $ERRMSG
 		fi
 	fi
-
-	if [ -f "$LABWCRC" ]; then
-		sed -i "s%^XKB_DEFAULT_MODEL=.*%XKB_DEFAULT_MODEL=$CHOICE%" $LABWCRC
-		[ -n "$WAYLAND_DISPLAY" ] && XkbApplyLater
-	fi
 }
 
 function XkbOption() {
-	if [ -n "$WAYLAND_DISPLAY" -a -f "$LABWCRC" ]; then
-		. $LABWCRC
-		CURRENT="$XKB_DEFAULT_OPTIONS"
-	elif [ -f "$XKBRC" ]; then
+	if [ -f "$XKBRC" ]; then
 		. $XKBRC
 		CURRENT="$XKB_DEFAULT_OPTIONS"
 	elif [ -f $XORG_CONF ]; then
@@ -423,11 +391,6 @@ To abort, press cancel.')"
 		else
 			eval $ERRMSG
 		fi
-	fi
-
-	if [ -f "$LABWCRC" ]; then
-		sed -i "s%^XKB_DEFAULT_OPTIONS=.*%XKB_DEFAULT_OPTIONS=$NEW%" $LABWCRC
-		[ -n "$WAYLAND_DISPLAY" ] && XkbApplyLater
 	fi
 }
 export -f XkbOption
@@ -501,11 +464,7 @@ function XkbVariantConfig() {
 	# change the XkbVariant variable in xorg.conf
 	TMPDIALOG=/tmp/XkbVariantDialog
 	TMPLIST=/tmp/XkbVariantList
-	if [ -n "$WAYLAND_DISPLAY" -a -f "$LABWCRC" ]; then
-		. $LABWCRC
-		CURRENT="$XKB_DEFAULT_VARIANT"
-		LAYOUTS="$XKB_DEFAULT_LAYOUT"
-	elif [ -f "$XKBRC" ]; then
+	if [ -f "$XKBRC" ]; then
 		. $XKBRC
 		CURRENT="$XKB_DEFAULT_VARIANT"
 		LAYOUTS="$XKB_DEFAULT_LAYOUT"
@@ -589,11 +548,6 @@ Xdialog --left --stdout --title "$gtxt1" --menubox "' >$TMPDIALOG
 			else
 				eval $ERRMSG
 			fi
-		fi
-	
-		if [ -f $LABWCRC ]; then
-			sed -i "s%^XKB_DEFAULT_VARIANT=.*%XKB_DEFAULT_VARIANT=$NEW%" $LABWCRC
-			[ -n "$WAYLAND_DISPLAY" ] && XkbApplyLater
 		fi
 	else
 		Xdialog --title "$(gettext 'layout'): $LAYOUTS" --msgbox "$(gettext 'No variants available for') $LAYOUTS" 0 0
