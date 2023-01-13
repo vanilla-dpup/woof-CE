@@ -8,4 +8,5 @@ build() {
     patch -p1 < ../defaults.patch
     ./configure --prefix=/usr --disable-blake2 --disable-internal-md6
     make install
+    sed -i 's/^Categories=.*/Categories=Utility;/' /usr/share/applications/org.gtkhash.gtkhash.desktop
 }
