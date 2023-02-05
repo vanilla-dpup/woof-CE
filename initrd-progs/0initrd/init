@@ -860,7 +860,7 @@ echo -e "\\033[0;34m ***\\033[0;39m"
 if [ $waitdev ];then
  WAITDEV=$waitdev
 else
- WAITDEV=5
+ WAITDEV=20
 fi
 
 #[ $pdebug ] && PDEBUG=$pdebug
