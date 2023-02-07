@@ -958,7 +958,7 @@ elif [ "$PDRV" = "" ];then #not specified anywhere
 fi
 
 if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
- [ "${PMEDIA:0:3}" != "usb" ] && search_func
+ search_func
  if [ "$P_PART" = "" ];then
   NUM=1
   while [ "$P_PART" = "" -a $NUM -le $WAITDEV ];do
