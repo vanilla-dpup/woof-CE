@@ -54,6 +54,7 @@ yes|coreutils|coreutils|exe,dev,doc,nls||deps:yes
 yes|cpio|cpio|exe,dev>null,doc,nls||deps:yes
 yes|crda|crda,wireless-regdb|exe,dev,doc,nls||deps:yes
 yes|cryptsetup|cryptsetup-bin|exe,dev,doc,nls||deps:yes
+yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
 yes|curl|curl,libcurl4,libcurl4-openssl-dev|exe,dev,doc,nls||deps:yes
 yes|dash|dash|exe,dev,doc,nls||deps:yes
 yes|dbus|dbus,libdbus-1-dev|exe,dev,doc,nls||deps:yes
@@ -71,6 +72,7 @@ yes|e2fsprogs|e2fsprogs,libblkid-dev,comerr-dev,ss-dev|exe,dev,doc,nls||deps:yes
 yes|efibootmgr|efibootmgr|exe,dev,doc,nls||deps:yes
 yes|eject|eject|exe,dev>null,doc,nls||deps:yes
 yes|ethtool|ethtool|exe,dev>null,doc,nls||deps:yes
+yes|exfatprogs|exfatprogs|exe,dev,doc,nls||deps:yes
 yes|ExpenseTracker-deps|libsqlite3-dev|exe,dev,doc,nls||deps:yes
 yes|f2fs-tools|f2fs-tools|exe,dev,doc,nls||deps:yes
 yes|file|file,libmagic-mgc|exe,dev,doc,nls||deps:yes
