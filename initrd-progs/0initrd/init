@@ -854,7 +854,7 @@ echo -e "\\033[0;34m ***\\033[0;39m"
 if [ $waitdev ];then
  WAITDEV=$waitdev
 else
- WAITDEV=20
+ WAITDEV=5
 fi
 
 #[ $pdebug ] && PDEBUG=$pdebug
@@ -943,8 +943,9 @@ fi
 
 if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
  search_func
- NUM=1
+ NUM=0
  while [ "$LOOK_PUP" -a "$P_PART" = "" ] || [ "$LOOK_SAVE" -a "$SAVEPART" = "" ];do
+  [ $NUM -ge $WAITDEV ] && break
   printf "${L_WAITING_FOR_DEV}\n" "$WAITDEV" "$NUM" "$WAITDEV" > /dev/console
   sleep 1
   get_part_info
@@ -960,7 +961,6 @@ if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
    search_func
   fi
   NUM=$(($NUM + 1))
-  [ $NUM -gt $WAITDEV ] && break
  done
 fi
 [ "$P_BP_ID" ] && { log_part_id "$P_BP_ID"; ONE_PART="$P_BP_ID"; }
