@@ -944,7 +944,7 @@ fi
 if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
  search_func
  NUM=1
- while [ "$P_PART" = "" -a $NUM -le $WAITDEV ];do
+ while [ "$LOOK_PUP" -a "$P_PART" = "" ] || [ "$LOOK_SAVE" -a "$SAVEPART" = "" ];do
   printf "${L_WAITING_FOR_DEV}\n" "$WAITDEV" "$NUM" "$WAITDEV" > /dev/console
   sleep 1
   get_part_info
@@ -960,6 +960,7 @@ if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
    search_func
   fi
   NUM=$(($NUM + 1))
+  [ $NUM -gt $WAITDEV ] && break
  done
 fi
 [ "$P_BP_ID" ] && { log_part_id "$P_BP_ID"; ONE_PART="$P_BP_ID"; }
@@ -1099,14 +1100,6 @@ if [ -f "/tmp/SAVESPEC" ];then
   SAVE_BP_FN="$SAVE_BP_DIR"
  fi
  [ "$SS_MEDIA" ] && PMEDIA="$SS_MEDIA"
-fi
-
-# might still need to search for save
-if [ "$PMEDIA" = "cd" ];then
- if [ "$SAVEPART" = "" ];then
-  LOOK_SAVE="yes"
-  search_func
- fi
 fi
 
 [ "$SAVEPART" ] || SAVEPART="$P_PART"
