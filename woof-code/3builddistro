@@ -1040,12 +1040,12 @@ else
 	            defaulthtmleditor=text/plain \
 	            defaulthtmlviewer=text/html \
 	            defaultimageeditor=image/bmp \
-	            defaultimageviewer=image/bmp \
+	            defaultimageviewer=image/png \
 	            defaultmediaplayer=video/mp4 \
 	            defaultpaint=image/bmp \
 	            defaultpdfviewer=application/pdf \
 	            defaultspreadsheet=application/vnd.oasis.opendocument.spreadsheet \
-	            defaulttexteditor=text/plain \
+	            defaulttexteditor=text/x-c \
 	            defaulttextviewer=text/plain \
 	            defaulttorrent=application/x-bittorrent \
 	            defaultwordprocessor=application/vnd.oasis.opendocument.text; do
