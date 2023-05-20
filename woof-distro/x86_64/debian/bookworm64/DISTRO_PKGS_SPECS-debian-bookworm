@@ -31,7 +31,6 @@ PKGS_SPECS_TABLE='
 yes|acl|libacl1|exe,dev,doc,nls||deps:yes
 yes|adduser|adduser|exe,dev,doc,nls
 yes|alsa-lib|libasound2,libasound2-data,libasound2-dev,alsa-topology-conf,alsa-ucm-conf|exe,dev,doc,nls||deps:yes
-yes|libasound2-plugins-pulseonly|libasound2-plugins|exe,dev,doc,nls
 yes|alsa-utils|alsa-utils|exe,dev,doc,nls||deps:yes
 yes|atk|libatk1.0-0,libatk1.0-dev|exe,dev,doc,nls||deps:yes
 yes|at-spi2-atk|libatspi2.0-0,libatk-bridge2.0-0,libatk-bridge2.0-dev,libatspi2.0-dev|exe,dev,doc,nls||deps:yes #needed by gtk+3.
@@ -52,7 +51,7 @@ yes|coreutils|coreutils|exe,dev,doc,nls||deps:yes
 yes|cpio|cpio|exe,dev>null,doc,nls||deps:yes
 yes|crda|wireless-regdb|exe,dev,doc,nls||deps:yes
 yes|cryptsetup|cryptsetup-bin|exe,dev,doc,nls||deps:yes
-yes|curl|curl,libcurl4,libcurl4-openssl-dev|exe,dev,doc,nls||deps:yes
+yes|curl|curl,libcurl4,libcurl4-gnutls-dev|exe,dev,doc,nls||deps:yes
 yes|dash|dash|exe,dev,doc,nls||deps:yes
 yes|dbus|dbus,libdbus-1-dev|exe,dev,doc,nls||deps:yes
 yes|d-conf|dconf-gsettings-backend,dconf-service|exe,dev,doc,nls||deps:yes #needed by gsettings-desktop-settings
@@ -126,7 +125,7 @@ yes|passwd|passwd|exe,dev,doc,nls||deps:yes
 yes|pavucontrol|pavucontrol|exe,dev,doc,nls||deps:yes
 yes|pciutils|pciutils,libpci3|exe,dev,doc,nls||deps:yes
 yes|perl|perl,perl-base|exe,dev,doc,nls||deps:yes
-yes|pipewire|pipewire-pulse,libspa-0.2-bluetooth,libpipewire-0.3-dev|exe,dev,doc,nls||deps:yes
+yes|pipewire|pipewire-pulse,pipewire-alsa,libspa-0.2-bluetooth,libpipewire-0.3-dev|exe,dev,doc,nls||deps:yes
 yes|pigz|pigz|exe,dev,doc,nls||deps:yes
 yes|procps|procps|exe,dev,doc,nls||deps:yes
 yes|psmisc|psmisc|exe,dev>null,doc,nls||deps:yes
@@ -196,6 +195,7 @@ yes|xwayland|xwayland|exe,dev>exe,doc,nls||deps:yes
 	if [ "$DISTRO_VARIANT" = "dwl" ]; then
 		PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|xorg_base_new|libglapi-mesa,libx11-xcb1,mesa-common-dev,libgl1,x11-xkb-utils,x11-apps,fontconfig,fontconfig-config,libfontconfig-dev,libdrm2,libdrm-common,libdrm-dev,libdrm-radeon1,libdrm-amdgpu1,libdrm-nouveau2,libdrm-intel1,libepoxy0,libepoxy-dev,libfontconfig1,libfontconfig1-dev,libfontenc1,libfontenc-dev,libgl-dev,libunwind8,libunwind-dev,libx11-6,libx11-dev,xkb-data,xauth|exe,dev,doc,nls||deps:yes
+yes|desktop-file-utils|desktop-file-utils|exe,dev,doc,nls||deps:yes
 yes|foot|foot|exe,dev,doc,nls||deps:yes
 yes|gsimplecal|gsimplecal|exe,dev,doc,nls||deps:yes
 yes|tofi|tofi|exe,dev,doc,nls||deps:yes
