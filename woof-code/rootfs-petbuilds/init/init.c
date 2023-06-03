@@ -146,7 +146,7 @@ int main(int argc, char *argv[])
 
 shutdown:
 	ret = kill(-1, SIGTERM);
-	delay(2);
+	delay(1);
 	if (ret == 0)
 		kill(-1, SIGKILL);
 
