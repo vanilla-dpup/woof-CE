@@ -57,6 +57,8 @@ DPkg::Post-Invoke { "rm -f /usr/lib/*/wireplumber-*/libwireplumber-module-logind
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
 
+printf 'woofwoof\nwoofwoof\n' | chroot rootfs-complete passwd root
+
 chroot rootfs-complete adduser --disabled-password --disabled-login --comment "" spot
 chroot rootfs-complete adduser spot video
 chroot rootfs-complete adduser spot render
