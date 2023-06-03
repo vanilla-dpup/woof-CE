@@ -1,5 +1,0 @@
-::sysinit:/etc/rc.d/rc.sysinit
-tty1::respawn:plogin
-tty2::respawn:getty 38400 tty2
-::ctrlaltdel:/sbin/reboot
-

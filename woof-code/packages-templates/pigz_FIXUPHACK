@@ -1,2 +1,0 @@
-ln -s pigz usr/bin/gzip
-ln -s unpigz usr/bin/gunzip

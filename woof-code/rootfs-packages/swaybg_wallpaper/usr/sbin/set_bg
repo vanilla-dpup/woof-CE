@@ -1,0 +1,4 @@
+#!/bin/ash
+
+killall swaybg
+sh -c "`grep ^Exec= ~/.config/autostart/swaybg.desktop | cut -c 6-`" &

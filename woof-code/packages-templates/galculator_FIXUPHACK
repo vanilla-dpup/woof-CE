@@ -1,7 +1,0 @@
-#!/bin/sh
-
-if [ -f usr/share/applications/galculator.desktop ] ; then
-	sed -i \
-		-e 's%Categories=.*%Categories=Calculator%' \
-			usr/share/applications/galculator.desktop
-fi

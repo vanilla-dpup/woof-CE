@@ -90,9 +90,6 @@ done
 
 [ "$PUNIONFS" = "aufs" ] && sfs_load --cli stop
 
-#remove file leftover by alsa script
-rm -f /tmp/snd-kmod.lst 2>/dev/null
-
 ### cleanly unmount cifs shares from /usr/share/Shares
 # samba rox app
 if [ -d /usr/share/Shares/ ];then

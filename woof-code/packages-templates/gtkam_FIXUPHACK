@@ -1,7 +1,0 @@
-#!/bin/sh
-
-if [ -f usr/share/applications/gtkam.desktop ] ; then
-	sed -i \
-		-e 's%Categories=.*%Categories=X-GraphicUtility%' \
-			usr/share/applications/gtkam.desktop
-fi

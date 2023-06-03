@@ -1,9 +1,0 @@
-#!/bin/sh
-
-if [ -f usr/share/applications/gdmap.desktop ] ; then
-	sed -i \
-		-e 's%Name=.*%Name=Gdmap%' \
-		-e 's%Comment=.*%Comment=graphical disk usage%' \
-		-e 's%Categories=.*%Categories=X-FilesystemUtility%' \
-			usr/share/applications/gdmap.desktop
-fi

@@ -1,7 +1,7 @@
 layout {
   css = "* { -GtkWidget-direction: right; -GtkWidget-visible: true; }"
   button {
-    value = "directory-home"
+    value = "inode-directory"
     action = "defaultfilemanager"
     tooltip = "File manager"
     css = "* { min-height: 36px; min-width: 36px; }"
@@ -13,25 +13,25 @@ layout {
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "execute"
+    value = "gtk-execute"
     action = "defaultprocessmanager"
     tooltip = "Process Viewer"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "browser"
+    value = "web-browser"
     action = "defaultbrowser"
     tooltip = "defaultbrowser"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "edit"
+    value = "text-x-generic"
     action = "defaulttexteditor"
     tooltip = "defaulttexteditor"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "paint"
+    value = "x-office-drawing"
     action = "defaultpaint"
     tooltip = "defaultpaint"
     css = "* { min-height: 36px; min-width: 36px; }"
@@ -61,7 +61,7 @@ layout {
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "quit"
+    value = "gtk-quit"
     action = "logout_gui"
     tooltip = "Leave Puppy"
     css = "* { min-height: 36px; min-width: 36px; }"

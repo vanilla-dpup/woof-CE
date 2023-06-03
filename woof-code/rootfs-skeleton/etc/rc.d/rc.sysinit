@@ -37,7 +37,7 @@
 #130504 moved up, i think fbcon needs to be loaded before intel, nouveau modules load.
 #160609 rerwin: Add wait for USB3 driver.
 
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/X11R7/bin
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 . /etc/rc.d/functions_x
 
 #================================================================
@@ -119,7 +119,6 @@ busybox mount -t devtmpfs devtmpfs /dev 2>/dev/null
 
 . /etc/DISTRO_SPECS
 . /etc/rc.d/BOOTCONSTRAINED # has BOOT_DISABLESWAP, BOOT_ATIME, BOOT_DIRTYWRITE.
-. /etc/rc.d/MODULESCONFIG #modules loading configuration.
 [ $loglevel ] && LOGLEVEL=$loglevel #boot param.
 [ $pmedia ] && PMEDIA=$pmedia #boot parameter, broad category of boot media. ex: cd.
 [ $pdev1 ] && PDEV1=$pdev1    #boot parameter, partition have booted off. ex: hda3
@@ -138,8 +137,6 @@ if [ $PUPMODE -ne 2 ] ; then #120313 fix...
  [ ! "$PLANG1" ] && PLANG1='en'
  [ "$ORIGLANG1" != "$PLANG1" ] && clear > /dev/console #120331 redirection is required.
 fi
-load_consolefont #120301 if this was done in initrd then it would carry through, and this would not be needed.
-#...this is done in rc.country, but needs to be move above all the o/p to /dev/console.
 
 STATUS=0
 
@@ -168,8 +165,6 @@ if [ $PUPMODE -eq 2 ] ; then
  fi
 fi
 #===============
-
-rm -f /tmp/snd-kmod.lst 2>/dev/null
 
 if [ "$BOOT_DIRTYWRITE" ];then #120704 see /etc/rc.d/BOOTCONSTRAINED, variable set in 3builddistro.
  #i have set this as 1500 which is 15 seconds (default is 5 seconds).
@@ -259,7 +254,6 @@ sysctl --system
 ## process some specific kernel params here
 for i in $(cat /proc/cmdline) ; do
 	case $i in
-		inteluxa|intel_uxa|uxa) xorg_intel_uxa.sh ;;
 		xerrs)   rm -f /var/local/xwin_disable_xerrs_log_flag ;; # see xwin / bootmanager
 		noxerrs) touch /var/local/xwin_disable_xerrs_log_flag ;; # see xwin / bootmanager
 	esac
@@ -328,18 +322,6 @@ echo -n "Loading kernel modules..." >/dev/console
 
 MODALIASES="`ls /sys/bus/*/devices/*/modalias`"
 
-#101119 new /sbin/pup_event_backend_modprobe, these must be deleted every boot...
-rm -f /etc/modprobe.d/alsa_card*.conf 2>/dev/null
-rm -f /dev/ttyUSB* 2>/dev/null #101210 may have been left there if modem plugged in at shutdown.
-rm -f /dev/mixer 2>/dev/null #see test in /etc/init.d/10alsa.
-rm -f /dev/snd/* #after a reboot, some of these may be wrong.
-mkdir /tmp/pup_event_backend #101210 for logging into, see /sbin/pup_event_backend_modprobe.
-
-#101119 no longer using /tmp/pup_event_modprobe.conf, put blacklist into /etc/modprobe.d/...
-rm -f /etc/modprobe.d/blacklist*.conf
-BLACKLISTVARS="`echo "$SKIPLIST" | tr '\-' '_' | tr ' ' '\n' | sed -e 's/^/blacklist /' | grep -v ' $'`"
-echo "$BLACKLISTVARS" > /etc/modprobe.d/blacklist.conf
-
 if [ $PUPMODE -eq 2 ] ; then #full hd install.
  modprobe psmouse 2>/dev/null
  #have this in 'init', probably need here too...
@@ -349,13 +331,6 @@ if [ $PUPMODE -eq 2 ] ; then #full hd install.
  # k2.6.29.6 dmesg has warning that ehci-hcd should load before uhci-hcd and ohci-hid
  [ "`lspci -n | grep -m 1 ' 0c03: '`" != "" ] && modprobe ehci-hcd > /dev/null 2>&1 #110712 maybe builtin to kernel.
 fi
-
-#130504 moved up, i think fbcon needs to be loaded before intel, nouveau modules load...
-#101119 i really only want to load this for a kms-enabled video...
-KMS=no
-[ "`grep -m 1 'modeset=1' /proc/cmdline`" != "" ] && KMS=yes
-[ "`cat /etc/modprobe.d/* | grep -m 1 '^options .* modeset=1'`" != "" ] && KMS=yes
-[ "$KMS" = "yes" ] && modprobe fbcon 2>/dev/null #100703 needed by some xorg drivers when exit to console (ex: nouveau). 110712 maybe builtin. 130311 maybe builtin.
 
 #130618 devtmpfs-enabled kernel, initrd may have loaded it on /dev
 #device nodes created by kernel in initrd are all 'root' group.
@@ -416,9 +391,6 @@ else
 fi
 [ "$DISTRO_TARGETARCH" = "x86" ] && sleep 0.3
 
-# kernel polling - https://lwn.net/Articles/423619/
-echo 5000 > /sys/module/block/parameters/events_dfl_poll_msecs
-
 #replay uevents from /sys...
 for ONEMODALIAS in $MODALIASES
 do
@@ -449,45 +421,6 @@ if [ $PUPMODE -eq 2 ] ; then #full hd installation.
    ) >> /etc/rc.d/PUPSTATE
 fi
 
-[ ! -d /proc/acpi ] && modprobe apm #load apm.ko if no acpi.
-modprobe input-leds 2>/dev/null #for >= k4.2x
-
-### /var/local/xorg_udev is created when X.Org is present and:
-### - a touchscreen has been detected
-### - missing xorg input-kbd and input-mouse drivers [ex: ubuntu xenial]
-ISITAMAC=`grep -i -m 1 '^Apple' /sys/class/dmi/id/board_vendor`
-if [ -e /usr/bin/X ] ; then
-  XORG_UDEV=0
-  if [ -n "$ISITAMAC" ] ; then
-    echo "MAC detected: $ISITAMAC"
-    XORG_UDEV=1
-  else
-    [ -f /lib64/libc.so.6 ] && lsuffix=64 || lsuffix= #slackware64
-    if [ ! -f /usr/lib${lsuffix}/xorg/modules/input/kbd_drv.so -a ! -f /usr/lib${lsuffix}/xorg/modules/input/mouse_drv.so ] ; then
-      echo "XORG_UDEV=1: Xorg kbd_drv.so and mouse_drv.so are missing"
-      XORG_UDEV=1
-    else
-      TOUCHSCREEN="$(udevadm info --export-db | grep -m 1 ID_INPUT_TOUCHSCREEN=1)"
-      if [ -n "$TOUCHSCREEN" ] ; then
-        echo "Touchscreen detected: $TOUCHSCREEN"
-        XORG_UDEV=1
-      else
-        case $(uname -m) in arm*|aarch*) XORG_UDEV=1 ;; esac
-      fi
-    fi
-  fi
-
-  if [ "$XORG_UDEV" = '1' ] ; then
-    echo "Activating Xorg Evdev"
-    [ ! -f /var/local/xorg_udev ] && rm -fv /etc/X11/xorg.conf #force xorgwizard-automatic
-    touch /var/local/xorg_udev
-  else
-    echo "Deactivating Xorg Evdev"
-    [ -f /var/local/xorg_udev ] && rm -fv /etc/X11/xorg.conf #force xorgwizard-automatic
-    rm -fv /var/local/xorg_udev
-  fi
-fi
-
 status_func 0
 
 #################MISC. SYSTEM SETUP#################
@@ -495,20 +428,7 @@ echo "MISC. SYSTEM SETUP"
 
 echo -e "${DISTRO_NAME}\n`uname -s` `uname -r` [`uname -m` arch]\n\n" > /etc/issue
 
-# see https://www.frozentux.net/iptables-tutorial/other/ip_dynaddr.txt
-# turn on special handling of dynamic addresses - quiet mode
-echo "1" > /proc/sys/net/ipv4/ip_dynaddr
-
 hostname -F /etc/hostname
-
-# /mnt/+... are mountpoints created by filemnt
-# but the dirs can remain after being unmounted or after an improper shutdown..
-for i in $(ls -d /mnt/+* 2>/dev/null) $(ls -d /media/+* 2>/dev/null) ; do
-	rmdir $i 2>/dev/null
-done
-
-mkdir -p /var/local/shared
-chmod 777 /var/local/shared
 
 ################WAIT MODULES LOADED##################
 echo "WAIT MODULES LOADED"
@@ -555,34 +475,6 @@ else
  fi
 fi
 
-if [ "$USBBUILTIN" = "no" ];then #110712
- #wait for usb-storage drives to become available...(already done if initrd)
- #note, udevd logs to this file when load modules
- # (the latter via udev handler script /sbin/pup_event_backend_modprobe)...
- #101119 /tmp/pup_event_backend/pup_event_module_devpath_log* now multiple files (see /sbin/pup_event_backend_modprobe)
- if [ "`cat /tmp/pup_event_backend/pup_event_module_devpath_log* | grep -m 1 'usb_storage'`" != "" ];then #see pup_event_backend_modprobe
-  echo -n " usb-storage"  >/dev/console
-  while [ $WAITCNT -lt 15 ];do
-   [ "`dmesg | grep -m 1 'usb-storage: device scan complete'`" != "" ] && break
-   sleep 1
-   WAITCNT=`expr $WAITCNT + 1`
-   echo -n " $WAITCNT" >/dev/console
-  done
-  #precaution, make sure have got them all... need sort -u...
-  USBSTORAGES=`dmesg | grep "usb-storage: device found at" | sort -u | wc -l`
-  while [ $WAITCNT -lt 15 ];do
-   AVAILABLEUSBSTORAGES=`dmesg | grep "usb-storage: device scan complete" | wc -l`
-   [ $AVAILABLEUSBSTORAGES -ge $USBSTORAGES ] && break
-   sleep 1
-   WAITCNT=`expr $WAITCNT + 1`
-   echo -n " $WAITCNT" >/dev/console
-  done
- fi
-
- sleep 1 #v411 a bit extra. rerwin reports usb mouse detection problem some hardware.
-         #(delay before usb mouse info appears in /proc/bus/input/devices)
-fi
-
 udevadm trigger #--action=add --subsystem-match="input" --subsystem-match="sound" --subsystem-match="power_supply"
 udevadm settle -t 20
 
@@ -611,77 +503,12 @@ cp --preserve=all --recursive --update /etc/udev/devices/* /dev 2> /dev/null
 
 status_func 0
 
-##############USER SELECTED MODULES##################
-echo "USER SELECTED MODULES"
-#the user can select extra modules to load in the BootManager...
-if [ "$ADDLIST" != "" ];then #variable is in /etc/rc.d/MODULESCONFIG
- echo -n "Loading user-selected modules..." >/dev/console
- for MODULE in $ADDLIST
- do
-  MPARAMS=""
-  if [ `echo -n "$MODULE" | tr ':' ' ' | wc -w` -gt 1 ];then
-   MPARAMS="`echo -n "$MODULE" | cut -f 2-9 -d ':' | tr ':' ' '`"
-   MODULE="`echo -n "$MODULE" | cut -f 1 -d ':'`"
-  fi
-  echo -n " $MODULE" >/dev/console
-  echo "Loading module $MODULE $MPARAMS"
-  modprobe $MODULE $MPARAMS
- done
- status_func 0
-fi
-
-##############platform adjustments################## see fd64's #rc.platform
-###  - do it before we configure network and services
-# detect if it's MacBookPro (mavrothal)
-is_mbp="`dmesg | grep -i -m 1 macbookpro`"
-if [ "$is_mbp" ] ; then
-	# enable gpe suppression and mbpfan
-	chmod 755 /etc/init.d/z-disable-spurious-gpe
-	if [ -f /etc/init.d/15-mbpfan ] ; then
-		chmod 755 /etc/init.d/15-mbpfan
-	fi
-fi
-
 ###################SETUP SERVICES################
 echo "SETUP SERVICES"
 echo -n "Setting up services (network" >/dev/console
-if [ -h /dev/modem ];then
- DEVM="`readlink /dev/modem`"
- case $DEVM in
-  modem) #error, circular link.
-   rm -f /dev/modem
-   DEVM=""
-  ;;
-  /dev/*) #wrong format.
-   DEVM="`echo -n "$DEVM" | cut -f 3,4 -d '/'`"
-   ln -svnf $DEVM /dev/modem
-  ;;
- esac
- case $DEVM in
-  ttyS[0-9]) #apparently setserial can crash with other modems.
-   setserial -v -b /dev/modem auto_irq skip_test autoconfig
-  ;;
- esac
-fi
 
 #had hoped to retire this, but HardInfo, Pupscan need it... 110814 fix test...
 [ -e /proc/bus/usb ] && busybox mount -t usbfs none /proc/bus/usb
-
-#only needed for 2.6.21.7, as 2.6.25.x loads these automatically...
-#explicitly load battery, ac, thermal, fan modules.
-modprobe battery
-if [ -z "$ISITAMAC" ];then #don't run this block on mac
- if [ -d /proc/acpi/battery ]; then
-  results="`find /proc/acpi/battery -mindepth 1 -type d`"
-  if [ ! -z "$results" ]; then
-   modprobe ac
-   modprobe thermal
-   modprobe fan
-  else
-   rmmod battery
-  fi
- fi
-fi
 
 # dbus
 DBUS_UUIDGEN=`command -v dbus-uuidgen`
@@ -705,16 +532,6 @@ fi
 # enable ktls, in case all internet-facing processes run as spot and cannot load tls
 modprobe tls 2>/dev/null
 
-#----------------------
-(
- sleep 5 # in some cases network modules take some time to load
- #100814 100903 record cumulative tx/rx, see also network_tray and rc.shutdown.
- #181209 tx/rx logic now included in network_default_connect...
- # Connect "current" or default network through eth0, frisbee, sns, network wizard, pgprs-connect, etc.
- network_default_connect --sysinit #181209
-) &
-#----------------------
-
 echo -n ", printing, etc.)..." >/dev/console
 
 # wireless passed from init
@@ -732,23 +549,6 @@ fi
 /etc/rc.d/rc.services & #run scripts in /etc/rc.d/init.d
 #----------------------
 echo -e "\\033[64G\\033[1;33m[backgrounded]\\033[0;39m" >/dev/console #column 62, yellow. 110426: 64
-
-############RECOGNISE MEDIA DEVICES################
-echo "RECOGNISE MEDIA DEVICES"
-STATUS=0
-echo -n "Recognising media devices..." >/dev/console
-
-echo -n ' optical' >/dev/console #optical drives
-CDTYPE="" ; DVDTYPE=""
-rm -f /dev/cdrom /dev/dvd /etc/cdburnerdevice 2>/dev/null
-if [ -e /dev/sr0 ] ; then
-	ln -snfv /dev/sr0 /dev/cdrom
-	ln -snfv /dev/sr0 /dev/dvd
-fi
-
-echo -n ' input' >/dev/console #input
-echo -n "input/mice" > /etc/mousedevice
-ln -snfv input/mice /dev/mouse
 
 #---- rc.country
 /etc/rc.d/rc.country

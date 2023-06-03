@@ -1,13 +1,13 @@
 layout {
   image {
-    value = "directory"
+    value = "inode-directory"
     action = "defaultfilemanager"
     tooltip = "Launch file manager"
     css = "* { min-height: 28px; min-width: 28px; padding: 2px; }"
   }
 
   image {
-    value = "browser"
+    value = "web-browser"
     action = "defaultbrowser"
     tooltip = "Launch browser"
     css = "* { min-height: 28px; min-width: 28px; padding: 2px; }"

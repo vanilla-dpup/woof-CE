@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# slacko
-mkdir -p bin
-if [ -f install/doinst.sh ] ; then
-	sed -i 's/ldconfig/zzldconfig/' install/doinst.sh
-fi

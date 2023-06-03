@@ -1,0 +1,16 @@
+#!/bin/ash
+
+BACKGROUNDS=`ls /usr/share/backgrounds/*.svg /usr/share/backgrounds/*.png /usr/share/backgrounds/*.jpg 2>/dev/null | sed s~.*/~~g`
+while :; do
+	CHOICE=`yad --title "Wallpaper setter" --window-icon=gtk-preferences --height=300 --list --no-headers --column=theme --print-column=1 --separator= -- "Solid color" $BACKGROUNDS`
+	[ -z "$CHOICE" ] && break
+
+	if [ "$CHOICE" = "Solid color" ]; then
+		CHOICE=`yad --title "Wallpaper setter" --window-icon=gtk-preferences --height=300 --color`
+		[ -z "$CHOICE" ] && break
+		sed -i "s~^Exec=.*~Exec=swaybg -c \"${CHOICE}\"~" ~/.config/autostart/swaybg.desktop
+	else
+		sed -i "s~^Exec=.*~Exec=swaybg -i \"/usr/share/backgrounds/${CHOICE}\" -m stretch~" ~/.config/autostart/swaybg.desktop
+	fi
+	set_bg
+done

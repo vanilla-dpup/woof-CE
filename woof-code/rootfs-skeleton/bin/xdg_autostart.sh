@@ -44,6 +44,9 @@ do
 	if ! [ -f $i ] ; then
 		continue
 	fi
+	case "$i" in
+	/etc/xdg/autostart/blueman.desktop|/etc/xdg/autostart/org.gnome.Software.desktop) continue ;;
+	esac
 	if ! verify_not_running $i ; then
 		continue
 	fi

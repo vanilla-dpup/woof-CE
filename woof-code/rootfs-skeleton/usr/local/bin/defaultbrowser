@@ -1,2 +1,1 @@
-#!/bin/ash
-exec mozstart "$@"
+../../bin/x-www-browser

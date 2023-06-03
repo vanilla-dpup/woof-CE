@@ -1,3 +1,0 @@
-#!/bin/ash
-type lxterminal >/dev/null 2>&1 && exec lxterminal "$@"
-exec urxvt "$@"

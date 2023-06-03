@@ -274,13 +274,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
     [ -f ${OLDFILESMNTPT}/etc/rc.d/${i} ] && cp -af ${NEWFILESMNTPT}/etc/rc.d/${i} /etc/rc.d/
  done
 
- SKIPLIST="`grep '^SKIPLIST' /etc/rc.d/MODULESCONFIG | cut -f 2 -d '"'`" #geany'
- ADDLIST="`grep '^ADDLIST' /etc/rc.d/MODULESCONFIG | cut -f 2 -d "'"`" #geany'
- REGEX1="s%^SKIPLIST.*%SKIPLIST=\"${SKIPLIST}\"%"
- REGEX2="s%^ADDLIST.*%ADDLIST='${ADDLIST}'%"
- cp -af ${NEWFILESMNTPT}/etc/rc.d/MODULESCONFIG /etc/rc.d/
- sed -i -e "${REGEX1}" -e "${REGEX2}" /etc/rc.d/MODULESCONFIG
- 
  #problem, as overwrites LANG setting...
  xLANG="`grep '^LANG=' /etc/profile | cut -f 2 -d '=' | cut -f 1 -d ' '`"
  #110216 still not working. so, do this bad hack (see rc.shutdown)...

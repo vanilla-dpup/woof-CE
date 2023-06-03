@@ -1,6 +1,0 @@
-find -L -type f -and \( -name '*.so*' -or -name '*.conf*' \) | while read FILE; do
-    case "$FILE" in
-    *pulse*) ;;
-    *) rm -vf "$FILE" ;;
-    esac
-done

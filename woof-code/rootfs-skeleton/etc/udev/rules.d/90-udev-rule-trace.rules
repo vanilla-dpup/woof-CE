@@ -1,3 +1,0 @@
-#Trace all uevents to /tmp/udevtrace.log
-
-SUBSYSTEM=="?*", RUN+="/bin/sh -c 'echo $env{ACTION}_%k_$env{SUBSYSTEM}_%s{vendor}_%s{device}_%s{modalias} >> /tmp/udevtrace.log'"

@@ -1,8 +1,0 @@
-layout {
-  image {
-    value = "shutdown"
-    action = "logout_gui"
-    tooltip = "Logout"
-    css = "* { min-height: 28px; min-width: 28px; padding: 2px; }"
-  }
-} 
