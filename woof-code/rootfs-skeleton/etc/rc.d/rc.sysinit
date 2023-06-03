@@ -550,9 +550,6 @@ fi
 #----------------------
 echo -e "\\033[64G\\033[1;33m[backgrounded]\\033[0;39m" >/dev/console #column 62, yellow. 110426: 64
 
-#---- rc.country
-/etc/rc.d/rc.country
-
 ###################PERSONAL BOOT SCRIPT######################
 echo "PERSONAL BOOT SCRIPT"
 #personal boot script here...
