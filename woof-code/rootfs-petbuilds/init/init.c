@@ -145,8 +145,6 @@ int main(int argc, char *argv[])
 	}
 
 shutdown:
-	script("/etc/rc.d/rc.shutdown");
-
 	ret = kill(-1, SIGTERM);
 	delay(2);
 	if (ret == 0)
