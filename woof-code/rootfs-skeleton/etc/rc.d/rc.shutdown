@@ -310,7 +310,6 @@ case $PUPMODE in
   umount $SMNTPT 2> /dev/null
  ;;
 
- 77) /usr/sbin/savesession-dvd ;; #requires /tmp/rc.shutdown_config - save to folder on multisession CD/DVD (including 1st shutdown)
  2)  echo -n ;; #echo "$(printf "$(gettext '%s mounted directly, session already saved.')" "$PDEV1")" >/dev/console
  12) echo "$(printf "$(gettext '%s mounted directly top layer, session already saved.')" "${SAVEFILE##*/}")" >/dev/console ;;
  13) #PDEV1 and PUPSFS and PUPSAVE 
@@ -327,22 +326,6 @@ case $PUPMODE in
   if [ $retval -eq 0 ]; then 
     echo "$(printf "$(gettext 'Saving session to %s (%s)...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
     /usr/sbin/snapmergepuppy /initrd/pup_ro1 /initrd/pup_rw
-  fi 
-  ;;
- 66) #every shutdown, save to archive - for vfat
-  if [ "$(blkid /dev/${PUPSAVE%%,*})" = "" ]; then
-    echo "$(gettext "Session not saved")" >/dev/console
-    STATUS=1
-  elif [ -e /tmp/rc.shutdown_config ]; then #is after shutdownconfig
-    STATUS=0
-  else
-    RAMSAVEINTERVAL=''
-    ASKTOSAVE='true'
-    asktosave_func
-    STATUS=$?
-  fi
-  if [ $STATUS -eq 0 ]; then
-    /usr/sbin/savesession-archive
   fi 
   ;;
  *)
