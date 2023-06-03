@@ -131,17 +131,17 @@ int main(int argc, char *argv[])
 	if ((pid = cttyhack(0)) < 0) goto shutdown;
 
 	while (1) {
-		if ((sigwaitinfo(&mask, &sig) < 0) || (sig.si_signo != SIGCHLD)) break;
-
-		if ((reaped = waitpid(sig.si_pid, &status, WNOHANG)) < 0) {
-			if (errno != ECHILD) break;
-			continue;
+		if (sigwaitinfo(&mask, &sig) < 0) {
+			if (errno == EINTR) continue;
+			break;
 		}
-		else if (reaped == 0) continue;
 
-		if (!WIFEXITED(status) && !WIFSIGNALED(status)) continue;
+		if (sig.si_signo != SIGCHLD) break;
 
-		if (sig.si_pid == pid && (pid = cttyhack(RESPAWN_DELAY)) < 0) break;
+		while ((reaped = waitpid(-1, &status, WNOHANG)) > 0) {
+			if (!WIFEXITED(status) && !WIFSIGNALED(status)) continue;
+			if (reaped == pid && (pid = cttyhack(RESPAWN_DELAY)) < 0) break;
+		}
 	}
 
 shutdown:
