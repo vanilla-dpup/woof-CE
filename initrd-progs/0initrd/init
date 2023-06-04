@@ -1167,7 +1167,7 @@ fi
 #load savefile if required, then setup stack
 case $PUPMODE in
  13)
-  [ $PUPMODE -eq 13 ] && setup_psave
+  setup_psave
   if [ "$PUPSAVE" ] ; then
     #prepend ro1 - #SAVE_LAYER=/pup_ro1
     rm -rf ${SAVE_LAYER}/tmp #in case last boot was pupmode=12
@@ -1372,6 +1372,6 @@ umount /dev
 umount /proc
 
 #now using cpio archive for initramfs 'initial ramdisk'...
-exec switch_root /pup_new /sbin/init
+exec switch_root /pup_new /usr/local/sbin/init
 
 ###END###

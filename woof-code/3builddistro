@@ -193,7 +193,6 @@ mv docx/usr/share/doc/puppylogo*.png rootfs-complete/usr/share/doc/
 
 cd ../initrd-progs
 cp -f ../DISTRO_SPECS .
-sed -i "s~ /sbin/init$~ /usr/local/sbin/init~" 0initrd/init 0initrd/sbin/switch
 ./build.sh -arch ${DISTRO_TARGETARCH}
 
 cd ../kernel-kit/output
