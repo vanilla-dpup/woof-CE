@@ -167,6 +167,14 @@ mkdir -p nlsx/usr/share/locale
 mv rootfs-complete/usr/share/locale/* nlsx/usr/share/locale/
 mv nlsx/usr/share/locale/locale.alias rootfs-complete/usr/share/locale/
 
+if [ -d rootfs-complete/usr/lib/firefox-esr/browser/extensions ]; then
+	mkdir -p nlsx/usr/lib/firefox-esr/browser/extensions
+	mv -f rootfs-complete/usr/lib/firefox-esr/browser/extensions/langpack-* nlsx/usr/lib/firefox-esr/browser/extensions/
+elif [ -d rootfs-complete/usr/lib/firefox/browser/extensions ]; then
+	mkdir -p nlsx/usr/lib/firefox/browser/extensions
+	mv -f rootfs-complete/usr/lib/firefox/browser/extensions/langpack-* nlsx/usr/lib/firefox/browser/extensions/
+fi
+
 mkdir -p nlsx/usr/share/fonts/truetype/noto
 mv -f rootfs-complete/usr/share/fonts/truetype/noto/*.ttf nlsx/usr/share/fonts/truetype/noto/
 mv -f nlsx/usr/share/fonts/truetype/noto/{NotoSans,NotoSerif,NotoMono}-*.ttf nlsx/usr/share/fonts/truetype/noto/NotoColorEmoji.ttf rootfs-complete/usr/share/fonts/truetype/noto/
