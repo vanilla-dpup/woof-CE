@@ -1,0 +1,19 @@
+download() {
+    if [ ! -f gplaces-0.17.6.tar ]; then
+        git clone https://github.com/dimkr/gplaces gplaces-0.17.6
+        cd gplaces-0.17.6
+        git checkout v0.17.6
+        git submodule update --init --recursive
+        cd ..
+        rm -rf gplaces-0.17.6/.git* gplaces-0.17.6/bestline/.git*
+        tar -c gplaces-0.17.6 --mtime=@0 --sort=name > gplaces-0.17.6.tar
+        rm -rf gplaces-0.17.6
+    fi
+}
+
+build() {
+    tar -xf gplaces-0.17.6.tar
+    cd gplaces-0.17.6
+    make CC=gcc VERSION=0.17.6 PREFIX=/usr CONFDIR=/etc install
+    sed -i 's/^Categories=.*/Categories=X-Internet-utility;/' /usr/share/applications/gplaces.desktop
+}
