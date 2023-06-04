@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 #(c) Copyright Barry Kauler sept. 2011 bkhome.org
 #2011 GPL licence v3 (/usr/share/doc/legal)
 #the idea of this script is that it is called when PUPMODE==5 by scripts
@@ -159,7 +159,7 @@ choosepartfunc() {
  if [ "$expBOOTDRV" = "" ];then
   T_finntitle="$(gettext 'First shutdown: get ready')"
   if [ "$PDEV1_ISOPTICAL" ] ; then
-    T_iso="`eval_gettext \"You have booted off a live-CD or DVD, and you can now save your personal settings and files to a USB Flash drive or any hard drive partition.`"
+    T_iso="`eval_gettext \"You have booted off a live-CD or DVD, and you can now save your personal settings and files to a USB Flash drive or any hard drive partition.\"`"
     ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_finntitle" --colors --ok-label "$T_continue" --cancel-label "$T_abort" --yesno "$T_yesno" 0 0
    SAVECHOICE=$?
    [ ! $SAVECHOICE -eq 0 ] && return 3 #skip. 
