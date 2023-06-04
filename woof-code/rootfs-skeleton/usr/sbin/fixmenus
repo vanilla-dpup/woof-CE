@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ash
 #v2.14 Puppy now has XDG menus.
 #this script builds the menus from template files.
 #Any templates can be placed into /etc/xdg/templates, and the file must be
