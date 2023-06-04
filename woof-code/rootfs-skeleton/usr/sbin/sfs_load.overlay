@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ash
 
 . /etc/rc.d/BOOTCONFIG
 . /etc/rc.d/PUPSTATE

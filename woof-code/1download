@@ -131,10 +131,6 @@ chroot rootfs apt-get install -y $PKGS
 chroot rootfs apt-get install -y busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc command-not-found gnome-software
 [ -e rootfs/usr/bin/flatpak ] && chroot rootfs apt-get install -y gnome-software-plugin-flatpak
 
-# set bash as the default shell
-rm -f rootfs/bin/sh
-ln -s bash rootfs/bin/sh
-
 # impersonate Puppy
 install -m 644 ../DISTRO_SPECS rootfs/etc/DISTRO_SPECS
 

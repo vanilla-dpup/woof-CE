@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ash
 #(c) Copyright Barry Kauler sept. 2011 bkhome.org
 #2011 GPL licence v3 (/usr/share/doc/legal)
 #the idea of this script is that it is called when PUPMODE==5 by scripts

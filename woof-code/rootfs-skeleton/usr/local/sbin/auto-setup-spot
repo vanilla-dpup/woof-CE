@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ash
 
 # this script is a best-effort attempt to configure problematic applications to run as spot
 
