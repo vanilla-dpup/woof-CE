@@ -95,6 +95,10 @@ static int script(const char *path)
 		    (sigprocmask(SIG_UNBLOCK, &mask, NULL) < 0))
 			exit(EXIT_FAILURE);
 
+		close(STDIN_FILENO);
+		close(STDOUT_FILENO);
+		close(STDERR_FILENO);
+
 		execl(path, path, (char *)NULL);
 		exit(EXIT_FAILURE);
 	}

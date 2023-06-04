@@ -115,6 +115,11 @@ ln -s /usr/share/fontconfig/conf.avail/10-hinting-none.conf rootfs-complete/etc/
 
 echo "MOZ_ENABLE_WAYLAND=1" >> rootfs-complete/etc/environment
 
+cat << EOF > rootfs-complete/etc/issue
+$DISTRO_NAME
+
+EOF
+
 chroot rootfs-complete /usr/sbin/firewall_ng enable
 
 cd rootfs-complete

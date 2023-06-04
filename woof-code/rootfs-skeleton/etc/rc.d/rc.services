@@ -1,8 +1,9 @@
 #!/bin/ash
 
-/etc/init.d/dbus start
-
-for S in /etc/init.d/*
+for S in /etc/rc5.d/*
 do
-        [ -x "$S" -a "$S" != /etc/init.d/dbus -a "$S" != /etc/init.d/udev -a "$S" != /etc/init.d/elogind ] && $S start
+	case "${S##*/}" in
+	README|*dbus|*udev|*elogind|*bootlogs|*rc.local) ;;
+	*) [ -x "$S" ] && $S $1 ;;
+	esac
 done
