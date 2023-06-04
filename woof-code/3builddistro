@@ -48,12 +48,16 @@ echo "LC_ALL=en_US.UTF-8" >> rootfs-complete/etc/environment
 # wireplumber fails to start if the logind module is enabled but logind is broken
 rm -f rootfs-complete/usr/lib/*/wireplumber-*/libwireplumber-module-logind.so
 
+# su hangs if logind is not running
+rm -f rootfs-complete/lib/*/security/pam_elogind.so
+
 cat << EOF >> rootfs-complete/etc/apt/apt.conf.d/00puppy
 # https://github.com/debuerreotype/debuerreotype/blob/6952be0a084e834bd25aa623c94f6ad342899b55/scripts/debuerreotype-minimizing-config#L88
 DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 DPkg::Post-Invoke { "/usr/local/sbin/auto-setup-spot"; };
 DPkg::Post-Invoke { "rm -f /usr/lib/*/wireplumber-*/libwireplumber-module-logind.so || true"; };
+DPkg::Post-Invoke { "rm -f /lib/*/security/pam_elogind.so || true"; };
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
 
