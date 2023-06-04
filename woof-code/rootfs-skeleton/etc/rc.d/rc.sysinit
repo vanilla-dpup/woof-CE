@@ -501,25 +501,6 @@ echo -n "Setting up services (network" >/dev/console
 #had hoped to retire this, but HardInfo, Pupscan need it... 110814 fix test...
 [ -e /proc/bus/usb ] && busybox mount -t usbfs none /proc/bus/usb
 
-# dbus
-DBUS_UUIDGEN=`command -v dbus-uuidgen`
-if [ -n "$DBUS_UUIDGEN" ] ; then
-	mkdir -p /var/lib/dbus /var/run/dbus
-	rm -f /var/lib/dbus/machine-id /etc/machine-id
-	chown messagebus /var/run/dbus
-	chgrp messagebus /var/run/dbus
-	"$DBUS_UUIDGEN" > /var/lib/dbus/machine-id
-	ln -snf /var/lib/dbus/machine-id /etc/machine-id
-	ln -snf /var/run/dbus /run/dbus
-fi
-
-#start dbus-daemon
-DBUS_DAEMON=`command -v dbus-daemon`
-if [ -n "$DBUS_DAEMON" ] ; then
- rm -f /run/dbus/pid
- "$DBUS_DAEMON" --system
-fi
-
 # enable ktls, in case all internet-facing processes run as spot and cannot load tls
 modprobe tls 2>/dev/null
 

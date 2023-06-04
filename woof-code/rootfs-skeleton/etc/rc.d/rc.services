@@ -1,5 +1,7 @@
 #!/bin/ash
 
+/etc/init.d/dbus start
+
 for S in /etc/init.d/*
 do
         [ -x "$S" -a "$S" != /etc/init.d/dbus -a "$S" != /etc/init.d/udev -a "$S" != /etc/init.d/elogind ] && $S start
