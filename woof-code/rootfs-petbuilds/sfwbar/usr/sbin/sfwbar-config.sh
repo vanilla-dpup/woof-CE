@@ -145,7 +145,7 @@ fi
 
 DEFRAD_NR=$(grep -n 'button {' ~/.config/sfwbar/sfwbar.config)
 read -d ';' j DEFRAD <<<$(sed -n $((${DEFRAD_NR%%\:*} + 3))p $HOME/.config/sfwbar/sfwbar.config)
-DEFSIZE=$(grep -o 'min-width.*;' $HOME/.config/sfwbar/logout.widget|grep -o '[0-9][0-9]px')
+DEFSIZE=$(grep -o 'min-width.*;' $HOME/.config/sfwbar/launcher.widget|grep -o '[0-9][0-9]px'|head -n 1)
 DEFRAD=${DEFRAD/px/}
 DEFSIZE=${DEFSIZE/px/}
 
