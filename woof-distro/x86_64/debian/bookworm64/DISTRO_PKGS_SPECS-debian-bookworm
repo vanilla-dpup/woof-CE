@@ -115,7 +115,7 @@ yes|netpbm|netpbm|exe,dev,doc,nls||deps:yes # dependency of wl_colpick
 yes|net-tools|net-tools|exe,dev,doc,nls||deps:yes
 yes|notification-daemon|notification-daemon|exe>null,dev>null,doc>null,nls>null
 yes|nscd|unscd|exe||deps:yes
-yes|ntfs-3g|ntfs-3g|exe,dev,doc,nls||deps:yes
+no|ntfs-3g|ntfs-3g|exe,dev,doc,nls||deps:yes
 yes|ntpdate|ntpdate|exe,dev>exe,doc,nls||deps:yes #used by psync to sync local time and date from the internet.
 yes|numix-gtk-theme|numix-gtk-theme|exe,dev,doc,nls||deps:yes
 yes|openssh-client|openssh-client|exe,dev,doc,nls||deps:yes
@@ -131,7 +131,7 @@ yes|procps|procps|exe,dev,doc,nls||deps:yes
 yes|psmisc|psmisc|exe,dev>null,doc,nls||deps:yes
 yes|pulseaudio-compat|libpulse0,libpulse-dev,pulseaudio-utils|exe,dev,doc,nls||deps:yes
 yes|python|python-is-python3,python3|exe,dev,doc,nls||deps:yes
-yes|python3-pkg-resources|python3-pkg-resources|exe,dev,doc,nls||deps:yes # dependency of gdebi
+no|python3-pkg-resources|python3-pkg-resources|exe,dev,doc,nls||deps:yes # dependency of gdebi
 yes|readline|libreadline8,libreadline-dev,readline-common|exe,dev,doc,nls||deps:yes
 yes|rsync|rsync|exe,dev,doc,nls||deps:yes
 yes|sed|sed|exe,dev>null,doc,nls||deps:yes
