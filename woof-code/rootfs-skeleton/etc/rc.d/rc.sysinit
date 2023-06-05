@@ -284,6 +284,7 @@ echo -n "Setting up services (network" >/dev/console
 #had hoped to retire this, but HardInfo, Pupscan need it... 110814 fix test...
 [ -e /proc/bus/usb ] && busybox mount -t usbfs none /proc/bus/usb
 
+/etc/init.d/hostname.sh start
 /etc/init.d/dbus start
 
 # enable ktls, in case all internet-facing processes run as spot and cannot load tls
