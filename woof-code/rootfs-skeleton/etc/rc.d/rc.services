@@ -1,5 +1,7 @@
 #!/bin/ash
 
+[ -x /etc/init.d/rc.firewall ] && /etc/init.d/rc.firewall $1
+
 for S in /etc/rc5.d/*
 do
 	case "${S##*/}" in
