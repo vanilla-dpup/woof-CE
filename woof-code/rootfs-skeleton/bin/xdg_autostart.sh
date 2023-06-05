@@ -30,7 +30,7 @@ run_desktop() {
 	while read j
 	do
 		case $j in "Exec="*)
-			sh -c "${j#Exec=}" &
+			ash -c "${j#Exec=}" &
 			break
 			;;
 		esac
