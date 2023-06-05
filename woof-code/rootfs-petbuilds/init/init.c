@@ -22,6 +22,16 @@ static inline void do_autoclose(void *fdp)
 
 #define autoclose __attribute__((cleanup(do_autoclose)))
 
+static void cat(const char *path)
+{
+	static char buf[512];
+	size_t len;
+	autoclose int fd = -1;
+
+	if ((fd = open(path, O_RDONLY)) < 0) return;
+	while ((len = read(fd, buf, sizeof(buf))) > 0 && write(STDOUT_FILENO, buf, len) == len);
+}
+
 static void fakelogin(void)
 {
 	struct passwd *user;
@@ -33,6 +43,8 @@ static void fakelogin(void)
 	    (setenv("SHELL", user->pw_shell, 1) < 0) ||
 	    (chdir(user->pw_dir) < 0))
 		return;
+
+	cat("/etc/motd");
 
 	execlp(user->pw_shell, user->pw_shell, "-l", (char *)NULL);
 }
@@ -131,6 +143,8 @@ int main(int argc, char *argv[])
 	if (script("/etc/rc.d/rc.sysinit") < 0) goto shutdown;
 
 	write(STDOUT_FILENO, CLEAR_TTY, sizeof(CLEAR_TTY) - 1);
+
+	cat("/etc/issue");
 
 	if ((pid = cttyhack(0)) < 0) goto shutdown;
 
