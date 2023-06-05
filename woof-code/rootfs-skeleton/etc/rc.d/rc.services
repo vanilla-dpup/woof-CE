@@ -1,6 +1,8 @@
 #!/bin/ash
 
-[ -x /etc/init.d/rc.firewall ] && /etc/init.d/rc.firewall $1
+for S in rc.firewall trim; do
+	[ -x /etc/init.d/$S ] && /etc/init.d/$S $1
+done
 
 for S in /etc/rc5.d/*
 do
