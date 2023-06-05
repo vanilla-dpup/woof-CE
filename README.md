@@ -1,5 +1,7 @@
 # woof - the Puppy builder
 
+## Overview
+
 This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE) that strips woof-CE down to the bare essentials.
 
 * Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap).
@@ -15,3 +17,54 @@ This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE) that 
 * coreutils, util-linux, etc' are not replaced with symlinks to busybox, because this breaks compatibility with the upstream distro.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
 * Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster.
+
+## Configuration Files
+
+### /etc/environment
+
+This file defines environment variables for the user's interactive shell and all descendant processes, including the compositor.
+
+Among other things, this file defines the dwl background and window border color.
+
+### ~/.libinputrc
+
+This file defines input device (mouse and touchpad) settings.
+
+For example, to enable left-handed mode:
+
+	LIBINPUT_DEFAULT_LEFT_HANDED=1
+
+### ~/.xkbrc
+
+This file defines keyboard settings.
+
+For example, to enable English and Hebrew with Alt+Shift to switch between the two:
+
+	XKB_DEFAULT_LAYOUT=us,il
+	XKB_DEFAULT_OPTIONS=grp:alt_shift_toggle
+
+### ~/.config/autostart/swayidle.desktop
+
+This configures auto-start of swayidle, which turns off the screen after 600 seconds of inactivity.
+
+You can disable swayidle by deleting this file, or change the interval via ~/.config/swayidle/config.
+
+### ~/.config/autostart/swaybg.desktop
+
+This configures auto-start of swaybg and defines the background color or image to display.
+
+### /etc/init.d/trim
+
+This script runs at boot time and implements periodic TRIM.
+
+To disable it:
+
+	chmod -x /etc/init.d/trim
+
+### /etc/rc.d/rc.local
+
+This script can be used to run extra initialization steps at the end of the boot process.
+
+### ~/.dwlinitrc
+
+This script runs as dwl's child process and handles application auto-start.
