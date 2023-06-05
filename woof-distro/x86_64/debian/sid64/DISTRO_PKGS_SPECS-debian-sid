@@ -44,7 +44,7 @@ yes|binutils|binutils|exe,dev>exe,doc,nls||deps:yes
 yes|blueman|blueman|exe,dev,doc,nls||deps:yes
 yes|bluez|bluez,bluez-obexd|exe,dev,doc,nls||deps:yes
 yes|bzip2|bzip2|exe,dev,doc,nls||deps:yes
-yes|breeze-cursor-theme|breeze-cursor-theme|exe,dev,doc,nls||deps:yes
+no|breeze-cursor-theme|breeze-cursor-theme|exe,dev,doc,nls||deps:yes
 yes|brightnessctl|brightnessctl|exe,dev,doc,nls||deps:yes
 yes|ca-certificates|ca-certificates|exe,dev,doc,nls||deps:yes
 yes|cairo|libcairo2,libcairo2-dev,libcairo-gobject2,libcairo-script-interpreter2|exe,dev,doc,nls||deps:yes
@@ -142,7 +142,7 @@ yes|notification-daemon|notification-daemon|exe>null,dev>null,doc>null,nls>null
 yes|nscd|unscd|exe||deps:yes
 no|ntfs-3g|ntfs-3g|exe,dev,doc,nls||deps:yes
 yes|ntpdate|ntpdate|exe,dev>exe,doc,nls||deps:yes #used by psync to sync local time and date from the internet.
-yes|numix-gtk-theme|numix-gtk-theme|exe,dev,doc,nls||deps:yes
+no|numix-gtk-theme|numix-gtk-theme|exe,dev,doc,nls||deps:yes
 yes|openssh-client|openssh-client|exe,dev,doc,nls||deps:yes
 yes|openssl|openssl,libssl3,libssl-dev|exe,dev,doc,nls||deps:yes #libssl1.0.2 = older libssl
 yes|parted|parted|exe,dev,doc,nls||deps:yes

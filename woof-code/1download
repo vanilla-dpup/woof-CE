@@ -124,7 +124,7 @@ chroot rootfs apt-get upgrade -y
 chroot rootfs apt-mark hold systemd
 
 # install all packages
-PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n' | grep -vE '\-theme$'`
+PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n'`
 chroot rootfs apt-get install -y $PKGS
 
 # add busybox, missing package recommendations, Synaptic and gnome-software
