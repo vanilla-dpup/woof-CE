@@ -68,3 +68,7 @@ This script can be used to run extra initialization steps at the end of the boot
 ### ~/.dwlinitrc
 
 This script runs as dwl's child process and handles application auto-start.
+
+### /var/local/xwin_disable_xerrs_log_flag
+
+Delete this file to enable logging of compositor errors to /tmp/xerrs.log.
