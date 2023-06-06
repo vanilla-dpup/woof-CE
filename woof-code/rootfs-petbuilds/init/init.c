@@ -41,6 +41,14 @@ static void fakelogin(void)
 	if ((setenv("USER", user->pw_name, 1) < 0) ||
 	    (setenv("HOME", user->pw_dir, 1) < 0) ||
 	    (setenv("SHELL", user->pw_shell, 1) < 0) ||
+	    (setenv("XDG_DATA_HOME", "/root/.local/share", 1) < 0) ||
+	    (setenv("XDG_CONFIG_HOME", "/root/.config", 1) < 0) ||
+	    (setenv("XDG_DATA_DIRS", "/usr/share:/usr/local/share", 1) < 0) ||
+	    (setenv("XDG_CONFIG_DIRS", "/etc/xdg", 1) < 0) ||
+	    (setenv("XDG_CACHE_HOME", "/root/.cache", 1) < 0) ||
+	    (setenv("XDG_RUNTIME_DIR", "/tmp/runtime-root", 1) < 0) ||
+	    (setenv("XDG_STATE_HOME", "/root/.local/state", 1) < 0) ||
+	    ((mkdir("/tmp/runtime-root", 0700) < 0 && errno != EEXIST) || (errno == EEXIST && chmod("/tmp/runtime-root", 0700) < 0)) ||
 	    (chdir(user->pw_dir) < 0))
 		return;
 
