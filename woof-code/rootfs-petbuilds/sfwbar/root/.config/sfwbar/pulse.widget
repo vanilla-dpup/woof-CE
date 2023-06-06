@@ -2,10 +2,10 @@ module("pulsectl")
 
 define SoundState = Val(Pulse("sink-volume"))
 define SoundMute = Val(Pulse("sink-mute"))
-define muted = "audio-volume-muted"
-define low = "audio-volume-low"
-define medium = "audio-volume-medium"
-define high = "audio-volume-high"
+define muted = "audio-volume-muted-symbolic"
+define low = "audio-volume-low-symbolic"
+define medium = "audio-volume-medium-symbolic"
+define high = "audio-volume-high-symbolic"
 define SoundIcon = If(Str(SoundMute,0)="1",muted,
     Lookup(SoundState,
       100, high,

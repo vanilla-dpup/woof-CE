@@ -6,10 +6,10 @@ function("net_menu") {
   Menu "net_opts"
 }
 
-define wireless = "pwifi"
-define wired = "pwired"
-define disconnected = "pnot"
-define phone = "pcell"
+define wireless = "network-wireless-symbolic"
+define wired = "network-wired-symbolic"
+define disconnected = "network-offline-symbolic"
+define phone = "network-cellular-symbolic"
 define iface = NetInfo("interface")
 define NetIcon = Map(Mid(iface,0,0),
   "w",wireless,
