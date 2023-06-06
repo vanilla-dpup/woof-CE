@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
 #include <time.h>
@@ -34,7 +35,10 @@ static void cat(const char *path)
 
 static void fakelogin(void)
 {
+	static char buf[512];
+	FILE *fp;
 	struct passwd *user;
+	char *sep, *end;
 
 	if (!(user = getpwuid(geteuid()))) return;
 
@@ -51,6 +55,17 @@ static void fakelogin(void)
 	    ((mkdir("/tmp/runtime-root", 0700) < 0 && errno != EEXIST) || (errno == EEXIST && chmod("/tmp/runtime-root", 0700) < 0)) ||
 	    (chdir(user->pw_dir) < 0))
 		return;
+
+	if ((fp = fopen("/etc/environment", "r"))) {
+		while (fgets(buf, sizeof(buf), fp)) {
+			if (buf[0] == '\0' || buf[0] == '\n' || buf[0] == '#') continue;
+			if (!(sep = strchr(buf, '='))) continue;
+			end = sep + strcspn(sep, " \t\r\n");
+			*sep = *end = '\0';
+			if (setenv(buf, sep + 1, 1) < 0) continue;
+		}
+		fclose(fp);
+	}
 
 	cat("/etc/motd");
 
