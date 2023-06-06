@@ -1,0 +1,16 @@
+#!/bin/sh
+
+interval=`head -n 1 ~/.config/swayidle/config  | awk '{print $2}'`
+if [ "$interval" = 0 ]; then
+	interval=`yad --title swayidle-config --window-icon=user-idle-symbolic --entry --entry-label="Idle interval (minutes)" --entry-text=$interval --button=OK --button=Cancel`
+else
+	interval=`yad --title swayidle-config --window-icon=user-idle-symbolic --entry --entry-label="Idle interval (minutes)" --entry-text=$interval --button=OK --button=Cancel --button=Disable`
+fi
+case $? in
+0) sed -i "s/^timeout [0-9]* /timeout $interval /" ~/.config/swayidle/config ;;
+1) exit ;;
+2) sed -i "s/^timeout [0-9]* /timeout 0 /" ~/.config/swayidle/config ;;
+esac
+
+killall swayidle
+swayidle < /dev/null > /dev/null 2>&1 &

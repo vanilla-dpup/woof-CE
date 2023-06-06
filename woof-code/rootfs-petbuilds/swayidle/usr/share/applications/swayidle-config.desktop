@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=swayidle-config
+Icon=user-idle-symbolic
+Comment=Configure swayidle
+Exec=swayidle-config
+Terminal=false
+Type=Application
+Categories=Screensaver
+GenericName=swayidle-config
