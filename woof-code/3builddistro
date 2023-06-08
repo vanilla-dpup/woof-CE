@@ -1,5 +1,6 @@
 #!/bin/sh
 
+. ./WOOFMERGEVARS
 . ./DISTRO_SPECS
 . ./_00build.conf
 . ./DISTRO_PKGS_SPECS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}
@@ -210,9 +211,4 @@ mksquashfs nlsx build/${NLSXSFS} ${SFSCOMP}
 mksquashfs docx build/${DOCXSFS} ${SFSCOMP}
 mksquashfs rootfs-complete build/${PUPPYSFS} ${SFSCOMP}
 
-install -D -m 644 ../rootfs-skeleton/usr/share/boot-dialog/grldr devx/usr/share/boot-dialog/grldr
-install -m 644 ../rootfs-skeleton/usr/share/boot-dialog/splash.jpg devx/usr/share/boot-dialog/splash.jpg
-rm -rf rootfs-complete-real
-mv rootfs-complete rootfs-complete-real
-ln -s devx rootfs-complete
-../support/mk_iso.sh
+. ../support/pc_image.sh

@@ -10,6 +10,7 @@ This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE) that 
 * Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils.
 * The only supported kind of kernel packages it the "huge" one.
 * Support for aufs is gone.
+* ISO images are gone: the woof-CE build output is a bootable flash drive image.
 * Support for PUPMOEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * All save files use ext4, with or without journaling.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
