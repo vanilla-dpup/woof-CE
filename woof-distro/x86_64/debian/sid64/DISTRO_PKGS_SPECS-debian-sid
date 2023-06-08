@@ -40,7 +40,7 @@ yes|bash|bash|exe,dev,doc,nls||deps:yes
 yes|bash-completion|bash-completion|exe,dev>null,doc,nls||deps:yes
 yes|bbe|bbe|exe,dev,doc,nls||deps:yes #sed-like editor for binary files.
 yes|bc|bc|exe,dev,doc,nls||deps:yes
-yes|binutils|binutils|exe,dev>exe,doc,nls||deps:yes
+yes|binutils|binutils|exe>dev,dev>exe,doc,nls||deps:yes
 yes|blueman|blueman|exe,dev,doc,nls||deps:yes
 yes|bluez|bluez,bluez-obexd|exe,dev,doc,nls||deps:yes
 yes|bzip2|bzip2|exe,dev,doc,nls||deps:yes

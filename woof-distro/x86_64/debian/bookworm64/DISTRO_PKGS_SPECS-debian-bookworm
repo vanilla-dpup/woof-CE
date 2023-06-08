@@ -236,10 +236,11 @@ yes|patch|patch|exe>dev,dev,doc>dev,nls>dev||deps:yes
 "
 else
 	PKGS_SPECS_TABLE="
+yes|binutils|binutils|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|gcc|gcc|exe>dev,dev>exe,doc,nls||deps:yes
 $PKGS_SPECS_TABLE
 yes|abiword-deps|libboost-dev,libwv-dev,libenchant-2-dev|exe,dev,doc,nls||deps:yes
-yes|binutils|binutils|exe,dev>exe,doc,nls||deps:yes
+yes|binutils|binutils|exe>dev,dev>exe,doc,nls||deps:yes
 yes|claws-mail-deps|libetpan-dev|exe,dev,doc,nls||deps:yes
 yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
 yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev|exe,dev,doc,nls||deps:yes
