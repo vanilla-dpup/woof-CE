@@ -1346,12 +1346,7 @@ fi
 
 cp -a /DISTRO_SPECS /pup_new/initrd/
 [ ! -f /pup_new/etc/DISTRO_SPECS ] && cp -a /DISTRO_SPECS /pup_new/etc/
-cp -a /init* /sbin /README.txt /pup_new/initrd/
-chmod -x /pup_new/initrd/init
 dmesg > /tmp/dmesg.txt
-
-[ -f /bin/cryptsetup ] && cp -af /bin/cryptsetup /pup_new/initrd/bin/ 
-[ -f /sbin/cryptsetup ] && cp -af /sbin/cryptsetup /pup_new/initrd/sbin/ 
 
 [ -d "/pup_new/initrd/tmp" ] && rm -rf /pup_new/initrd/tmp
 mkdir -p /pup_new/initrd/tmp
