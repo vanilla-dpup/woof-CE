@@ -12,6 +12,7 @@ This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE) that 
 * Support for aufs is gone.
 * Support for PUPMOEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * All save files use ext4, with or without journaling.
+* ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
 * If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
 * Support for the devx SFS is gone. Development packages are installed inside a copy of the main SFS during the build, but don't make it into the build output.
 * The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country no longer sets the locale using the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.
