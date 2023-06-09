@@ -83,6 +83,7 @@ ROOTFS_PACKAGES="acpid_busybox pup_advert_blocker firewall_ng"
 [ -e rootfs-complete/usr/bin/swaybg ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES swaybg_wallpaper"
 [ -e rootfs-complete/usr/bin/tofi ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES tofi_exec"
 [ -e rootfs-complete/usr/bin/firefox -o -e rootfs-complete/usr/bin/firefox-esr ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES firefox_cfg"
+[ -e rootfs-complete/usr/bin/gsimplecal ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES gsimplecal_cfg"
 for NAME in $ROOTFS_PACKAGES; do
 	cp -a ../rootfs-packages/${NAME}/* rootfs-complete/
 
