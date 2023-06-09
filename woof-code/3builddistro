@@ -80,7 +80,9 @@ cp -a rootfs-skeleton/* rootfs-complete/
 
 cd rootfs-complete
 for TEMPLATE in ../../packages-templates/*; do
-	[ -e var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}.list -o -e var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}:${ARCH}.list ] || continue
+	NAME=${TEMPLATE##*/}
+	NAME=${NAME%_FIXUPHACK}
+	[ -e var/lib/dpkg/info/${NAME}.list -o -e var/lib/dpkg/info/${NAME}:${ARCH}.list ] || continue
 	echo "Applying ${TEMPLATE}"
 	cd rootfs-complete
 	bash ${TEMPLATE}
