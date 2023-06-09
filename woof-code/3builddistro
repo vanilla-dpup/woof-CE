@@ -131,7 +131,7 @@ cd ..
 # stop advertising the bluez version by default
 sed -i 's~^#Name *=.*~Name = BlueZ~' rootfs-complete/etc/bluetooth/main.conf
 
-for EXEC in firefox firefox-esr claws-mail transmission-gtk weechat uget-gtk putty gplaces; do
+for EXEC in firefox firefox-esr claws-mail transmission-gtk weechat uget-gtk putty gplaces blueman-applet blueman-manager; do
 	[ -L rootfs-complete/usr/bin/$EXEC -o -e rootfs-complete/usr/bin/$EXEC ] && chroot rootfs-complete /usr/sbin/setup-spot ${EXEC}=true
 done
 
