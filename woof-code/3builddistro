@@ -122,6 +122,9 @@ $DISTRO_NAME
 
 EOF
 
+# enable DNS cache via nscd
+[ -e rootfs-complete/etc/nscd.conf ] && sed -i -E 's/(enable-cache\s+hosts\s+)no/\1yes/' rootfs-complete/etc/nscd.conf
+
 chroot rootfs-complete /usr/sbin/firewall_ng enable
 
 cd rootfs-complete
