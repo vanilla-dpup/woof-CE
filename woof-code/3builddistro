@@ -84,7 +84,7 @@ for TEMPLATE in ../../packages-templates/*; do
 	NAME=${NAME%_FIXUPHACK}
 	[ -e var/lib/dpkg/info/${NAME}.list -o -e var/lib/dpkg/info/${NAME}:${ARCH}.list ] || continue
 	echo "Applying ${TEMPLATE}"
-	bash ${TEMPLATE}
+	bash -c ". ../../DISTRO_SPECS; . ${TEMPLATE}"
 	if [ -f pinstall.sh ]; then
 		bash pinstall.sh
 		rm -f pinstall.sh
