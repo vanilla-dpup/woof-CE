@@ -1,0 +1,2 @@
+# stop advertising the bluez version by default
+sed -i 's~^#Name *=.*~Name = BlueZ~' etc/bluetooth/main.conf

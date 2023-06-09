@@ -1,0 +1,6 @@
+cat << EOF > pinstall.sh
+echo '#!/bin/sh
+exec pavucontrol "\$@"' > usr/local/bin/defaultaudiomixer
+chmod 755 usr/local/bin/defaultaudiomixer
+EOF
+

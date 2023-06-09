@@ -5,6 +5,14 @@
 . ./_00build.conf
 . ./DISTRO_PKGS_SPECS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}
 
+case "$DISTRO_TARGETARCH" in
+x86_64) ARCH=amd64 ;;
+x86) ARCH=i386  ;;
+arm) ARCH=armhf ;;
+arm64) ARCH=aarch64 ;;
+*) exit 1 ;;
+esac
+
 PUPPYSFS="puppy_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 ZDRVSFS="zdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 FDRVSFS="fdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
@@ -46,19 +54,11 @@ sed -i 's~^# en_US\.UTF-8~en_US.UTF-8~' rootfs-complete/etc/locale.gen
 chroot rootfs-complete locale-gen
 echo "LC_ALL=en_US.UTF-8" >> rootfs-complete/etc/environment
 
-# wireplumber fails to start if the logind module is enabled but logind is broken
-rm -f rootfs-complete/usr/lib/*/wireplumber-*/libwireplumber-module-logind.so
-
-# su hangs if logind is not running
-rm -f rootfs-complete/lib/*/security/pam_elogind.so
-
 cat << EOF >> rootfs-complete/etc/apt/apt.conf.d/00puppy
 # https://github.com/debuerreotype/debuerreotype/blob/6952be0a084e834bd25aa623c94f6ad342899b55/scripts/debuerreotype-minimizing-config#L88
 DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 DPkg::Post-Invoke { "/usr/sbin/auto-setup-spot"; };
-DPkg::Post-Invoke { "rm -f /usr/lib/*/wireplumber-*/libwireplumber-module-logind.so || true"; };
-DPkg::Post-Invoke { "rm -f /lib/*/security/pam_elogind.so || true"; };
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
 
@@ -77,14 +77,24 @@ if [ "$USR_SYMLINKS" = "yes" ]; then
 	rmdir rootfs-skeleton/{bin,sbin}
 fi
 cp -a rootfs-skeleton/* rootfs-complete/
-rm -rf rootfs-complete/usr/share/boot-dialog
+
+for TEMPLATE in packages-templates/*; do
+	[ -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}.list || -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}:${ARCH}.list ] || continue
+	echo "Applying ${TEMPLATE}"
+	cd rootfs-complete
+	bash ${TEMPLATE}
+	if [ -f pinstall.sh ]; then
+		bash pinstall.sh
+		rm -f pinstall.sh
+	fi
+	cd ..
+done
 
 ROOTFS_PACKAGES="acpid_busybox pup_advert_blocker firewall_ng"
 [ -e rootfs-complete/usr/bin/swaybg ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES swaybg_wallpaper"
-[ -e rootfs-complete/usr/bin/tofi ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES tofi_exec"
-[ -e rootfs-complete/usr/bin/firefox -o -e rootfs-complete/usr/bin/firefox-esr ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES firefox_cfg"
-[ -e rootfs-complete/usr/bin/gsimplecal ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES gsimplecal_cfg"
 for NAME in $ROOTFS_PACKAGES; do
+	echo "Adding ${NAME}"
+
 	cp -a ../rootfs-packages/${NAME}/* rootfs-complete/
 
 	if [ -f rootfs-complete/pinstall.sh ]; then
@@ -116,31 +126,10 @@ rm -f rootfs-complete/usr/share/doc/changelog*.gz
 rm -f rootfs-complete/etc/fonts/conf.d/10-hinting-slight.conf rootfs-complete/etc/fonts/conf.d/10-autohint.conf
 ln -s /usr/share/fontconfig/conf.avail/10-hinting-none.conf rootfs-complete/etc/fonts/conf.d/
 
-echo "MOZ_ENABLE_WAYLAND=1" >> rootfs-complete/etc/environment
-
 cat << EOF > rootfs-complete/etc/issue
 $DISTRO_NAME
 
 EOF
-
-# enable DNS cache via nscd
-[ -e rootfs-complete/etc/nscd.conf ] && sed -i -E 's/(enable-cache\s+hosts\s+)no/\1yes/' rootfs-complete/etc/nscd.conf
-
-chroot rootfs-complete /usr/sbin/firewall_ng enable
-
-cd rootfs-complete
-./usr/sbin/pup-advert-blocker start ./etc/hosts
-cd ..
-
-# stop advertising the bluez version by default
-sed -i 's~^#Name *=.*~Name = BlueZ~' rootfs-complete/etc/bluetooth/main.conf
-
-for EXEC in firefox firefox-esr claws-mail transmission-gtk weechat uget-gtk putty gplaces blueman-applet blueman-manager; do
-	[ -L rootfs-complete/usr/bin/$EXEC -o -e rootfs-complete/usr/bin/$EXEC ] && chroot rootfs-complete /usr/sbin/setup-spot ${EXEC}=true
-done
-
-chroot rootfs-complete run-as-spot weechat-headless -r "/server add libera irc.libera.chat/6697 -autoconnect -ssl;/set irc.server.libera.autojoin #puppylinux;/quit"
-rm -f rootfs-complete/usr/bin/weechat-headless
 
 rm -f rootfs-complete/var/cache/apt/archives/*.deb rootfs-complete/var/cache/apt/archives/partial/*.deb
 rm -rf rootfs-complete/var/lib/apt/lists/*

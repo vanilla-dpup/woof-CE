@@ -59,3 +59,12 @@ cat << EOF > ${FFDIR}/defaults/pref/puppy-settings.js
 pref("general.config.obscure_value", 0);
 pref("general.config.filename", "puppy.cfg");
 EOF
+
+(
+echo "[ -e usr/bin/firefox ] && chroot . /usr/sbin/setup-spot firefox=true"
+echo "[ -e usr/bin/firefox-esr ] && chroot . /usr/sbin/setup-spot firefox-esr=true"
+echo "[ -e usr/bin/X -o -e usr/bin/jwm ] || echo MOZ_ENABLE_WAYLAND=1 >> etc/environment"
+echo 'echo "setting up Firefox"'
+) > pinstall.sh
+
+### END ###
