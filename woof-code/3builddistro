@@ -78,8 +78,9 @@ if [ "$USR_SYMLINKS" = "yes" ]; then
 fi
 cp -a rootfs-skeleton/* rootfs-complete/
 
-for TEMPLATE in packages-templates/*; do
-	[ -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}.list -o -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}:${ARCH}.list ] || continue
+cd rootfs-complete
+for TEMPLATE in ../../packages-templates/*; do
+	[ -e var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}.list -o -e var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}:${ARCH}.list ] || continue
 	echo "Applying ${TEMPLATE}"
 	cd rootfs-complete
 	bash ${TEMPLATE}
@@ -87,8 +88,8 @@ for TEMPLATE in packages-templates/*; do
 		bash pinstall.sh
 		rm -f pinstall.sh
 	fi
-	cd ..
 done
+cd ..
 
 ROOTFS_PACKAGES="acpid_busybox pup_advert_blocker firewall_ng"
 [ -e rootfs-complete/usr/bin/swaybg ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES swaybg_wallpaper"
@@ -208,4 +209,6 @@ mksquashfs nlsx build/${NLSXSFS} ${SFSCOMP}
 mksquashfs docx build/${DOCXSFS} ${SFSCOMP}
 mksquashfs rootfs-complete build/${PUPPYSFS} ${SFSCOMP}
 
+WOOF_OUTPUT="woof-output-${DISTRO_FILE_PREFIX}-${DISTRO_VERSION}"
+mkdir -p ../${WOOF_OUTPUT}
 . ../support/pc_image.sh
