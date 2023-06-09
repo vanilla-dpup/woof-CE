@@ -84,7 +84,7 @@ ROOTFS_PACKAGES="acpid_busybox pup_advert_blocker firewall_ng"
 [ -e rootfs-complete/usr/bin/tofi ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES tofi_exec"
 [ -e rootfs-complete/usr/bin/firefox -o -e rootfs-complete/usr/bin/firefox-esr ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES firefox_cfg"
 for NAME in $ROOTFS_PACKAGES; do
-    cp -a ../rootfs-packages/${NAME}/* rootfs-complete/
+	cp -a ../rootfs-packages/${NAME}/* rootfs-complete/
 
 	if [ -f rootfs-complete/pinstall.sh ]; then
 		cd rootfs-complete
@@ -127,6 +127,9 @@ chroot rootfs-complete /usr/sbin/firewall_ng enable
 cd rootfs-complete
 ./usr/sbin/pup-advert-blocker start ./etc/hosts
 cd ..
+
+# stop advertising the bluez version by default
+sed -i 's~^#Name *=.*~Name = BlueZ~' rootfs-complete/etc/bluetooth/main.conf
 
 for EXEC in firefox firefox-esr claws-mail transmission-gtk weechat uget-gtk putty gplaces; do
 	[ -L rootfs-complete/usr/bin/$EXEC -o -e rootfs-complete/usr/bin/$EXEC ] && chroot rootfs-complete /usr/sbin/setup-spot ${EXEC}=true
