@@ -84,7 +84,6 @@ for TEMPLATE in ../../packages-templates/*; do
 	NAME=${NAME%_FIXUPHACK}
 	[ -e var/lib/dpkg/info/${NAME}.list -o -e var/lib/dpkg/info/${NAME}:${ARCH}.list ] || continue
 	echo "Applying ${TEMPLATE}"
-	cd rootfs-complete
 	bash ${TEMPLATE}
 	if [ -f pinstall.sh ]; then
 		bash pinstall.sh
