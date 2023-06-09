@@ -160,7 +160,7 @@ jobs:
         sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
     - name: Move build output
       run: |
-        for i in `ls ../woof-out_*/woof-output-*/*.img 2>/dev/null`; do gzip -1 $i; done
+        for i in `ls ../woof-out_*/woof-output-*/*.img 2>/dev/null`; do sudo gzip -1 $i; done
         for i in `ls ../woof-out_*/woof-output-*/*.{img.gz,iso} 2>/dev/null`; do sudo mv -f $i .; done
         sudo mv -f ../woof-out_*/kernel-kit/output/kernel_sources-*.sfs .
     - name: Upload build artifacts
