@@ -79,7 +79,7 @@ fi
 cp -a rootfs-skeleton/* rootfs-complete/
 
 for TEMPLATE in packages-templates/*; do
-	[ -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}.list || -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}:${ARCH}.list ] || continue
+	[ -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}.list -o -e rootfs-complete/var/lib/dpkg/info/${TEMPLATE%_FIXUPHACK}:${ARCH}.list ] || continue
 	echo "Applying ${TEMPLATE}"
 	cd rootfs-complete
 	bash ${TEMPLATE}
