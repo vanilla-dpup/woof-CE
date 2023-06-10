@@ -143,12 +143,6 @@ chroot devx apt-get install -y $PKGS
 # create an archive of downloaded packages
 tar -C devx -c var/cache/apt/archives | gzip -1 > ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz
 
-# impersonate the distro we're compatible with, so tools like software-properties-gtk work
-mkdir -p rootfs/usr/lib
-sed -i "s/^ID=.*/ID=${DISTRO_BINARY_COMPAT}/" rootfs/usr/lib/os-release
-echo "VERSION_CODENAME=${DISTRO_COMPAT_VERSION}" >> rootfs/usr/lib/os-release
-chmod 644 rootfs/usr/lib/os-release
-
 # remove any unneeded packages
 chroot rootfs apt-get autoremove -y --purge
 
