@@ -102,7 +102,7 @@ fi
 KFILESYSTEMS="$(cat /proc/filesystems | grep -v "nodev" | grep -v "fuseblk" | sed -e "s#\t##g" | tr '\n' '|' | sed -e 's#|$##g')"
 
 #List linux filesystems
-LINUXFSLIST="ext2|ext3|ext4|btrfs|minix|f2fs|reiserfs"
+LINUXFSLIST="ext2|ext3|ext4|xfs|btrfs|f2fs"
 
 #Filesystem to be fsck
 FSCKLIST="ext2|ext3|ext4|vfat|msdos|exfat"
