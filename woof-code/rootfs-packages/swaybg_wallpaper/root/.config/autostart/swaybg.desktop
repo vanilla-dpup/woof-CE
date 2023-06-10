@@ -2,6 +2,6 @@
 Version=1.0
 Name=swaybg
 Comment=swaybg
-Exec=swaybg -c "#4a494a"
+Exec=swaybg -c "#112222"
 Terminal=false
 Type=Application
