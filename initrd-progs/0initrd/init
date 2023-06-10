@@ -1,5 +1,5 @@
 #!/bin/sh
-# see also /sbin scripts: usablefs, set_plang, switch
+# see also /sbin scripts: usablefs, switch
 #
 # _FN = _FILENAME
 # _MP = _MOUNTPOINT
@@ -12,7 +12,6 @@
 #ditto, but flash drive:    tmpfs         pup_save.3fs    pup_xxx.sfs      13
 
 ######################## localization ########################
-#ex: /locale/<locale>/init.mo
 L_WINDOWS_HIBERNATED="ERROR: Windows NTFS hibernated partition, cannot mount"
 L_DONE="done"
 L_FAILED="failed"
@@ -753,9 +752,6 @@ echo -e "\\033[0;34m ***\\033[0;39m"
 
 [ ! -f /bin/resize2fs ] && touch /tmp/no_resize2fs
 
-# sets PLANG, PKEYS, VFAT_OUT_PARAM, FONTMAP, KMAP, CODEPAGE
-[ -f /sbin/set_plang ] && . /sbin/set_plang
-
 #pmedia= usbflash|usbhd|usbcd|ataflash|atahd|atacd|atazip|scsihd|scsicd|cd
 [ $pmedia ] && PMEDIA=$pmedia #boot parameter, broad category of boot media. ex: cd.
 [ $psubdir ] && PSUBDIR=$psubdir #boot parameter, directory for puppy files. ex: puppy220
@@ -1265,7 +1261,6 @@ echo "PSUBDIR='$PSUBDIR'"
 echo "PUNIONFS='$UNIONFS'"
 echo "DOIMODS='yes'"
 echo "DOMIBS='no'"
-[ -f /sbin/set_plang ] && plang_pupstate #echo
 ) > /pup_new/etc/rc.d/PUPSTATE
 
 if [ "$PUPSAVE" ];then
@@ -1351,8 +1346,6 @@ dmesg > /tmp/dmesg.txt
 [ -d "/pup_new/initrd/tmp" ] && rm -rf /pup_new/initrd/tmp
 mkdir -p /pup_new/initrd/tmp
 cp -af /tmp/* /pup_new/initrd/tmp/ #keep any log files.
-
-[ -f /sbin/set_plang ] && plang_copy_to_newroot #$LANG, /etc/keymap|fontmap|codepage
 
 if [ "$RDSH" = "yes" ];then
  echo > /dev/console

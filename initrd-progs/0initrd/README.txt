@@ -213,13 +213,6 @@ psave=<partition>:<path>/<filename>  Specifies the save layer file.
 
 ------------------------------------------------------------
 
-pkeys=<keyboard layout specification> e.g de
-   Used to setup the keyboard layout to be used by Puppy.
-
-plang=<language specification> e.g. de_DE.UTF-8
-   Specifies the language to be used by Puppy, including any messages displayed by init.
-   If no pkeys parameter is provided the first 2 letters of this specification are used to set the keyboard layout.
-
 pimod=<, separated list of kernel module names>
    On some computers the keyboard requires a kernel module to be loaded before they will work.
    The normal loading of kernel modules does not happen until after init has finished.

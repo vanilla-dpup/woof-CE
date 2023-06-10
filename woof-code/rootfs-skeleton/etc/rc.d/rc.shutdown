@@ -148,7 +148,6 @@ fi
 
 [ ! -f /tmp/debugshutdown ] && clear >/dev/console
 
-cp -f /etc/profile /var/local/etc_profile_at_shutdown #bad hack, see /etc/rc.d/rc.update.
 #when the working files run in tmpfs in ram, they are saved (below) and /tmp and /var
 #are screened out. however, some PUPMODES mount ${DISTRO_FILE_PREFIX}save.2fs directly on /initrd/pup_rw,
 #the top aufs layer, meaning that there is no intermediary tmpfs in ram for working

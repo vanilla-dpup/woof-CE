@@ -273,13 +273,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
     [ -f ${OLDFILESMNTPT}/etc/rc.d/${i} ] && cp -af ${NEWFILESMNTPT}/etc/rc.d/${i} /etc/rc.d/
  done
 
- #problem, as overwrites LANG setting...
- xLANG="`grep '^LANG=' /etc/profile | cut -f 2 -d '=' | cut -f 1 -d ' '`"
- #110216 still not working. so, do this bad hack (see rc.shutdown)...
- [ -f /var/local/etc_profile_at_shutdown ] && xLANG="`grep '^LANG=' /var/local/etc_profile_at_shutdown | cut -f 2 -d '=' | cut -f 1 -d ' '`" #110216
- REGEX3="s%^LANG=.*%LANG=${xLANG}%"
- sed -e "$REGEX3" ${NEWFILESMNTPT}/etc/profile > /etc/profile
- 
  cp -af ${NEWFILESMNTPT}/root/.xinitrc /root/
  
  #make sure all woof scripts are updated...
@@ -310,7 +303,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
  chmod 1777 /tmp
  chmod 777 /var
 fi
-xLANG="`grep '^LANG=' /etc/profile | cut -f 2 -d '=' | cut -f 1 -d ' '`"
 
 #===========================================================================
 
