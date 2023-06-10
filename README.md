@@ -4,14 +4,15 @@
 
 This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE) that strips woof-CE down to the bare essentials.
 
+* Only dpup ([Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based Puppy) is supported.
+* Support for X.Org and tools that modify xorg.conf are gone. Only Wayland is supported.
+* Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
 * Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap).
 * PPM and support for .pet packages are gone: packages in the build come from rootfs-packages or rootfs-petbuilds (built from source).
-* Support for X.Org and tools that modify xorg.conf are gone.
-* Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils.
 * The only supported kind of kernel packages it the "huge" one.
 * Support for aufs is gone.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image.
-* Support for PUPMOEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
+* Support for PUPMODEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * All save files use ext4, with or without journaling.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
 * If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
@@ -20,7 +21,8 @@ This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE) that 
 * Themes are gone. [Themes break applications](https://stopthemingmy.app/) and they're hard to maintain.
 * coreutils, util-linux, etc' are not replaced with symlinks to busybox, because this breaks compatibility with the upstream distro.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
-* Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster.
+* Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster. Daemons like udev and dbus are started using their init scripts.
+* Some core Puppy scripts that override the upstream distro are moved to /usr/local{,s}bin and PATH makes the shell prefer them. This makes package updates safe, because they no longer remove Puppy's hooks.
 
 ## Configuration Files
 
