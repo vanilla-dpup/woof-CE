@@ -13,9 +13,12 @@ arm64) ARCH=aarch64 ;;
 *) exit 1 ;;
 esac
 
+BDRVSFS="bdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 PUPPYSFS="puppy_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 ZDRVSFS="zdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 FDRVSFS="fdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+ADRVSFS="adrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+YDRVSFS="ydrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 DOCXSFS="docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 NLSXSFS="nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 
@@ -191,8 +194,17 @@ mv rootfs-complete/usr/share/{doc,man,help} docx/usr/share/
 mkdir rootfs-complete/usr/share/doc
 mv docx/usr/share/doc/puppylogo*.png rootfs-complete/usr/share/doc/
 
+cat << EOF >> rootfs-complete/etc/DISTRO_SPECS
+DISTRO_BDRVSFS='${BDRVSFS}'
+DISTRO_PUPPYSFS='${PUPPYSFS}'
+DISTRO_ZDRVSFS='${ZDRVSFS}'
+DISTRO_FDRVSFS='${FDRVSFS}'
+DISTRO_ADRVSFS='${ADRVSFS}'
+DISTRO_YDRVSFS='${YDRVSFS}'
+EOF
+
 cd ../initrd-progs
-cp -f ../DISTRO_SPECS .
+cp -f ../sandbox3/rootfs-complete/etc/DISTRO_SPECS .
 ./build.sh -arch ${DISTRO_TARGETARCH}
 
 cd ../kernel-kit/output
