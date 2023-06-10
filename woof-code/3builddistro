@@ -30,7 +30,7 @@ for PKG in `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 
 done
 
 # prevent all explicitly added non-development packages from being removed
-chroot rootfs-complete apt-mark hold `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n' | grep -vE -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'` busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc command-not-found gnome-software
+chroot rootfs-complete apt-mark hold `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n' | grep -vE -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'` busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk command-not-found gnome-software
 [ -e rootfs/usr/bin/flatpak ] && chroot rootfs-complete apt-mark hold gnome-software-plugin-flatpak
 
 # remove development packages
