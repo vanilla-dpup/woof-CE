@@ -136,6 +136,9 @@ $DISTRO_NAME
 
 EOF
 
+# enable colors and shell completion in bash running as root
+cat rootfs-complete/etc/skel/.bashrc > rootfs-complete/root/.bashrc
+
 rm -f rootfs-complete/var/cache/apt/archives/*.deb rootfs-complete/var/cache/apt/archives/partial/*.deb
 rm -rf rootfs-complete/var/lib/apt/lists/*
 
