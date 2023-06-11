@@ -320,23 +320,13 @@ EOF
 
 #--
 
-unmountcdfunc() {
-	if [ "$CDDRIVE" -a "`mount | grep "^/dev/$CDDRIVE " | cut -f 3 -d ' '`" ];then
-		umount /dev/$CDDRIVE "`mount | grep "^/dev/$CDDRIVE " | cut -f 3 -d ' '`"
-	fi
-	if [ "$ISO_MP" -a "`mount | grep " $ISO_MP "`" ] ; then
-		umount $ISO_MP 2>/dev/null #iso mountpoint
-	fi
-}
-
 locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	SRCPATH=""
 	CDDRIVE=""
-	ISO_MP=""
-	MOUNT_ISO=""
+	ASK=""
 	#-----
 	if [ $PUPMODE -eq 2 ] ; then #full install
-		MOUNT_ISO=1
+		ASK=1
 	else
 		PDEV1_IS_CD=$(probedisk /dev/${PDEV1} 2>/dev/null | grep '|optical|')
 		PDEV1_MP=$(LANG=C mount | grep "^/dev/${PDEV1} " | awk '{print $3}')
@@ -386,32 +376,24 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	fi
 	#-----
 	if [ ! "$SRCPATH" ] ; then
-		MOUNT_ISO=1 #last resort..
+		ASK=1 #last resort..
 	fi
 	#-----
-	if [ "$MOUNT_ISO" ] ; then
-		ISO_MP=/mnt/iso_file
+	if [ "$ASK" ] ; then
 		cd $HOME
-		ISO_FILE=$(/usr/lib/gtkdialog/file_chooser "ISO File" "$(gettext "Please select a Puppy live-CD .iso file for $DISTRO_NAME $DISTRO_VERSION ")")
+		CHOICE=$(/usr/lib/gtkdialog/file_chooser --directory "Puppy Directory" "$(gettext "Please select a directory containing $DISTRO_NAME $DISTRO_VERSION ")")
 		[ $? -ne 0 ] && exit 1
-		umount ${ISO_MP} 2>/dev/null
-		mkdir -p ${ISO_MP}
-		mount -t iso9660 -o loop ${ISO_FILE} ${ISO_MP}
 		#--
-		if [ -f ${ISO_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} ] ; then
-			SRCPATH=${ISO_MP}${PSUBDIR}
-		elif [ -f ${ISO_MP}/${DISTRO_PUPPYSFS} ] ; then
-			SRCPATH=${ISO_MP}
-		else
-			umount ${ISO_MP} 2>/dev/null
-			ISO_MP=""
+		if [ -f ${CHOICE}${PSUBDIR}/${DISTRO_PUPPYSFS} ] ; then
+			SRCPATH=${CHOICE}${PSUBDIR}
+		elif [ -f ${CHOICE}/${DISTRO_PUPPYSFS} ] ; then
+			SRCPATH=${CHOICE}
 		fi
 		#--
 	fi
 	#===============================
 	#sanity check...
 	if [ ! -f ${SRCPATH}/${DISTRO_PUPPYSFS} ];then #v3.01 v424 100913
-		unmountcdfunc
 		Xdialog --wmclass "gtkdialog2" --left \
 			--title "$(gettext 'ERROR')" --msgbox "`eval_gettext \"Oh dear, a 'sanity check' has failed.\
  \nThis file: \\\$SRCPATH/\\\${DISTRO_PUPPYSFS}\ndoes not exist.\nThe above \
@@ -936,7 +918,6 @@ umount /mnt/${USBDRV}1
 if [ "${FSTYPE2}" ] ; then
 	umount /mnt/${USBDRV}2
 fi
-unmountcdfunc
 kill $X1PID
 
 /usr/lib/gtkdialog/box_ok "$(gettext 'BootFlash: Puppy installed')" complete \
