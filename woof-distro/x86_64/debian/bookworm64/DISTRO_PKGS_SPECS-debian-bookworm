@@ -185,7 +185,7 @@ yes|grim|grim|exe,dev,doc,nls||deps:yes
 yes|scdoc|scdoc|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|seatd|seatd|exe,dev,doc,nls||deps:yes
 yes|slurp|slurp|exe,dev,doc,nls||deps:yes
-yes|swayidle|swayidle|exe,dev,doc,nls||deps:yes
+yes|swayidle|swayidle|exe>null,dev>null,doc>null,nls>null||deps:yes # using swayidle petbuild without logind support
 yes|swaylock|swaylock|exe>null,dev>null,doc>null,nls>null # using swaylock petbuild with root patch
 yes|wlroots-deps|libegl-dev,libgbm-dev,libgles-dev,libinput-dev,libseat-dev,libpixman-1-dev,libxcb1-dev,libxcb-composite0-dev,libxcb-dri3-dev,libxcb-icccm4-dev,libxcb-present-dev,libxcb-render0-dev,libxcb-render-util0-dev,libxcb-res0-dev,libxcb-shm0-dev,libxcb-xfixes0-dev,libxcb-xinput-dev,libxkbcommon-dev|exe,dev,doc,nls||deps:yes
 yes|wlr-randr|wlr-randr|exe,dev,doc,nls||deps:yes
