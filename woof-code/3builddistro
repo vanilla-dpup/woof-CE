@@ -108,6 +108,9 @@ for NAME in $ROOTFS_PACKAGES; do
 		rm -f pinstall.sh
 		cd ..
 	fi
+
+	# prevent apt from replacing the petbuild with a bigger package
+	chroot rootfs-complete apt-mark hold ${NAME}
 done
 
 FOUND_PETBUILDS=
