@@ -656,7 +656,6 @@ If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
  done
 
  mkdir -p $SMNTPT$SAVEFILE 2>/dev/null
- cp -f /usr/share/pixmaps/puppy/puppy_save.svg  "$SMNTPT$SAVEFILE/.DirIcon"
 
  PUPMODE=128
  SAVEPART=${SAVEPART}
@@ -711,7 +710,6 @@ autosavefunc() {
        return 1
      fi
      mkdir -p "${SMNTPT}${SAVEFILE}" 2>/dev/null
-     cp -f /usr/share/pixmaps/puppy/puppy_save.svg  "${SMNTPT}${SAVEFILE}/.DirIcon"
      SAVEPATH=$(dirname "$SAVEFILE")
      [ "$SAVEPATH" = '/' ] && SAVEPATH=''
      PUPMODE=128
