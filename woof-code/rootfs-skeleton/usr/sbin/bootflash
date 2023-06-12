@@ -93,7 +93,8 @@ create_gpt_drv() {
 	mkdosfs -F 32 -v /dev/${XDEV}1
 	sleep 1
 	case "$XFSTYPE2" in
-		f2fs) mkfs.f2fs /dev/${XDEV}2 ;;
+		f2fs) mkfs.f2fs -f /dev/${XDEV}2 ;;
+		ext4) mkfs.ext4 /dev/${XDEV}2 ;;
 	esac
 	sync
 
@@ -265,10 +266,6 @@ create_bios_bootable_drv() {
 	blockdev --rereadpt /dev/${XDEV}
 
 	#-- create_target_partition
-	if grep -q '64bit' /etc/mke2fs.conf ; then
-		sed -i 's/64bit,//g' /etc/mke2fs.conf #remove 64bit flag
-	fi
-
 	case "$XFSTYPE" in
 		vfat) mkdosfs -F 32 -v /dev/${XDEV}1 ;;
 		ntfs) mkntfs -f /dev/${XDEV}1        ;;
@@ -276,7 +273,8 @@ create_bios_bootable_drv() {
 	esac
 	sleep 1
 	case "$XFSTYPE2" in
-		f2fs) mkfs.f2fs /dev/${XDEV}2 ;;
+		f2fs) mkfs.f2fs -f /dev/${XDEV}2 ;;
+		ext4) mkfs.ext4 /dev/${XDEV}2 ;;
 	esac
 
 	sync
@@ -562,6 +560,11 @@ case $EXIT in
 
 	'${F2FS_DLG}'
 
+	'$(create_dlg_item "$(gettext '<b>FAT32 partition + ext4 partition</b>')" \
+		"$(gettext 'Create ext4 partition and install efilinux')" \
+		install_options.svg 13
+		)'
+
 	'$(create_dlg_item "$(gettext '<b>FAT32 GPT UEFI</b>')" \
 		"$(gettext 'Create FAT32 partition and install efilinux')" \
 		install_options.svg 11
@@ -590,6 +593,7 @@ case $EXIT in
 		eval "$RETPARAMS"
 		case $EXIT in
 			11) FSTYPE='vfat' ;;
+			13) FSTYPE='vfat' ; FSTYPE2='ext4' ;;
 			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
 			*) exit ;;
 		esac
@@ -669,6 +673,11 @@ case $EXIT in
 
 	'${F2FS_DLG}'
 
+	'$(create_dlg_item "$(gettext '<b>FAT32 partition + ext4 partition</b>')" \
+		"$(gettext 'Create ext4 partition and install syslinux')" \
+		install_options.svg 13
+		)'
+
 	'$(create_dlg_item "$(gettext '<b>FAT32 partition + syslinux</b>')" \
 		"$(gettext 'Create FAT32 partition and install syslinux')" \
 		install_options.svg 11
@@ -696,6 +705,7 @@ case $EXIT in
 		eval "$RETPARAMS"
 		case $EXIT in
 			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
+			13) FSTYPE='vfat' ; FSTYPE2='ext4' ;;
 			11) FSTYPE='vfat' ;;
 			*) exit ;;
 		esac
