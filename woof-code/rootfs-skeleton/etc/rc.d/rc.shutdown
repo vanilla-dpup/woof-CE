@@ -22,9 +22,6 @@ if [ ! -f /tmp/debugshutdown ] ; then
 	exec 1> /dev/null 2>&1
 fi
 
-#if don't do this, may be locked at next boot...
-which rfkill >/dev/null 2>&1 && rfkill unblock all
-
 . /etc/rc.d/PUPSTATE #variables created at bootup by init script in initrd...
 . /etc/DISTRO_SPECS
 . /etc/eventmanager	# 140417, SFR
