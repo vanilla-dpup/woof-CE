@@ -128,7 +128,7 @@ PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null"
 chroot rootfs apt-get install -y $PKGS
 
 # add busybox, missing package recommendations, Synaptic and gnome-software
-chroot rootfs apt-get install -y busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software
+chroot rootfs apt-get install -y busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software fwupd
 [ -e rootfs/usr/bin/flatpak ] && chroot rootfs apt-get install -y gnome-software-plugin-flatpak
 
 # impersonate Puppy
