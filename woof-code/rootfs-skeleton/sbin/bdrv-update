@@ -1,6 +1,6 @@
 #!/bin/ash
 
-cmp -s /initrd/pup_b/var/lib/dpkg/status /var/lib/dpkg/status
+cmp -s /initrd/pup_ro2/var/lib/dpkg/status /var/lib/dpkg/status
 [ $? -ne 1 ] && exit 0
 
 rm -f /tmp/.dpkgstatus-*.new
@@ -14,7 +14,7 @@ while IFS="" read -r LINE; do
 		[ -z "$NAME" ] && exit 1
 		mv -f $F "/tmp/.dpkgstatus-$NAME.new"
 	fi
-done < /initrd/pup_b/var/lib/dpkg/status
+done < /initrd/pup_ro2/var/lib/dpkg/status
 
 (
 	while IFS="" read -r LINE; do
