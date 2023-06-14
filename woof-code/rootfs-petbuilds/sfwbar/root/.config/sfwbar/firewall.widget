@@ -6,8 +6,8 @@ scanner {
 
 define On = "on"
 define Off = "off"
-define OnIcon = "security-high"
-define OffIcon = "security-low"
+define OnIcon = "security-high-symbolic"
+define OffIcon = "security-low-symbolic"
 define State = If(Status > 10,On,Off)
 define Ico = If(Status > 10,OnIcon,OffIcon)
 

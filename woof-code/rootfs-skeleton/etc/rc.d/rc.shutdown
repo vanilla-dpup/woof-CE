@@ -22,9 +22,6 @@ if [ ! -f /tmp/debugshutdown ] ; then
 	exec 1> /dev/null 2>&1
 fi
 
-#if don't do this, may be locked at next boot...
-which rfkill >/dev/null 2>&1 && rfkill unblock all
-
 . /etc/rc.d/PUPSTATE #variables created at bootup by init script in initrd...
 . /etc/DISTRO_SPECS
 . /etc/eventmanager	# 140417, SFR
@@ -64,7 +61,6 @@ fi
 while [ "`pidof snapmergepuppy`" ]; do sleep 1 ; done
 
 cd /
-sync
 echo "Killing X and all X apps..."
 killall -TERM X > /dev/null 2>&1 #just a precaution...
 killall -TERM Xorg > /dev/null 2>&1 #just a precaution...
@@ -73,25 +69,11 @@ killall -TERM labwc > /dev/null 2>&1 #just a precaution...
 sleep 1
 sync
 
-#MU warns may need to do this for dillo...
-killall file.dpi 2>/dev/null
-killall bookmarks.dpi 2>/dev/null
-killall dpid 2>/dev/null
-
 # some packages have a service script that requires stopping...
-for service_script in $(ls /etc/init.d/* | sort -r)
-do
-  #Stop service except for dbus. Dbus will be stopped later...
-  if [ -x $service_script ] && [ "$(cat $service_script | grep "dbus-daemon")" == "" ]; then
-   $service_script stop
-  fi
-done
-#note, /etc/rc.d/rc.services does same, with 'start' parameter.
+
+/etc/rc.d/rc.services stop
 
 [ "$PUNIONFS" = "aufs" ] && sfs_load --cli stop
-
-#remove file leftover by alsa script
-rm -f /tmp/snd-kmod.lst 2>/dev/null
 
 ### cleanly unmount cifs shares from /usr/share/Shares
 # samba rox app
@@ -121,49 +103,13 @@ sync
 busybox umount -a -t cifs,smbfs,nfs,sshfs
 ###
 
-#100902 rerwin: log the cumulative bytes transmitted on dialup...
-which modemdisconnect >/dev/null && modemdisconnect #(if connected)
-
-#100301 brought down below call to 'stop' service scripts, needed for lamesmbxplorer.
-#100814 log the cumulative bytes transmitted on network
-# (see also /etc/rc.d/rc.sysinit and network_tray)
-#bring down network interfaces (prevents shutdown sometimes)...
-networkdisconnect --shutdown #181209
-
-#100604 reported by shel: http://murga-linux.com/puppy/viewtopic.php?t=56238
-# Unload the Ethernet drivers on shutdown to prevent battery drain.
-for i in /sys/class/net/* ; do
-	if [ -e "${i}" -a -e ${i}/device/driver ] ; then
-		driver=$(readlink ${i}/device/driver)
-		modprobe -r ${driver##*/} #basename $driver
-	fi
-done
-
 #=======================================================================
-
 # terminate stuff
 # dbus daemon
-if [ -d /var/run/dbus/ ]; then
-	for p in  /var/run/dbus/*pid 
-	do
-		DPID=$(cat $p)
-		echo killing $DPID
-		kill $DPID >/dev/null 2>&1
-		rm -f $p
-	done
-fi
-killall dbus-daemon >/dev/null 2>&1
-killall dbus-launch >/dev/null 2>&1
+/etc/init.d/dbus stop
 # udev
-udevadm control --exit
-killall udevd >/dev/null 2>&1
-export DM_DISABLE_UDEV=1 # prevent cryptsetup from waiting forever if built with udev support
-# pulse
-killall pulseaudio >/dev/null 2>&1
-# dhcpcd
-pidof dhcpcd >/dev/null 2>&1 && dhcpcd -k
-# wait
-sleep 2 # needed to clean up
+/etc/init.d/udev stop
+
 #=======================================================================
 
 #first time booted puppy, there may not have been any persistent storage...
@@ -199,24 +145,14 @@ fi
 
 [ ! -f /tmp/debugshutdown ] && clear >/dev/console
 
-cp -f /etc/profile /var/local/etc_profile_at_shutdown #bad hack, see /etc/rc.d/rc.update.
-#120629 raspberry pi does not have a hw clock. save here, read at bootup (see rc.country)...
-DATESAVE="`date "+%Y-%m-%d %H:%M:%S"`" #ex: 2018-07-30 06-27-38 #busybox compatible..
-echo -n "$DATESAVE" > /var/local/shutdown_date_saved
 #when the working files run in tmpfs in ram, they are saved (below) and /tmp and /var
 #are screened out. however, some PUPMODES mount ${DISTRO_FILE_PREFIX}save.2fs directly on /initrd/pup_rw,
 #the top aufs layer, meaning that there is no intermediary tmpfs in ram for working
 #files, hence everything is saved directly, ditto for PUPMODE=2 a full h.d. install.
 #hence need to do some explicit wiping here...
-cat /var/log/messages* > /var/log/previous.messages
-rm -f /var/log/messages*
 rm -f /var/lock/LCK*
-rm -f /var/run/*.pid
-rm -rf /root/tmp 2> /dev/null #...note, not screening this out in any of above save modes.
-rm -rf /root/.thumbnails/* 2> /dev/null
 [ -d /var/tmp ] && rm -rf /var/tmp/* 2> /dev/null #100820
 rm -f /tmp/geany_socket* 2>/dev/null #if geany still running at shutdown
-[ -d /root/.config/geany ] && rm -f /root/.config/geany/geany_socket* 2>/dev/null
 [ -f /etc/rc.d/MORESFS ] && rm /etc/rc.d/MORESFS
 sync
 
@@ -313,7 +249,6 @@ case $PUPMODE in
   umount $SMNTPT 2> /dev/null
  ;;
 
- 77) /usr/sbin/savesession-dvd ;; #requires /tmp/rc.shutdown_config - save to folder on multisession CD/DVD (including 1st shutdown)
  2)  echo -n ;; #echo "$(printf "$(gettext '%s mounted directly, session already saved.')" "$PDEV1")" >/dev/console
  12) echo "$(printf "$(gettext '%s mounted directly top layer, session already saved.')" "${SAVEFILE##*/}")" >/dev/console ;;
  13) #PDEV1 and PUPSFS and PUPSAVE 
@@ -330,22 +265,6 @@ case $PUPMODE in
   if [ $retval -eq 0 ]; then 
     echo "$(printf "$(gettext 'Saving session to %s (%s)...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
     /usr/sbin/snapmergepuppy /initrd/pup_ro1 /initrd/pup_rw
-  fi 
-  ;;
- 66) #every shutdown, save to archive - for vfat
-  if [ "$(blkid /dev/${PUPSAVE%%,*})" = "" ]; then
-    echo "$(gettext "Session not saved")" >/dev/console
-    STATUS=1
-  elif [ -e /tmp/rc.shutdown_config ]; then #is after shutdownconfig
-    STATUS=0
-  else
-    RAMSAVEINTERVAL=''
-    ASKTOSAVE='true'
-    asktosave_func
-    STATUS=$?
-  fi
-  if [ $STATUS -eq 0 ]; then
-    /usr/sbin/savesession-archive
   fi 
   ;;
  *)
@@ -473,9 +392,7 @@ if [ "$SAVE_LAYER" ];then
  	fi
 fi
 
-sync
 umount.crypto_LUKS all
-sync
 umount-FULL -in -a -r -d >/dev/null 2>&1
 sync
 

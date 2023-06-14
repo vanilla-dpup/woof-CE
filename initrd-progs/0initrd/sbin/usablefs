@@ -8,7 +8,6 @@ do
 done
 [ -f "/bin/exfatfsck" ] && ln -s exfatfsck "/bin/fsck.exfat" 2>/dev/null
 [ -f "/bin/mount.exfat-fuse" ] && ln -s mount.exfat-fuse "/bin/mount.exfat" 2>/dev/null
-[ -f "/bin/ntfs-3g" ] && ln -s ntfs-3g "/bin/mount.ntfs" 2>/dev/null
 [ -f "/bin/fsck.fat" ] && ln -s fsck.fat "/bin/fsck.vfat" 2>/dev/null
 if [ -f "/bin/e2fsck" ] ; then 2>/dev/null
 	ln -s e2fsck "/bin/fsck.ext2" 2>/dev/null

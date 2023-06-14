@@ -1,20 +1,13 @@
 #!/bin/ash
-#(c) Copyright Barry Kauler Nov. 2010. License GPL v3 /usr/share/doc/legal.
 
-. /etc/DISTRO_SPECS
-
-#wait for snd_ modules to complete loading...
-#this sleep benefits all slow peripherals.
-[ "$DISTRO_TARGETARCH" = "x86" ] && sleep 6
-
-for service_script in /etc/init.d/*
-do
- if [ -x $service_script ]; then
-  #Check if the script contains dbus-daemon
-  grep -qF dbus-daemon $service_script || $service_script start
- fi
+for S in rc.firewall trim; do
+	[ -x /etc/init.d/$S ] && /etc/init.d/$S $1
 done
 
-unset service_script
-
-###END###
+for S in /etc/rc5.d/*
+do
+	case "${S##*/}" in
+	README|*dbus|*udev|*elogind|*bootlogs|*rc.local) ;;
+	*) [ -x "$S" ] && $S $1 ;;
+	esac
+done

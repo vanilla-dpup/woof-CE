@@ -1,0 +1,8 @@
+download() {
+	:
+}
+
+build() {
+    mkdir -p /usr/local/sbin
+    $CC $CFLAGS -D_GNU_SOURCE init.c $LDFLAGS -o /usr/local/sbin/init
+}

@@ -33,8 +33,13 @@ fi
 # desktop settings
 [ -e "$XDG_CONFIG_HOME/wmonitors/wmon_cmd" ] && . $XDG_CONFIG_HOME/wmonitors/wmon_cmd
 
-. /etc/rc.d/wl_func
-apply_gtk_settings
+gsettings set org.gnome.desktop.interface enable-animations false
+run-as-spot gsettings set org.gnome.desktop.interface enable-animations false
+
+gsettings set org.gnome.software download-updates false
+run-as-spot gsettings set org.gnome.software download-updates false
+gsettings set org.gnome.software download-updates-notify false
+run-as-spot gsettings set org.gnome.software download-updates-notify false
 
 # pass environment variables to D-Bus activated applications like Blueman
 dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY

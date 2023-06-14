@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ash
 #v2.14 Puppy now has XDG menus.
 #this script builds the menus from template files.
 #Any templates can be placed into /etc/xdg/templates, and the file must be
@@ -18,11 +18,6 @@ export HOME
 
 [ -f $HOME/.jwm/menuheights ] && . $HOME/.jwm/menuheights
 
-if [ "$LANG" = "C" ];then #fix in case this script gets called with LANG=C
-	LANG="`grep '^LANG=' /etc/profile`"
-	LANG=${LANG#*=} #cut -f 2 -d '='  .. ex: en_US.UTF-8
-	export LANG
-fi
 LANG1="${LANG%_*}" #120207 ex: de
 
 for ONESRC in `ls /etc/xdg/templates/_* 2>/dev/null` #ex: _root_.jwmrc

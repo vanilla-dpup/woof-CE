@@ -1,4 +1,0 @@
-#!/bin/ash
-
-exec pm13 trayicon "$@"
-

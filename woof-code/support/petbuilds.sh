@@ -186,12 +186,8 @@ EOF
         rm -rf ../petbuild-output/${NAME}-* # remove older petbuilds of $NAME
         mkdir -p ../petbuild-output/${NAME}-${HASH} petbuild-rootfs-complete-${NAME}
         [ "$BUILD_DEVX" = "yes" ] && LOWERDIR='devx:petbuild-rootfs-complete' || LOWERDIR='petbuild-rootfs-complete'
-        if [ "$LAYER_TYPE" = 'overlay' ]; then
-             mkdir petbuild-workdir
-             mount -t overlay -o upperdir=../petbuild-output/${NAME}-${HASH},lowerdir=${LOWERDIR},workdir=petbuild-workdir petbuild petbuild-rootfs-complete-${NAME}
-        else
-             mount -t aufs -o br=../petbuild-output/${NAME}-${HASH}:${LOWERDIR} petbuild petbuild-rootfs-complete-${NAME}
-        fi
+        mkdir petbuild-workdir
+        mount -t overlay -o upperdir=../petbuild-output/${NAME}-${HASH},lowerdir=${LOWERDIR},workdir=petbuild-workdir petbuild petbuild-rootfs-complete-${NAME}
 
         mkdir -p petbuild-rootfs-complete-${NAME}/proc petbuild-rootfs-complete-${NAME}/sys petbuild-rootfs-complete-${NAME}/dev petbuild-rootfs-complete-${NAME}/tmp
         mkdir -p petbuild-rootfs-complete-${NAME}/root/.ccache petbuild-rootfs-complete-${NAME}/root/.cache
@@ -217,7 +213,7 @@ EOF
         umount -l petbuild-rootfs-complete-${NAME}
         rmdir petbuild-rootfs-complete-${NAME}
 
-        clean_out_whiteouts ../petbuild-output/${NAME}-${HASH}
+        find ../petbuild-output/${NAME}-${HASH} -type c -delete
         rm -rf petbuild-workdir
 
         if [ $ret -ne 0 ]; then
@@ -306,57 +302,22 @@ done
 
 echo "Copying petbuilds to rootfs-complete"
 
-MAINPKGS=
-
 for NAME in $PKGS; do
-    rm -rf ../packages-${DISTRO_FILE_PREFIX}/${NAME} ../packages-${DISTRO_FILE_PREFIX}/${NAME}_NLS ../packages-${DISTRO_FILE_PREFIX}/${NAME}_DOC
-
-    mkdir ../packages-${DISTRO_FILE_PREFIX}/${NAME}
-    cp -a ../petbuild-output/${NAME}-latest/* ../packages-${DISTRO_FILE_PREFIX}/${NAME}/
-
-    if [ -d ../packages-${DISTRO_FILE_PREFIX}/${NAME}/usr/share/locale ]; then
-        mkdir -p ../packages-${DISTRO_FILE_PREFIX}/${NAME}_NLS/usr/share
-        mv ../packages-${DISTRO_FILE_PREFIX}/${NAME}/usr/share/locale ../packages-${DISTRO_FILE_PREFIX}/${NAME}_NLS/usr/share/
-    fi
-
-    for DOCDIR in doc man info help; do
-        [ ! -d ../packages-${DISTRO_FILE_PREFIX}/${NAME}/usr/share/${DOCDIR} ] && continue
-        mkdir -p ../packages-${DISTRO_FILE_PREFIX}/${NAME}_DOC/usr/share
-        mv ../packages-${DISTRO_FILE_PREFIX}/${NAME}/usr/share/${DOCDIR} ../packages-${DISTRO_FILE_PREFIX}/${NAME}_DOC/usr/share/
-    done
+    cp -a ../petbuild-output/${NAME}-latest/* rootfs-complete/
 
     for EXTRAFILE in ../rootfs-petbuilds/${NAME}/*; do
         case "${EXTRAFILE##*/}" in
         petbuild|*.patch|sha256.sum|*-*|DOTconfig|*.c|*.h) ;;
-        *) cp -a $EXTRAFILE ../packages-${DISTRO_FILE_PREFIX}/${NAME}/
+        *) cp -a $EXTRAFILE rootfs-complete/
         esac
     done
 
-    for SUFFIX in _DOC _NLS; do
-        [ ! -d ../packages-${DISTRO_FILE_PREFIX}/${NAME}${SUFFIX} ] && continue
-        sed -e "s/^${NAME}/${NAME}${SUFFIX}/" -e "s/|${NAME}/|${NAME}${SUFFIX}/g" ../packages-${DISTRO_FILE_PREFIX}/${NAME}/pet.specs > ../packages-${DISTRO_FILE_PREFIX}/${NAME}${SUFFIX}/pet.specs
-    done
-
-    rmdir ../packages-${DISTRO_FILE_PREFIX}/${NAME}/usr/share 2>/dev/null
-    rmdir ../packages-${DISTRO_FILE_PREFIX}/${NAME}/usr 2>/dev/null
-
-    cat ../packages-${DISTRO_FILE_PREFIX}/${NAME}/pet.specs >> /tmp/petbuild-output.specs
-
-    # redirect packages with menu entries to adrv, with exceptions
-    COPY=1
-    for DRVPKG in $ADRV_INC $YDRV_INC $FDRV_INC; do
-        [ "$DRVPKG" != "$NAME" ] && continue
-        COPY=0
-        break
-    done
-
-    if [ $COPY -eq 1 -a -n "$MAINPKGS" ]; then
-        MAINPKGS="$MAINPKGS $NAME"
-    elif [ $COPY -eq 1 ]; then
-        MAINPKGS="$NAME"
+    if [ -f rootfs-complete/pinstall.sh ]; then
+        cd rootfs-complete
+        bash pinstall.sh
+        rm -f pinstall.sh
+        cd ..
     fi
 done
-
-(cd .. && copy_pkgs_to_build "$MAINPKGS" rootfs-complete)
 
 echo

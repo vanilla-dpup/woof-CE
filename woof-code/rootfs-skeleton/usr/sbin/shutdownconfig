@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #(c) Copyright Barry Kauler sept. 2011 bkhome.org
 #2011 GPL licence v3 (/usr/share/doc/legal)
 #the idea of this script is that it is called when PUPMODE==5 by scripts
@@ -159,19 +159,16 @@ choosepartfunc() {
  if [ "$expBOOTDRV" = "" ];then
   T_finntitle="$(gettext 'First shutdown: get ready')"
   if [ "$PDEV1_ISOPTICAL" ] ; then
-   T_iso="`eval_gettext \"You have booted off a live-CD or DVD, and you can now save your personal settings and files to a USB Flash drive or any hard drive partition.
-However, if you have burnt the CD/DVD as multisession (not closed), then sessions can be saved as additional tracks to the CD/DVD -- each saved session will appear on the CD/DVD as a directory with all the saved files in it, not as a single file. \Zb\Z1THIS IS STILL EXPERIMENTAL, AND DOES NOT WORK WITH LAPTOP OPTICAL DRIVES\Zn\ZB\"`"
-    T_yesno="$T_iso\n\n$T_yesno
-$(eval_gettext "or \Zb${T_cd}\ZB button to save your session back to the CD/DVD..." )"
-    ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_finntitle" --colors --extra-button --ok-label "$T_continue" --extra-label "$T_cd" --cancel-label "$T_abort" --yesno "$T_yesno" 0 0
+    T_iso="`eval_gettext \"You have booted off a live-CD or DVD, and you can now save your personal settings and files to a USB Flash drive or any hard drive partition.\"`"
+    T_yesno="$T_iso\n\n$T_yesno"
+    ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_finntitle" --colors --ok-label "$T_continue" --cancel-label "$T_abort" --yesno "$T_yesno" 0 0
    SAVECHOICE=$?
-   [ "$SAVECHOICE" == "3" ] && PUPMODE=77 && SAVEPART="$PDEV1" && return 1 #save to cd/dvd.
    [ ! $SAVECHOICE -eq 0 ] && return 3 #skip. 
   fi
  fi
 
  #130216 add f2fs...
- PARTSLIST="`probepart -m 2> /dev/null | grep '^/dev/' | grep -E 'f2fs|ext2|ext3|ext4|reiserfs|btrfs|minix|msdos|vfat|exfat|ntfs' | cut -f 1-3 -d '|' | sed -e 's/msdos/vfat/g'`"
+ PARTSLIST="`probepart -m 2> /dev/null | grep '^/dev/' | grep -E 'f2fs|ext2|ext3|ext4|xfs|btrfs|msdos|vfat|exfat|ntfs' | cut -f 1-3 -d '|' | sed -e 's/msdos/vfat/g'`"
 
  #nothing to save to...
  if [ "$PARTSLIST" = "" ];then
@@ -206,7 +203,7 @@ $(eval_gettext "or \Zb${T_cd}\ZB button to save your session back to the CD/DVD.
   [ $ASIZE -lt 600 ] && continue
   AFS="`echo -n "$APART" | cut -f 2 -d '|'`"
   case $AFS in
-   ext4|ext3|ext2|f2fs|reiserfs|btrfs|minix)
+   ext4|ext3|ext2|f2fs|xfs|btrfs)
     [ "$ATAG" = "$PDEV1" ] && touch /tmp/pdev1islinux
     [ $ASIZE -gt $maxLIN ] && { echo "$ATAG" > /tmp/maxlintag; maxLIN=$ASIZE; }
     ;;
@@ -289,8 +286,8 @@ $(gettext "Instead, you should first run Microsoft Windows -- most often this pr
   T_partitiontitle="$(gettext 'First shutdown: choose partition')"
   T_menu="$(gettext 'Please choose a partition to create a pupsave on.')
 
-$(gettext 'For Windows partitions(ntfs/vfat), Puppy makes a file with a Linux filesystem image in it. The size is typically 512MB - 4GB (it can be made bigger later).')
-$(gettext 'On linux partitions(ext3 and etc.), Puppy makes a folder for pupsave. Unlike single file, the size is not predetermined but limited by the free space of the partition. A Linux partition is recommended, if available.')
+$(gettext 'For Windows partitions(ntfs/vfat), Puppy makes a file with a Linux filesystem image in it. The size is typically 512MB - 4GB (it can be made bigger later) and preallocated if f.s. or driver lacks support for sparse files.')
+$(gettext 'On linux partitions(ext4 and etc.), Puppy makes a folder for pupsave. Unlike single file, the size is not predetermined but limited by the free space of the partition. A Linux partition is recommended, if available.')
 
 $(gettext 'Highlight desired choice, then click OK button...')"
   echo '#!/bin/sh' > /tmp/savedlg
@@ -374,7 +371,7 @@ choosestyle() {
  $(gettext "A \Zbfolder\ZB is recommended for this case, but you still have another option if you have some reason and you want it.")"
  T_folder="$(gettext 'Save in a folder.') $(gettext '*RECOMMENDED*')"
  T_partition=$(gettext "Save to the entire partition. Only one profile.")
- T_file=$(gettext 'Single file, ext2/3/4 filesystem image in it.')
+ T_file=$(gettext 'Single file, ext4 filesystem image in it.')
  ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_fstitle" --colors --no-cancel --default-item folder --menu "$T_fsmenu" 0 0 0 folder "$T_folder" file "$T_file" 2>/tmp/rc.shutdown_pupsave_style
  SAVESTYLE=$(cat /tmp/rc.shutdown_pupsave_style)
  [ "$SAVESTYLE" ]
@@ -389,28 +386,20 @@ choosesize() {
  SIZEPFILE=524288 #512M = 524288K
  [ $SIZEPFILE -gt  $PARTFREE ] && SIZEPFILE=$PARTFREE
  [ $PARTFREE -gt 32768 ] && choosesizefunc $PARTFREE #sets SIZEPFILE
- if [ "`echo -n $SAVEFILE | grep '\.[34]fs$'`" != "" ];then #ext3 f.s. needs minimum size.
-  [ $SIZEPFILE -lt 5000 ] && return 1 #precaution. rerwin discovered this.
- fi
+ [ $SIZEPFILE -lt 5000 ] && return 1 #precaution. rerwin discovered this.
 }
 
 choosefs(){
- #choose f.s. of save-file... 100410 for now, leave out ext4, doesn't work...
  T_fstitle="$(gettext 'First shutdown: choose filesystem')"
- T_fsmenu="$(gettext 'Previously, Puppy has only used 'ext2', now there is a choice. Regarding power-failure, note that Puppy will do a f.s. check at next boot so ext2 can recover, however journalled filesystems can recover even without a f.s. check. If in doubt, choose 'ext2'. After making the choice, click OK button...')"
- T_ext2="$(gettext 'Maximum storage space, encrypted save-file must use ext2')"
- T_ext3="$(gettext 'Journalled f.s., safest if power failure etc.')"
- #120427 01micko: support ext4...
+ T_fsmenu="$(gettext 'Previously, Puppy has only offered 'ext2', now there is a choice. Regarding power-failure, note that Puppy will do a f.s. check at next boot so f.s. can recover, however journalled filesystems can recover even without a f.s. check. If in doubt, choose 'journalled'. After making the choice, click OK button...')"
  T_ext4="$(gettext 'Journalled f.s., safest if power failure etc.')"
- if [ "`grep 'ext4$' /proc/filesystems`" != "" ];then #120428 technosaurus: simplify test. 
-  ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_fstitle" --no-cancel --default-item ext4 --menu "$T_fsmenu" 0 0 0 ext2 "$T_ext2" ext3 "$T_ext3"  ext4 "$T_ext4" 2>/tmp/rc.shutdown_pupsave_fs #120425 01micko
- else
-  ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_fstitle" --no-cancel --default-item ext3 --menu "$T_fsmenu" 0 0 0 ext2 "$T_ext2" ext3 "$T_ext3"  2>/tmp/rc.shutdown_pupsave_fs #110926
- fi
- SFFS="`cat /tmp/rc.shutdown_pupsave_fs`"
- [ "$SFFS" = "" ] && SFFS='ext2'
- SFEXTNUM="`echo -n "$SFFS" | cut -c 4`"
- SFEXT="${SFEXTNUM}fs" #ex: 2fs
+ T_ext4_nj="$(gettext 'Non-journalled f.s., reduces writing to disk etc.')"
+ ${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_fstitle" --no-cancel --default-item ext4 --menu "$T_fsmenu" 0 0 0 1 "$T_ext4" 2 "$T_ext4_nj" 2>/tmp/rc.shutdown_pupsave_fs #120425 01micko
+ CHOICE="`cat /tmp/rc.shutdown_pupsave_fs`"
+ SFFS='ext4'
+ SFFSOPTS=''
+ [ "$CHOICE" = '2' ] && SFFSOPTS='-O ^has_journal'
+ SFEXT="4fs"
 }
 
 choosename() {
@@ -457,11 +446,8 @@ This must be remembered and entered at every bootup.')"
     fi
     [ "$MYPASSWORD" ] && break
   done
-  DENSITY="z"
   CRYPTO='luks'
   CRYPT_NAME="_luks"
-  SFEXT="4fs"
-  SFFS="ext4"
  fi
 }
 
@@ -494,7 +480,11 @@ enmount() {
  [ "$SMNTPT" = "" ] && SMNTPT="`ps -e | grep -o 'ntfs\-3g.*' | grep "$sPTN" | tr '\t' ' ' | tr -s ' ' | tr ' ' "\n" | grep '^/mnt/'`"
  if [ "$SMNTPT" = "" ];then
   mkdir /mnt/$SAVEPART 2>/dev/null
-  mount -t $SAVEFS /dev/$SAVEPART /mnt/$SAVEPART
+  if [ "$SAVEFS" = 'ntfs' ] && grep -q ntfs3 /proc/filesystems;then
+   mount -t ntfs3 -o sparse /dev/$SAVEPART /mnt/$SAVEPART || mount -t ntfs3 /dev/$SAVEPART /mnt/$SAVEPART || mount -t $SAVEFS /dev/$SAVEPART /mnt/$SAVEPART
+  else
+   mount -t $SAVEFS /dev/$SAVEPART /mnt/$SAVEPART
+  fi
   SMNTPT="/mnt/$SAVEPART"
  fi
  return 0
@@ -536,7 +526,9 @@ The filesystem of \\\${SAVEPART} partition: \Zb\\\${SAVEFS}\ZB
 Name of the save file:            \Zb\\\${NAMEONLY}\ZB
 Path (folder) of the save file:   \Zb\\\${SAVEPATH}\ZB
 Size of save file:                \Zb\\\${SIZEPFILE}KB (\\\${AAAMB}MB)\ZB
+Encryption:                       \Zb\\\${CRYPTO}\ZB
 Filesystem inside save file:      \Zb\\\${SFFS}\ZB
+Filesystem options:               \Zb\\\${SFFSOPTS}\ZB
 
 If they definitely look right, choose \Zb\\\${T_saniyes}\ZB button...
 If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
@@ -550,7 +542,9 @@ The filesystem of \\\${SAVEPART} partition: \Zb\\\${SAVEFS}\ZB
 Name of the save file:            \Zb\\\${NAMEONLY}\ZB
 Path (folder) of the save file:   \Zb\\\${SAVEPATH}\ZB
 Size of save file:                \Zb\\\${SIZEPFILE}KB (\\\${AAAMB}MB)\ZB
+Encryption:                       \Zb\\\${CRYPTO}\ZB
 Filesystem inside save file:      \Zb\\\${SFFS}\ZB
+Filesystem options:               \Zb\\\${SFFSOPTS}\ZB
 
 If they definitely look right, choose \Zb\\\${T_saniyes}\ZB button...
 Looks ok, but you want to change the folder, choose \Zb\\\${T_sanichange}\ZB...
@@ -589,30 +583,21 @@ If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
   ${DIALOGEXE} ${BACKGROUNDORANGE} ${TITLEPARAM} "$T_createtitle" --colors --ok-label "OK" --msgbox "$T_createsf" 0 0 &
   w1PID=$!
  fi
- dd if=/dev/zero of=${SMNTPT}$SAVEFILE bs=1k count=$SIZEPFILE >&2
+ dd if=/dev/zero of=${SMNTPT}$SAVEFILE bs=1k count=$SIZEPFILE conv=sparse >&2
  sync
  echo "`eval_gettext \"Creating a \\\${SFFS} filesystem in \\\${NAMEONLY}...\"`"
  if [ "$CRYPTO" = "" ];then
-  mkfs.${SFFS} -q -m 0 -F ${SMNTPT}$SAVEFILE
+  mkfs.${SFFS} -q -m 0 -F ${SMNTPT}$SAVEFILE ${SFFSOPTS}
   #...default is f.s. auto checked every 26 mounts or 180 days. tune2fs to change.
   pupkill $w1PID #130525 moved down.
  else
   #note: loop2 is kept available for scripts to use. but, find which is free...
   echo -e "Save this log somewhere and close this window to continue...\n" >/tmp/mk2fs.log
   DEVLOOP="$(losetup -f)"
-  if [ "$CRYPTO" = "luks" ] ; then
-    losetup -v $DEVLOOP ${SMNTPT}$SAVEFILE >>/tmp/mk2fs.log
-    VER="$(cryptsetup --version)"
-    VER="${VER#cryptsetup }"
-    OPTS=""
-    vercmp "$VER" ge 2.1.0 && OPTS="--type luks1" # cryptsetup 1.7.5 in initrd doesn't support luks2
-    echo -n "$MYPASSWORD" | cryptsetup luksFormat -v $DEVLOOP $OPTS - &>>/tmp/mk2fs.log
-    echo -n "$MYPASSWORD" | cryptsetup luksOpen -v $DEVLOOP savefile - &>>/tmp/mk2fs.log
-    FSCK_DEV=/dev/mapper/savefile
-  fi
-  echo "mke2fs -v -t $SFFS -m 0 -E nodiscard -F $FSCK_DEV" >>/tmp/mk2fs.log
-  mke2fs -v -t $SFFS -m 0 -E nodiscard -F $FSCK_DEV &>>/tmp/mk2fs.log && \
-  e2fsck -v -f -y -E discard $FSCK_DEV &>>/tmp/mk2fs.log || e2fsck -v -f -y $FSCK_DEV &>>/tmp/mk2fs.log
+  losetup -v $DEVLOOP ${SMNTPT}$SAVEFILE >>/tmp/mk2fs.log
+  echo -n "$MYPASSWORD" | cryptsetup luksFormat -v $DEVLOOP --type luks1 - &>>/tmp/mk2fs.log
+  echo -n "$MYPASSWORD" | cryptsetup luksOpen -v $DEVLOOP savefile - &>>/tmp/mk2fs.log
+  mkfs.${SFFS} -q -m 0 -F /dev/mapper/savefile ${SFFSOPTS} &>>/tmp/mk2fs.log
   if [ $? -ne 0 ] ; then
     pupkill $w1PID
     /usr/lib/gtkdialog/box_ok "$(gettext 'Error')" error "$(gettext 'Unable to create filesystem')"
@@ -671,7 +656,6 @@ If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
  done
 
  mkdir -p $SMNTPT$SAVEFILE 2>/dev/null
- cp -f /usr/share/pixmaps/puppy/puppy_save.svg  "$SMNTPT$SAVEFILE/.DirIcon"
 
  PUPMODE=128
  SAVEPART=${SAVEPART}
@@ -714,7 +698,7 @@ autosavefunc() {
      return 1
    fi
    case $SAVEFS in
-     ext?|reiserfs|minix|btrfs|f2fs) SAVEFS_IS_LINUX="y";;
+     ext?|xfs|btrfs|f2fs) SAVEFS_IS_LINUX="y";;
      *) SAVEFS_IS_LINUX="";;
    esac
    if [ "$SAVEFS_IS_LINUX" = "y" ];then
@@ -726,15 +710,9 @@ autosavefunc() {
        return 1
      fi
      mkdir -p "${SMNTPT}${SAVEFILE}" 2>/dev/null
-     cp -f /usr/share/pixmaps/puppy/puppy_save.svg  "${SMNTPT}${SAVEFILE}/.DirIcon"
      SAVEPATH=$(dirname "$SAVEFILE")
      [ "$SAVEPATH" = '/' ] && SAVEPATH=''
      PUPMODE=128
-     return 0
-   elif [ "$SAVEFS" = "vfat" ];then
-     PUPMODE=66
-     umount ${SMNTPT} 2>/dev/null
-     SMNTPT=''
      return 0
    fi
  fi
@@ -776,7 +754,6 @@ T_orwait240=""
 T_orwait240=$(printf "$(gettext '(Or, wait %s seconds to shutdown without saving anything)')" "$TIMELIMIT")
 
 T_save="$(gettext 'SAVE')"
-T_cd="$(gettext 'SAVE TO CD')"
 
 #130221 note, pupdialog will exit with 255 if click window close-box, 254 if timeout.
 # former, want to abort shutdown, latter, shutdown without saving.
@@ -831,18 +808,17 @@ case $SAVECHOICE in
   elif choosepartfunc; then
     enmount
     case $SAVEFS in
-      ext?|reiserfs|minix|btrfs|f2fs) SAVEFS_IS_LINUX="y";;
+      ext?|xfs|btrfs|f2fs) SAVEFS_IS_LINUX="y";;
       *) SAVEFS_IS_LINUX="";;
     esac
     SAVESTYLE='file'
-    DENSITY=''
     SFEXT=''
     if cryptsetup --help >/dev/null 2>&1 && modprobe dm-crypt && modprobe xts ; then
       choosecrypt_new
     fi
-    [ -z "$DENSITY" ] && [ "$SAVEFS_IS_LINUX" ] && choosestyle
+    [ "$SAVEFS_IS_LINUX" ] && choosestyle
     if [ "$SAVESTYLE" = "file" ]; then
-       [ -z "$DENSITY" ] && choosefs
+       choosefs
        choosesize || exit	###FIXME###
     fi
     choosename

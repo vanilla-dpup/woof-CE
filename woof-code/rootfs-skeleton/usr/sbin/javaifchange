@@ -1,3 +1,0 @@
-#!/bin/ash
-# /usr/sbin/javaifchange
-exec /etc/init.d/javaif.sh change

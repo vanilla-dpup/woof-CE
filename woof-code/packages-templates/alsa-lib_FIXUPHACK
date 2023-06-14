@@ -1,3 +1,0 @@
-
-rm -rf etc
-[ -e ../alsa-lib_DEV/etc/asound.conf ] && rm -fv ../alsa-lib_DEV/etc/asound.conf

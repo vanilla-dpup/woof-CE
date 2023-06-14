@@ -1,7 +1,0 @@
-#!/bin/bash
-# shellcheck disable=SC1090 # Skip sourced checks.
-# shellcheck disable=SC2034 # Variable used by sourced file.
-INTERFACE="$(cat /etc/frisbee/interface)"
-. "$FRISBEEFUNCDIR/connect-func"
-connect
-#reset_dhcp&

@@ -1,1 +1,6 @@
 rm -f `find . -name libwireplumber-module-logind.so` 2>/dev/null
+
+cat << EOF >> etc/apt/apt.conf.d/00puppy-wireplumber
+DPkg::Post-Invoke { "rm -f /usr/lib/*/wireplumber-*/libwireplumber-module-logind.so || true"; };
+EOF
+chmod 644 etc/apt/apt.conf.d/00puppy-wireplumber

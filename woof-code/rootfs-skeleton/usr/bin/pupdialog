@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/ash
 #(c) Copyright Barry Kauler Sept. 2011 puppylinux.com
 #2011 GPL licence v3 (/usr/share/doc/legal)
 #a simple replacement for 'dialog', for when X is running. can use this instead of Xdialog.

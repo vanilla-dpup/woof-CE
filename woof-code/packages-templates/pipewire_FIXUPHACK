@@ -1,7 +1,7 @@
 # add an apulse stub to avoid breakage of old .pet packages that run applications with apulse (apulse $CMD)
-mkdir -p usr/bin
-cat << EOF > usr/bin/apulse
+mkdir -p usr/local/bin
+cat << EOF > usr/local/bin/apulse
 #!/bin/ash
 exec "\$@"
 EOF
-chmod 755 usr/bin/apulse
+chmod 755 usr/local/bin/apulse

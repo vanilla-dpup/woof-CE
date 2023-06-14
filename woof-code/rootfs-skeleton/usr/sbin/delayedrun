@@ -28,8 +28,6 @@ if [ ! -f /var/local/delayedrun_firstboot_flag ];then
   if [ ! -f /tmp/delayedrun_firstboot_flag ];then
     # if quicksetup restarts X, reenter here jumps this...
     touch /tmp/delayedrun_firstboot_flag
-    # rerwin: skip quicksetup if /etc/personal_settings_popup_disabled file created by remasterpup2
-    [ ! -f /etc/personal_settings_popup_disabled ] && quicksetup
   fi
   if [ -c /dev/mixer -o -c /dev/snd/controlC0 ];then #test for sound ready, see /etc/init.d/10alsa.
    aplay /usr/share/audio/2barks.au &

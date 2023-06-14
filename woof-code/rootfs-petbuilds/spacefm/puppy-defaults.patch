@@ -180,7 +180,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
      {
          v = atoi( value );
 -        app_settings.height = ( v > 0 ? v : 480 );
-+        app_settings.height = ( v > 0 ? v : 240 );
++        app_settings.height = ( v > 0 ? v : 301 );
      }
      if ( 0 == strcmp( name, "maximized" ) )
      {
@@ -207,7 +207,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
      //app_settings.splitter_pos = 160;
      app_settings.width = 640;
 -    app_settings.height = 480;
-+    app_settings.height = 240;
++    app_settings.height = 301;
  
      // MOD extra settings
      xset_defaults();

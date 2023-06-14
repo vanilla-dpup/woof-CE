@@ -1,141 +1,153 @@
-#!/bin/bash
-#(c) Copyright 2009 Barry Kauler.
-#110819 support/findpkgs is new script to find all pkgs to be used in Puppy build.
+#!/bin/sh -e
 
-[ -n "$GITPOD_WORKSPACE_ID" -a "`id -u`" -ne 0 ] && exec fakeroot $0 "$@"
-
-export LANG=C #faster.
-[ $1 ] && XPKG=$1 #download specific pkg
-MWD=$PWD
-
-. ./_00build.conf
-. ./_00func
 . ./DISTRO_SPECS
-source_compat_repos  # ./DISTRO_COMPAT_REPOS-
-. ./DISTRO_PET_REPOS #has PACKAGELISTS_PET_ORDER
-set_binaries_var     #ex: BINARIES=tgz_txz-14.2 BINARIES=deb-xenial
-create_local_repos_dirs
-rm -f DOWNLOAD-FAILS-* 2>/dev/null
-wget --help | grep -q '\--show-progress' && WGET_SHOW_PROGRESS='-q --show-progress'
+. ./_00build.conf
+. ./DISTRO_PKGS_SPECS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}
 
-xabort() {
-	if [ -f /tmp/1dl_busy ] ; then
-		read file < /tmp/1dl_busy
-		rm -f $file /tmp/1dl_busy
-	fi
-	do_exit "Aborted"
-}
+case "$DISTRO_TARGETARCH" in
+x86_64) ARCH=amd64 ;;
+x86) ARCH=i386  ;;
+arm) ARCH=armhf ;;
+arm64) ARCH=aarch64 ;;
+*) exit 1 ;;
+esac
 
-function do_exit() { #$1: msg
-	echo -e "\n${1}"
-	echo -e "\nScript finished."
-	exit
-}
+case "$DISTRO_BINARY_COMPAT" in
+debian) MIRROR=http://deb.debian.org/debian ;;
+devuan) MIRROR=http://deb.devuan.org/merged ;;
+ubuntu) MIRROR=http://archive.ubuntu.com/ubuntu ;;
+*) exit 1 ;;
+esac
 
-trap "xabort" SIGINT SIGTERM
+export DEBIAN_FRONTEND=noninteractive
 
-run_findpkgs #find all packages that will be used in the Puppy build...
+mkdir -p sandbox3
+cd sandbox3
 
-#==============================================================================
+CACHE_DIR=`pwd`/../../local-repositories/debootstrap/${DISTRO_TARGETARCH}
+mkdir -p "$CACHE_DIR"
+TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz"
+[ "$USR_SYMLINKS" != "yes" ] || TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}-usrmerge.tar.gz"
 
-REPOS_DISTRO_COMPAT=$(echo "$REPOS_DISTRO_COMPAT" | tr ' ' '\n')
-PET_REPOS=$(echo "$PET_REPOS" | tr ' ' '\n')
-XFILE=status/findpkgs_FINAL_PKGS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}
+rm -rf rootfs
 
-echo -e "\nDownloading packages..."
-if [ $XPKG ] ; then
-	XFILE=/tmp/zz_downloadpkg
-	grep ":${XPKG}:" status/findpkgs_FINAL_PKGS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION} | sort > /tmp/zz_downloadpkg
+if [ "$USR_SYMLINKS" = "yes" -a ! -e ${TARBALL} ]; then
+	debootstrap --arch=$ARCH --variant=minbase --include=sysvinit-core --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
+elif [ ! -e ${TARBALL} ]; then
+	debootstrap --no-merged-usr --arch=$ARCH --variant=minbase --include=sysvinit-core --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
 fi
 
-echo "" > $MWD/status/download_list
-while read ONEDBENTRY
-do
-	#ONEDBENTRY=:GENERICNAME:|PETorCOMPAT|DBFILE|pkgname|nameonly|version|pkgrelease|category[;subcategory]|size|path|fullfilename|dependencies|description|compileddistro|compiledrelease|repo|
-	#...pkgname onwards is the full db entry for a package.
-	IFS="|" read -r F1 F2 F3 F4 F5 F6 F7 F8 F9 F10 F11 F12 F13 <<< "$ONEDBENTRY"
-	PETorCOMPAT="$F2" #ex: compat
-	DBFILE="$F3"           #ex: Packages-puppy-5-official
-	DB_genericname="$F1"	#ex: abiword
-	DB_pkgname="$F4"       #ex: abiword-2.3.4-w5
-	DB_fullfilename="$F11" #ex: abiword-2.3.4-w5.pet
-	DB_path="$F10"         #ex: pet_packages-5
-	if [ ! "$DB_path" ];then
-		ONLINESUBDIR="`echo -n "$DBFILE" | cut -f 3 -d '-'`"   #ex: 5
-		if [ "$PETorCOMPAT" = "pet" ];then #120515
-			DB_path="pet_packages-${ONLINESUBDIR}"
-		else #compat binary tarballs
-			DB_path="compat_packages-${ONLINESUBDIR}"
-		fi
-	fi
- 
-	if [ "$PETorCOMPAT" = "pet" ];then
-		LFILE=${MWD}/DOWNLOAD-FAILS-PET
-		FILE_DIR=${MWD}/packages-pet
-	else #-- compat
-		LFILE=${MWD}/DOWNLOAD-FAILS-${BINARIES}
-		FILE_DIR=${MWD}/packages-${BINARIES}
-	fi
-	FILE_PATH=${FILE_DIR}/${DB_fullfilename}
+# create a tiny installation of the compatible distro
+if [ "$USR_SYMLINKS" = "yes" ]; then
+	debootstrap --arch=$ARCH --variant=minbase --unpack-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
+else
+	debootstrap --no-merged-usr --arch=$ARCH --variant=minbase --unpack-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
+fi
 
-	if [ -f "$FILE_PATH" ] ; then
-		echo -n " ${DB_fullfilename}"
-		continue
-	fi
-	echo -e "\n* Downloading ${DB_fullfilename}"
+rm -f rootfs/etc/resolv.conf
+cat /etc/resolv.conf > rootfs/etc/resolv.conf
 
-	if [ "$PETorCOMPAT" = "pet" ];then
-		XREPOS="$PET_REPOS"
-	else #-- compat
-		XREPOS="$REPOS_DISTRO_COMPAT"
-	fi
+[ ! -e ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz ] || tar -C rootfs -xzf ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz
 
-	SUCCESS='no'
+# configure the package manager
+case "$DISTRO_BINARY_COMPAT" in
+debian)
+	case "$DISTRO_COMPAT_VERSION" in
+	sid)
+		cat << EOF > rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
+EOF
+		;;
+	stretch|buster|bullseye)
+		cat << EOF > rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free
+deb ${MIRROR}-security ${DISTRO_COMPAT_VERSION}-security main contrib non-free
+EOF
+		;;
+	*)
+		cat << EOF > rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free non-free-firmware
+deb ${MIRROR}-security ${DISTRO_COMPAT_VERSION}-security main contrib non-free non-free-firmware
+EOF
+		;;
+	esac
+	;;
 
-	# have to give priority to the repo $DBFILE is in
-	# $DBFILE ex: Packages-slackware-14.2-official
-	# z|http://mirror.aarnet.edu.au/pub/slackware/slackware-14.2|Packages-slackware-14.2-official
-	REPOS="$(echo "$XREPOS" | grep "|${DBFILE}$")
-$(echo "$XREPOS" | grep -v "|${DBFILE}$")"
-	URLS="$(echo "$REPOS" | cut -f 2 -d '|')"
+devuan)
+	case "$DISTRO_COMPAT_VERSION" in
+	ceres)
+		cat << EOF > rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
+EOF
+		;;
+	ascii|beowulf|chimaera)
+		cat << EOF > rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-security main contrib non-free
+EOF
+		;;
+	*)
+		cat << EOF > rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free non-free-firmware
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-security main contrib non-free non-free-firmware
+EOF
+		;;
+	esac
+	;;
 
-	for ONE_URL in ${URLS}
-	do
-		REMOTE_PATH=${ONE_URL}/${DB_path}/${DB_fullfilename}
-		echo "  - from ${REMOTE_PATH%/*}"
-		echo -n "$PWD/${DB_fullfilename}" > /tmp/1dl_busy
-		wget --no-check-certificate -c ${WGET_SHOW_PROGRESS} \
-		 -O ${FILE_PATH} --timeout=15 ${REMOTE_PATH} || {
-			echo "  failed (file not found on server or could not finish download)"
-			rm -f ${FILE_PATH}
-			continue
-		}
-		#-
-		${MWD}/rootfs-skeleton/usr/local/petget/verifypkg.sh ${FILE_PATH}
-		[ $? -eq 0 ] && SUCCESS='yes'
-		#-
-		if [ "$SUCCESS" = "no" ] ; then
-			echo "  failed (file not found or corrupted file)"
-			rm -f ${FILE_PATH} 2>/dev/null
-		fi
-		rm -f /tmp/1dl_busy
-		#--
-		if [ "$SUCCESS" = "yes" ] ; then
-			echo "  success"
-			echo "${DB_genericname}" >> $MWD/status/download_list
-			break
-		fi
-	done
+ubuntu)
+	echo "deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main universe multiverse restricted" > rootfs/etc/apt/sources.list
 
-	if [ "$SUCCESS" = "no" ] ; then
-		echo "DOWNLOAD FAIL: ${DB_fullfilename}"
-		[ -z "$GITHUB_ACTIONS" ] || exit 1
-		echo "$DB_fullfilename" >> ${LFILE}
+	if [ "$DISTRO_COMPAT_VERSION" != "devel" ]; then
+		cat << EOF >> rootfs/etc/apt/sources.list
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main universe multiverse restricted
+deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-security main universe multiverse restricted
+EOF
 	fi
 
-done < $XFILE
+	# the x86 repo is small, contains popular packages like Steam and won't make apt update 2x slower
+	[ "$ARCH" != "amd64" ] || chroot rootfs dpkg --add-architecture i386
+	;;
+esac
+cat << EOF > rootfs/etc/apt/apt.conf.d/00puppy
+APT::Install-Recommends "false";
+APT::Install-Suggests "false";
+EOF
+chroot rootfs apt-get update
+chroot rootfs apt-get upgrade -y
 
-[ $XPKG ] && echo && exit
-do_exit ""
+# prevent the installation of systemd
+chroot rootfs apt-mark hold systemd
 
-###END###
+# install all packages
+PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n'`
+chroot rootfs apt-get install -y $PKGS
+
+# add busybox, missing package recommendations, Synaptic and gnome-software
+chroot rootfs apt-get install -y busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software fwupd
+[ -e rootfs/usr/bin/flatpak ] && chroot rootfs apt-get install -y gnome-software-plugin-flatpak
+
+# impersonate Puppy
+install -m 644 ../DISTRO_SPECS rootfs/etc/DISTRO_SPECS
+
+# install development packages to devx
+rm -rf devx
+cp -a rootfs devx
+PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 -d \| | tr , " "`
+chroot devx apt-get install -y $PKGS
+
+# create an archive of downloaded packages
+tar -C devx -c var/cache/apt/archives | gzip -1 > ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz
+
+# remove any unneeded packages
+chroot rootfs apt-get autoremove -y --purge
+
+# remove unneeded files
+chroot rootfs apt-get clean
+rm -f rootfs/var/lib/apt/lists/* 2>/dev/null || :
+rm -rf rootfs/etc/resolv.conf rootfs/run/* rootfs/var/log/* rootfs/var/cache/man rootfs/var/cache/fontconfig rootfs/var/cache/ldconfig rootfs/usr/share/mime/mime.cache rootfs/etc/ld.so.cache
+rm -rf `find rootfs -name __pycache__`

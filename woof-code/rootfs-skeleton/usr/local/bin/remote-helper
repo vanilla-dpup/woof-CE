@@ -1,7 +1,0 @@
-#!/bin/sh
-
-while netstat | grep 'ssh' | grep -qi 'ESTABLISHED'
-do
-	sleep 5
-	exec "$@"
-done

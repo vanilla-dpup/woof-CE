@@ -1,8 +1,0 @@
-#!/bin/sh
-
-rm -rf usr/share/libgphoto2/*/konica/french
-rm -rf usr/share/libgphoto2/*/konica/german
-rm -rf usr/share/libgphoto2/*/konica/japanese
-rm -rf usr/share/libgphoto2/*/konica/korean
-rm -rf usr/share/libgphoto2/*/konica/spanish
-

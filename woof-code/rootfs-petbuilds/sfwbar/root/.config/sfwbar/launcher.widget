@@ -1,69 +1,57 @@
 layout {
   css = "* { -GtkWidget-direction: right; -GtkWidget-visible: true; }"
   button {
-    value = "directory-home"
+    value = "inode-directory-symbolic"
     action = "defaultfilemanager"
     tooltip = "File manager"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "terminal"
+    value = "utilities-terminal-symbolic"
     action = "defaultterminal"
     tooltip = "Terminal emulator"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "execute"
+    value = "application-x-executable-symbolic"
     action = "defaultprocessmanager"
-    tooltip = "Process Viewer"
+    tooltip = "Task manager"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "browser"
+    value = "web-browser-symbolic"
     action = "defaultbrowser"
-    tooltip = "defaultbrowser"
+    tooltip = "Web browser"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "edit"
+    value = "text-editor-symbolic"
     action = "defaulttexteditor"
-    tooltip = "defaulttexteditor"
+    tooltip = "Text editor"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "paint"
-    action = "defaultpaint"
-    tooltip = "defaultpaint"
+    value = "image-x-generic-symbolic"
+    action = "defaultimageeditor"
+    tooltip = "Image editor"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "spreadsheet"
+    value = "x-office-spreadsheet-symbolic"
     action = "defaultspreadsheet"
-    tooltip = "defaultspreadsheet"
+    tooltip = "Spreadsheet"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "document"
+    value = "x-office-document-symbolic"
     action = "defaultwordprocessor"
-    tooltip = "defaultwordprocessor"
+    tooltip = "Word processor"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
-    value = "preferences-system"
-    action = "wizardwizard"
-    tooltip = "Puppy Setup"
-    css = "* { min-height: 36px; min-width: 36px; }"
-  }
-  button {
-    value = "help"
-    action = "puppyhelp"
-    tooltip = "Puppy Help"
-    css = "* { min-height: 36px; min-width: 36px; }"
-  }
-  button {
-    value = "quit"
+    value = "application-exit-symbolic"
     action = "logout_gui"
-    tooltip = "Leave Puppy"
+    tooltip = "Puppy Log Out"
     css = "* { min-height: 36px; min-width: 36px; }"
   }
 }

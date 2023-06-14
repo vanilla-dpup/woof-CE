@@ -1,2 +1,0 @@
-# don't need this
-[ -d etc/profile.d ] && rm -rf etc/profile.d

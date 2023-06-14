@@ -1,5 +1,0 @@
-
-# config files are in rootfs-skeleton
-# /etc/ppp .. hmmm ..
-
-rm -rf etc

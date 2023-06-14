@@ -1,22 +1,22 @@
 layout {
   image {
-    value = "directory"
+    value = "inode-directory-symbolic"
     action = "defaultfilemanager"
-    tooltip = "Launch file manager"
+    tooltip = "File manager"
     css = "* { min-height: 28px; min-width: 28px; padding: 2px; }"
   }
 
   image {
-    value = "browser"
+    value = "web-browser-symbolic"
     action = "defaultbrowser"
-    tooltip = "Launch browser"
+    tooltip = "Web browser"
     css = "* { min-height: 28px; min-width: 28px; padding: 2px; }"
   }
 
   image {
-    value = "terminal"
+    value = "utilities-terminal-symbolic"
     action = "defaultterminal"
-    tooltip = "Launch terminal"
+    tooltip = "Terminal"
     css = "* { min-height: 28px; min-width: 28px; padding: 2px; }"
   }
 }

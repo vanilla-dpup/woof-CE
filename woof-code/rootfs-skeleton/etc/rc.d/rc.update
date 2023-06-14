@@ -182,7 +182,6 @@ case $PUPMODE in
  ;;
  5)
   #PUPMODE=5 is first boot, ignore.
-  /usr/sbin/savesession-dvd 5 # creates /archive if booting from cd..
   basic_update
   if [ -f /etc/rc.d/WOOFMERGEVARS ];then # inserted by 3builddistro.
    . /etc/rc.d/WOOFMERGEVARS
@@ -274,20 +273,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
     [ -f ${OLDFILESMNTPT}/etc/rc.d/${i} ] && cp -af ${NEWFILESMNTPT}/etc/rc.d/${i} /etc/rc.d/
  done
 
- SKIPLIST="`grep '^SKIPLIST' /etc/rc.d/MODULESCONFIG | cut -f 2 -d '"'`" #geany'
- ADDLIST="`grep '^ADDLIST' /etc/rc.d/MODULESCONFIG | cut -f 2 -d "'"`" #geany'
- REGEX1="s%^SKIPLIST.*%SKIPLIST=\"${SKIPLIST}\"%"
- REGEX2="s%^ADDLIST.*%ADDLIST='${ADDLIST}'%"
- cp -af ${NEWFILESMNTPT}/etc/rc.d/MODULESCONFIG /etc/rc.d/
- sed -i -e "${REGEX1}" -e "${REGEX2}" /etc/rc.d/MODULESCONFIG
- 
- #problem, as overwrites LANG setting...
- xLANG="`grep '^LANG=' /etc/profile | cut -f 2 -d '=' | cut -f 1 -d ' '`"
- #110216 still not working. so, do this bad hack (see rc.shutdown)...
- [ -f /var/local/etc_profile_at_shutdown ] && xLANG="`grep '^LANG=' /var/local/etc_profile_at_shutdown | cut -f 2 -d '=' | cut -f 1 -d ' '`" #110216
- REGEX3="s%^LANG=.*%LANG=${xLANG}%"
- sed -e "$REGEX3" ${NEWFILESMNTPT}/etc/profile > /etc/profile
- 
  cp -af ${NEWFILESMNTPT}/root/.xinitrc /root/
  
  #make sure all woof scripts are updated...
@@ -318,7 +303,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
  chmod 1777 /tmp
  chmod 777 /var
 fi
-xLANG="`grep '^LANG=' /etc/profile | cut -f 2 -d '=' | cut -f 1 -d ' '`"
 
 #===========================================================================
 

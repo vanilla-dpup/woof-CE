@@ -8,3 +8,4 @@ Terminal=false
 Type=Application
 Categories=X-SetupEntry;PackageManager
 GenericName=SFS file loader
+MimeType=application/x-squashfs-image;

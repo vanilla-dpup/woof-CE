@@ -93,7 +93,8 @@ create_gpt_drv() {
 	mkdosfs -F 32 -v /dev/${XDEV}1
 	sleep 1
 	case "$XFSTYPE2" in
-		f2fs) mkfs.f2fs /dev/${XDEV}2 ;;
+		f2fs) mkfs.f2fs -f /dev/${XDEV}2 ;;
+		ext4) mkfs.ext4 /dev/${XDEV}2 ;;
 	esac
 	sync
 
@@ -265,10 +266,6 @@ create_bios_bootable_drv() {
 	blockdev --rereadpt /dev/${XDEV}
 
 	#-- create_target_partition
-	if grep -q '64bit' /etc/mke2fs.conf ; then
-		sed -i 's/64bit,//g' /etc/mke2fs.conf #remove 64bit flag
-	fi
-
 	case "$XFSTYPE" in
 		vfat) mkdosfs -F 32 -v /dev/${XDEV}1 ;;
 		ntfs) mkntfs -f /dev/${XDEV}1        ;;
@@ -276,7 +273,8 @@ create_bios_bootable_drv() {
 	esac
 	sleep 1
 	case "$XFSTYPE2" in
-		f2fs) mkfs.f2fs /dev/${XDEV}2 ;;
+		f2fs) mkfs.f2fs -f /dev/${XDEV}2 ;;
+		ext4) mkfs.ext4 /dev/${XDEV}2 ;;
 	esac
 
 	sync
@@ -320,23 +318,13 @@ EOF
 
 #--
 
-unmountcdfunc() {
-	if [ "$CDDRIVE" -a "`mount | grep "^/dev/$CDDRIVE " | cut -f 3 -d ' '`" ];then
-		umount /dev/$CDDRIVE "`mount | grep "^/dev/$CDDRIVE " | cut -f 3 -d ' '`"
-	fi
-	if [ "$ISO_MP" -a "`mount | grep " $ISO_MP "`" ] ; then
-		umount $ISO_MP 2>/dev/null #iso mountpoint
-	fi
-}
-
 locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	SRCPATH=""
 	CDDRIVE=""
-	ISO_MP=""
-	MOUNT_ISO=""
+	ASK=""
 	#-----
 	if [ $PUPMODE -eq 2 ] ; then #full install
-		MOUNT_ISO=1
+		ASK=1
 	else
 		PDEV1_IS_CD=$(probedisk /dev/${PDEV1} 2>/dev/null | grep '|optical|')
 		PDEV1_MP=$(LANG=C mount | grep "^/dev/${PDEV1} " | awk '{print $3}')
@@ -386,32 +374,24 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	fi
 	#-----
 	if [ ! "$SRCPATH" ] ; then
-		MOUNT_ISO=1 #last resort..
+		ASK=1 #last resort..
 	fi
 	#-----
-	if [ "$MOUNT_ISO" ] ; then
-		ISO_MP=/mnt/iso_file
+	if [ "$ASK" ] ; then
 		cd $HOME
-		ISO_FILE=$(/usr/lib/gtkdialog/file_chooser "ISO File" "$(gettext "Please select a Puppy live-CD .iso file for $DISTRO_NAME $DISTRO_VERSION ")")
+		CHOICE=$(/usr/lib/gtkdialog/file_chooser --directory "Puppy Directory" "$(gettext "Please select a directory containing $DISTRO_NAME $DISTRO_VERSION ")")
 		[ $? -ne 0 ] && exit 1
-		umount ${ISO_MP} 2>/dev/null
-		mkdir -p ${ISO_MP}
-		mount -t iso9660 -o loop ${ISO_FILE} ${ISO_MP}
 		#--
-		if [ -f ${ISO_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} ] ; then
-			SRCPATH=${ISO_MP}${PSUBDIR}
-		elif [ -f ${ISO_MP}/${DISTRO_PUPPYSFS} ] ; then
-			SRCPATH=${ISO_MP}
-		else
-			umount ${ISO_MP} 2>/dev/null
-			ISO_MP=""
+		if [ -f ${CHOICE}${PSUBDIR}/${DISTRO_PUPPYSFS} ] ; then
+			SRCPATH=${CHOICE}${PSUBDIR}
+		elif [ -f ${CHOICE}/${DISTRO_PUPPYSFS} ] ; then
+			SRCPATH=${CHOICE}
 		fi
 		#--
 	fi
 	#===============================
 	#sanity check...
 	if [ ! -f ${SRCPATH}/${DISTRO_PUPPYSFS} ];then #v3.01 v424 100913
-		unmountcdfunc
 		Xdialog --wmclass "gtkdialog2" --left \
 			--title "$(gettext 'ERROR')" --msgbox "`eval_gettext \"Oh dear, a 'sanity check' has failed.\
  \nThis file: \\\$SRCPATH/\\\${DISTRO_PUPPYSFS}\ndoes not exist.\nThe above \
@@ -580,6 +560,11 @@ case $EXIT in
 
 	'${F2FS_DLG}'
 
+	'$(create_dlg_item "$(gettext '<b>FAT32 partition + ext4 partition</b>')" \
+		"$(gettext 'Create ext4 partition and install efilinux')" \
+		install_options.svg 13
+		)'
+
 	'$(create_dlg_item "$(gettext '<b>FAT32 GPT UEFI</b>')" \
 		"$(gettext 'Create FAT32 partition and install efilinux')" \
 		install_options.svg 11
@@ -608,6 +593,7 @@ case $EXIT in
 		eval "$RETPARAMS"
 		case $EXIT in
 			11) FSTYPE='vfat' ;;
+			13) FSTYPE='vfat' ; FSTYPE2='ext4' ;;
 			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
 			*) exit ;;
 		esac
@@ -687,6 +673,11 @@ case $EXIT in
 
 	'${F2FS_DLG}'
 
+	'$(create_dlg_item "$(gettext '<b>FAT32 partition + ext4 partition</b>')" \
+		"$(gettext 'Create ext4 partition and install syslinux')" \
+		install_options.svg 13
+		)'
+
 	'$(create_dlg_item "$(gettext '<b>FAT32 partition + syslinux</b>')" \
 		"$(gettext 'Create FAT32 partition and install syslinux')" \
 		install_options.svg 11
@@ -714,6 +705,7 @@ case $EXIT in
 		eval "$RETPARAMS"
 		case $EXIT in
 			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
+			13) FSTYPE='vfat' ; FSTYPE2='ext4' ;;
 			11) FSTYPE='vfat' ;;
 			*) exit ;;
 		esac
@@ -936,7 +928,6 @@ umount /mnt/${USBDRV}1
 if [ "${FSTYPE2}" ] ; then
 	umount /mnt/${USBDRV}2
 fi
-unmountcdfunc
 kill $X1PID
 
 /usr/lib/gtkdialog/box_ok "$(gettext 'BootFlash: Puppy installed')" complete \

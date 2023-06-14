@@ -1,0 +1,1 @@
+chroot . /usr/sbin/setup-spot gplaces=true

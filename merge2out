@@ -51,7 +51,7 @@ if [ "$1" != "" ]; then
 fi
 
 echo
-echo 'This script merges woof-arch, woof-code
+echo 'This script merges woof-code
 woof-distro, kernel-kit and initrd-progs to ../woof-out_*.
 See README.md
 '
@@ -156,8 +156,6 @@ echo
 echo "Directory '${WOOF_OUT}'
 has been created, if it didn't exist, and the contents of 'woof-code' will
 be copied into it. Then, these will also be copied into it:
-woof-arch/${HOSTARCH}/build
-woof-arch/${TARGETARCH}/target
 woof-distro/${TARGETARCH}/${COMPATDISTRO}  (files all levels)
 ${COMPATVERSION_DIR}"
 echo
@@ -184,12 +182,6 @@ sync
 echo | tee -a ${WOOF_OUT}/merge2out.log
 echo "Copying woof-code/*..." | tee -a ${WOOF_OUT}/merge2out.log
 cp -a -f --remove-destination woof-code/* ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
-sync
-echo "Copying woof-arch/${HOSTARCH}/build/*..." | tee -a ${WOOF_OUT}/merge2out.log
-cp -a -f --remove-destination woof-arch/${HOSTARCH}/build/* ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
-sync
-echo "Copying woof-arch/${TARGETARCH}/target/*" | tee -a ${WOOF_OUT}/merge2out.log
-cp -a -f --remove-destination woof-arch/${TARGETARCH}/target/* ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
 sync
 echo "Copying kernel-kit, initrd-progs..." | tee -a ${WOOF_OUT}/merge2out.log
 cp -a -f --remove-destination kernel-kit ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
@@ -218,10 +210,6 @@ do
 done
 
 WOOF_OUT_REALPATH=$(realpath ${WOOF_OUT})
-if [ "$ALTERNATE_BUILD" != "" ];then
-	( cd "${ALTERNATE_BUILD%/*}"
-	tar -cJf ${WOOF_OUT_REALPATH}/rootfs-skeleton/root/.packages/ALTERNATE_BUILD-${ALTERNATE_BUILD##*/}.tar.xz --exclude-vcs --exclude='woof.conf' ${ALTERNATE_BUILD##*/} ) 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
-fi
 if [ "$EXTRA_MERGE" != "" ];then
 	for ONEDIRECTORY in patches $sdirs
 	do
@@ -262,7 +250,7 @@ echo -e "\nUndoing VCS-friendly stuff..." | tee -a ${WOOF_OUT}/merge2out.log
 cd ${WOOF_OUT}
 for d in $sdirs huge_kernel
 do
-	[ -d "${d}" ] && find $d -type f -name EMPTYDIRMARKER -delete
+	[ -d "${d}" ] && find $d -type f -name .gitignore -delete
 done
 sync
 . ./_00func
@@ -297,18 +285,6 @@ if which git &>/dev/null && [ "`git log -n 1`" != "" ]; then
 else
 	echo "BUILD_FROM_WOOF=\"No woof-CE-git info available\"" >> ${WOOF_OUT}/DISTRO_SPECS
 fi
-
-(
-	# make sure target has these...
-	cp -afv woof-arch/${TARGETARCH}/build/support/debdb2pupdb ${WOOF_OUT}/rootfs-skeleton/usr/local/petget/ 2>&1
-	cp -afv woof-arch/${TARGETARCH}/build/support/find_cat ${WOOF_OUT}/rootfs-skeleton/usr/local/petget/ 2>&1 
-	cp -afv woof-arch/${TARGETARCH}/target/rootfs-skeleton/usr/sbin/pngoverlay-cairo ${WOOF_OUT}/support/ 2>&1
-
-	for CONFFILE in passwd shadow group; do
-		[ -e ${WOOF_OUT}/rootfs-skeleton/etc/${CONFFILE}.${COMPATDISTRO} ] && cat ${WOOF_OUT}/rootfs-skeleton/etc/${CONFFILE}.${COMPATDISTRO} > ${WOOF_OUT}/rootfs-skeleton/etc/${CONFFILE}
-		rm -f ${WOOF_OUT}/rootfs-skeleton/etc/${CONFFILE}.*
-	done
-) | tee -a ${WOOF_OUT}/merge2out.log
 
 echo
 echo "Directory '${WOOF_OUT}'

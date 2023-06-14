@@ -70,7 +70,7 @@ jobs:
       - name: Generate SHA512 checksums
         run: |
           find . -type f -name '*.sfs' -exec sha512sum {} \; > SHA512checksums.txt
-          find . -type f -name '*.iso' -exec sha512sum {} \; >> SHA512checksums.txt
+          find . -type f -name '*.img.gz' -exec sha512sum {} \; >> SHA512checksums.txt
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -78,7 +78,7 @@ jobs:
           tag_name: ${{ github.event.inputs.prefix }}-${{ github.event.inputs.version }}${{ github.event.inputs.suffix }}
           fail_on_unmatched_files: true
           files: |
-            *.iso
+            *.img.gz
             *.sfs
             SHA512checksums.txt
           draft: true

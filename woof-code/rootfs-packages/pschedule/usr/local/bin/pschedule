@@ -1,5 +1,0 @@
-#!/bin/bash
-cd "/usr/local/pschedule"
-"/usr/local/pschedule/pschedule" "$@"
-
-

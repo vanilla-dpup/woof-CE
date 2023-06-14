@@ -1,5 +1,5 @@
 #!/bin/sh
-# see also /sbin scripts: usablefs, set_plang, switch
+# see also /sbin scripts: usablefs, switch
 #
 # _FN = _FILENAME
 # _MP = _MOUNTPOINT
@@ -10,10 +10,8 @@
 #First boot (or pfix=ram):  tmpfs                         pup_xxx.sfs      5
 #Normal running puppy:      pup_save.3fs                  pup_xxx.sfs      12
 #ditto, but flash drive:    tmpfs         pup_save.3fs    pup_xxx.sfs      13
-#Multisession cd/dvd:       tmpfs         folders         pup_xxx.sfs      77
 
 ######################## localization ########################
-#ex: /locale/<locale>/init.mo
 L_WINDOWS_HIBERNATED="ERROR: Windows NTFS hibernated partition, cannot mount"
 L_DONE="done"
 L_FAILED="failed"
@@ -104,7 +102,7 @@ fi
 KFILESYSTEMS="$(cat /proc/filesystems | grep -v "nodev" | grep -v "fuseblk" | sed -e "s#\t##g" | tr '\n' '|' | sed -e 's#|$##g')"
 
 #List linux filesystems
-LINUXFSLIST="ext2|ext3|ext4|btrfs|minix|f2fs|reiserfs"
+LINUXFSLIST="ext2|ext3|ext4|xfs|btrfs|f2fs"
 
 #Filesystem to be fsck
 FSCKLIST="ext2|ext3|ext4|vfat|msdos|exfat"
@@ -579,88 +577,6 @@ setup_psave(){ # setup savefile or savefolder
  fi
 }
 
-copy_folders() { #SAVE_LAYER=/pup_ro1
- echo -e "\n-------------------- copy_folders" #debug
- echo "SAVE_MP=$SAVE_MP"
- DESTDIR="/mnt/tmpfs/pup_ro1"
- [ -d "$DESTDIR" ] || mkdir -p $DESTDIR
- rm -r -f "$SAVE_LAYER"
- SAVE_FN="$DESTDIR"
- ln -s $DESTDIR $SAVE_LAYER
- #BKFOLDERS now set in check for pupmode=77
- BKLASTFOLDER="$(echo "${BKFOLDERS}" | head -n 1)"
- #a boot option allows ignore last n sessions, also need to create a badlist...
- if [ "$PIGNORELAST" ];then
-  BKBADLIST="$(echo "${BKFOLDERS}" | head -n ${PIGNORELAST})"
-  if [ -f ${SAVE_MP}/${BKLASTFOLDER}/.badfolders ];then
-   cp ${SAVE_MP}/${BKLASTFOLDER}/.badfolders ${DESTDIR}/
-   if [ $? -ne 0 ];then
-    #fallback, in case last folder badly corrupted...
-    BKPREVFOLDER="$(echo "${BKFOLDERS}" | head -n 2 | tail -n 1)"
-    [ -f ${SAVE_MP}/${BKPREVFOLDER}/.badfolders ] && cp ${SAVE_MP}/${BKPREVFOLDER}/.badfolders ${DESTDIR}/
-   fi
-  fi
-  echo "$BKBADLIST" >> ${DESTDIR}/.badfolders
-  #note, rc.shutdown and savesession-dvd 'touch' this file so it will get saved.
-  sync
- else
-  [ -f ${SAVE_MP}/${BKLASTFOLDER}/.badfolders ] && cp ${SAVE_MP}/${BKLASTFOLDER}/.badfolders ${DESTDIR}/
- fi
- [ -f ${DESTDIR}/.badfolders ] && BKBADLIST="$(cat ${DESTDIR}/.badfolders | tr "\n" " ")"
- echo "BKBADLIST=${BKBADLIST}" #debug
- BKFOLDERS="$(echo -n "${BKFOLDERS}" | tr "\n" " ")"
- for ONEFOLDER in ${BKFOLDERS}
- do
-  if [ "$(echo -n "$BKBADLIST" | grep "${ONEFOLDER}")" != "" -o -L "${SAVE_MP}/${ONEFOLDER}" ];then
-   echo "$(printf "${L_FOLDER_MARKED_BAD}" "${ONEFOLDER}")" >/dev/console
-   continue #ignore bad folder.
-  fi
-  echo "$ONEFOLDER" #debug
-  echo -n "$(printf "${L_LOADING_FROM_CD}" "${ONEFOLDER}")" >/dev/console
-  #need to be careful not to overfill the ramdisk...
-  FREERAMDISK=$(df 2>/dev/null | grep /mnt/tmpfs | head -n 1 | tr -s " " | cut -f 4 -d " ")
-  SIZEFOLDER=$(du -k -s ${SAVE_MP}/${ONEFOLDER} | cut -f 1)
-  SIZEARCHIVE=0
-  if [ -d ${SAVE_MP}/${ONEFOLDER}/archive ];then
-   SIZEARCHIVE=$(du -k -s ${SAVE_MP}/${ONEFOLDER}/archive | cut -f 1)
-  fi
-  SIZESOURCE=$(expr $SIZEFOLDER - $SIZEARCHIVE)
-  if [ $FREERAMDISK -gt $SIZESOURCE ];then
-   #well, -u will only copy if files newer, so less stuff may get copied than calc'd above.
-   #need to copy everything except archive folder...
-   [ -d ${SAVE_MP}/${ONEFOLDER}/bin ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/bin ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/sbin ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/sbin ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/etc ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/etc ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/lib ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/lib ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/opt ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/opt ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/var ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/var ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/root ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/root ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/home ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/home ${DESTDIR}/
-   [ -d ${SAVE_MP}/${ONEFOLDER}/usr ] && cp -a -u ${SAVE_MP}/${ONEFOLDER}/usr ${DESTDIR}/
-   [ -f ${DESTDIR}/root/.XLOADED ] && rm -fv ${DESTDIR}/root/.XLOADED #toxic
-   [ -f ${DESTDIR}/var/local/shared/.XLOADED ] && rm -fv ${DESTDIR}/var/local/shared/.XLOADED #toxic
-   cp -a -u ${SAVE_MP}/${ONEFOLDER}/*.sfs ${DESTDIR}/ 2>/dev/null
-   #delete deleted files (.wh.filename)... 110212 screen out .wh..wh..opq
-   WHITEOUTS="$(find ${DESTDIR} -xdev -type f -name .wh.* | grep -v '__dir_opaque' | grep -v '.wh..wh.')" #110212
-   echo "$WHITEOUTS" | while read DELWHITE ; do
-    DELFILE="$(echo -n "$DELWHITE" | sed -e 's/\.wh\.//g')"
-    if [ -e "$DELFILE" ];then
-     [ "$PDEBUG" ] && echo "Deleting $DELFILE" #debug
-     rm -rf "$DELFILE"
-     rm -rf "$DELWHITE"
-    fi
-   done
-   check_status 0 #display 'done' for each folder loaded.
-  else
-   printf "${L_RAM_DISK_FULL}\n" "${ONEFOLDER}"
-   check_status 1
-   break
-  fi
- done
- sync
- echo -e "--------------------\n" # debug
-}
-
 set_fs_linux() {
 # "$1" - file system type - ex: ext4
  ONE_FS_IS_LINUX=""
@@ -835,9 +751,6 @@ echo -e "\\033[0;34m ***\\033[0;39m"
 [ "$LOGLEVEL" -le 3 -o "$LOGLEVEL" -eq 7 ] && exec 1>/tmp/bootinit.log 2>&1 #remove o/p from console. v2.22 loglevel added.
 
 [ ! -f /bin/resize2fs ] && touch /tmp/no_resize2fs
-
-# sets PLANG, PKEYS, VFAT_OUT_PARAM, FONTMAP, KMAP, CODEPAGE
-[ -f /sbin/set_plang ] && . /sbin/set_plang
 
 #pmedia= usbflash|usbhd|usbcd|ataflash|atahd|atacd|atazip|scsihd|scsicd|cd
 [ $pmedia ] && PMEDIA=$pmedia #boot parameter, broad category of boot media. ex: cd.
@@ -1158,26 +1071,6 @@ PUPSAVE=""
 if [ "${SAVE_MP}" != "" -a "$PRAMONLY" != "yes" ];then #have mounted save? partition
  #check if save partition is linux
  set_fs_linux "$SAVE_FS"
- #check for pupmode=66
- if [ "$SAVE_FS" = "vfat" ];then
-  FN_66=${PSUBDIR}/${DISTRO_FILE_PREFIX}save66.tar.gz
-  if [ -e "${SAVE_MP}${FN_66}" ];then
-    PUPMODE=66
-    PUPSAVE="${SAVEPART},${SAVE_FS},${FN_66}"
-  fi
- fi
- #check for cd multisession
- if [ "$SAVE_FS" = "iso9660" ];then #booting on optical, is it multisession?...
-  BKFOLDERS="$(find $SAVE_MP -maxdepth 1 -xdev -type d -name '20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]-[0-9][0-9]' | sed -e s%^${SAVE_MP}/%% | sort -r)"
-  if [ "$BKFOLDERS" ];then #multisession cd/dvd
-   FND_MULTIFOLDER="/$(echo "$BKFOLDERS" | head -n 1)"
-   if [ "$FND_MULTIFOLDER" ];then #multisession cd/dvd
-    PUPMODE=77
-    PUPSAVE="${SAVEPART},${SAVE_FS},${FND_MULTIFOLDER}"
-   fi
-  fi
- fi
- echo "FND_MULTIFOLDER=${FND_MULTIFOLDER}" #debug
  #check for save to partition 
  if [ "$ONE_FS_IS_LINUX" = "yes" -a "$PSUBDIR" = "" -a -f "${SAVE_MP}/etc/rc.d/PUPSTATE" ];then
   # make sure it's not a full install
@@ -1264,16 +1157,13 @@ if [ "$PUPSAVE" ];then #refine pupmode
    SAVE_LAYER="/pup_ro1"
   fi
   echo "SAVE_LAYER=$SAVE_LAYER" #debug
- elif [ $PUPMODE -eq 77 ];then
-  SAVE_LAYER="/pup_ro1"
  fi
 fi
 
 #load savefile if required, then setup stack
 case $PUPMODE in
- 77|13)
-  [ $PUPMODE -eq 77 ] && copy_folders #to /pup_ro1 (part of the tmpfs)
-  [ $PUPMODE -eq 13 ] && setup_psave
+ 13)
+  setup_psave
   if [ "$PUPSAVE" ] ; then
     #prepend ro1 - #SAVE_LAYER=/pup_ro1
     rm -rf ${SAVE_LAYER}/tmp #in case last boot was pupmode=12
@@ -1287,7 +1177,7 @@ case $PUPMODE in
      mount -o remount,add:1:${SAVE_LAYER}=ro+wh /pup_new #ro+wh = Readonly branch and it has/might have whiteouts on it
     fi
     if [ $? -eq 0 ];then
-      [ $PUPMODE -ne 77 ] && KEEPMOUNTED="${KEEPMOUNTED}${SAVEPART} "
+      KEEPMOUNTED="${KEEPMOUNTED}${SAVEPART} "
       [ "$SAVE_NAME" ] && NEWUNIONRECORD="$SAVE_NAME $NEWUNIONRECORD"
     else
       printf "${L_ADDING_SAVE_LAYER_FAILED}\n" "$SAVE_LAYER"
@@ -1314,42 +1204,6 @@ case $PUPMODE in
     else
       printf "${L_ADDING_SAVE_LAYER_FAILED}\n" "$SAVE_LAYER"
     fi
-  fi
- ;;
- 66) #extract to stack at new tmpfs
-  ARCHIVE_FN="${SAVE_MP}${PUPSAVE#*,*,}"
-  if [ -s "$ARCHIVE_FN" ];then
-    echo -n "$(printf "${L_LOADING_SAVE_ARCHIVE}" "${PUPSAVE#*,*,}" "$SAVEPART")" > /dev/console
-    echo "--SAVEARCHIVE-- $ARCHIVE_FN" #debug
-    PM66_DIR='/pup_rw'
-    rm -r -f "$PM66_DIR"
-    [ -d "$PM66_DIR" ] || mkdir $PM66_DIR
-    mount -t tmpfs tmpfs $PM66_DIR
-    if [ "$UNIONFS" = 'overlay' ]; then
-      mkdir $PM66_DIR/upper $PM66_DIR/work
-      tar xf "$ARCHIVE_FN" -m -C $PM66_DIR/upper 2>/dev/null
-      STATUS=$?
-      if [ $STATUS -eq 0 ];then
-        remount_overlay -e "s~upperdir=[^,]+~upperdir=${PM66_DIR}/upper~" -e "s~workdir=[^,]+~workdir=${PM66_DIR}/work~"
-        STATUS=$?
-      fi
-    else
-      tar xf "$ARCHIVE_FN" -m -C $PM66_DIR 2>/dev/null
-      STATUS=$?
-      if [ $STATUS -eq 0 ];then
-        #replace rw branch with new populated tmpfs
-        echo "mount -o remount,prepend:${PM66_DIR}=rw,mod:/mnt/tmpfs/pup_rw=ro,del:/mnt/tmpfs/pup_rw /pup_new" #debug
-        mount -o remount,prepend:${PM66_DIR}=rw,mod:/mnt/tmpfs/pup_rw=ro,del:/mnt/tmpfs/pup_rw /pup_new
-        STATUS=$?
-      fi
-    fi
-    if [ $STATUS -eq 0 ];then
-      SAVE_MP=''
-      rm -rf /mnt/tmpfs/pup_rw
-    else
-      printf "${L_ADDING_SAVE_LAYER_FAILED}\n" "$PM66_DIR"
-    fi
-    check_status $STATUS
   fi
  ;;
  5)
@@ -1407,7 +1261,6 @@ echo "PSUBDIR='$PSUBDIR'"
 echo "PUNIONFS='$UNIONFS'"
 echo "DOIMODS='yes'"
 echo "DOMIBS='no'"
-[ -f /sbin/set_plang ] && plang_pupstate #echo
 ) > /pup_new/etc/rc.d/PUPSTATE
 
 if [ "$PUPSAVE" ];then
@@ -1458,8 +1311,8 @@ if [ "$PUPSAVE" ];then
 fi
 
 # symlinks to /pup_new/initrd/tmpfs subdirs
-# * /pup_rw:  pupmodes 5,13,77)
-# * /pup_ro1: in PUPMODE 77 pup_ro1 is part of the tmpfs but an aufs read-only branch
+# * /pup_rw:  pupmodes 5,13
+# * /pup_ro1: in PUPMODE 13 pup_ro1 is part of the tmpfs but an aufs read-only branch
 #             where the previous session is stored to build the final filesystem
 # * (rm -rf ... is an extra measure to ensure deletion
 #     since an actual directory might be there and therefore was not deleted.)
@@ -1488,18 +1341,11 @@ fi
 
 cp -a /DISTRO_SPECS /pup_new/initrd/
 [ ! -f /pup_new/etc/DISTRO_SPECS ] && cp -a /DISTRO_SPECS /pup_new/etc/
-cp -a /init* /sbin /README.txt /pup_new/initrd/
-chmod -x /pup_new/initrd/init
 dmesg > /tmp/dmesg.txt
-
-[ -f /bin/cryptsetup ] && cp -af /bin/cryptsetup /pup_new/initrd/bin/ 
-[ -f /sbin/cryptsetup ] && cp -af /sbin/cryptsetup /pup_new/initrd/sbin/ 
 
 [ -d "/pup_new/initrd/tmp" ] && rm -rf /pup_new/initrd/tmp
 mkdir -p /pup_new/initrd/tmp
 cp -af /tmp/* /pup_new/initrd/tmp/ #keep any log files.
-
-[ -f /sbin/set_plang ] && plang_copy_to_newroot #$LANG, /etc/keymap|fontmap|codepage
 
 if [ "$RDSH" = "yes" ];then
  echo > /dev/console
@@ -1514,6 +1360,6 @@ umount /dev
 umount /proc
 
 #now using cpio archive for initramfs 'initial ramdisk'...
-exec switch_root /pup_new /sbin/init
+exec switch_root /pup_new /usr/local/sbin/init
 
 ###END###
