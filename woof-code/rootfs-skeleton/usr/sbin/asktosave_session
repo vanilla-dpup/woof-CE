@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #GUI dialog for saving session at PUPMODE 13
 # --file parameter for saving user response in /tmp/session_ramdisk_result to be read by /etc/rc.d/rc.shutdown
 
