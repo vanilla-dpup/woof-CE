@@ -17,6 +17,7 @@ elif command -v startdwl >/dev/null 2>&1 ; then
 	else
 		/usr/sbin/pm13 cli
 	fi
+else
 	/usr/sbin/pm13 cli
 fi
 
