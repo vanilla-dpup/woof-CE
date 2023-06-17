@@ -13,7 +13,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 This fork strips woof-CE down to the bare essentials:
 
 * Only dpup ([Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based Puppy) is supported.
-* Support for X.Org and tools that modify xorg.conf are gone. Only Wayland is supported.
+* Support for X.Org and tools that modify xorg.conf is gone. Only Wayland is supported.
 * Support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone. Only [PipeWire](https://pipewire.org/) is supported.
 * Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
 * Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap). Build times are much shorter than upstream's.
@@ -22,11 +22,8 @@ This fork strips woof-CE down to the bare essentials:
 * Support for aufs is gone. Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image.
 * Support for PUPMODEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
-* Support PUPMODE 13 with periodic saving is gone. The user can `save2flash` to save now, or save at shutdown.
-* All save files use ext4, with or without journaling.
-* Bootflash supports FAT32, ext4 and f2fs, using syslinux, extlinux or efilinux.
+* Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
-* If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
 * Support for the devx SFS is gone. Development packages are installed inside a copy of the main SFS during the build, but don't make it into the build output.
 * The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country is gone, and so is the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.
 * Themes are gone. [Themes break applications](https://stopthemingmy.app/) and they're hard to maintain.
@@ -34,6 +31,13 @@ This fork strips woof-CE down to the bare essentials:
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
 * Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster. Daemons like udev and dbus are started using their init scripts.
 * Some core Puppy scripts that override the upstream distro are moved to /usr/local/{,s}bin and PATH makes the shell prefer them. This makes package updates safe, because they no longer remove Puppy's hooks.
+
+Other changes:
+
+* The prompt that asks whether or not to save at shutdown is now graphical, and the old terminal-based prompt is only used as fallback: for example, if the compositor crashed.
+* All save files (including encrypted ones) use ext4, with or without journaling.
+* Bootflash in upstream supports FAT32 and f2fs, using syslinux, extlinux or efilinux. This fork adds ext4 support.
+* If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
 
 ## Usage
 
