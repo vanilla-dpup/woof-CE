@@ -72,7 +72,7 @@ static void fakelogin(void)
 	execlp(user->pw_shell, user->pw_shell, "-l", (char *)NULL);
 }
 
-static void do_cttyhack(void)
+static void do_cttyhack(const int first)
 {
 	autoclose int fd = -1;
 
@@ -89,6 +89,7 @@ static void do_cttyhack(void)
 	close(fd);
 	fd = -1;
 
+	if (first) cat("/etc/issue");
 	fakelogin();
 }
 
@@ -99,7 +100,7 @@ static void delay(const time_t sec)
 	while (nanosleep(&req, &rem) < 0 && errno == EINTR) memcpy(&req, &rem, sizeof(struct timespec));
 }
 
-static pid_t cttyhack(const time_t sec)
+static pid_t cttyhack(const int first)
 {
 	pid_t pid;
 	sigset_t mask;
@@ -109,10 +110,10 @@ static pid_t cttyhack(const time_t sec)
 		    (sigprocmask(SIG_UNBLOCK, &mask, NULL) < 0))
 			exit(EXIT_FAILURE);
 
-		if (sec > 0)
-			delay(sec);
+		if (!first)
+			delay(RESPAWN_DELAY);
 
-		do_cttyhack();
+		do_cttyhack(first);
 		exit(EXIT_FAILURE);
 	}
 
@@ -167,9 +168,7 @@ int main(int argc, char *argv[])
 
 	write(STDOUT_FILENO, CLEAR_TTY, sizeof(CLEAR_TTY) - 1);
 
-	cat("/etc/issue");
-
-	if ((pid = cttyhack(0)) < 0) goto shutdown;
+	if ((pid = cttyhack(1)) < 0) goto shutdown;
 
 	while (1) {
 		if (sigwaitinfo(&mask, &sig) < 0) {
@@ -181,7 +180,7 @@ int main(int argc, char *argv[])
 
 		while ((reaped = waitpid(-1, &status, WNOHANG)) > 0) {
 			if (!WIFEXITED(status) && !WIFSIGNALED(status)) continue;
-			if (reaped == pid && (pid = cttyhack(RESPAWN_DELAY)) < 0) break;
+			if (reaped == pid && (pid = cttyhack(0)) < 0) break;
 		}
 	}
 
