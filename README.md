@@ -47,9 +47,9 @@ Then:
 
 Or:
 
-	./merge2out woof-distro/x86_64/debian/sid64
+	./merge2out woof-distro/x86_64/debian/trixie64
 
-(Debian Sid based, featuring [labwc](https://labwc.github.io/) and [sfwbar](https://github.com/LBCrion/sfwbar))
+(Debian 13 based, featuring [labwc](https://labwc.github.io/) and [sfwbar](https://github.com/LBCrion/sfwbar))
 
 Then:
 
