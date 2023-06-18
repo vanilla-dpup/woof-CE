@@ -1,7 +1,7 @@
 # su hangs if logind is not running
 rm -f usr/lib/*/security/pam_elogind.so
 
-cat << EOF >> etc/apt/apt.conf.d/00puppy-elogind
+cat << EOF >> etc/apt/apt.conf.d/00puppy-libpam-elogind
 DPkg::Post-Invoke { "rm -f /usr/lib/*/security/pam_elogind.so || true"; };
 EOF
-chmod 644 etc/apt/apt.conf.d/00puppy-elogind
+chmod 644 etc/apt/apt.conf.d/00puppy-libpam-elogind

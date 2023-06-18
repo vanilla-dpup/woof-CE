@@ -1,0 +1,5 @@
+# some applications wait for elogind to start, but org.freedesktop.login1.service doesn't start it and elogind is broken without PAM anyway
+cat << EOF >> etc/apt/apt.conf.d/00puppy-elogind
+DPkg::Post-Invoke { "rm -f /usr/share/dbus-1/system-services/org.freedesktop.login1.service || true"; };
+EOF
+chmod 644 etc/apt/apt.conf.d/00puppy-elogind
