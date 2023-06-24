@@ -122,6 +122,7 @@ for NAME in $PETBUILDS; do
 	FOUND_PETBUILDS="${FOUND_PETBUILDS} ${NAME}"
 done
 PETBUILDS="init $FOUND_PETBUILDS"
+CROSSBUILD=0
 . ../support/petbuilds.sh
 
 rm -f rootfs-complete/pet.specs
