@@ -27,11 +27,6 @@ cd sandbox3
 rm -rf rootfs-complete
 cp -a rootfs rootfs-complete
 
-# remove devx packages pulled as dependencies
-for PKG in `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 -d \| | tr , ' '`; do
-	chroot rootfs-complete apt-get remove --purge -y $PKG
-done
-
 # prevent all explicitly added non-development packages from being removed
 chroot rootfs-complete apt-mark hold `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n' | grep -vE -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'` busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software fwupd
 [ -e rootfs/usr/bin/flatpak ] && chroot rootfs-complete apt-mark hold gnome-software-plugin-flatpak
@@ -39,6 +34,11 @@ chroot rootfs-complete apt-mark hold `echo "$PKGS_SPECS_TABLE" | grep ^yes | gre
 # remove development packages
 for PKG in `chroot rootfs-complete dpkg-query -W -f '${Package}\n' | grep -E -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'`; do
 	chroot rootfs-complete apt-get remove --purge -y $PKG
+done
+
+# remove devx packages pulled as dependencies
+for PKG in `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 -d \| | tr , ' '`; do
+	chroot rootfs-complete apt-get autoremove --purge -y $PKG
 done
 
 # blacklist packages that may conflict with petbuilds
