@@ -56,12 +56,9 @@ L_SFFS_ERROR="ERROR: savefile filesystem is not ext2/3/4"
 for i in $(cat /proc/cmdline) ; do
   case $i in
     fullinstall) exec ash /sbin/init_full_install ;;
-    bootmenu)    ZBOOTMENU=1 ;;
     loglevel=*)  LOGLEVEL=${i##*=}  ;;
   esac
 done
-# always call init-bootmenu on ARM devices
-case $(uname -m) in arm*) ZBOOTMENU=1 ;; esac
 
 export TERMINFO="/etc/terminfo"
 export LANG=C
@@ -740,8 +737,6 @@ remount_overlay() {
 
 clear #clear the screen.
 
-[ "$ZBOOTMENU" ] && . /sbin/init-bootmenu
-
 echo -en "\\033[0;34m***\\033[0;37m ${DISTRO_NAME} ${DISTRO_VERSION}"
 echo -en "\\033[0;34m -\\033[0;37m Linux ${KERNELVER} "
 echo -en "\\033[0;31m[\\033[0;37m`uname -m`\\033[0;31m]"
@@ -749,8 +744,6 @@ echo -e "\\033[0;34m ***\\033[0;39m"
 
 [ "$LOGLEVEL" -eq 7 ] && set -x
 [ "$LOGLEVEL" -le 3 -o "$LOGLEVEL" -eq 7 ] && exec 1>/tmp/bootinit.log 2>&1 #remove o/p from console. v2.22 loglevel added.
-
-[ ! -f /bin/resize2fs ] && touch /tmp/no_resize2fs
 
 #pmedia= usbflash|usbhd|usbcd|ataflash|atahd|atacd|atazip|scsihd|scsicd|cd
 [ $pmedia ] && PMEDIA=$pmedia #boot parameter, broad category of boot media. ex: cd.
@@ -791,7 +784,6 @@ if [ "$pfix" ];then
   case $ONEFIX in
    ram)     PRAMONLY="yes";;      #run in ram only (do not load ${DISTRO_FILE_PREFIX}save).
    rdsh)    RDSH="yes";;          #exit to shell in initial ramdisk.
-   xorgwizard) PXORGWIZARD="yes";;#force xorgwizard for this session
    nox)     PNOX="yes";;          #do not start X.
    clean)   PCLEAN="yes";;        #force version upgrade and cleanup.
    copy)    PCOPY="yes";;         #copy .sfs files into ram.
@@ -1335,7 +1327,6 @@ fi
 
 #---
 
-[ "$PXORGWIZARD" = "yes" ] && touch /pup_new/initrd/mnt/tmpfs/tmp/xwin_xorgwizard_cli
 #PNOX is a boot param. /etc/profile prevents X from starting if this file exists...
 [ "$PNOX" = "yes" ] && touch /pup_new/initrd/mnt/tmpfs/tmp/bootcnt.txt
 
