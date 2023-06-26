@@ -42,9 +42,13 @@ static void fakelogin(void)
 
 	if (!(user = getpwuid(geteuid()))) return;
 
+	clearenv();
+
 	if ((setenv("USER", user->pw_name, 1) < 0) ||
 	    (setenv("HOME", user->pw_dir, 1) < 0) ||
 	    (setenv("SHELL", user->pw_shell, 1) < 0) ||
+	    (setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1) < 0) ||
+	    (setenv("TERM", "linux", 1) < 0) ||
 	    (setenv("XDG_DATA_HOME", "/root/.local/share", 1) < 0) ||
 	    (setenv("XDG_CONFIG_HOME", "/root/.config", 1) < 0) ||
 	    (setenv("XDG_DATA_DIRS", "/usr/share:/usr/local/share", 1) < 0) ||
