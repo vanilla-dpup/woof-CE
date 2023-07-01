@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
 
 <labwc_config>
-  <theme>
-    <cornerRadius>5</cornerRadius>
-  </theme>
-
   <windowSwitcher show="yes" preview="no" outlines="yes">
     <fields>
       <field content="title" width="100%" />
