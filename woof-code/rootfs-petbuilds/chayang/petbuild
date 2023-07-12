@@ -1,0 +1,10 @@
+download() {
+    [ -f chayang-61ad53b0.tar.gz ] || wget -t 3 -T 60 -O chayang-61ad53b0.tar.gz https://git.sr.ht/~emersion/chayang/archive/61ad53b0.tar.gz
+}
+
+build() {
+    tar -xzf chayang-61ad53b0.tar.gz
+    cd chayang-61ad53b0
+    meson --buildtype=release --prefix=/usr build
+    ninja -C build install
+}

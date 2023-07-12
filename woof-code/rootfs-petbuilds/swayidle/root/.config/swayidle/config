@@ -1,1 +1,1 @@
-timeout 600 'sh -c "wlopm --off \*"' resume 'sh -c "wlopm --on \*"'
+timeout 600 'sh -c "chayang -d 7 && wlopm --off \*"' resume 'sh -c "wlopm --on \*"'
