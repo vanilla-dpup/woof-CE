@@ -129,7 +129,7 @@ yes|libzstd|libzstd1,libzstd-dev|exe,dev,doc,nls||deps:yes
 yes|login|login|exe>null,dev>null,doc>null,nls>null
 yes|lsb-base|lsb-base|exe,dev,doc,nls||deps:yes
 yes|lzma|lzma|exe,dev,doc,nls||deps:yes
-yes|make|make|exe,dev,doc,nls||deps:yes
+yes|make|make|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|man-db|man-db|exe,dev,doc,nls||deps:yes
 yes|mpclib3|libmpc3|exe,dev,doc,nls||deps:yes #needed by gcc.
 yes|mpv|mpv|exe,dev,doc,nls||deps:yes
@@ -146,7 +146,7 @@ yes|openssh-client|openssh-client|exe,dev,doc,nls||deps:yes
 yes|openssl|openssl,libssl3,libssl-dev|exe,dev,doc,nls||deps:yes #libssl1.0.2 = older libssl
 yes|parted|parted|exe,dev,doc,nls||deps:yes
 yes|passwd|passwd|exe,dev,doc,nls||deps:yes
-yes|patch|patch|exe,dev,doc,nls||deps:yes
+yes|patch|patch|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|pavucontrol|pavucontrol|exe,dev,doc,nls||deps:yes
 yes|pciutils|pciutils,libpci3|exe,dev,doc,nls||deps:yes
 yes|perl|perl,perl-base|exe,dev,doc,nls||deps:yes
