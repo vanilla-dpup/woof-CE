@@ -243,6 +243,7 @@ yes|libfuse2|libfuse2|exe,dev,doc,nls||deps:yes # used by AppImages
 yes|libva|vainfo,va-driver-all|exe,dev,doc,nls||deps:yes
 yes|man-db|man-db|exe,dev,doc,nls||deps:yes
 yes|make|make|exe,dev,doc,nls||deps:yes
+yes|mpv|mpv|exe,dev,doc,nls||deps:yes
 yes|netpbm|netpbm|exe,dev,doc,nls||deps:yes # dependency of wl_colpick
 yes|notification-daemon|notification-daemon|exe>null,dev>null,doc>null,nls>null
 yes|nscd|unscd|exe||deps:yes
@@ -260,16 +261,6 @@ yes|transmission-deps|libevent-dev,libnatpmp-dev,libminiupnpc-dev|exe,dev,doc,nl
 yes|xdg-desktop-portal-gtk|xdg-desktop-portal-gtk|exe,dev,doc,nls||deps:yes
 yes|xdg-utils|xdg-utils|exe,dev,doc,nls||deps:yes
 yes|xournalpp-deps|libsndfile1-dev,portaudio19-dev,libzip-dev|exe,dev,doc,nls||deps:yes
-"
-fi
-
-if [ "$DISTRO_VARIANT" = "dwl" ]; then
-	PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|mpv-deps|libavcodec-dev,libavfilter-dev,libass-dev,libva-dev,libvdpau-dev,liblua5.2-dev,libdvdnav-dev,libdvdread-dev,libbluray-dev,libwayland-cursor0|exe,dev,doc,nls||deps:yes
-"
-elif [ "$DISTRO_VARIANT" != "retro" ]; then
-	PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|mpv-deps|libavcodec-dev,libavfilter-dev,libass-dev,libva-dev,libvdpau-dev,liblua5.2-dev,libdvdnav-dev,libdvdread-dev,libbluray-dev,libwayland-cursor0,libxss-dev,libxpresent-dev,libxv-dev|exe,dev,doc,nls||deps:yes
 "
 fi
 
