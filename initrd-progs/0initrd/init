@@ -435,7 +435,7 @@ copy_onepupdrv() {
  SIZEZK=$(du -k $ONE_FN | cut -f 1)
  TNEEDK=$SIZEZK
  [ "$COPY2RAM" = "" ] && TNEEDK=$(($TNEEDK + 65535)) #some slack.
- TFREEK=$(df | grep -m1 ' /mnt/tmpfs' | tr -s ' ' | cut -f 4 -d ' ')
+ TFREEK=$(df /mnt/tmpfs /pup_new/initrd/mnt/tmpfs | tail -n1 | tr -s ' ' | cut -f 4 -d ' ')
  if [ $TFREEK -le $TNEEDK ];then
   COPY2RAM="no" # stop copying when running out of ram
   return 0
