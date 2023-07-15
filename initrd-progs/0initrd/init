@@ -86,7 +86,6 @@ Y_DEF_FN="$DISTRO_YDRVSFS"
 B_DEF_FN="$DISTRO_BDRVSFS"
 P_DEF_FN="$DISTRO_PUPPYSFS"
 KBUILD_DEF_FN="kbuild-$KERNELVER.sfs"
-DEVX_DEF_FN="devx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 DOCX_DEF_FN="docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 NLSX_DEF_FN="nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 
@@ -964,9 +963,6 @@ find_onepupdrv "" "" "$KBUILD_DEF_FN" "k" ""
 [ "$ONE_FN" ] && KBUILD="$ONE_PART,$ONE_FS,$ONE_FN"
 
 if [ "$UNIONFS" = 'overlay' ]; then
- find_onepupdrv "" "" "$DEVX_DEF_FN" "k" ""
- [ "$ONE_FN" ] && DEVX="$ONE_PART,$ONE_FS,$ONE_FN"
-
  find_onepupdrv "" "" "$DOCX_DEF_FN" "k" ""
  [ "$ONE_FN" ] && DOCX="$ONE_PART,$ONE_FS,$ONE_FN"
 
@@ -978,7 +974,6 @@ fi
 [ "$ADRV" ] && copy_onepupdrv "$ADRV"
 [ "$YDRV" ] && copy_onepupdrv "$YDRV"
 [ "$BDRV" ] && copy_onepupdrv "$BDRV"
-[ "$DEVX" ] && copy_onepupdrv "$DEVX"
 [ "$NLSX" ] && copy_onepupdrv "$NLSX"
 [ "$DOCX" ] && copy_onepupdrv "$DOCX"
 [ "$ZDRV" ] && copy_onepupdrv "$ZDRV"
@@ -986,7 +981,6 @@ fi
 [ "$KBUILD" ] && copy_onepupdrv "$KBUILD"
 
 #stack the SFSs on top of pdrv
-[ "$DEVX" ] && { LOADMSG="devx"; stack_onepupdrv "$DEVX" "dev"; }
 [ "$NLSX" ] && { LOADMSG="nlsx"; stack_onepupdrv "$NLSX" "nls"; }
 [ "$DOCX" ] && { LOADMSG="docx"; stack_onepupdrv "$DOCX" "doc"; }
 [ "$KBUILD" ] && { LOADMSG="kbuild"; stack_onepupdrv "$KBUILD" "k"; }
