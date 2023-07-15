@@ -8,4 +8,4 @@ umount /dev 2>/dev/null
 umount /proc
 
 #now using cpio archive for initramfs 'initial ramdisk'...
-exec switch_root /pup_new /sbin/init
+exec switch_root /pup_new /usr/local/sbin/init
