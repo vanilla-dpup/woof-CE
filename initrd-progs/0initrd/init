@@ -355,6 +355,9 @@ stack_onepupdrv() {
  ONE_PREP="${3}"
  if [ "$ONE_PART" = "rootfs" ];then #humongous initrd.
   ONE_MP="" #actually it's '/'.
+ elif [ "$ONE_PART" = "$P_PART" ];then
+  ONE_MP="$P_MP"
+  [ "$ONE_MP" ] || return 2
  else
   ONE_MP="$(mount | grep -m1 "/dev/$ONE_PART " | cut -f 3 -d ' ')"
   [ "$ONE_MP" ] || return 2
