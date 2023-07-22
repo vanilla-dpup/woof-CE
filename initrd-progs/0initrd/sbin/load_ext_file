@@ -63,11 +63,6 @@ SFFS=$(blkid "$SAVE_FN" | grep -o ' TYPE=".*' | cut -f 2 -d '"')
 ENCRYPTION=''
 if [ "$SFFS" = "crypto_LUKS" ] ; then
   ENCRYPTION='luks'
-else
-  case $SAVE_FN in 
-    *_cryptx*) ENCRYPTION='cryptoloop' ;; #old cryptoloop light encryption
-    *_crypta*) ENCRYPTION='luks' ; LOOPAES=1 ;; #old cryptoloop aes
-  esac
 fi
 
 #===================================================================
@@ -100,16 +95,7 @@ if [ "$ENCRYPTION" = "luks" ] ; then
   modprobe dm-crypt || ERROR_M_DESC="\nOr maybe the kernel doesn't properly support dm-crypt"
   modprobe xts || ERROR_M_DESC="\nOr maybe the kernel doesn't properly support dm-crypt"
   SAVEFILE_LOOP='/dev/mapper/savefile'
-  if [ "$LOOPAES" ] ; then # old cryptoloop aes (heavy encryption)
-    CS_OPTS='-M plain -c aes-cbc-plain -h plain open'
-  else
-    CS_OPTS='luksOpen -v'
-  fi
-elif [ "$ENCRYPTION" = "cryptoloop" ] ; then
-  ln -sv /pup_new/lib/modules/${KERNELVER} /lib/modules/${KERNELVER}
-  check_bin losetup-222
-  modprobe cryptoloop || ERROR_M_DESC="\nOr maybe the kernel doesn't properly support cryptoloop"
-  SAVEFILE_LOOP="$(losetup -f)"
+  CS_OPTS='luksOpen -v'
 fi
 
 #===================================================================
@@ -139,17 +125,6 @@ else
         # cryptsetup loads the cryptoloop aes savefile even when
         # the provided password is wrong, have to close it
         [ -e /dev/mapper/savefile ] && cryptsetup close savefile
-        echo -e "\\033[1;31m\nYou probably entered a wrong password. $ERROR_M_DESC \\033[0;39m" >/dev/console
-        continue
-      fi
-    else # old light cryptoloop encryption
-      echo "++ losetup-222 -p 0 -e 1 $SAVEFILE_LOOP $SAVE_FN" #debug
-      echo "$MYPASS" | losetup-222 -p 0 -e 1 $SAVEFILE_LOOP "$SAVE_FN"
-      # losetup-222 mounts the loop file even when the provided password is wrong
-      # and blkid misdetects the filesystem (ext2->ext4)
-      SFFS=$(blkid $SAVEFILE_LOOP | grep -o ' TYPE=".*' | cut -f 2 -d '"')
-      if [ "$SFFS" != "ext2" ] ; then
-        losetup -d $SAVEFILE_LOOP 2>/dev/null
         echo -e "\\033[1;31m\nYou probably entered a wrong password. $ERROR_M_DESC \\033[0;39m" >/dev/console
         continue
       fi
