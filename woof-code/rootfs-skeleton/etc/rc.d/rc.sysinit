@@ -220,6 +220,14 @@ for i in $(cat /proc/cmdline) ; do
 	esac
 done
 
+#################LOAD KERNEL MODULES################
+echo "LOAD KERNEL MODULES"
+echo -n "Loading kernel modules..." >/dev/console
+
+/etc/init.d/udev start
+/etc/init.d/mountdevsubfs.sh start
+status_func 0
+
 if [ $SFSLOCK -eq 1 -a -f /usr/local/sbin/sfslock ]; then
 	. /etc/rc.d/BOOTCONFIG
 	# copy SFSs to RAM and prioritize frequently-accessed ones
@@ -233,14 +241,6 @@ if [ $SFSLOCK -eq 1 -a -f /usr/local/sbin/sfslock ]; then
 		status_func $?
 	done
 fi
-#################LOAD KERNEL MODULES################
-echo "LOAD KERNEL MODULES"
-echo -n "Loading kernel modules..." >/dev/console
-
-/etc/init.d/udev start
-/etc/init.d/mountdevsubfs.sh start
-status_func 0
-
 ######################LOAD SWAP#####################
 # we prefer not to use swap unless we have to; this should improve responsiveness if we don't have much RAM
 echo 5 > /proc/sys/vm/swappiness
