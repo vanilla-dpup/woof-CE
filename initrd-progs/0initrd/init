@@ -30,7 +30,6 @@ L_ADDING_SAVE_LAYER_FAILED="adding %s to aufs stack failed." #printf
 L_WAITING_FOR_DEV='Waiting %s seconds for slow storage devices [%s/%s].' #printf
 L_WAITING_FOR_PART='Waiting for partition [%s]' #printf
 L_LOADING_KEYBOARD_LAYOUT="Loading '%s' keyboard layout..." #printf
-L_COPY_MESSAGE="Copying '%s' to ram..." #printf
 L_LOAD_MESSAGE="main"
 L_PRE_MESSAGE="Loading puppy main sfs file."
 L_ERR_PDRV_INCOMPLETE="%s information is incomplete." #printf
@@ -371,12 +370,8 @@ stack_onepupdrv() {
  echo -n "$(printf "${L_LOADING_FILE}" "$ONE_BASENAME" "$LOADMSG")" > /dev/console
  #-
  ONE_LOOP="$(losetup -f)"
- if [ -f /mnt/tmpfs/$ONE_BASENAME ] ; then
-   losetup -r $ONE_LOOP /mnt/tmpfs/$ONE_BASENAME
- else
-   losetup -r $ONE_LOOP $ONE_FN
-   [ "$ONE_PART" != "rootfs" ] && KEEPMOUNTED="${KEEPMOUNTED}${ONE_PART} "
- fi
+ losetup -r $ONE_LOOP $ONE_FN
+ [ "$ONE_PART" != "rootfs" ] && KEEPMOUNTED="${KEEPMOUNTED}${ONE_PART} "
  SFS_MP="/pup_${ONE_SFX}"
  [ "$ONE_SFX" = "p" ] && SFS_MP="/pup_ro2"
  [ -d "$SFS_MP" ] || mkdir $SFS_MP
@@ -419,47 +414,6 @@ stack_onepupdrv() {
  fi
  NEWUNIONRECORD="${NEWUNIONRECORD}${ONE_BASENAME} "
  return 0
-}
-
-copy_onepupdrv() {
-# "$1" - sfs spec - ex: sdb2,ext4,/pup/mydrv-1.2.3.sfs
- [ $RAMSIZE -le 1048576 ] && return 0
- ONE_PART="$(echo "${1}" | cut -f 1 -d ',')"
- [ "$ONE_PART" ] || return 1
- [ "$COPY2RAM" = "no" -a "$ONE_PART" != "rootfs" ] && return 0
- ONE_REL_FN="$(echo "${1}" | cut -f 3 -d ',')"
- [ "$ONE_REL_FN" ] || return 1
- ONE_FN="${ONE_MP}${ONE_REL_FN}"
- ONE_BASENAME="$(basename $ONE_REL_FN)"
- [ -s "$ONE_FN" ] || return 3 #sfs not Ok - empty file
- SIZEZK=$(du -k $ONE_FN | cut -f 1)
- TNEEDK=$SIZEZK
- [ "$COPY2RAM" = "" ] && TNEEDK=$(($TNEEDK + 65535)) #some slack.
- TFREEK=$(df /mnt/tmpfs /pup_new/initrd/mnt/tmpfs | tail -n1 | tr -s ' ' | cut -f 4 -d ' ')
- if [ $TFREEK -le $TNEEDK ];then
-  COPY2RAM="no" # stop copying when running out of ram
-  return 0
- fi
- if [ "$ONE_MP" = "" ];then #101101 humongous initrd, actually it is already in ram, but load_sfs_file code puts it in a tmpfs.
-  mv -f $ONE_FN /mnt/tmpfs/
- else
-  echo -en "\\033[1;35m$(printf "${L_COPY_MESSAGE}" "$ONE_BASENAME")\\033[0;39m" > /dev/console
-  TOTAL_SIZEK_SFS_RAM=$(($TOTAL_SIZEK_SFS_RAM + $SIZEZK))
-  cp -af $ONE_FN /mnt/tmpfs/
-  STATUS=$? ; check_status $STATUS
- fi
- sync
- return 0
-}
-
-setup_onepupdrv() {
-# "$1" - sfs spec - ex: sdb2,ext4,/pup/mydrv-1.2.3.sfs
-# "$2" - suffix for "pup_" branch directory - ex: a
-# "$3" - prepend after rw layer indicator - ex: p
- copy_onepupdrv "$1"
- STATUS=$?
- [ $STATUS -gt 0 ] && return $STATUS
- stack_onepupdrv "$1" "$2" "$3"
 }
 
 setup_psave(){ # setup savefile or savefolder
@@ -777,7 +731,6 @@ fi
 
 #[ $pdebug ] && PDEBUG=$pdebug
 PDEBUG=1
-TOTAL_SIZEK_SFS_RAM=0
 
 RDSH=""
 if [ "$pfix" ];then
@@ -908,23 +861,13 @@ if [ "$P_PART" ];then
  fi
 fi
 
-#have pup...sfs, now try to load it
-RAMSIZE=$(free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 2 -d ' ') #total physical ram (less shared video). 110405
-
 mount -t tmpfs tmpfs /mnt/tmpfs
 [ -d "/mnt/tmpfs/pup_rw" ] || mkdir /mnt/tmpfs/pup_rw
 
 NEWUNIONRECORD=""
-COPY2RAM=""
-#- handle pfix=copy pfix=ram pfix=nocopy
-if [ "$PCOPY" = "yes" -o "$PRAMONLY" = "yes" ] ; then
- COPY2RAM="yes"
-elif [ "$PNOCOPY" = "yes" ] ; then
- COPY2RAM="no"
-fi
 
 LOADMSG="${L_LOAD_MESSAGE}"
-setup_onepupdrv "$PDRV" "p"
+stack_onepupdrv "$PDRV" "p"
 STATUS=$?
 if [ $STATUS -gt 0 ];then
  P_PRE_MSG="${L_PRE_MESSAGE}"
@@ -972,16 +915,6 @@ if [ "$UNIONFS" = 'overlay' ]; then
  find_onepupdrv "" "" "$NLSX_DEF_FN" "k" ""
  [ "$ONE_FN" ] && NLSX="$ONE_PART,$ONE_FS,$ONE_FN"
 fi
-
-#if possible, copy SFSs to RAM and prioritize frequently-accessed ones
-[ "$ADRV" ] && copy_onepupdrv "$ADRV"
-[ "$YDRV" ] && copy_onepupdrv "$YDRV"
-[ "$BDRV" ] && copy_onepupdrv "$BDRV"
-[ "$NLSX" ] && copy_onepupdrv "$NLSX"
-[ "$DOCX" ] && copy_onepupdrv "$DOCX"
-[ "$ZDRV" ] && copy_onepupdrv "$ZDRV"
-[ "$FDRV" ] && copy_onepupdrv "$FDRV"
-[ "$KBUILD" ] && copy_onepupdrv "$KBUILD"
 
 #stack the SFSs on top of pdrv
 [ "$NLSX" ] && { LOADMSG="nlsx"; stack_onepupdrv "$NLSX" "nls"; }
@@ -1206,13 +1139,11 @@ if [ "$SAVEPART" -a "$UNIONFS" = 'overlay' -a -f /pup_new/etc/rc.d/BOOTCONFIG ];
  for ONE_SFS in $EXTRASFSLIST; do
   LOOP=`losetup -f`
   find_onepupdrv "$SAVEPART" "" "$ONE_SFS" "p" "1"
-  [ "$ONE_FN" ] && { LOADMSG="extra"; setup_onepupdrv "$ONE_PART,$ONE_FS,$ONE_FN" "ro${LOOP#/dev/loop}" ""; }
+  [ "$ONE_FN" ] && { LOADMSG="extra"; stack_onepupdrv "$ONE_PART,$ONE_FS,$ONE_FN" "ro${LOOP#/dev/loop}" ""; }
  done
 fi
 
 umount_unneeded
-
-echo -n $(($TOTAL_SIZEK_SFS_RAM - 5)) > /tmp/sfs_ram_sizek
 
 [ "$DEV1FS" ] || DEV1FS="$(echo "$PDRV" | cut -f 2 -d ',')"
 [ "$ATADRIVES" ] || ATADRIVES="$(cat /tmp/ATADRIVES0 | tr '\n' ' ')"

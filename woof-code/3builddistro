@@ -121,7 +121,7 @@ for NAME in $PETBUILDS; do
 	fi
 	FOUND_PETBUILDS="${FOUND_PETBUILDS} ${NAME}"
 done
-PETBUILDS="init $FOUND_PETBUILDS"
+PETBUILDS="init sfslock $FOUND_PETBUILDS"
 CROSSBUILD=0
 . ../support/petbuilds.sh
 

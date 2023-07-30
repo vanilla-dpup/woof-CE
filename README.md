@@ -34,10 +34,10 @@ This fork strips woof-CE down to the bare essentials:
 
 Other changes:
 
-* The prompt that asks whether or not to save at shutdown is now graphical, and the old terminal-based prompt is only used as fallback: for example, if the compositor crashed.
 * All save files (including encrypted ones) use ext4, with or without journaling.
 * Bootflash in upstream supports FAT32 and f2fs, using syslinux, extlinux or efilinux. This fork adds ext4 support.
 * If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
+* Copying of SFSs to RAM (`pfix=ram|copy`) happens later in the boot process and it's implemented differently. SFSs are cached and not copied to the ramdisk (see woof-code/rootfs-petbuilds/sfslock), leaving more usable ramdisk space, and the memory spent on SFSs is freed automatically (using OOM score adjustment) if needed. However, this also means that the boot partition remains mounted even when using `pfix=ram`.
 
 ## Usage
 
