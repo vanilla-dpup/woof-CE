@@ -223,7 +223,7 @@ done
 if [ $SFSLOCK -eq 1 -a -f /usr/local/sbin/sfslock ]; then
 	. /etc/rc.d/BOOTCONFIG
 	# copy SFSs to RAM and prioritize frequently-accessed ones
-	for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-$KERNELVER.sfs $EXTRASFSLIST; do
+	for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-$KERNVER.sfs $EXTRASFSLIST; do
 		LOOP=`grep -l "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file | head -n 1`
 		[ -z "$LOOP" ] && continue
 		LOOP=${LOOP%/loop/backing_file}
