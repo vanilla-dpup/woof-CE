@@ -67,7 +67,6 @@ PATH="/bin:/sbin"
 export KERNELVER="$(uname -r)"
 . /DISTRO_SPECS #v412 has DISTRO_VERSION, DISTRO_FILE_PREFIX
 . /etc/rc.d/functions_x
-export DISTRODESC="${DISTRO_NAME} ${DISTRO_VERSION} - Linux ${KERNELVER} - `uname -m`"
 
 #precaution - if DISTRO_SPECS was not processed by 3builddistro...
 [ ! "$DISTRO_ZDRVSFS" ] && DISTRO_ZDRVSFS="zdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
