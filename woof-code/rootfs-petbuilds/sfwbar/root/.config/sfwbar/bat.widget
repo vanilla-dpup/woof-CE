@@ -1,6 +1,6 @@
 define batpercent = (0 + If($BatState = "Full", 100, BatLeft / BatTotal * 100))
 define charging = Val($BatState = "Full") | Val($BatState = "Charging")
-define Ico = If(batpercent >= 98, If(charging, 'battery-full-charging-symbolic', 'battery-full-charged-symbolic.svg'),
+define Ico = If(batpercent >= 98, If(charging, 'battery-full-charging-symbolic', 'battery-full-charged-symbolic'),
 	If(batpercent >= 90, If(charging, 'battery-level-90-charging-symbolic', 'battery-level-90-symbolic'),
 		If(batpercent >= 80, If(charging, 'battery-level-80-charging-symbolic', 'battery-level-80-symbolic'),
 			If(batpercent >= 70, If(charging, 'battery-level-70-charging-symbolic', 'battery-level-70-symbolic'),
