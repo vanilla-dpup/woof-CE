@@ -123,17 +123,7 @@ loadswap_func() { #w481 made into a function.
 #if have just done a switch_root, output a 'done' message...
 [ $PUPMODE -ne 2 ] && status_func 0
 
-ORIGLANG="`grep -m 1 '^LANG=' /etc/profile | cut -f 2 -d '=' | cut -f 1 -d ' '`" #120217
-ORIGLANG1="${ORIGLANG%_*}" #ex: en
 export LANG=C
-
-#120301 a problem if initrd has kernel default font, switching here changes all o/p from initrd to partial garbage.
-#workaround, clear the screen...
-if [ $PUPMODE -ne 2 ] ; then #120313 fix...
- PLANG1=`grep -m 1 '^PLANG=' /etc/rc.d/PUPSTATE | cut -f 2 -d '=' | cut -f 1 -d '_'`
- [ ! "$PLANG1" ] && PLANG1='en'
- [ "$ORIGLANG1" != "$PLANG1" ] && clear > /dev/console #120331 redirection is required.
-fi
 
 STATUS=0
 
