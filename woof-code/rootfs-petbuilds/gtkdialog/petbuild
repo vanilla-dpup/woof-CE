@@ -6,6 +6,7 @@ build() {
     tar -xzf gtkdialog-0.8.5a.tar.gz
     if [ $PETBUILD_GTK -eq 3 ]; then
         cd gtkdialog-0.8.5a
+        patch -p1 < ../bash.patch
         meson --buildtype=release --prefix=/usr --bindir=/usr/sbin -Dgtkver=3 build
         ninja -C build install
 
@@ -19,6 +20,7 @@ build() {
         fi
     else
         cd gtkdialog-0.8.5a
+        patch -p1 < ../bash.patch
         ./autogen.sh --prefix=/usr --bindir=/usr/sbin
         make install
         ln -s gtkdialog /usr/sbin/gtk2dialog
