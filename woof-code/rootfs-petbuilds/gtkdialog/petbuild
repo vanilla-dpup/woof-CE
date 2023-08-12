@@ -1,13 +1,12 @@
 download() {
-    [ -f gtkdialog-0.8.5b.tar.gz ] || wget -t 3 -T 60 -O gtkdialog-0.8.5b.tar.gz https://github.com/puppylinux-woof-CE/gtkdialog/archive/0.8.5b.tar.gz
+    [ -f gtkdialog-0.8.5c.tar.gz ] || wget -t 3 -T 60 -O gtkdialog-0.8.5c.tar.gz https://github.com/puppylinux-woof-CE/gtkdialog/archive/0.8.5c.tar.gz
 }
 
 build() {
-    tar -xzf gtkdialog-0.8.5b.tar.gz
+    tar -xzf gtkdialog-0.8.5c.tar.gz
     if [ $PETBUILD_GTK -eq 3 ]; then
-        cd gtkdialog-0.8.5b
-        patch -p1 < ../bash.patch
-        meson --buildtype=release --prefix=/usr --bindir=/usr/sbin -Dgtkver=3 build
+        cd gtkdialog-0.8.5c
+        meson --buildtype=release --prefix=/usr --bindir=/usr/sbin -Dgtkver=3 -Dbash=true build
         ninja -C build install
 
         if pkg-config --exists gtk+-2.0; then
@@ -19,8 +18,7 @@ build() {
             ln -s gtkdialog /usr/sbin/gtk2dialog
         fi
     else
-        cd gtkdialog-0.8.5b
-        patch -p1 < ../bash.patch
+        cd gtkdialog-0.8.5c
         ./autogen.sh --prefix=/usr --bindir=/usr/sbin
         make install
         ln -s gtkdialog /usr/sbin/gtk2dialog
