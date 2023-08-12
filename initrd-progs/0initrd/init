@@ -334,8 +334,12 @@ find_onepupdrv() {
   ONE_PART="$P_PART"
  fi
  [ "$ONE_PART" ] || return
- ensure_mounted "$ONE_PART" "/mnt/${4}drv"
- [ "$ONE_MP" ] || return
+ if [ "$4" = "p" ]; then
+  ensure_mounted "$ONE_PART" "/mnt/${4}drv"
+  [ "$ONE_MP" ] || return
+ else
+  ONE_MP="/mnt/${4}drv"
+ fi
  find_drv_file "${2}" "${3}" "${5}"
  [ "$ONE_FN" = "" -a "${2}" ] && echo "$ONE_PART, $ONE_TRY_FN file not found."
 }
