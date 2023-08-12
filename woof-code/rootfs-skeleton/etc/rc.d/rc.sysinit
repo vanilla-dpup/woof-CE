@@ -220,15 +220,25 @@ status_func 0
 
 if [ $SFSLOCK -eq 1 -a -f /usr/local/sbin/sfslock ]; then
 	. /etc/rc.d/BOOTCONFIG
+	MEMTOTALK=$(grep -m1 ^MemTotal /proc/meminfo | awk '{print $2}')
+	MEMTOTAL=$((MEMTOTALK * 1000))
+	LOCKLIMIT=$((MEMTOTAL / 2))
+	LOCKED=0
+
 	# copy SFSs to RAM and prioritize frequently-accessed ones
 	for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-$KERNVER.sfs $EXTRASFSLIST; do
-		LOOP=`grep -l "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file | head -n 1`
-		[ -z "$LOOP" ] && continue
-		LOOP=${LOOP%/loop/backing_file}
+		BACKF=$(grep -l "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file | head -n 1)
+		[ -z "$BACKF" ] && continue
+		SFSSIZE=$(du -b $(cat $BACKF) | awk '{print $1}')
+		LOCKED=$(($LOCKED + $SFSSIZE))
+		[ $LOCKED -gt $LOCKLIMIT ] && break
+		LOOP=${BACKF%/loop/backing_file}
 		LOOP=${LOOP#/sys/devices/virtual/block/}
 		echo -n "Copying '${SFS}' to ram..." >/dev/console
 		sfslock /dev/${LOOP}
-		status_func $?
+		STATUS=$?
+		status_func $STATUS
+		[ $STATUS -ne 0 ] && break
 	done
 fi
 ######################LOAD SWAP#####################
