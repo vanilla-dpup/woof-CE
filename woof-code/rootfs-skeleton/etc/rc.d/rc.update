@@ -171,15 +171,6 @@ case $PUPMODE in
   NEWFILESMNTPT="/initrd/pup_ro2"
   OLDFILESMNTPT="/initrd/pup_ro1"
  ;;
- "77") #tmpfs (pup_rw), folders (pup_ro1), ${DISTRO_PUPPYSFS} (pup_ro2).
-  #example: boot from multisession live-cd/dvd, pup_ro1 is a tmpfs folders copied from cd.
-  NEWFILESMNTPT="/initrd/pup_ro2"
-  OLDFILESMNTPT="/initrd/pup_ro1"
- ;;
- "66") #archive - tar- tmpfs (pup_rw)
-  NEWFILESMNTPT="/initrd/pup_ro2"
-  OLDFILESMNTPT="/initrd/pup_rw"
- ;;
  5)
   #PUPMODE=5 is first boot, ignore.
   basic_update
