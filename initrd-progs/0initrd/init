@@ -285,11 +285,12 @@ stack_onepupdrv() {
  if [ "$ONE_PREP" ];then
   remount_overlay -e "s~lowerdir=([^,]+)~lowerdir=${SFS_MP}:\1~" -e "s~lowerdir=,~lowerdir=${SFS_MP},~"
   [ $? -eq 0 ] || return 5
+  NEWUNIONRECORD="${ONE_BASENAME} ${NEWUNIONRECORD}"
  else
   remount_overlay -e "s~lowerdir=([^,]+)~lowerdir=\1:${SFS_MP}~" -e "s~lowerdir=,~lowerdir=${SFS_MP},~"
   [ $? -eq 0 ] || return 5
+  NEWUNIONRECORD="${NEWUNIONRECORD}${ONE_BASENAME} "
  fi
- NEWUNIONRECORD="${NEWUNIONRECORD}${ONE_BASENAME} "
  return 0
 }
 
@@ -798,15 +799,34 @@ case $PUPMODE in
  ;;
 esac
 
-if [ "$SAVE_MP" -a -f /pup_new/etc/rc.d/BOOTCONFIG ]; then
- EXTRASFSLIST=""
- . /pup_new/etc/rc.d/BOOTCONFIG
- for ONE_SFS in $EXTRASFSLIST; do
-  LOOP=`losetup -f`
-  find_drv_file "$SAVE_MP" "$ONE_SFS" "1"
-  [ "$ONE_SFS" ] && { stack_onepupdrv "$ONE_SFS" "ro${LOOP#/dev/loop}" ""; }
+EXTRASFSLIST=
+EXTRASFSPATHS=`find /mnt/dev_save${PSUBDIR} /mnt/dev_save -maxdepth 1 -name '*.sfs' -size +0 -exec sh -c 'SFS={}; echo ${SFS##*/},$SFS' \; | sort -n | uniq | cut -f 2- -d ,`
+for ONE_SFS in $EXTRASFSPATHS; do
+ ONE_NAME="${ONE_SFS##*/}"
+
+ # skip SFSs from other Puppy family distros
+ case "$ONE_NAME" in
+ *_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs) ;;
+ puppy_*.sfs|*drv_*.sfs) continue ;;
+ esac
+
+ # skip loaded SFSs
+ LOADED=0
+ for ONE_LOADED in $NEWUNIONRECORD; do
+  [ "$ONE_LOADED" = "$ONE_NAME" ] || continue
+  LOADED=1
+  break
  done
-fi
+ [ $LOADED -eq 1 ] && continue
+
+ LOOP=`losetup -f`
+ stack_onepupdrv "$ONE_SFS" "ro${LOOP#/dev/loop}" ""
+ if [ -z "$EXTRASFSLIST" ]; then
+  EXTRASFSLIST="${ONE_NAME}"
+ else
+  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
+ fi
+done
 
 mkdir -p /pup_new/etc/rc.d
 ( # > /pup_new/etc/rc.d/PUPSTATE
@@ -828,13 +848,13 @@ echo "PUNIONFS='overlay'"
 ) > /pup_new/etc/rc.d/PUPSTATE
 
 if [ "$PUPSAVE" ];then
- xBOOTCONFIG="$(grep -v '^PREVUNIONRECORD' /pup_new/etc/rc.d/BOOTCONFIG | sed -e 's/^LASTUNIONRECORD/PREVUNIONRECORD/')"
+ xBOOTCONFIG="$(grep -v -e '^PREVUNIONRECORD' -e '^EXTRASFSLIST' /pup_new/etc/rc.d/BOOTCONFIG | sed -e 's/^LASTUNIONRECORD/PREVUNIONRECORD/')"
  echo "$xBOOTCONFIG" > /pup_new/etc/rc.d/BOOTCONFIG
- echo "LASTUNIONRECORD='$(echo -n $NEWUNIONRECORD)'" >> /pup_new/etc/rc.d/BOOTCONFIG
 else
- echo "" > /pup_new/etc/rc.d/BOOTCONFIG
- echo "LASTUNIONRECORD=''" >> /pup_new/etc/rc.d/BOOTCONFIG
+ echo "PREVUNIONRECORD=''" >> /pup_new/etc/rc.d/BOOTCONFIG
 fi
+echo "EXTRASFSLIST='${EXTRASFSLIST}'" >> /pup_new/etc/rc.d/BOOTCONFIG
+echo "LASTUNIONRECORD='$(echo -n $NEWUNIONRECORD)'" >> /pup_new/etc/rc.d/BOOTCONFIG
 
 echo -n "${L_SWITCH_ROOT}" > /dev/console
 
