@@ -58,11 +58,6 @@ export KERNELVER="$(uname -r)"
 . /DISTRO_SPECS #v412 has DISTRO_VERSION, DISTRO_FILE_PREFIX
 . /etc/rc.d/functions_x
 
-# filenames specified in DISTRO_SPECS: DISTRO_ZDRVSFS, DISTRO_PUPPYSFS...
-KBUILD_DEF_FN="kbuild-$KERNELVER.sfs"
-DOCX_DEF_FN="docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-NLSX_DEF_FN="nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-
 if [ ! "$LOGLEVEL" ] ; then
   echo '3' > /proc/sys/kernel/printk # '3' is the standard loglevel.
   LOGLEVEL=3
@@ -273,7 +268,6 @@ stack_onepupdrv() {
  ONE_LOOP="$(losetup -f)"
  losetup -r $ONE_LOOP $ONE_SFS
  SFS_MP="/pup_${ONE_SFX}"
- [ "$ONE_SFX" = "p" ] && SFS_MP="/pup_ro2"
  [ -d "$SFS_MP" ] || mkdir $SFS_MP
  mount -r -t squashfs -o noatime $ONE_LOOP $SFS_MP > /dev/console 2>&1
  STATUS=$? ; check_status $STATUS
@@ -562,7 +556,6 @@ if [ "$pfix" ];then
    nocopy)  PNOCOPY="yes";;        #do not copy .sfs files into ram (default is copy if enough ram).
    fsck)    PFSCK="yes";;         #do a fsck of ${DISTRO_FILE_PREFIX}save file.
    fsckp)   PFSCKP="yes";;        #do fsck before first mount of ext partitions
-   [0-9]*)  PIGNORELAST=$ONEFIX;; #blacklist last $ONEFIX folders (multisession).
    *)       echo "pfix=$ONEFIX is not a known boot parameter";;
   esac
  done
@@ -628,7 +621,7 @@ mount -t tmpfs tmpfs /mnt/tmpfs
 
 NEWUNIONRECORD=""
 
-stack_onepupdrv "$PDRV_SFS" "p"
+stack_onepupdrv "$PDRV_SFS" "ro2"
 STATUS=$?
 if [ $STATUS -gt 0 ];then
  P_PRE_MSG="${L_PRE_MESSAGE}"
@@ -643,31 +636,6 @@ PUP_LAYER="$SFS_MP"
 
 #all partition id's should be decoded by now
 [ "$SAVE_BP_ID" ] && log_part_id "$SAVE_BP_ID"
-
-#have basic system, now try to add optional stuff
-find_drv_file "/mnt/pdrv" "$NLSX_DEF_FN" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "nls"
-
-find_drv_file "/mnt/pdrv" "$DOCX_DEF_FN" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "doc"
-
-find_drv_file "/mnt/pdrv" "$KBUILD_DEF_FN" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "k"
-
-find_drv_file "/mnt/pdrv" "$DISTRO_FDRVSFS" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "f"
-
-find_drv_file "/mnt/pdrv" "$DISTRO_ZDRVSFS" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "z"
-
-find_drv_file "/mnt/pdrv" "$DISTRO_BDRVSFS" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "b" "p"
-
-find_drv_file "/mnt/pdrv" "$DISTRO_YDRVSFS" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "y" "p"
-
-find_drv_file "/mnt/pdrv" "$DISTRO_ADRVSFS" ""
-[ "$ONE_SFS" ] && stack_onepupdrv "$ONE_SFS" "a" "p"
 
 [ "$SAVEPART" ] || SAVEPART="$P_PART"
 
@@ -819,8 +787,13 @@ for ONE_SFS in $EXTRASFSPATHS; do
  done
  [ $LOADED -eq 1 ] && continue
 
+ ONE_PREP=
+ case "$ONE_NAME" in
+ $DISTRO_BDRVSFS|$DISTRO_YDRVSFS|$DISTRO_ADRVSFS) ONE_PREP="p" ;;
+ esac
+
  LOOP=`losetup -f`
- stack_onepupdrv "$ONE_SFS" "ro${LOOP#/dev/loop}" ""
+ stack_onepupdrv "$ONE_SFS" "extra${LOOP#/dev/loop}" "$ONE_PREP"
  if [ -z "$EXTRASFSLIST" ]; then
   EXTRASFSLIST="${ONE_NAME}"
  else

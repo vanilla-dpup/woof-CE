@@ -23,8 +23,8 @@ This fork strips woof-CE down to the bare essentials:
 * ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
 * Support for PUPMODEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
-* Support for custom SFS names (for adrv, ydrv, etc') is gone. The "mandatory" SFSs always use their traditional names and the partition containing Puppy files can be specified using `pupsfs=$UUID`.
-* Support for SAVEMARK and SAVESPEC is gone. The partition containing the save file/folder can be specified using `psave=$UUID`.
+* The partition containing Puppy files can be specified only using `pupsfs=$UUID`.
+* Support for SAVEMARK and SAVESPEC is gone. The partition containing the save file/folder can be specified only using `psave=$UUID`.
 * Support for pimod and pwireless is gone.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
 * Support for the devx SFS is gone. Development packages are installed inside a copy of the main SFS during the build, but don't make it into the build output.
@@ -41,7 +41,7 @@ Other changes:
 * Bootflash in upstream supports FAT32 and f2fs, using syslinux, extlinux or efilinux. This fork adds ext4 support.
 * If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
 * Copying of SFSs to RAM (`pfix=ram|copy`) happens later in the boot process and it's implemented differently. SFSs are cached and not copied to the ramdisk (see woof-code/rootfs-petbuilds/sfslock), leaving more usable ramdisk space, and the memory spent on SFSs is freed automatically (using OOM score adjustment) if needed. However, this also means that the boot partition remains mounted even when using `pfix=ram`. In addition, SFSs are prioritized and lower priority SFSs are not cached when cached SFSs occupy half of available RAM.
-* EXTRASFSLIST is now managed automatically and SFSs don't need to be "queued" by the user for loading at boot time. Instead, the init script loads all SFSs under psubdir (if specified) and the partition root, under both the save partition or the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order.
+* EXTRASFSLIST is now managed automatically and SFSs don't need to be "queued" by the user for loading at boot time. Instead, the init script loads all SFSs under psubdir (if specified) and the partition root, under both the save partition or the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order. The traditional *drv SFS names no longer have any special handling, but {b,y,a}drv are still loaded above the main SFS.
 
 ## Usage
 
