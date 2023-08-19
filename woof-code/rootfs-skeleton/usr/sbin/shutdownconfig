@@ -131,10 +131,6 @@ choosepartfunc() {
   expBOOTDRV="/dev/`echo ${PDEV1} | sed -e 's%[0-9]*$%%'`"
   PCHOOSE="yes"
  fi
- if [ "$PSAVEMARK" != "" ];then #see /etc/rc.d/PUPSTATE
-  devnameonly="`echo -n "$PDEV1" | sed -e 's/[0-9]*$//'`"
-  SAVEPART="${devnameonly}${PSAVEMARK}" #partition that will-have ${DISTRO_FILE_PREFIX}save.
- fi
  if [ "$PSAVEPART" != "" ];then #see /etc/rc.d/PUPSTATE
   SAVEPART="${PSAVEPART}"
  fi
@@ -888,54 +884,6 @@ LABEL ${SAVEFILE##*/}
    umount ${MOUNTED} 2>/dev/null
   fi
  fi
-elif [ "$PUPMODE" = "128" -a "$PMEDIA" != "cd" ]; then
-  # Add a SAVESPEC file if save in a diffrent partition or different directory
-  SPEC_DIR="/tmp/shutdown$$"
-  [ -d "$SPEC_DIR" ] || mkdir -p "$SPEC_DIR"
-  SPEC_FN="$SPEC_DIR/SAVESPEC"
-  [ -e "$SPEC_FN" ] && rm "$SPEC_FN"
-  if [ "${SAVEPART}" != "${DSAVEPART}" -o "${SAVEPATH}" != "${DSAVEDIR}" ]; then
-    SAVEID="$(busybox blkid /dev/${SAVEPART} | grep -o ' LABEL=.*' | cut -f2 -d '"')"
-    [ "$SAVEID" ] || SAVEID="$(busybox blkid /dev/${SAVEPART} | grep -o ' UUID=.*' | cut -f2 -d '"')"
-    if [ "$SAVEID" ]; then
-      echo "SS_ID='$SAVEID'" >> "$SPEC_FN"
-      [ "$SAVEPATH" ] || SAVEPATH='/'
-      echo "SS_DIR='$SAVEPATH'" >> "$SPEC_FN"
-    fi
-  fi
-  get_DRV "${SAVEPART}"
-  if [ "${ret_DRV}" ]; then
-    SAVEDRV="${ret_DRV}"
-    get_DRV "${PUPSFS%%,*}"
-    if [ "${SAVEDRV}" != "${ret_DRV}" ]; then
-      # check and set SAVEMEDIA for SAVEPART
-      DRVTYPE="`probedisk | grep "$SAVEDRV" | cut -f 2 -d '|'`"
-      case "$DRVTYPE" in
-        drive)
-          if [ "$(cat /sys/block/$SAVEDRV/queue/rotational 2>/dev/null)" = "0" -a "$SAVEFS" != 'f2fs' ]; then
-            xMEDIA='ataflash'
-          else
-            xMEDIA='atahd'
-          fi
-          ;;
-        usbdrv)
-          if [ "$(cat /sys/block/$SAVEDRV/removable 2>/dev/null)" = "1" -a "$SAVEFS" != 'f2fs' ]; then
-            xMEDIA='usbflash'
-          else
-            xMEDIA='usbhd'
-          fi
-          ;;
-        *)
-          xMEDIA=''
-          ;;
-      esac
-      if [ "$xMEDIA" ]; then
-        [ "$xMEDIA" = "$PMEDIA" ] || echo "SS_MEDIA='$xMEDIA'" >> "$SPEC_FN"
-      fi
-    fi
-  fi
-  [ -e "$SPEC_FN" ] && copy2installdir "$SPEC_FN"
-  rm -rf "$SPEC_DIR"
 fi
 
 exit 0

@@ -20,9 +20,12 @@ This fork strips woof-CE down to the bare essentials:
 * PPM and support for .pet packages are gone: packages in the build come from rootfs-packages or rootfs-petbuilds (built from source).
 * The only supported kind of kernel packages is the "huge" one, and fdrv is built by moving /usr/lib/firmware out of the main SFS.
 * Support for aufs is gone. Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported.
-* ISO images are gone: the woof-CE build output is a bootable flash drive image.
+* ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
 * Support for PUPMODEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
+* Support for custom SFS names (for adrv, ydrv, etc') is gone. The "mandatory" SFSs always use their traditional names and the partition containing Puppy files can be specified using `pupsfs=$UUID`.
+* Support for SAVEMARK and SAVESPEC is gone. The partition containing the save file/folder can be specified using `psave=$UUID`.
+* Support for pimod and pwireless is gone.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
 * Support for the devx SFS is gone. Development packages are installed inside a copy of the main SFS during the build, but don't make it into the build output.
 * The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country is gone, and so is the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.

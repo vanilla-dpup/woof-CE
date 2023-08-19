@@ -144,13 +144,9 @@ punionfs=<aufs|overlay>
 
 ------------------------------------------------------------
 pupsfs=<partition> Specifies the puppy...sfs partition
-zdrv=<partition>   Specifies the zdrv...sfs  partition
-fdrv=<partition>   Specifies the fdrv...sfs  partition
-adrv=<partition>   Specifies the adrv...sfs  partition
-ydrv=<partition>   Specifies the ydrv...sfs  partition
 psave=<partition>  Specifies the save layer  partition
 
-   Where <partition> can be the name e.g sdb2, or a label e.g. Work, or a uuid
+   Where <partition> is a partition uuid
        e.g. 0db94719-cdf1-44b7-9766-23db62fb85a5
 
    Specifying psave=<partition> can be quite useful in directing all save layers to a different partition.
@@ -160,64 +156,10 @@ psave=<partition>  Specifies the save layer  partition
        If you forget to plug in the appropriate device, Puppy will simply do a first boot,
          no harm done, just insert the appropriate usb device and reboot.
 
-    ex: adrv=sdd6
-    ex: psave=Work
+    ex: psave=0db94719-cdf1-44b7-9766-23db62fb85a5
     ex: pupsfs=0db94719-cdf1-44b7-9766-23db62fb85a5
 
-----
-pupsfs=<partition>:<path>/<filename> Specifies the puppy...sfs file.
-zdrv=<partition>:<path>/<filename>   Specifies the zdrv...sfs file.
-fdrv=<partition>:<path>/<filename>   Specifies the fdrv...sfs file.
-adrv=<partition>:<path>/<filename>   Specifies the adrv...sfs file.
-ydrv=<partition>:<path>/<filename>   Specifies the ydrv...sfs file.
-psave=<partition>:<path>/<filename>  Specifies the save layer file.
-
-   Where <partition> can be the name e.g sdb2, or a label e.g. Work, or a uuid
-       e.g. 0db94719-cdf1-44b7-9766-23db62fb85a5
-   When a label or uuid is used, only the beginning is required, enough to be unique on your system,
-       e.g "pupsfs=0db94719-cdf1"
-
-   Where <path> is the sub-directory within the partition.
-       e.g. "pupsfs=sdb2:/path/to/" or "psave=:/path/to/"
-   Any specified <path> is relative to the root of the partition, the same as "psubdir=".
-   If <path> does not start with a "/" then a "/" is prepended to it.
-   If no <path> is specified, the directory defined by "psubdir=" is used.
-
-   Where <filename> is just a filename,
-       e.g. "pupsfs=sdb2:/path/to/my-improved-puppy.sfs" or "psave=sdc2:my-improved-savefolder"
-   If no <filename> is specified the default filename, as determined by the DISTRO_SPECS file, is used.
-
-   For the purposes of the "psave=" specification a savefolder is considered to be just a file.
-       The <path> specification defines the directory containing the savefolder,
-           and the <filename> specification defines it's name.
-       So, "psave=sdb4:/lxpupsc/mysave" says that the savefolder is on the sdb4 partition
-           in the "/lxpupsc" directory, named "mysave".
-       Whereas "psave=sdb4:/lxpupsc/mysave/" says that the savefolder is on the sdb4 partition
-           in the "/lxpupsc/mysave" directory, with the default savefolder name for the puppy.
-
-   It is not necessary to specify all elements,
-       but if there is no ":" it is assumed to be a <partition> specification.
-       e.g. "pupsfs=sdb2", specifies that the puppy...sfs file is on sdb2 in the default path with the default filename.
-       "fdrv=:alternate-firmware.sfs", specifies that it's a file called alternate-firmware.sfs
-       on the default partition in the default directory i.e. where the puppy...sfs is located.
-
-   It is recommended that a pupsfs=<partition> always be specified.
-   This enables init to go straight to that partition to find the Puppy files
-       instead of searching through all partitions looking for puppy...sfs.
-
-   ex: psave=sdc1:/path/to/tahrsave.4fs
-   ex: psave=sdc1:tahrsave.4fs
-   ex: zdrv=sdc1:/zz/myzz.sfs
-   ex: adrv=sdd6:/puppy/drvs/custom/adrv.sfs
-   ex: pupsfs=sdb2:/puppy/precise/puppy_precise_5.7.1.sfs
-
 ------------------------------------------------------------
-
-pimod=<, separated list of kernel module names>
-   On some computers the keyboard requires a kernel module to be loaded before they will work.
-   The normal loading of kernel modules does not happen until after init has finished.
-   But sometimes init needs to request input from the user via the keyboard.
-   Specifying kernel modules in this parameter will cause init to load them before any possible keyboard interaction.
 
 pfix=<ram, nox, nocopy, fsck, fsckp, rdsh, <number>>
    The pfix parameter is a ',' separated list of 1 or more of the above sub-parameters.
@@ -231,28 +173,6 @@ pfix=<ram, nox, nocopy, fsck, fsckp, rdsh, <number>>
    <number>: blacklist last <number> folders (multisession). e.g. pfix=3
 
 
-Parameter files:
-================
-
-If they exist in the frugal install directory their contents are used to set some variables that otherwise could be set by boot parameters.
-
-SAVEMARK
-   Provides a means of specifying that the save layer file is on a different partition on the same
-   device. It contains a single number. If the puppy...sfs is located in sdb2 and SAVEMARK
-   contains 4, a save layer file is expected to be in sdb4.
-
-initmodules.txt
-   Contains a list of kernel modules that init loads before any keyboard interaction.
-   Usually these are modules needed for the keyboard to work.
-
-BOOT_SPECS
-   This is a file that sets variables, like DISTRO_SPECS. But it is meant to be for the user to override the variables normally set by boot parameters.
-   It can also be used to set other variables in init, e.g. "TZ='XXX-10'" sets the timezone in init to Queensland, Australia.
-   The idea is that there is a copy of this file in user space, the user edits this file and then stores a copy of it in initrd.gz.
-   This file could also be used instead of specific parameter files like initmodules.txt and even SAVEMARK.
-   Part of this concept is to move the complication out of init into the running system.
-
-
 #############################
     MORE TECHNICAL NOTES
 #############################
@@ -260,7 +180,7 @@ BOOT_SPECS
 How the script determines what pupsave to use
 =============================================
 
-If you haven't specified psave=<partition>:<filename> then init looks
+If you haven't specified psave=<partition> then init looks
 for a file with this base name:
 
 /DISTRO_SPECS -> DISTRO_FILE_PREFIX='...'
