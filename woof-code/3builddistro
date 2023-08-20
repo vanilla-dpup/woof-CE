@@ -13,15 +13,14 @@ arm64) ARCH=aarch64 ;;
 *) exit 1 ;;
 esac
 
-# stacking order: adrv ydrv bdrv puppy nlsx docx kbuild fdrv zdrv
+BDRVSFS="bdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 PUPPYSFS="puppy_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-BDRVSFS="00_bdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-YDRVSFS="01_ydrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-ADRVSFS="02_adrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-NLSXSFS="03_nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-DOCXSFS="04_docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-FDRVSFS="06_fdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-ZDRVSFS="07_zdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+ZDRVSFS="zdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+FDRVSFS="fdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+ADRVSFS="adrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+YDRVSFS="ydrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+DOCXSFS="docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
+NLSXSFS="nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 
 cd sandbox3
 
@@ -220,7 +219,7 @@ tar -xjf huge-*-kernel-kit.tar.bz2
 cd ../../sandbox3
 
 cp -f ../kernel-kit/output/vmlinuz-*-kernel-kit build/vmlinuz
-cp -f ../kernel-kit/output/kbuild-*.sfs build/05_kbuild_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs
+cp -f ../kernel-kit/output/kbuild-*.sfs build/
 cp -f ../kernel-kit/output/kernel-modules-*-kernel-kit.sfs build/${ZDRVSFS}
 
 mv -f ../initrd-progs/initrd.gz build/

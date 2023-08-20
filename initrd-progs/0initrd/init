@@ -250,7 +250,7 @@ find_drv_file() {
  [ -f "${ONE_MP}${ONE_TRY_FN}" ] && ONE_SFS="${ONE_MP}${ONE_TRY_FN}"
 }
 
-stack_onepupdrv() {
+do_stack_onepupdrv() {
 # "$1" - sfs path - ex: /mnt/pdrv/pup/mydrv-1.2.3.sfs
 # "$2" - suffix for "pup_" branch directory - ex: a
 # "$3" - prepend after rw layer indicator - ex: p
@@ -285,7 +285,42 @@ stack_onepupdrv() {
   [ $? -eq 0 ] || return 5
   NEWUNIONRECORD="${NEWUNIONRECORD}${ONE_BASENAME} "
  fi
+ if [ -z "$EXTRASFSLIST" ]; then
+  EXTRASFSLIST="${ONE_NAME}"
+ else
+  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
+ fi
  return 0
+}
+
+stack_onepupdrv() {
+# "$1" - sfs list - ex: /mnt/pdrv/pup/mydrv-1.2.3.sfs /mnt/pdrv/pup/otherdrv-1.2.3.sfs
+# "$2" - sfs name - ex: mydrv-1.2.3.sfs
+# "$3" - suffix for "pup_" branch directory - ex: a
+# "$4" - prepend after rw layer indicator - ex: p
+ SFS_LIST="${1}"
+ SFS_NAME="${2}"
+ ONE_SFX="${3}"
+ ONE_PREP="${4}"
+
+ FOUND=0
+ for ONE_SFS in $SFS_LIST; do
+  ONE_NAME="${ONE_SFS##*/}"
+  [ "$ONE_NAME" = "$SFS_NAME" ] || continue
+  FOUND=1
+  break
+ done
+ [ $FOUND -eq 0 ] && return
+
+ LOADED=0
+ for ONE_LOADED in $NEWUNIONRECORD; do
+  [ "$ONE_LOADED" = "$SFS_NAME" ] || continue
+  LOADED=1
+  break
+ done
+ [ $LOADED -eq 1 ] && continue
+
+ do_stack_onepupdrv "$ONE_SFS" "$ONE_SFX" "$ONE_PREP"
 }
 
 setup_psave(){ # setup savefile or savefolder
@@ -620,8 +655,9 @@ mount -t tmpfs tmpfs /mnt/tmpfs
 [ -d "/mnt/tmpfs/pup_rw" ] || mkdir /mnt/tmpfs/pup_rw
 
 NEWUNIONRECORD=""
+EXTRASFSLIST=""
 
-stack_onepupdrv "$PDRV_SFS" "ro2"
+do_stack_onepupdrv "$PDRV_SFS" "ro2"
 STATUS=$?
 if [ $STATUS -gt 0 ];then
  P_PRE_MSG="${L_PRE_MESSAGE}"
@@ -767,8 +803,20 @@ case $PUPMODE in
  ;;
 esac
 
-EXTRASFSLIST=
 EXTRASFSPATHS=`find /mnt/dev_save${PSUBDIR} /mnt/dev_save -maxdepth 1 -name '*.sfs' -size +0 -exec sh -c 'SFS={}; echo ${SFS##*/},$SFS' \; | sort -n | uniq | cut -f 2- -d ,`
+
+# load traditional SFSs in the traditional order
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_BDRVSFS" "b" "p"
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_YDRVSFS" "y" "p"
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ADRVSFS" "a" "p"
+stack_onepupdrv "$EXTRASFSPATHS" "nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs" "nls" ""
+stack_onepupdrv "$EXTRASFSPATHS" "docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs" "doc" ""
+stack_onepupdrv "$EXTRASFSPATHS" "kbuild-${KERNELVER}.sfs" "k" ""
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_FDRVSFS" "f" ""
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ZDRVSFS" "z" ""
+
+# load all other SFSs, sorted numerically
+CNT=3
 for ONE_SFS in $EXTRASFSPATHS; do
  ONE_NAME="${ONE_SFS##*/}"
 
@@ -778,27 +826,8 @@ for ONE_SFS in $EXTRASFSPATHS; do
  puppy_*.sfs|*drv_*.sfs) continue ;;
  esac
 
- # skip loaded SFSs
- LOADED=0
- for ONE_LOADED in $NEWUNIONRECORD; do
-  [ "$ONE_LOADED" = "$ONE_NAME" ] || continue
-  LOADED=1
-  break
- done
- [ $LOADED -eq 1 ] && continue
-
- ONE_PREP=
- case "$ONE_NAME" in
- $DISTRO_BDRVSFS|$DISTRO_YDRVSFS|$DISTRO_ADRVSFS) ONE_PREP="p" ;;
- esac
-
- LOOP=`losetup -f`
- stack_onepupdrv "$ONE_SFS" "extra${LOOP#/dev/loop}" "$ONE_PREP"
- if [ -z "$EXTRASFSLIST" ]; then
-  EXTRASFSLIST="${ONE_NAME}"
- else
-  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
- fi
+ stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" ""
+ CNT=$(($CNT + 1))
 done
 
 mkdir -p /pup_new/etc/rc.d
