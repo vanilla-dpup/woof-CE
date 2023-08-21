@@ -169,7 +169,7 @@ yes|sysfsutils|libsysfs2,sysfsutils|exe,dev,doc,nls||deps:yes
 yes|syslinux|syslinux,syslinux-common,syslinux-utils,syslinux-efi,extlinux,isolinux|exe,dev,doc,nls||deps:yes
 yes|tar|tar|exe,dev>null,doc,nls||deps:yes
 yes|time|time|exe,dev>null,doc,nls||deps:yes
-yes|transmission-deps|libevent-dev,libnatpmp-dev,libminiupnpc-dev|exe,dev,doc,nls||deps:yes
+yes|transmission-gtk|transmission-gtk|exe,dev,doc,nls||deps:yes
 yes|udev|udev|exe,dev,doc,nls||deps:yes
 yes|ucf|ucf|exe,dev,doc,nls||deps:yes
 yes|unzip|unzip|exe,dev>null,doc,nls||deps:yes
