@@ -180,6 +180,7 @@ yes|wget|wget|exe,dev>null,doc,nls||deps:yes
 yes|wireless-tools|wireless-tools,libiw30,libiw-dev|exe,dev,doc,nls||deps:yes
 yes|wireplumber|wireplumber|exe,dev,doc,nls||deps:yes
 yes|wpa_supplicant|wpasupplicant|exe,dev>null,doc,nls||deps:yes
+yes|xarchiver|xarchiver|exe,dev,doc,nls||deps:yes
 yes|xdg-utils|xdg-utils|exe,dev,doc,nls||deps:yes
 yes|xorg_dri|libgl1-mesa-dri,mesa-utils|exe,dev,doc,nls||deps:yes
 yes|xournalpp|xournalpp|exe,dev,doc,nls||deps:yes
