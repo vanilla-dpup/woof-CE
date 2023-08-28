@@ -1,1 +1,0 @@
-chroot . /usr/sbin/setup-spot uget-gtk=true
