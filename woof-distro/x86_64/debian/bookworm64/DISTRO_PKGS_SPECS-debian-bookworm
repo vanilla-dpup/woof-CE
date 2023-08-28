@@ -221,7 +221,6 @@ yes|binutils|binutils|exe>dev,dev>exe,doc,nls||deps:yes
 yes|blueman|blueman|exe,dev,doc,nls||deps:yes
 yes|bluez|bluez,bluez-obexd|exe,dev,doc,nls||deps:yes
 no|breeze-cursor-theme|breeze-cursor-theme|exe,dev,doc,nls||deps:yes
-yes|claws-mail-deps|libetpan-dev|exe,dev,doc,nls||deps:yes
 yes|connman|connman|exe,dev,doc,nls||deps:yes
 yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
 yes|dbus-x11|dbus-x11|exe,dev,doc,nls||deps:yes
