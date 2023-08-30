@@ -71,7 +71,7 @@ sync
 
 /etc/rc.d/rc.services stop
 
-[ "$PUNIONFS" = "aufs" ] && sfs_load --cli stop
+sfs_load --cli stop
 
 ### cleanly unmount cifs shares from /usr/share/Shares
 # samba rox app

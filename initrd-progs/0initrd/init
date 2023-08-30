@@ -819,6 +819,9 @@ stack_onepupdrv "$EXTRASFSPATHS" "kbuild-${KERNELVER}.sfs" "k" ""
 stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_FDRVSFS" "f" ""
 stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ZDRVSFS" "z" ""
 
+# under PUPMODE 12, a dynamically loaded SFS may leave behind symlinks in the save layer
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin chroot /pup_new /usr/sbin/sfs_load.overlay --cli stop
+
 # load all other SFSs, sorted numerically
 CNT=3
 for ONE_SFS in $EXTRASFSPATHS; do
