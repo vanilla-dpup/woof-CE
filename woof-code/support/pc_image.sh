@@ -61,13 +61,13 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 	mount -o noatime ${LOOP}p1 /mnt/uefiimagep1
 	[ -f ../../local-repositories/efilinux.efi ] || wget --tries=1 --timeout=10 -O ../../local-repositories/efilinux.efi https://github.com/puppylinux-woof-CE/efilinux/releases/latest/download/efilinux.efi
 	install -D -m 644 ../../local-repositories/efilinux.efi /mnt/uefiimagep1/EFI/BOOT/BOOTX64.EFI
-	install -m 644 build/vmlinuz /mnt/uefiimagep1/EFI/BOOT/vmlinuz
-	install -m 644 build/initrd.gz /mnt/uefiimagep1/EFI/BOOT/initrd.gz
+	install -m 644 build/vmlinuz /mnt/uefiimagep1/vmlinuz
+	install -m 644 build/initrd.gz /mnt/uefiimagep1/initrd.gz
 	if [ -e build/ucode.cpio ]; then
-		install -m 644 build/ucode.cpio /mnt/uefiimagep1/EFI/BOOT/ucode.cpio
-		echo "-f \EFI\BOOT\vmlinuz initrd=\EFI\BOOT\ucode.cpio initrd=\EFI\BOOT\initrd.gz" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
+		install -m 644 build/ucode.cpio /mnt/uefiimagep1/ucode.cpio
+		echo "-f \vmlinuz initrd=\ucode.cpio initrd=\initrd.gz" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
 	else
-		echo "-f \EFI\BOOT\vmlinuz initrd=\EFI\BOOT\initrd.gz" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
+		echo "-f \vmlinuz initrd=\initrd.gz" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
 	fi
 
 	umount /mnt/uefiimagep1 2>/dev/null
