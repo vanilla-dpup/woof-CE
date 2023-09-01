@@ -465,9 +465,9 @@ $TRY_PARTS_LAST"
    if [ "$LOOK_PUP" ];then
     find_drv_file /mnt/pdrv "$DISTRO_PUPPYSFS" ""
     if [ "$ONE_SFS" ];then
-     PDRV="$ONE_PART,$ONE_FS,${ONE_SFS#/mnt/pdrv}"
      PDRV_SFS="$ONE_SFS"
      P_PART="$ONE_PART"
+     DEV1FS="$ONE_FS"
      break;
     fi
    fi
@@ -612,7 +612,7 @@ if [ "$P_BP_ID" ];then #specified as parameter
  ensure_mounted "$P_PART" "/mnt/pdrv"
  if [ "$ONE_MP" ];then
   find_drv_file "/mnt/pdrv" "$DISTRO_PUPPYSFS" ""
-  [ "$ONE_SFS" ] && { PDRV="$ONE_PART,$ONE_FS,${ONE_SFS#/mnt/pdrv}"; PDRV_SFS="$ONE_SFS"; }
+  [ "$ONE_SFS" ] && { PDRV_SFS="$ONE_SFS"; DEV1FS="$ONE_FS"; }
  fi
 else #not specified anywhere
  #determine what to search for
@@ -839,7 +839,8 @@ mkdir -p /pup_new/etc/rc.d
 ( # > /pup_new/etc/rc.d/PUPSTATE
 echo "PUPMODE=$PUPMODE"
 echo "PDEV1='$P_PART'"
-echo "PUPSFS='$PDRV'"
+echo "DEV1FS='$DEV1FS'"
+echo "PUPSFS='$P_PART,$DEV1FS,${PDRV#/mnt/pdrv}'"
 echo "PUPSAVE='$PUPSAVE'"
 echo "PMEDIA='$PMEDIA'"
 echo '#these directories are overlay layers in /initrd...'
