@@ -117,8 +117,6 @@ loadswap_func() { #w481 made into a function.
 . /etc/DISTRO_SPECS
 . /etc/rc.d/BOOTCONSTRAINED # has BOOT_DISABLESWAP, BOOT_ATIME, BOOT_DIRTYWRITE.
 [ $loglevel ] && LOGLEVEL=$loglevel #boot param.
-[ $pmedia ] && PMEDIA=$pmedia #boot parameter, broad category of boot media. ex: cd.
-[ $pdev1 ] && PDEV1=$pdev1    #boot parameter, partition have booted off. ex: hda3
 
 #if have just done a switch_root, output a 'done' message...
 [ $PUPMODE -ne 2 ] && status_func 0
@@ -136,20 +134,6 @@ echo -n "Making the filesystem usable..." >/dev/console
 FREERAM=`free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 4 -d ' '` #w481 110405
 QTRFREERAM=`expr $FREERAM \/ 4`
 
-#=============== full-hd-install
-if [ $PUPMODE -eq 2 ] ; then
- #no longer deleting /tmp/* in rc.shutdown... (note, init script in initrd.gz wipes it)
- rm -rf /tmp/*
- rm -rf /tmp/.[0-9a-zA-Z]*
- busybox mount -t tmpfs -o size=${QTRFREERAM}k tmpfs /tmp ;STATUS=$((STATUS+$?))
- chmod 1777 /tmp 2>/dev/null
- dmesg | grep -o 'EXT[2,3,4]-fs.*running e2fsck is recommended' > /tmp/dmesg_e2fsck_warnings1
- if grep -G "(${PDEV1})" /tmp/dmesg_e2fsck_warnings1 ; then
-   #EXT3-fs (sda9): warning: mounting fs with errors, running e2fsck is recommended
-   #EXT3-fs (sda10): warning: maximal mount count reached, running e2fsck is recommended
-   echo > /tmp/bootsysinit_must_fsck
- fi
-fi
 #===============
 
 if [ "$BOOT_DIRTYWRITE" ];then #120704 see /etc/rc.d/BOOTCONSTRAINED, variable set in 3builddistro.
@@ -319,34 +303,6 @@ if [ ! -f /etc/rc.d/rc.local ];then
  echo '#When firewall is installed, will append lines to this file...' >> /etc/rc.d/rc.local
 else
  . /etc/rc.d/rc.local
-fi
-
-#improper shutdown check. see above, also rc.shutdown and /sbin/init...
-if [ $PUPMODE -eq 2 ];then #full hd install.
- if [ "`mount | grep -m 1 '^/dev/root ' | grep ' / '`" ] ; then
-   ln -sfnv /dev/${PDEV1} /dev/root 2>/dev/null
- fi
- #this file gets removed by rc.shutdown if a proper shutdown...
- echo -n "${PDEV1},${DEV1FS}," > /fsckme.flg #ex: sda7,ext3,
- busybox chmod 666 /fsckme.flg #110503 so non-root can delete it.
-else
- if [ "$PUPSAVE" -a $PUPMODE -ne 77 ];then # don't do this in a multi-session DVD (77)
-  echo -n "$PUPSAVE" > /initrd${PUP_HOME}/fsckme.flg #ex: sda7,ext3,/pupsave-10MAR2010.2fs
-  busybox chmod 666 /initrd${PUP_HOME}/fsckme.flg #110503 so non-root can delete it.
- fi
-fi
-
-if [ "$BOOT_SCHEDULER" ];then #120704 see /etc/rc.d/BOOTCONSTRAINED, variable set in 3builddistro.
- #my kernel defaults to 'cfq', change to 'deadline'. refer: http://tombuntu.com/index.php/2008/09/04/four-tweaks-for-using-linux-with-solid-state-drives/
- if [ "$PDEV1" ];then
-  PDEV="`echo -n "$PDEV1" | sed -e 's%[0-9]*$%%' -e 's%p$%%'`" #mmcblk0p2 becomes mmcblk0
-  if [ "`grep -m 1 "$BOOT_SCHEDULER" /sys/block/${PDEV}/queue/scheduler`" != "" ];then #check available.
-   if [ "`cat /sys/block/${PDEV}/queue/scheduler | cut -f 2 -d '[' | cut -f 1 -d ']' | grep -m 1 "$BOOT_SCHEDULER"`" = "" ];then #check not already chosen.
-    echo $BOOT_SCHEDULER > /sys/block/${PDEV}/queue/scheduler
-    echo 1 > /sys/block/${PDEV}/queue/iosched/fifo_batch
-   fi
-  fi
- fi
 fi
 
 # SFR hack for IO bug http://murga-linux.com/puppy/viewtopic.php?p=681383#681383
