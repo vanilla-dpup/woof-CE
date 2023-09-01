@@ -465,7 +465,7 @@ $TRY_PARTS_LAST"
    if [ "$LOOK_PUP" ];then
     find_drv_file /mnt/pdrv "$DISTRO_PUPPYSFS" ""
     if [ "$ONE_SFS" ];then
-     PDRV="$ONE_PART,$ONE_FS,$ONE_SFS"
+     PDRV="$ONE_PART,$ONE_FS,${ONE_SFS#/mnt/pdrv}"
      PDRV_SFS="$ONE_SFS"
      P_PART="$ONE_PART"
      break;
@@ -612,7 +612,7 @@ if [ "$P_BP_ID" ];then #specified as parameter
  ensure_mounted "$P_PART" "/mnt/pdrv"
  if [ "$ONE_MP" ];then
   find_drv_file "/mnt/pdrv" "$DISTRO_PUPPYSFS" ""
-  [ "$ONE_SFS" ] && { PDRV="$ONE_PART,$ONE_FS,$ONE_SFS"; PDRV_SFS="$ONE_SFS"; }
+  [ "$ONE_SFS" ] && { PDRV="$ONE_PART,$ONE_FS,${ONE_SFS#/mnt/pdrv}"; PDRV_SFS="$ONE_SFS"; }
  fi
 else #not specified anywhere
  #determine what to search for
