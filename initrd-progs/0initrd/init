@@ -840,7 +840,7 @@ mkdir -p /pup_new/etc/rc.d
 echo "PUPMODE=$PUPMODE"
 echo "PDEV1='$P_PART'"
 echo "DEV1FS='$DEV1FS'"
-echo "PUPSFS='$P_PART,$DEV1FS,${PDRV#/mnt/pdrv}'"
+echo "PUPSFS='$P_PART,$DEV1FS,${PDRV_SFS#/mnt/pdrv}'"
 echo "PUPSAVE='$PUPSAVE'"
 echo "PMEDIA='$PMEDIA'"
 echo '#these directories are overlay layers in /initrd...'
