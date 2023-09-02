@@ -812,7 +812,7 @@ case $SAVECHOICE in
     if cryptsetup --help >/dev/null 2>&1 && modprobe dm-crypt && modprobe xts ; then
       choosecrypt_new
     fi
-    [ "$SAVEFS_IS_LINUX" ] && choosestyle
+    [ -z "$CRYPTO" ] && [ "$SAVEFS_IS_LINUX" ] && choosestyle
     if [ "$SAVESTYLE" = "file" ]; then
        choosefs
        choosesize || exit	###FIXME###
