@@ -284,11 +284,6 @@ do_stack_onepupdrv() {
   [ $? -eq 0 ] || return 5
   NEWUNIONRECORD="${NEWUNIONRECORD}${ONE_BASENAME} "
  fi
- if [ -z "$EXTRASFSLIST" ]; then
-  EXTRASFSLIST="${ONE_NAME}"
- else
-  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
- fi
  return 0
 }
 
@@ -309,7 +304,7 @@ stack_onepupdrv() {
   FOUND=1
   break
  done
- [ $FOUND -eq 0 ] && return
+ [ $FOUND -eq 0 ] && return 1
 
  LOADED=0
  for ONE_LOADED in $NEWUNIONRECORD; do
@@ -317,7 +312,7 @@ stack_onepupdrv() {
   LOADED=1
   break
  done
- [ $LOADED -eq 1 ] && continue
+ [ $LOADED -eq 1 ] && return 1
 
  do_stack_onepupdrv "$ONE_SFS" "$ONE_SFX" "$ONE_PREP"
 }
@@ -828,10 +823,15 @@ for ONE_SFS in $EXTRASFSPATHS; do
  # skip SFSs from other Puppy family distros
  case "$ONE_NAME" in
  *_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs) ;;
- puppy_*.sfs|*drv_*.sfs|kbuild-*.sfs|devx_*.sfs|nlsx_*.sfs|docs_*.sfs) continue ;;
+ puppy_*.sfs|*drv_*.sfs|kbuild-*.sfs|devx_*.sfs|nlsx_*.sfs|docx_*.sfs) continue ;;
  esac
 
- stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" ""
+ stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" "" || continue
+ if [ -z "$EXTRASFSLIST" ]; then
+  EXTRASFSLIST="${ONE_NAME}"
+ else
+  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
+ fi
  CNT=$(($CNT + 1))
 done
 
