@@ -156,6 +156,8 @@ rm -f rootfs-complete/usr/lib/udev/hwdb.bin
 
 chroot rootfs-complete /etc/rc.d/rc.update w
 
+chmod 700 rootfs-complete/root rootfs-complete/home/spot
+
 rm -rf build
 mkdir build
 
