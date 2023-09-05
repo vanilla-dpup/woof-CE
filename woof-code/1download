@@ -1,4 +1,4 @@
-#!/bin/sh -ex
+#!/bin/sh -e
 
 . ./DISTRO_SPECS
 . ./_00build.conf
