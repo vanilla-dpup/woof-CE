@@ -49,6 +49,12 @@ layout {
     css = "* { min-height: 36px; min-width: 36px; }"
   }
   button {
+    value = "help-contents-symbolic"
+    action = "puppyhelp"
+    tooltip = "Puppy Help"
+    css = "* { min-height: 36px; min-width: 36px; }"
+  }
+  button {
     value = "application-exit-symbolic"
     action = "logout_gui"
     tooltip = "Puppy Log Out"

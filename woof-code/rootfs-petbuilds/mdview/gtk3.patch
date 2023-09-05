@@ -1,0 +1,80 @@
+diff -rupN mdview-3e4c564a88-orig/Makefile mdview-3e4c564a88/Makefile
+--- mdview-3e4c564a88-orig/Makefile	2023-09-05 19:12:34.112267100 +0300
++++ mdview-3e4c564a88/Makefile	2023-09-05 19:14:58.031483917 +0300
+@@ -1,10 +1,9 @@
+ .PHONY: all clean test
+ 
+-GTK_CFLAGS=$(shell pkg-config --cflags gtk+-2.0)
+-GTK_LIBS=$(shell pkg-config --libs gtk+-2.0)
++GTK_CFLAGS=$(shell pkg-config --cflags gtk+-3.0)
++GTK_LIBS=$(shell pkg-config --libs gtk+-3.0)
+ 
+-DEBUG=-O0 -g
+-CFLAGS=$(GTK_CFLAGS) $(DEBUG)
++CFLAGS+=$(GTK_CFLAGS)
+ LIBS=$(GTK_LIBS)
+ 
+ all: mdview
+diff -rupN mdview-3e4c564a88-orig/markdown-text-view.c mdview-3e4c564a88/markdown-text-view.c
+--- mdview-3e4c564a88-orig/markdown-text-view.c	2023-09-05 19:12:34.116267102 +0300
++++ mdview-3e4c564a88/markdown-text-view.c	2023-09-05 19:13:36.123982425 +0300
+@@ -29,6 +29,7 @@
+ #include <fcntl.h>
+ #include <sys/mman.h>
+ #include <gdk/gdkkeysyms.h>
++#include <gdk/gdkkeysyms-compat.h>
+ #include <string.h>
+ 
+ #include "markdown-text-view.h"
+@@ -106,6 +107,7 @@ static void markdown_textview_class_init
+              G_TYPE_STRING);
+ }
+ 
++#if 0
+ static void
+ gtk_text_buffer_insert_markup(GtkTextBuffer * buffer, GtkTextIter * iter,
+ 			      const gchar * markup)
+@@ -244,6 +246,7 @@ gtk_text_buffer_insert_markup(GtkTextBuf
+     pango_attr_list_unref(attrlist);
+     g_free(text);
+ }
++#endif
+ 
+ 
+ static void
+@@ -314,7 +317,7 @@ motion_notify_event(GtkWidget * self, Gd
+ 
+     set_cursor_if_appropriate(MARKDOWN_TEXTVIEW(self), x, y);
+ 
+-    gdk_window_get_pointer(self->window, NULL, NULL, NULL);
++    gdk_window_get_pointer(gtk_widget_get_window(self), NULL, NULL, NULL);
+     return FALSE;
+ }
+ 
+@@ -326,7 +329,7 @@ visibility_notify_event(GtkWidget * self
+ {
+     gint wx, wy, bx, by;
+ 
+-    gdk_window_get_pointer(self->window, &wx, &wy, NULL);
++    gdk_window_get_pointer(gtk_widget_get_window(self), &wx, &wy, NULL);
+ 
+     gtk_text_view_window_to_buffer_coords(GTK_TEXT_VIEW(self),
+ 					  GTK_TEXT_WINDOW_WIDGET,
+@@ -532,7 +535,7 @@ append_text(MarkdownTextView * self,
+ 
+     line = egg_markdown_parse(self->markdown, text);
+     if (line && *line) {
+-        gtk_text_buffer_insert_markup(text_buffer, &iter, line);
++        gtk_text_buffer_insert_markup(text_buffer, &iter, line, -1);
+         gtk_text_buffer_insert(text_buffer, &iter, "\n", 1);
+         g_free(line);
+         
+@@ -612,7 +615,7 @@ markdown_textview_load_file(MarkdownText
+ 		gtk_text_buffer_get_start_iter(text_buffer, &iter);
+ 		
+ 		if (parsed) {
+-			gtk_text_buffer_insert_markup(text_buffer, &iter, parsed);
++			gtk_text_buffer_insert_markup(text_buffer, &iter, parsed, -1);
+ 			g_free(parsed);
+ 			load_images(self, abs_path);
+ 		}
