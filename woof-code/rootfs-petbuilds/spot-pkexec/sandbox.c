@@ -64,7 +64,6 @@ int main(int argc, char *argv[])
 		"proc",
 		"tmp",
 		"mnt",
-		"initrd/mnt/dev_save",
 	};
 	static const char *skip_dirs[] = {
 		".",
