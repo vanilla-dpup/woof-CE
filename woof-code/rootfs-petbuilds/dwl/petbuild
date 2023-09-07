@@ -1,5 +1,5 @@
 download() {
-    [ -f dwl-ca4a97b9335296c40f558baa1ead14578b166d70.tar.gz ] || wget -t 3 -T 60 -O dwl-ca4a97b9335296c40f558baa1ead14578b166d70.tar.gz https://github.com/djpohly/dwl/archive/ca4a97b9335296c40f558baa1ead14578b166d70.tar.gz
+    [ -f dwl-960c32a7d83703a64ec0a363d8a11f3c1c51bf20.tar.gz ] || wget -t 3 -T 60 -O dwl-960c32a7d83703a64ec0a363d8a11f3c1c51bf20.tar.gz https://github.com/djpohly/dwl/archive/960c32a7d83703a64ec0a363d8a11f3c1c51bf20.tar.gz
     [ -f wlroots-0.16.2.tar.gz ] || wget -t 3 -T 60 https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.16.2/downloads/wlroots-0.16.2.tar.gz
 }
 
@@ -10,8 +10,8 @@ build() {
     ninja -C build install
     cd ..
 
-    tar -xzf dwl-ca4a97b9335296c40f558baa1ead14578b166d70.tar.gz
-    cd dwl-ca4a97b9335296c40f558baa1ead14578b166d70
+    tar -xzf dwl-960c32a7d83703a64ec0a363d8a11f3c1c51bf20.tar.gz
+    cd dwl-960c32a7d83703a64ec0a363d8a11f3c1c51bf20
     patch -p1 < ../patches.patch
     sed -e s/^#XWAYLAND/XWAYLAND/ -e s/^#XLIBS/XLIBS/ -i config.mk
     cp -f ../config.h .

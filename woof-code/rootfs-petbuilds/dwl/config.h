@@ -9,7 +9,8 @@ static float focuscolor[]            = {0.0, 0.333333, 0.466667, 1.0};
 static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
 
 /* tagging - tagcount must be no greater than 31 */
-static const int tagcount = 9;
+#define TAGCOUNT (9)
+static const int tagcount = TAGCOUNT;
 
 static const Rule rules[0] = {
 	/* app_id     title       tags mask     isfloating   monitor */
