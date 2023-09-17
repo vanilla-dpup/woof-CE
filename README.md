@@ -44,28 +44,6 @@ Other changes:
 * EXTRASFSLIST is now managed automatically and SFSs don't need to be "queued" by the user for loading at boot time. Instead, the init script loads all SFSs under psubdir (if specified) and the partition root, under both the save partition or the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order. The stacking order of the traditional *drv SFS is retained, for backward compatibility.
 * The [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox that restricts file system access for applications running as spot is stricter and also prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777, but without this new restriction, spot can access /initrd/mnt/dev_save/*save/upper/root instead, to bypass the sandbox. This breaks compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
 
-## Usage
-
-	sudo apt-get install -y --no-install-recommends dc debootstrap librsvg2-bin zstd xml2 syslinux-utils extlinux
-
-Then:
-
-	./merge2out woof-distro/x86_64/debian/bookworm64
-
-(Debian 12 based, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail))
-
-Or:
-
-	./merge2out woof-distro/x86_64/debian/trixie64
-
-(Debian 13 based, featuring [labwc](https://labwc.github.io/) and [sfwbar](https://github.com/LBCrion/sfwbar))
-
-Then:
-
-	cd ../woof-out_*
-	./1download
-	./3builddistro
-
 ## Persistency Modes (PUPMODE)
 
 * 5: no persistency ("live"); changes to the layered file system at / reside in RAM and a shutdown prompt offers the user to save them.
@@ -88,6 +66,57 @@ Then:
 * `pfix=rdsh`: drops to a rescue shell at the end of the early boot process.
 * `pfix=nox`: disables automatic start of the graphical desktop.
 * `loglevel=number`: specifies the verbosity level, using a printk log level: the default is 3 (KERN_ERR) and 7 (KERN_DEBUG) makes {/initrd,}/tmp/bootinit.log extra verbose.
+
+## Directory Structure
+
+* initrd-progs/ contains the initramfs skeleton
+  * initrd-progs/0initrd/init is the early init script, which searches for Puppy files, sets up an overlay file system and `switch_root`s into it
+* kernel-kit/ contains a tool that builds Puppy-compatible kernels
+* woof-distro/ contains configuration files
+  * woof-distro/x86_64/debian/bookworm64 builds a [Debian](https://www.debian.org/) 12 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail)
+    * woof-distro/x86_64/debian/bookworm64/DISTRO_SPECS contains the distro name and version
+    * woof-distro/x86_64/debian/bookworm64/DISTRO_PKGS_SPECS-debian-bookworm contains a list of [Debian](https://www.debian.org/) 12 packages to include
+    * woof-distro/x86_64/debian/bookworm64/_00build.conf contains a list of packages to build from source (PETBUILDS) and other settings
+  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [labwc](https://labwc.github.io/) and [sfwbar](https://github.com/LBCrion/sfwbar)
+    * woof-distro/x86_64/debian/trixie64/DISTRO_SPECS contains the distro name and version
+    * woof-distro/x86_64/debian/trixie64/DISTRO_PKGS_SPECS-debian-trixie contains a list of [Debian](https://www.debian.org/) 13 package sto include
+    * woof-distro/x86_64/debian/trixie64/_00build.conf contains a list of packages to build from source (PETBUILDS) and other settings
+* woof-code/ contains most of woof-CE itself and the Puppy skeleton (minus initramfs)
+  * woof-code/rootfs-skeleton contains the Puppy root file system skeleton
+    * rootfs-skeleton/etc/rc.d/rc.sysinit is the init script
+    * rootfs-skeleton/usr/sbin/shutdownconfig implements the save/no save prompt shown when shutting down under PUPMODE 5
+    * rootfs-skeleton/usr/sbin/{save2flash,snapmergepuppy.overlay} implement saving under PUPMODE 13
+    * rootfs-skeleton/etc/rc.d/rc.shutdown takes care of saving on shutdown
+    * rootfs-skeleton/usr/local/sbin/{reboot,poweroff} run /etc/rc.d/rc.shutdown, then pass control to `/sbin/$0`
+    * rootfs-skeleton/root/.profile starts the graphical desktop
+  * woof-code/rootfs-petbuilds contains recipes for building Puppy-specific packages or packages with Puppy-specific customization, from source
+    * woof-code/rootfs-petbuilds/init provides a simple init implementation that runs /etc/rc.d/rc.sysinit and a login shell
+    * woof-code/rootfs-petbuilds/spot-pkexec implements a sandbox for unprivileged applications
+    * woof-code/rootfs-petbuilds/ram-saver changes the memory allocator settings to reduce RAM consumption
+    * woof-code/rootfs-petbuilds/sfslock locks a file into the page cache to speed up reading from it
+  * woof-code/rootfs-packages contains Puppy-specific tools
+  * woof-code/1download builds:
+    * sandbox3/rootfs, a basic root file system template
+    * sandbox3/devx, a copy of rootfs with development packages on top
+  * woof-code/3builddistro builds the packages specified in `$PETBUILDS` inside sandbox3/devx, then adds them and packages under rootfs-packages/ to sandbox3/rootfs, then builds bootable distro images
+
+## Usage
+
+	sudo apt-get install -y --no-install-recommends dc debootstrap librsvg2-bin zstd xml2 syslinux-utils extlinux
+
+Then:
+
+	./merge2out woof-distro/x86_64/debian/bookworm64
+
+Or:
+
+	./merge2out woof-distro/x86_64/debian/trixie64
+
+Then:
+
+	cd ../woof-out_*
+	./1download
+	./3builddistro
 
 ## Configuration Files
 
