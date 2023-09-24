@@ -110,6 +110,7 @@ yes|iptables|iptables,libip4tc2,libip6tc2,libxtables12,libnftnl11|exe,dev>exe,do
 yes|iw|iw|exe,dev,doc,nls||deps:yes
 yes|jq|jq,libjq1|exe,dev,doc,nls||deps:yes
 yes|kmod|kmod,libkmod2,libkmod-dev|exe,dev,doc,nls||deps:yes #er, no, looks like compiled without gzip support --but i think only need that in initrd, where already have old modprobe.
+yes|l3afpad|l3afpad|exe,dev,doc,nls||deps:yes
 yes|less|less|exe,dev>null,doc,nls||deps:yes
 yes|libelogind0|libelogind0|exe,dev,doc,nls||deps:yes
 yes|libfuse2|libfuse2|exe,dev,doc,nls||deps:yes # used by AppImages
