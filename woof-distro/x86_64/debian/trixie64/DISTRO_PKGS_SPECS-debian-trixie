@@ -125,6 +125,7 @@ yes|libxslt|libxslt1.1|exe,dev,doc,nls||deps:yes
 yes|libzstd|libzstd1,libzstd-dev|exe,dev,doc,nls||deps:yes
 yes|login|login|exe>null,dev>null,doc>null,nls>null
 yes|lsb-base|lsb-base|exe,dev,doc,nls||deps:yes
+yes|lxterminal|lxterminal|exe,dev,doc,nls||deps:yes
 yes|lzma|lzma|exe,dev,doc,nls||deps:yes
 yes|make|make|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|man-db|man-db|exe,dev,doc,nls||deps:yes

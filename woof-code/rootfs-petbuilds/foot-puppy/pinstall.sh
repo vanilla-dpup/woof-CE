@@ -5,8 +5,7 @@ chmod 755 usr/local/bin/defaultterminal
 if [ -e usr/bin/urxvt ]; then
 	rm -f usr/bin/foot-urxvt
 else
-	ln -s foot-urxvt usr/bin/urxvt
-	ln -s foot-urxvt usr/bin/rxvt
-	rm -f usr/bin/xterm
-	ln -s foot-urxvt usr/bin/xterm
+	ln -s ../../bin/foot-urxvt usr/local/bin/urxvt
+	ln -s ../../bin/foot-urxvt usr/local/bin/rxvt
+	ln -s ../../bin/foot-urxvt usr/local/bin/xterm
 fi
