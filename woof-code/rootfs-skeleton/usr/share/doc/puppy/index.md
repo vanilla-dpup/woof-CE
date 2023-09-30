@@ -1,0 +1,11 @@
+## DISTRO_NAME DISTRO_VERSION
+
+## For Users
+
+- [Boot codes](boot-codes.md)
+- [Persistency modes (PUPMODE)](persistency-modes.md)
+- [Configuration files](configuration-files.md)
+
+## For Contributors
+
+- [woof - the Puppy builder](woof-CE.md)

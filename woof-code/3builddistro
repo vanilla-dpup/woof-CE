@@ -80,8 +80,9 @@ if [ "$USR_SYMLINKS" = "yes" ]; then
 	rmdir rootfs-skeleton/{bin,sbin}
 fi
 cp -a rootfs-skeleton/* rootfs-complete/
-install -D -m 644 ../README.md rootfs-complete/usr/share/doc/woof-CE/index.md
-install -m 644 ../LICENSE rootfs-complete/usr/share/doc/woof-CE/LICENSE
+sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" rootfs-complete/usr/share/doc/puppy/*.md 
+install -m 644 ../README.md rootfs-complete/usr/share/doc/puppy/woof-CE.md
+install -m 644 ../LICENSE rootfs-complete/usr/share/doc/puppy/LICENSE
 
 cd rootfs-complete
 for TEMPLATE in ../../packages-templates/*; do
