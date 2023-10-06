@@ -69,9 +69,9 @@ Other changes:
   * woof-code/rootfs-petbuilds contains recipes for building Puppy-specific packages or packages with Puppy-specific customization, from source
     * woof-code/rootfs-petbuilds/init provides a simple init implementation that runs /etc/rc.d/rc.sysinit and a login shell
     * woof-code/rootfs-petbuilds/spot-pkexec implements a sandbox for unprivileged applications
-    * woof-code/rootfs-petbuilds/ram-saver changes the memory allocator settings to reduce RAM consumption
     * woof-code/rootfs-petbuilds/sfslock locks a file into the page cache to speed up reading from it
   * woof-code/rootfs-packages contains Puppy-specific tools
+    * woof-code/rootfs-packages/ram-saver changes the memory allocator settings to reduce RAM consumption
   * woof-code/1download builds:
     * sandbox3/rootfs, a basic root file system template
     * sandbox3/devx, a copy of rootfs with development packages on top
