@@ -2,13 +2,13 @@ cat << EOF > pinstall.sh
 echo -e '#!/bin/sh\nexec connman-gtk' > usr/local/bin/defaultconnect
 chmod 755 usr/local/bin/defaultconnect
 
-[ -f root/.spot-status ] && mv -f root/.spot-status root/.spot-status.orig
-chroot . /usr/sbin/setup-spot connman-gtk=true
-[ -f root/.spot-status.orig ] && mv -f root/.spot-status.orig root/.spot-status || rm -f root/.spot-status
+cat << EOF2 > usr/local/bin/connman-gtk
+#!/bin/sh
 
-chroot . gsettings set net.connman.gtk launch-to-tray false
-chroot . run-as-spot gsettings set net.connman.gtk launch-to-tray false
+run-as-spot gsettings set net.connman.gtk launch-to-tray false
+run-as-spot gsettings set net.connman.gtk launch-to-tray false
 
-chroot . gsettings set net.connman.gtk status-icon-enabled false
-chroot . run-as-spot gsettings set net.connman.gtk status-icon-enabled false
+exec run-as-spot /usr/bin/connman-gtk "\\\$@"
+EOF2
+chmod 755 usr/local/bin/connman-gtk
 EOF
