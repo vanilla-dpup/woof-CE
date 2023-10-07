@@ -111,9 +111,6 @@ for NAME in $ROOTFS_PACKAGES; do
 		rm -f pinstall.sh
 		cd ..
 	fi
-
-	# prevent apt from replacing the petbuild with a bigger package
-	chroot rootfs-complete apt-mark hold ${NAME}
 done
 
 FOUND_PETBUILDS=
@@ -127,6 +124,11 @@ done
 PETBUILDS="init sfslock $FOUND_PETBUILDS"
 CROSSBUILD=0
 . ../support/petbuilds.sh
+
+# prevent apt from replacing petbuilds with bigger or incompatible packages
+for NAME in $PETBUILDS; do
+	chroot rootfs-complete apt-mark hold ${NAME}
+done
 
 rm -f rootfs-complete/pet.specs
 
