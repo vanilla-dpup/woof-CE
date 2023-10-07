@@ -65,6 +65,7 @@ yes|debianutils|debianutils|exe,dev,doc,nls||deps:yes
 yes|desktop-file-utils|desktop-file-utils|exe,dev,doc,nls||deps:yes
 yes|dialog|dialog|exe,dev>null,doc,nls||deps:yes
 yes|diffutils|diffutils|exe,dev>null,doc,nls||deps:yes
+yes|disktype|disktype|exe,dev,doc,nls||deps:yes
 no|dkms|dkms|exe,dev>exe,doc,nls||deps:yes
 yes|dmidecode|dmidecode|exe,dev>null,doc,nls||deps:yes
 yes|dosfstools|dosfstools|exe,dev>null,doc,nls||deps:yes
