@@ -1,8 +1,10 @@
 #include <fcntl.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/mman.h>
+#include <linux/ioprio.h>
 
 static int oom_score_adj(void)
 {
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
 
 	if (argc != 2 || sigemptyset(&mask) < 0 || sigaddset(&mask, SIGTERM) < 0 || sigprocmask(SIG_SETMASK, &mask, NULL) < 0) return EXIT_FAILURE;
 
-	if (oom_score_adj() < 0) return EXIT_FAILURE;
+	if (syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 7)) < 0 || oom_score_adj() < 0) return EXIT_FAILURE;
 
 	if (pipe(comm) < 0) return EXIT_FAILURE;
 	if ((fd = open(argv[1], O_RDONLY)) < 0) return EXIT_FAILURE;
