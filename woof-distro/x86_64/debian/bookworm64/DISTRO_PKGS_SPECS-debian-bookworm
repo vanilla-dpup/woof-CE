@@ -239,6 +239,7 @@ yes|fonts-noto|fonts-noto-core,fonts-noto-mono,fonts-noto-cjk,fonts-noto-color-e
 yes|galculator|galculator|exe,dev>null,doc,nls||deps:yes
 yes|gpart|gpart|exe,dev,doc,nls||deps:yes
 yes|gparted-deps|libgtkmm-3.0-dev,libparted-dev|exe,dev,doc,nls||deps:yes
+yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
 yes|groff|groff,groff-base|exe,dev,doc,nls||deps:yes
 yes|hardinfo-deps|libjson-glib-dev|exe,dev,doc,nls||deps:yes
 yes|libfuse2|libfuse2|exe,dev,doc,nls||deps:yes # used by AppImages
