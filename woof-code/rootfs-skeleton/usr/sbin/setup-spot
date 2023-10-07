@@ -39,49 +39,16 @@ exec /usr/sbin/run-as-spot "'${1}'" "$@"
 
 #setup the app to run as spot or root...
 generic_func() {
- # if the executable is a symlink, replace the link target
- if [ -h ${ONEAPPpath}/${ONEAPPname} ]; then
-  TARGET=`readlink -f ${ONEAPPpath}/${ONEAPPname}`
-  case $ONEAPPvalue in
-   true)
-    TARGET=`readlink -f ${ONEAPPpath}/${ONEAPPname}`
-    if [ ! -e ${TARGET}.bin ] || ! grep -qE "^CMD=${TARGET}.bin$" ${TARGET}; then
-     mv -f ${TARGET} ${TARGET}.bin
-    fi
-    case $RUNNINGPUP in
-     0)APPpath=${TARGET};;
-     1)APPpath=`echo ${TARGET}|sed "s%$PREFIXDIR%%"`;;
-    esac
-    run_as_spot ${TARGET}.bin ${TARGET}
-   ;;
-   false)
-    if [ -e ${TARGET}.bin ]; then
-     rm -f ${TARGET}
-     mv -f ${TARGET}.bin ${TARGET} #restore original.
-    fi
-   ;;
-  esac
-
-  return 0
- fi
-
- # if the executable is a file, replace the executable
  case $ONEAPPvalue in
   true)
-   if [ ! -e ${ONEAPPpath}/${ONEAPPname}.bin ] || ! grep -qE "^CMD=.+/${ONEAPPname}.bin$" ${ONEAPPpath}/${ONEAPPname}; then
-    mv -f ${ONEAPPpath}/${ONEAPPname} ${ONEAPPpath}/${ONEAPPname}.bin
-   fi
    case $RUNNINGPUP in
     0)APPpath=${ONEAPPpath};;
     1)APPpath=`echo ${ONEAPPpath}|sed "s%$PREFIXDIR%%"`;;
    esac
-   run_as_spot ${APPpath}/${ONEAPPname}.bin ${ONEAPPpath}/${ONEAPPname}
+   run_as_spot ${APPpath}/${ONEAPPname} /usr/local/bin/${ONEAPPname}
   ;;
   false)
-   if [ -e ${ONEAPPpath}/${ONEAPPname}.bin ];then
-    rm -f ${ONEAPPpath}/${ONEAPPname}
-    mv -f ${ONEAPPpath}/${ONEAPPname}.bin ${ONEAPPpath}/${ONEAPPname} #restore original.
-   fi
+   [ -e /usr/local/bin/${ONEAPPname} ] && rm -f /usr/local/bin/${ONEAPPname}
   ;;
  esac
  return 0
