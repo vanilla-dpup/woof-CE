@@ -246,6 +246,7 @@ yes|xsltproc|xsltproc|exe>dev,dev,doc>dev,nls>dev||deps:yes
 
 if [ "$DISTRO_VARIANT" = "dwl" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
+yes|foot|foot|exe,dev,doc,nls||deps:yes
 yes|gsimplecal|gsimplecal|exe,dev,doc,nls||deps:yes
 yes|tofi|tofi|exe,dev,doc,nls||deps:yes
 yes|yambar|yambar|exe,dev,doc,nls||deps:yes
