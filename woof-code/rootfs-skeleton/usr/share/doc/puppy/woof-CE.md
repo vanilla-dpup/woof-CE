@@ -50,11 +50,7 @@ Other changes:
   * initrd-progs/0initrd/init is the early init script, which searches for Puppy files, sets up an overlay file system and `switch_root`s into it
 * kernel-kit/ contains a tool that builds Puppy-compatible kernels
 * woof-distro/ contains configuration files
-  * woof-distro/x86_64/debian/bookworm64 builds a [Debian](https://www.debian.org/) 12 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail)
-    * woof-distro/x86_64/debian/bookworm64/DISTRO_SPECS contains the distro name and version
-    * woof-distro/x86_64/debian/bookworm64/DISTRO_PKGS_SPECS-debian-bookworm contains a list of [Debian](https://www.debian.org/) 12 packages to include
-    * woof-distro/x86_64/debian/bookworm64/_00build.conf contains a list of packages to build from source (PETBUILDS) and other settings
-  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [labwc](https://labwc.github.io/) and [sfwbar](https://github.com/LBCrion/sfwbar)
+  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail) and [yambar](https://codeberg.org/dnkl/yambar), or [labwc](https://labwc.github.io/) with [sfwbar](https://github.com/LBCrion/sfwbar)
     * woof-distro/x86_64/debian/trixie64/DISTRO_SPECS contains the distro name and version
     * woof-distro/x86_64/debian/trixie64/DISTRO_PKGS_SPECS-debian-trixie contains a list of [Debian](https://www.debian.org/) 13 package sto include
     * woof-distro/x86_64/debian/trixie64/_00build.conf contains a list of packages to build from source (PETBUILDS) and other settings
@@ -83,14 +79,15 @@ Other changes:
 
 Then:
 
-	./merge2out woof-distro/x86_64/debian/bookworm64
+	export DISTRO_VARIANT=labwc
 
 Or:
 
-	./merge2out woof-distro/x86_64/debian/trixie64
+	export DISTRO_VARIANT=dwl
 
 Then:
 
+	./merge2out woof-distro/x86_64/debian/trixie64
 	cd ../woof-out_*
 	./1download
 	./3builddistro
