@@ -110,7 +110,7 @@ EOF
 
         rm -rf ../petbuild-output/${NAME}-* # remove older petbuilds of $NAME
         mkdir -p ../petbuild-output/${NAME}-${HASH} petbuild-rootfs-complete-${NAME}
-        [ "$BUILD_DEVX" = "yes" ] && LOWERDIR='devx:petbuild-rootfs-complete' || LOWERDIR='petbuild-rootfs-complete'
+        LOWERDIR='devx:petbuild-rootfs-complete'
         mkdir petbuild-workdir
         mount -t overlay -o upperdir=../petbuild-output/${NAME}-${HASH},lowerdir=${LOWERDIR},workdir=petbuild-workdir petbuild petbuild-rootfs-complete-${NAME}
 
