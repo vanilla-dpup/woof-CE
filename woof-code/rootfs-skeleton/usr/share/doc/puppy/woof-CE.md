@@ -3,7 +3,7 @@
 This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE).
 
 The goal is to build something similar to [DebianDog](https://debiandog.github.io/doglinux/), a highly [Debian](https://www.debian.org/)-compatible "live" distro with a layered file system, but with core features of [Puppy Linux](https://puppylinux.com), a distro that -
-* Provides a lightweight desktop environment and a variety of applications, all built from source to minimize dependencies
+* Provides a lightweight desktop environment and a variety of applications
 * Provides a fully functional package manager, [Flatpak](https://flatpak.org/) and support for extra read-only layers (sfs_load)
 * Supports non-persistent, fully persistent or "persistent-on-demand" sessions where the user can decide whether or not to save, and when
 * Has just a drop or two of Puppy's secret sauce: all kinds of legacy cruft, technical debt and complex in-house solutions are gone, to reduce size, speed things up, increase compatibility with Debian, make updates safe and ensure the project's sustainability with very few developers

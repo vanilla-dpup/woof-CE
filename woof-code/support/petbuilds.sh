@@ -53,21 +53,7 @@ fi
 HERE=`pwd`
 PKGS=
 
-# busybox must be first, so other petbuilds can use coreutils commands
 for NAME in $PETBUILDS; do
-    # peabee hack to reuse old petbuild output if BUILD_DEVX=no
-    if [ "$BUILD_DEVX" != "yes" ]; then
-        case "$NAME" in
-        pmaterial_icons|puppy_flat_icons|puppy_standard_icons) ;;
-        *)
-            echo "WARNING - petbuilds require BUILD_DEVX=yes"
-            [ -n "$GITHUB_ACTIONS" ] && exit 1
-            ;;
-        esac
-        PKGS="$PKGS $NAME"
-        continue
-    fi
-
     HASH=`cat ../DISTRO_PKGS_SPECS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION} ../DISTRO_COMPAT_REPOS ../DISTRO_COMPAT_REPOS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION} ../DISTRO_PET_REPOS ../rootfs-petbuilds/${NAME}/petbuild 2>/dev/null | md5sum | awk '{print $1}'`
     if [ ! -d "../petbuild-output/${NAME}-${HASH}" ]; then
         if [ $HAVE_ROOTFS -eq 0 ]; then
@@ -95,52 +81,6 @@ EOF
             chroot petbuild-rootfs-complete sh /pinstall.sh
             rm -f petbuild-rootfs-complete/pinstall.sh
 
-            # to speed up compilation, we build a static, native ccache executable
-            if [ "$BUILD_DEVX" = "yes" ]; then
-                if [ $CROSSBUILD -eq 1 -o ! -e devx/usr/bin/ccache ]; then
-                    if [ ! -f ../petbuild-cache/ccache ]; then
-                        wget -t 1 -T 15 https://github.com/ccache/ccache/releases/download/v3.7.12/ccache-3.7.12.tar.xz
-                        tar -xJf ccache-3.7.12.tar.xz
-                        cd ccache-3.7.12
-                        CFLAGS=-O3 LDFLAGS="-static -Wl,-s" ./configure
-                        MAKEFLAGS="$MAKEFLAGS" make
-                        install -D -m 755 ccache ../../petbuild-cache/ccache
-                        cd ..
-                    fi
-                    install -m 755 ../petbuild-cache/ccache petbuild-rootfs-complete/usr/bin/ccache
-                fi
-            fi
-
-            # speed up configure scripts by using a native shell executable and a native busybox
-            if [ $CROSSBUILD -eq 1 ]; then
-                if [ ! -f ../petbuild-cache/bash ]; then
-                    wget -t 1 -T 15 https://ftp.gnu.org/gnu/bash/bash-5.1.tar.gz
-                    tar -xzf bash-5.1.tar.gz
-                    cd bash-5.1
-                    CFLAGS=-O3 LDFLAGS="-static -Wl,-s" ./configure --enable-minimal-config
-                    MAKEFLAGS="$MAKEFLAGS" make bash
-                    install -D -m 755 bash ../../petbuild-cache/bash
-                    cd ..
-                fi
-
-                rm -f petbuild-rootfs-complete/bin/sh petbuild-rootfs-complete/bin/bash
-                install -m 755 ../petbuild-cache/bash petbuild-rootfs-complete/bin/bash
-                ln -s bash petbuild-rootfs-complete/bin/sh
-
-                if [ ! -f ../petbuild-cache/busybox ]; then
-                    wget -t 1 -T 15 https://busybox.net/downloads/busybox-1.36.0.tar.bz2
-                    tar -xjf busybox-1.36.0.tar.bz2
-                    cp -f ../rootfs-petbuilds/busybox/DOTconfig busybox-1.36.0/.config
-                    cd busybox-1.36.0
-                    make CONFIG_STATIC=y
-                    install -D -m 755 busybox ../../petbuild-cache/busybox || exit 1
-                    cd ..
-                fi
-
-                rm -f petbuild-rootfs-complete/bin/busybox
-                install -m 755 ../petbuild-cache/busybox petbuild-rootfs-complete/bin/busybox
-            fi
-
             # required for slacko
             chroot petbuild-rootfs-complete ldconfig
 
@@ -148,21 +88,6 @@ EOF
             PKG_CONFIG_PATH=`dirname $(find petbuild-rootfs-complete devx -name '*.pc' 2>/dev/null) 2>/dev/null | sed -e s/^petbuild-rootfs-complete//g -e s/^devx//g | sort | uniq | tr '\n' :`
 
             HAVE_ROOTFS=1
-        fi
-
-        if [ $HAVE_BUSYBOX -eq 0 -a "$NAME" != "busybox" ]; then
-            if [ ! -f petbuild-rootfs-complete/bin/busybox ]; then
-                if [ -f ../petbuild-output/busybox-latest/bin/busybox ]; then # busybox petbuild
-                    install -D -m 755 ../petbuild-output/busybox-latest/bin/busybox petbuild-rootfs-complete/bin/busybox
-                elif [ -f ../packages-${DISTRO_FILE_PREFIX}/busybox/bin/busybox ]; then # prebuilt busybox
-                    install -D -m 755 ../packages-${DISTRO_FILE_PREFIX}/busybox/bin/busybox petbuild-rootfs-complete/bin/busybox
-                elif [ "$NAME" != "busybox" ]; then
-                    echo "No busybox in the build environment!"
-                    exit 1
-                fi
-            fi
-            ../support/busybox_symlinks.sh petbuild-rootfs-complete
-            HAVE_BUSYBOX=1
         fi
 
         echo "Downloading ${NAME}"
@@ -280,10 +205,6 @@ EOF
         rmdir ../petbuild-output/${NAME}-${HASH}/usr/share/* 2>/dev/null
         rmdir ../petbuild-output/${NAME}-${HASH}/usr/* 2>/dev/null
         rmdir ../petbuild-output/${NAME}-${HASH}/* 2>/dev/null
-
-        find ../petbuild-output/${NAME}-${HASH} -type l | while read LINK; do
-            [ "`readlink $LINK`" = "/bin/busybox" ] && rm -f $LINK
-        done
 
         find ../petbuild-output/${NAME}-${HASH} -type f | while read ELF; do
             strip --strip-all -R .note -R .comment ${ELF} 2>/dev/null
