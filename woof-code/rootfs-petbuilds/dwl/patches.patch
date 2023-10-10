@@ -1,10 +1,23 @@
-From 62dc54af4eb022601eedef60c42522b3924d2ffc Mon Sep 17 00:00:00 2001
+From dde5f3c609289491d504fe4bf28fb06aa1529eda Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Tue, 10 Oct 2023 20:03:45 +0300
+Date: Tue, 10 Oct 2023 20:14:36 +0300
 Subject: [PATCH] Squashed commit of the following:
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+
+commit 91aa684b6572b8e901ff2d5999c72647c1dc28e8
+Merge: c75e0da 69e9380
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Tue Oct 10 20:14:19 2023 +0300
+
+    Merge branch 'env' into dwl-kiosk-v7
+
+commit 69e9380fb737420e87dc32c31b398dec76aa6b21
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Tue Oct 10 20:13:36 2023 +0300
+
+    allow environment variables to override config.h
 
 commit c75e0da828ce8fd1e87bca8cfd311306d46703dc
 Merge: 58b0dae da34a62
@@ -280,9 +293,9 @@ Date:   Thu Jul 21 21:26:31 2022 +0300
  Makefile                                      |  13 +-
  config.def.h                                  |  43 +-
  dwl.c                                         | 589 ++++++++++++++++--
- env.c                                         | 213 +++++++
+ env.c                                         | 217 +++++++
  ...lr-output-power-management-unstable-v1.xml | 128 ++++
- 5 files changed, 924 insertions(+), 62 deletions(-)
+ 5 files changed, 928 insertions(+), 62 deletions(-)
  create mode 100644 env.c
  create mode 100644 protocols/wlr-output-power-management-unstable-v1.xml
 
@@ -1482,10 +1495,10 @@ index a7d41b08..bafc3aec 100644
  	cleanup();
 diff --git a/env.c b/env.c
 new file mode 100644
-index 00000000..6fe624ef
+index 00000000..618f81ea
 --- /dev/null
 +++ b/env.c
-@@ -0,0 +1,213 @@
+@@ -0,0 +1,217 @@
 +static int
 +isenabled(const char *val, int def)
 +{
@@ -1694,6 +1707,10 @@ index 00000000..6fe624ef
 +	val = getenv("DWL_FOCUS_COLOR");
 +	if (val)
 +		parsecolor(val, focuscolor);
++
++	val = getenv("DWL_URGENT_COLOR");
++	if (val)
++		parsecolor(val, urgentcolor);
 +
 +	val = getenv("DWL_BORDER");
 +	if (val && sscanf(val, "%u", &tmp) == 1)
