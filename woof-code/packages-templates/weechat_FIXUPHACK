@@ -1,0 +1,15 @@
+cat << EOF > pinstall.sh
+echo '#!/bin/sh
+exec defaultterminal -e weechat' > usr/local/bin/weechat-shell
+chmod 755 usr/local/bin/weechat-shell
+
+echo '#!/bin/sh
+exec weechat-shell' > usr/local/bin/defaultchat
+chmod 755 usr/local/bin/defaultchat
+
+chroot . /usr/sbin/setup-spot weechat=true
+
+chroot . run-as-spot weechat-headless -r '/set irc.server_default.msg_part \"\";/set irc.server_default.msg_quit \"\";/quit' < /dev/null > /dev/null
+chroot . run-as-spot weechat-headless -r '/set irc.ctcp.clientinfo \"\";/set irc.ctcp.finger \"\";/set irc.ctcp.source \"\";/set irc.ctcp.time \"\";/set irc.ctcp.userinfo \"\";/set irc.ctcp.version \"\";/quit' < /dev/null > /dev/null
+chroot . run-as-spot weechat-headless -r '/server add libera irc.libera.chat/6697 -autoconnect -ssl;/set irc.server.libera.autojoin #puppylinux;/quit' < /dev/null > /dev/null
+EOF

@@ -180,6 +180,7 @@ yes|usbutils|usbutils|exe,dev,doc,nls||deps:yes
 yes|util-linux|util-linux,mount,libuuid1,libblkid1,libmount1,libsmartcols1,uuid-dev|exe,dev,doc,nls||deps:yes
 yes|viewnior|viewnior|exe,dev,doc,nls||deps:yes
 yes|wget|wget|exe,dev>null,doc,nls||deps:yes
+yes|weechat|weechat,weechat-curses,weechat-headless|exe,dev,doc,nls||deps:yes
 yes|wireless-tools|wireless-tools,libiw30,libiw-dev|exe,dev,doc,nls||deps:yes
 yes|wireplumber|wireplumber|exe,dev,doc,nls||deps:yes
 yes|wpa_supplicant|wpasupplicant|exe,dev>null,doc,nls||deps:yes
