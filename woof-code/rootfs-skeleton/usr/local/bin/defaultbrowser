@@ -1,1 +1,3 @@
-../../bin/x-www-browser
+#!/bin/sh
+
+exec x-www-browser "$@"
