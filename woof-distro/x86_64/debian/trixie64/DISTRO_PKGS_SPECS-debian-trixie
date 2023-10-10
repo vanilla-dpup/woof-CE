@@ -103,6 +103,7 @@ yes|gparted-deps|libgtkmm-3.0-dev,libparted-dev|exe,dev,doc,nls||deps:yes
 yes|grep|grep|exe,dev>null,doc,nls||deps:yes
 yes|groff|groff,groff-base|exe,dev,doc,nls||deps:yes
 yes|gsettings-desktop-schemas|gsettings-desktop-schemas|exe,dev,doc,nls||deps:yes #needs d-conf.
+yes|gsimplecal|gsimplecal|exe,dev,doc,nls||deps:yes
 yes|gtk+3|libgtk-3-0,libgtk-3-dev,libgtk-3-common,gtk-update-icon-cache,adwaita-icon-theme|exe,dev,doc,nls||deps:yes #have taken out all gtk3 apps. 140127 still have gnome-mplayer --no
 yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
 yes|gxmessage|gxmessage|exe,dev,doc,nls||deps:yes
@@ -247,7 +248,6 @@ yes|xsltproc|xsltproc|exe>dev,dev,doc>dev,nls>dev||deps:yes
 if [ "$DISTRO_VARIANT" = "dwl" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|foot|foot|exe,dev,doc,nls||deps:yes
-yes|gsimplecal|gsimplecal|exe,dev,doc,nls||deps:yes
 yes|tofi|tofi|exe,dev,doc,nls||deps:yes
 yes|yambar|yambar|exe,dev,doc,nls||deps:yes
 "

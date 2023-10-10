@@ -6,3 +6,9 @@ clock_format = %A, %d %B %Y, %H:%M
 clock_label =
 clock_tz =
 EOF
+
+cat << EOF > pinstall.sh
+echo '#!/bin/sh
+exec gsimplecal "\$@"' > usr/local/bin/defaultcalendar
+chmod 755 usr/local/bin/defaultcalendar
+EOF
