@@ -1,10 +1,23 @@
-From 939cff0d11ba8e590f5c3c791653ae60eed37e59 Mon Sep 17 00:00:00 2001
+From 62dc54af4eb022601eedef60c42522b3924d2ffc Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Sat, 30 Sep 2023 09:33:36 +0300
+Date: Tue, 10 Oct 2023 20:03:45 +0300
 Subject: [PATCH] Squashed commit of the following:
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+
+commit c75e0da828ce8fd1e87bca8cfd311306d46703dc
+Merge: 58b0dae da34a62
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Tue Oct 10 20:03:21 2023 +0300
+
+    Merge branch 'env' into dwl-kiosk-v7
+
+commit da34a6214c9b070f7af05e6e4a92b419d8efb2b8
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sun Jul 24 20:55:56 2022 +0300
+
+    allow environment variables to override config.h
 
 commit 58b0dae129d85e17d94ca19903a902c7b32237de
 Merge: d8426d4 f695674
@@ -265,16 +278,16 @@ Date:   Thu Jul 21 21:26:31 2022 +0300
     fall back to a lower output mode if needed (swaywm/sway@4cdc4ac)
 ---
  Makefile                                      |  13 +-
- config.def.h                                  |  41 +-
+ config.def.h                                  |  43 +-
  dwl.c                                         | 589 ++++++++++++++++--
  env.c                                         | 213 +++++++
  ...lr-output-power-management-unstable-v1.xml | 128 ++++
- 5 files changed, 923 insertions(+), 61 deletions(-)
+ 5 files changed, 924 insertions(+), 62 deletions(-)
  create mode 100644 env.c
  create mode 100644 protocols/wlr-output-power-management-unstable-v1.xml
 
 diff --git a/Makefile b/Makefile
-index 5320e42b7..d5ee518cf 100644
+index 5320e42b..d5ee518c 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -9,14 +9,15 @@ DWLDEVCFLAGS = -pedantic -Wall -Wextra -Wdeclaration-after-statement -Wno-unused
@@ -310,24 +323,26 @@ index 5320e42b7..d5ee518cf 100644
  config.h:
  	cp config.def.h $@
 diff --git a/config.def.h b/config.def.h
-index 1677f6f12..ee964a5a7 100644
+index 4e30885b..3da4f88c 100644
 --- a/config.def.h
 +++ b/config.def.h
-@@ -1,9 +1,10 @@
+@@ -6,10 +6,11 @@
  /* appearance */
  static const int sloppyfocus               = 1;  /* focus follows mouse */
  static const int bypass_surface_visibility = 0;  /* 1 means idle inhibitors will disable idle tracking even if it's surface isn't visible  */
 -static const unsigned int borderpx         = 1;  /* border pixel of windows */
--static const float bordercolor[]           = {0.5, 0.5, 0.5, 1.0};
--static const float focuscolor[]            = {1.0, 0.0, 0.0, 1.0};
+-static const float bordercolor[]           = COLOR(0x444444ff);
+-static const float focuscolor[]            = COLOR(0x005577ff);
+-static const float urgentcolor[]           = COLOR(0xff0000ff);
 +static unsigned int borderpx         = 1;  /* border pixel of windows */
-+static float rootcolor[]             = {0.3, 0.3, 0.3, 1.0};
-+static float bordercolor[]           = {0.5, 0.5, 0.5, 1.0};
-+static float focuscolor[]            = {1.0, 0.0, 0.0, 1.0};
++static float bordercolor[]           = COLOR(0x444444ff);
++static float focuscolor[]            = COLOR(0x005577ff);
++static float urgentcolor[]           = COLOR(0xff0000ff);
++static float rootcolor[]             = COLOR(0x111122ff);
  /* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
- static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0};
+ static const float fullscreen_bg[]         = {0.1, 0.1, 0.1, 1.0}; /* You can also use glsl colors */
  
-@@ -25,6 +26,7 @@ static const Layout layouts[] = {
+@@ -33,6 +34,7 @@ static const Layout layouts[] = {
  	{ "[]=",      tile },
  	{ "><>",      NULL },    /* no layout function means floating behavior */
  	{ "[M]",      monocle },
@@ -335,7 +350,7 @@ index 1677f6f12..ee964a5a7 100644
  };
  
  /* monitors */
-@@ -34,7 +36,7 @@ static const MonitorRule monrules[] = {
+@@ -42,7 +44,7 @@ static const MonitorRule monrules[] = {
  	{ "eDP-1",    0.5,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
  	*/
  	/* defaults */
@@ -344,7 +359,7 @@ index 1677f6f12..ee964a5a7 100644
  };
  
  /* keyboard */
-@@ -120,33 +122,34 @@ static const Key keys[] = {
+@@ -128,33 +130,34 @@ static const Key keys[] = {
  	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05} },
  	{ MODKEY,                    XKB_KEY_Return,     zoom,           {0} },
  	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
@@ -395,7 +410,7 @@ index 1677f6f12..ee964a5a7 100644
  	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
  };
 diff --git a/dwl.c b/dwl.c
-index b51614d64..67023d200 100644
+index a7d41b08..bafc3aec 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -1,10 +1,16 @@
@@ -606,7 +621,7 @@ index b51614d64..67023d200 100644
  static struct wl_listener new_xdg_surface = {.notify = createnotify};
  static struct wl_listener new_xdg_decoration = {.notify = createdecoration};
  static struct wl_listener new_layer_shell_surface = {.notify = createlayersurface};
-@@ -413,6 +470,8 @@ static Atom netatom[NetLast];
+@@ -413,6 +470,8 @@ static xcb_atom_t netatom[NetLast];
  /* attempt to encapsulate suck into one file */
  #include "client.h"
  
@@ -971,7 +986,7 @@ index b51614d64..67023d200 100644
  void
  destroysessionlock(struct wl_listener *listener, void *data)
  {
-@@ -1263,7 +1538,7 @@ focusclient(Client *c, int lift)
+@@ -1261,7 +1536,7 @@ focusclient(Client *c, int lift)
  	}
  
  	/* Change cursor surface */
@@ -980,7 +995,7 @@ index b51614d64..67023d200 100644
  
  	/* Have a client, so focus its top-level wlr_surface */
  	client_notify_enter(client_surface(c), wlr_seat_get_keyboard(seat));
-@@ -1422,7 +1697,7 @@ keypress(struct wl_listener *listener, void *data)
+@@ -1420,7 +1695,7 @@ keypress(struct wl_listener *listener, void *data)
  	/* Get a list of keysyms based on the keymap for this keyboard */
  	const xkb_keysym_t *syms;
  	int nsyms = xkb_state_key_get_syms(
@@ -989,7 +1004,7 @@ index b51614d64..67023d200 100644
  
  	int handled = 0;
  	uint32_t mods = wlr_keyboard_get_modifiers(kb->wlr_keyboard);
-@@ -1528,7 +1803,8 @@ void
+@@ -1526,7 +1801,8 @@ void
  maplayersurfacenotify(struct wl_listener *listener, void *data)
  {
  	LayerSurface *l = wl_container_of(listener, l, map);
@@ -999,7 +1014,7 @@ index b51614d64..67023d200 100644
  }
  
  void
-@@ -1591,6 +1867,7 @@ mapnotify(struct wl_listener *listener, void *data)
+@@ -1589,6 +1865,7 @@ mapnotify(struct wl_listener *listener, void *data)
  		c->isfloating = 1;
  		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
  		setmon(c, p->mon, p->tags);
@@ -1007,7 +1022,7 @@ index b51614d64..67023d200 100644
  	} else {
  		applyrules(c);
  	}
-@@ -1606,13 +1883,10 @@ mapnotify(struct wl_listener *listener, void *data)
+@@ -1604,13 +1881,10 @@ mapnotify(struct wl_listener *listener, void *data)
  void
  maximizenotify(struct wl_listener *listener, void *data)
  {
@@ -1024,7 +1039,7 @@ index b51614d64..67023d200 100644
  }
  
  void
-@@ -1643,21 +1917,61 @@ motionabsolute(struct wl_listener *listener, void *data)
+@@ -1641,21 +1915,61 @@ motionabsolute(struct wl_listener *listener, void *data)
  	 * so we have to warp the mouse there. There is also some hardware which
  	 * emits these events. */
  	struct wlr_pointer_motion_absolute_event *event = data;
@@ -1089,7 +1104,7 @@ index b51614d64..67023d200 100644
  		IDLE_NOTIFY_ACTIVITY;
  
  		/* Update selmon (even while dragging a window) */
-@@ -1680,19 +1994,6 @@ motionnotify(uint32_t time)
+@@ -1678,19 +1992,6 @@ motionnotify(uint32_t time)
  		return;
  	}
  
@@ -1109,7 +1124,7 @@ index b51614d64..67023d200 100644
  	/* If there's no client surface under the cursor, set the cursor image to a
  	 * default. This is what makes the cursor image appear when you move it
  	 * off of a client or over its border. */
-@@ -1713,8 +2014,8 @@ motionrelative(struct wl_listener *listener, void *data)
+@@ -1711,8 +2012,8 @@ motionrelative(struct wl_listener *listener, void *data)
  	 * special configuration applied for the specific input device which
  	 * generated the event. You can pass NULL for the device if you want to move
  	 * the cursor around without any input. */
@@ -1120,7 +1135,7 @@ index b51614d64..67023d200 100644
  }
  
  void
-@@ -1728,6 +2029,8 @@ moveresize(const Arg *arg)
+@@ -1726,6 +2027,8 @@ moveresize(const Arg *arg)
  
  	/* Float the window and tell motionnotify to grab it */
  	setfloating(grabc, 1);
@@ -1129,7 +1144,7 @@ index b51614d64..67023d200 100644
  	switch (cursor_mode = arg->ui) {
  	case CurMove:
  		grabcx = cursor->x - grabc->geom.x;
-@@ -1816,6 +2119,14 @@ outputmgrtest(struct wl_listener *listener, void *data)
+@@ -1814,6 +2117,14 @@ outputmgrtest(struct wl_listener *listener, void *data)
  	outputmgrapplyortest(config, 1);
  }
  
@@ -1144,7 +1159,7 @@ index b51614d64..67023d200 100644
  void
  pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
  		uint32_t time)
-@@ -1885,6 +2196,16 @@ printstatus(void)
+@@ -1883,6 +2194,16 @@ printstatus(void)
  	fflush(stdout);
  }
  
@@ -1161,7 +1176,7 @@ index b51614d64..67023d200 100644
  void
  quit(const Arg *arg)
  {
-@@ -1991,7 +2312,10 @@ run(char *startup_cmd)
+@@ -1989,7 +2310,10 @@ run(char *startup_cmd)
  	 * instead of (0, 0) and then jumping. still may not be fully
  	 * initialized, as the image/coordinates are not transformed for the
  	 * monitor when displayed here */
@@ -1173,7 +1188,7 @@ index b51614d64..67023d200 100644
  	wlr_xcursor_manager_set_cursor_image(cursor_mgr, cursor_image, cursor);
  
  	/* Run the Wayland event loop. This does not return until you exit the
-@@ -2030,6 +2354,8 @@ setfloating(Client *c, int floating)
+@@ -2028,6 +2352,8 @@ setfloating(Client *c, int floating)
  		return;
  	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen
  			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
@@ -1182,7 +1197,7 @@ index b51614d64..67023d200 100644
  	arrange(c->mon);
  	printstatus();
  }
-@@ -2071,6 +2397,25 @@ setlayout(const Arg *arg)
+@@ -2069,6 +2395,25 @@ setlayout(const Arg *arg)
  	printstatus();
  }
  
@@ -1442,7 +1457,7 @@ index b51614d64..67023d200 100644
  
  	/* First remove from the layout the disabled monitors */
  	wl_list_for_each(m, &mons, link) {
-@@ -2733,6 +3235,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
+@@ -2735,6 +3237,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
  	LISTEN(&xsurface->events.set_title, &c->set_title, updatetitle);
  	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
  	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
@@ -1456,8 +1471,8 @@ index b51614d64..67023d200 100644
 +			toggleminimize);
  }
  
- Atom
-@@ -2811,6 +3321,7 @@ main(int argc, char *argv[])
+ xcb_atom_t
+@@ -2819,6 +3329,7 @@ main(int argc, char *argv[])
  	/* Wayland requires XDG_RUNTIME_DIR for creating its communications socket */
  	if (!getenv("XDG_RUNTIME_DIR"))
  		die("XDG_RUNTIME_DIR must be set");
@@ -1467,7 +1482,7 @@ index b51614d64..67023d200 100644
  	cleanup();
 diff --git a/env.c b/env.c
 new file mode 100644
-index 000000000..6fe624efa
+index 00000000..6fe624ef
 --- /dev/null
 +++ b/env.c
 @@ -0,0 +1,213 @@
@@ -1686,7 +1701,7 @@ index 000000000..6fe624efa
 +}
 diff --git a/protocols/wlr-output-power-management-unstable-v1.xml b/protocols/wlr-output-power-management-unstable-v1.xml
 new file mode 100644
-index 000000000..a97783991
+index 00000000..a9778399
 --- /dev/null
 +++ b/protocols/wlr-output-power-management-unstable-v1.xml
 @@ -0,0 +1,128 @@
