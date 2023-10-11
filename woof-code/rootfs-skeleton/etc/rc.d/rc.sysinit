@@ -185,12 +185,13 @@ busybox mount -a #Load fstab entries
 sysctl --system
 
 ## process some specific kernel params here
-SFSLOCK=1
+SFSLOCK=2
 for i in $(cat /proc/cmdline) ; do
 	case $i in
 		xerrs)   rm -f /var/local/xwin_disable_xerrs_log_flag ;; # see xwin / bootmanager
 		noxerrs) touch /var/local/xwin_disable_xerrs_log_flag ;; # see xwin / bootmanager
-		pfix=nocopy) SFSLOCK=0 ;;
+		pfix=copy|pfix=copy,*|pfix=*,copy,*|pfix=*,copy|pfix=ram|pfix=ram,*|pfix=*,ram,*|pfix=*,ram) SFSLOCK=1 ;;
+		pfix=nocopy|pfix=nocopy,*|pfix=*,nocopy,*|pfix=*,nocopy) SFSLOCK=0 ;;
 	esac
 done
 
@@ -201,6 +202,17 @@ echo -n "Loading kernel modules..." >/dev/console
 /etc/init.d/udev start
 /etc/init.d/mountdevsubfs.sh start
 status_func 0
+
+if [ $SFSLOCK -eq 2 ]; then
+  PDEV=""
+  case "$PDEV1" in
+  sd*[0-9]*) PDEV="${DEV%%[0-9]*}" ;;
+  mmcblk[0-9]*p[0-9]*) PDEV="${DEV%p[0-9]*}" ;;
+  nvme[0-9]*n[0-9]*p[0-9]*) PDEV="${DEV%p[0-9]*}" ;;
+  esac
+
+  [ -n "$PDEV" ] && [ "`cat /sys/class/block/$PDEV/queue/discard_granularity`" = "0" ] && SFSLOCK=1
+fi
 
 if [ $SFSLOCK -eq 1 -a -f /usr/local/sbin/sfslock ]; then
 	echo -n "Copying to ram..." >/dev/console
