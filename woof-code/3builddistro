@@ -64,6 +64,7 @@ APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/a
 DPkg::Post-Invoke { "/usr/sbin/auto-setup-spot"; };
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
+chroot rootfs-complete /usr/sbin/auto-setup-spot
 
 printf 'woofwoof\nwoofwoof\n' | chroot rootfs-complete passwd root
 
