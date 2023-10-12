@@ -64,7 +64,6 @@ APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/a
 DPkg::Post-Invoke { "/usr/sbin/auto-setup-spot"; };
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
-chroot rootfs-complete /usr/sbin/auto-setup-spot
 
 printf 'woofwoof\nwoofwoof\n' | chroot rootfs-complete passwd root
 
@@ -158,6 +157,7 @@ rm -rf rootfs-complete/var/cache/ldconfig/*
 
 rm -f rootfs-complete/usr/lib/udev/hwdb.bin
 
+chroot rootfs-complete /usr/sbin/auto-setup-spot
 chroot rootfs-complete /etc/rc.d/rc.update w
 
 chmod 700 rootfs-complete/root rootfs-complete/home/spot
