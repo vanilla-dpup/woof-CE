@@ -12,4 +12,20 @@ chroot . /usr/sbin/setup-spot weechat=true
 chroot . run-as-spot weechat-headless -r '/set irc.server_default.msg_part \"\";/set irc.server_default.msg_quit \"\";/quit'
 chroot . run-as-spot weechat-headless -r '/set irc.ctcp.clientinfo \"\";/set irc.ctcp.finger \"\";/set irc.ctcp.source \"\";/set irc.ctcp.time \"\";/set irc.ctcp.userinfo \"\";/set irc.ctcp.version \"\";/quit'
 chroot . run-as-spot weechat-headless -r '/server add libera irc.libera.chat/6697 -autoconnect -ssl;/set irc.server.libera.autojoin #puppylinux;/quit'
+
+if [ ! -e usr/share/applications/weechat.desktop ]; then
+	cat << EOF2 > usr/share/applications/weechat.desktop
+[Desktop Entry]
+Name=WeeChat
+GenericName=Chat client
+Comment=Extensible chat client
+Exec=weechat %u
+Terminal=true
+Icon=weechat
+Type=Application
+Categories=Network;Chat;IRCClient;ConsoleOnly;
+MimeType=x-scheme-handler/irc;x-scheme-handler/ircs;
+EOF2
+	chmod 644 usr/share/applications/weechat.desktop
+fi
 EOF
