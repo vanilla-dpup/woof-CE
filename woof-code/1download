@@ -58,13 +58,6 @@ debian)
 deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
 EOF
 		;;
-	stretch|buster|bullseye)
-		cat << EOF > rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free
-deb ${MIRROR}-security ${DISTRO_COMPAT_VERSION}-security main contrib non-free
-EOF
-		;;
 	*)
 		cat << EOF > rootfs/etc/apt/sources.list
 deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
@@ -80,13 +73,6 @@ devuan)
 	ceres)
 		cat << EOF > rootfs/etc/apt/sources.list
 deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
-EOF
-		;;
-	ascii|beowulf|chimaera)
-		cat << EOF > rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-security main contrib non-free
 EOF
 		;;
 	*)
