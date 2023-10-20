@@ -25,7 +25,7 @@ DEFAULT ${DISTRO_FILE_PREFIX}
 
 LABEL ${DISTRO_FILE_PREFIX}
 	LINUX vmlinuz
-	INITRD ucode.cpio,initrd.gz
+	INITRD ucode.cpio,initrd.zst
 EOF
 else
 	cat << EOF > /mnt/biosimagep1/extlinux.conf
@@ -33,11 +33,11 @@ DEFAULT ${DISTRO_FILE_PREFIX}
 
 LABEL ${DISTRO_FILE_PREFIX}
 	LINUX vmlinuz
-	INITRD initrd.gz
+	INITRD initrd.zst
 EOF
 fi
 
-cp -f build/initrd.gz /mnt/biosimagep1/
+cp -f build/initrd.zst /mnt/biosimagep1/
 cp -f build/vmlinuz /mnt/biosimagep1/
 cp -a build/*.sfs /mnt/biosimagep1/
 umount /mnt/biosimagep1 2>/dev/null
@@ -61,12 +61,12 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 	mount -o noatime ${LOOP}p1 /mnt/uefiimagep1
 	install -D -m 644 rootfs-complete/usr/lib/efilinux/efilinux.efi /mnt/uefiimagep1/EFI/BOOT/BOOTX64.EFI
 	install -m 644 build/vmlinuz /mnt/uefiimagep1/vmlinuz
-	install -m 644 build/initrd.gz /mnt/uefiimagep1/initrd.gz
+	install -m 644 build/initrd.zst /mnt/uefiimagep1/initrd.zst
 	if [ -e build/ucode.cpio ]; then
 		install -m 644 build/ucode.cpio /mnt/uefiimagep1/ucode.cpio
-		echo "-f \vmlinuz initrd=\ucode.cpio initrd=\initrd.gz" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
+		echo "-f \vmlinuz initrd=\ucode.cpio initrd=\initrd.zst" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
 	else
-		echo "-f \vmlinuz initrd=\initrd.gz" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
+		echo "-f \vmlinuz initrd=\initrd.zst" > /mnt/uefiimagep1/EFI/BOOT/efilinux.cfg
 	fi
 
 	umount /mnt/uefiimagep1 2>/dev/null

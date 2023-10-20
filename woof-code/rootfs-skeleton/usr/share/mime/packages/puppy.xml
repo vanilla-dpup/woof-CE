@@ -35,6 +35,7 @@
     <comment>Linux initramfs, compressed</comment>
     <glob pattern="initrd.gz"/>
     <glob pattern="initrd.xz"/>
+    <glob pattern="initrd.zst"/>
   </mime-type>
 
   <mime-type type="application/linux-kernel">

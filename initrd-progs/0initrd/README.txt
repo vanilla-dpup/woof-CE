@@ -15,7 +15,7 @@ vmlinuz:
    This is the Linux part of Puppy Linux, usually referred to as the Linux kernel.
    The boot process has already loaded this into memory and started running it before init starts.
 
-initrd.gz:
+initrd.zst:
    This contains the Puppy files that form the RAM based filesystem that is in place when init runs.
    The init script is one of these files.
 
@@ -111,7 +111,7 @@ Things that provide input to init and change the things it does:
 ================================================================
 
 DISTRO_SPECS:
-   This is a file in initrd.gz that is created by the Puppy builder.
+   This is a file in initrd.zst that is created by the Puppy builder.
    It contains definitions of various information about a particular Puppy.
    DISTRO_FILE_PREFIX defines the name that occurs frequently in files that belong to it. e.g. 'slacko64'.
    DISTRO_VERSION defines the version number. e.g. '6.9.5'

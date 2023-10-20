@@ -101,9 +101,9 @@ generate_initrd() {
 
 	find . | cpio -o -H newc > ../initrd 2>/dev/null
 	cd ..
-	gzip -f initrd || exit_error "ERROR"
+	zstd -19 -f initrd || exit_error "ERROR"
 
-	echo -e "\n***        INITRD: initrd.gz [${ARCH}]"
+	echo -e "\n***        INITRD: initrd.zst [${ARCH}]"
 	echo -e "*** /DISTRO_SPECS: ${DISTRO_NAME} ${DISTRO_VERSION} ${DISTRO_TARGETARCH}"
 }
 

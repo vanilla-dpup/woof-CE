@@ -151,7 +151,7 @@ copy_efilinux_uefi_boot() {
 	mkdir -p ${HOMEDIR}/EFI/boot
 	cp -f /usr/lib/efilinux/efilinux.efi ${HOMEDIR}/EFI/boot/bootx64.efi
 
-	INITRD="initrd=\initrd.gz"
+	INITRD="initrd=\initrd.zst"
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="initrd=\ucode.cpio ${INITRD}"
 
 	APPEND="pfix=fsck pmedia=${PMEDIA}"
@@ -295,7 +295,7 @@ create_syslinux_conf() {
 	local PMEDIA="$3"
 	local XFSTYPE2="$4"
 
-	INITRD="initrd.gz"
+	INITRD="initrd.zst"
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="ucode.cpio,${INITRD}"
 
 	APPEND="pfix=fsck pmedia=${PMEDIA}"
@@ -343,14 +343,14 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 			# not mounted
 			mkdir -p /mnt/$PDEV1
 			mount -t $PDEV1_FS /dev/$PDEV1 /mnt/$PDEV1
-			if [ $? -eq 0 -a -f /mnt/${PDEV1}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f /mnt/${PDEV1}${PSUBDIR}/vmlinuz -a -f /mnt/${PDEV1}${PSUBDIR}/initrd.gz ] ; then
+			if [ $? -eq 0 -a -f /mnt/${PDEV1}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f /mnt/${PDEV1}${PSUBDIR}/vmlinuz -a -f /mnt/${PDEV1}${PSUBDIR}/initrd.zst ] ; then
 				SRCPATH=/mnt/${PDEV1}${PSUBDIR}
 			else
 				umount /mnt/$PDEV1 2>/dev/null
 			fi
 		else
 			# already mounted
-			if [ -f ${PDEV1_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f ${PDEV1_MP}${PSUBDIR}/vmlinuz -a -f ${PDEV1_MP}${PSUBDIR}/initrd.gz ] ; then
+			if [ -f ${PDEV1_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f ${PDEV1_MP}${PSUBDIR}/vmlinuz -a -f ${PDEV1_MP}${PSUBDIR}/initrd.zst ] ; then
 				SRCPATH=${PDEV1_MP}${PSUBDIR}
 			fi
 		fi
@@ -863,7 +863,7 @@ elif [ "$BOOTLOADER" = "efilinux" ] ; then
 fi
 
 FILES2COPY="vmlinuz
-initrd.gz
+initrd.zst
 ucode.cpio
 ${DISTRO_PUPPYSFS}
 ${DISTRO_ZDRVSFS}
@@ -887,7 +887,7 @@ if [ "${FSTYPE2}" ] ; then # fat32 + f2fs
 	fi
 	#-
 	cp -fv ${SRCPATH}/vmlinuz /mnt/${USBDRV}1/
-	cp -fv ${SRCPATH}/initrd.gz /mnt/${USBDRV}1/
+	cp -fv ${SRCPATH}/initrd.zst /mnt/${USBDRV}1/
 	[ -f ${SRCPATH}/ucode.cpio ] && cp -fv ${SRCPATH}/ucode.cpio /mnt/${USBDRV}1/
 	#- get partition UUID
 	UUID=$(busybox blkid /dev/${USBDRV}2 | grep -o ' UUID=".*' | cut -f2 -d '"')
@@ -912,7 +912,7 @@ if [ "${FSTYPE2}" ] ; then # fat32 + f2fs
 			-e "s%pmedia=usbflash%pmedia=usbflash $PUPSFS%" \
 			${SEDFILES}
 	fi
-	FILES2COPY=$(echo "$FILES2COPY" | grep -v 'vmlinuz|initrd.gz')
+	FILES2COPY=$(echo "$FILES2COPY" | grep -v 'vmlinuz|initrd.zst')
 fi
 #-------------------------
 

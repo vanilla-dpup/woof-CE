@@ -230,7 +230,7 @@ cp -f ../kernel-kit/output/vmlinuz-*-kernel-kit build/vmlinuz
 cp -f ../kernel-kit/output/kbuild-*.sfs build/
 cp -f ../kernel-kit/output/kernel-modules-*-kernel-kit.sfs build/${ZDRVSFS}
 
-mv -f ../initrd-progs/initrd.gz build/
+mv -f ../initrd-progs/initrd.zst build/
 
 mksquashfs fdrv build/${FDRVSFS} ${SFSCOMP}
 mksquashfs nlsx build/${NLSXSFS} ${SFSCOMP}
