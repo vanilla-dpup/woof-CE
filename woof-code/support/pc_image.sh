@@ -59,8 +59,7 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 	mkdir -p /mnt/uefiimagep1 /mnt/uefiimagep2
 
 	mount -o noatime ${LOOP}p1 /mnt/uefiimagep1
-	[ -f ../../local-repositories/efilinux.efi ] || wget --tries=1 --timeout=10 -O ../../local-repositories/efilinux.efi https://github.com/puppylinux-woof-CE/efilinux/releases/latest/download/efilinux.efi
-	install -D -m 644 ../../local-repositories/efilinux.efi /mnt/uefiimagep1/EFI/BOOT/BOOTX64.EFI
+	install -D -m 644 rootfs-complete/usr/lib/efilinux/efilinux.efi /mnt/uefiimagep1/EFI/BOOT/BOOTX64.EFI
 	install -m 644 build/vmlinuz /mnt/uefiimagep1/vmlinuz
 	install -m 644 build/initrd.gz /mnt/uefiimagep1/initrd.gz
 	if [ -e build/ucode.cpio ]; then
