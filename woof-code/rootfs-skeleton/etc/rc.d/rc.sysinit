@@ -134,6 +134,7 @@ mount -t tmpfs -onodev,noexec,nosuid,size=20%,mode=1777 /run/lock
 mount -t proc -onodev,noexec,nosuid proc /proc
 mount -t sysfs -onodev,noexec,nosuid sysfs /sys
 mount -t pstore pstore /sys/fs/pstore
+[ -d /sys/firmware/efi/efivars ] && mount -t efivarfs none /sys/firmware/efi/efivars
 
 mount -n -o nosuid,size=10M,mode=0755 -t devtmpfs devtmpfs /dev
 busybox syslogd -C128
