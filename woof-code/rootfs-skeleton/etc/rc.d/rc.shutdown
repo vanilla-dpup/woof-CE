@@ -104,9 +104,9 @@ busybox umount -a -t cifs,smbfs,nfs,sshfs
 #=======================================================================
 # terminate stuff
 # dbus daemon
-/etc/init.d/dbus stop
+killall dbus-daemon >/dev/null 2>&1
 # udev
-/etc/init.d/udev stop
+killall systemd-udevd >/dev/null 2>&1
 
 #=======================================================================
 

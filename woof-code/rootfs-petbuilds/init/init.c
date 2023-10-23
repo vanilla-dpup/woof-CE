@@ -126,18 +126,20 @@ static pid_t cttyhack(const int first)
 
 static int script(const char *path)
 {
+	autoclose int fd = -1;
 	pid_t pid;
 	sigset_t mask;
 	int status;
 
+	if ((fd = open("/dev/null", O_RDWR)) < 0) return -1;
+
 	if ((pid = fork()) == 0) {
 		if ((sigfillset(&mask) < 0) ||
-		    (sigprocmask(SIG_UNBLOCK, &mask, NULL) < 0))
+		    (sigprocmask(SIG_UNBLOCK, &mask, NULL) < 0) ||
+		    (dup2(fd, STDIN_FILENO) < 0) ||
+		    (dup2(fd, STDOUT_FILENO) < 0) ||
+		    (dup2(fd, STDERR_FILENO) < 0))
 			exit(EXIT_FAILURE);
-
-		close(STDIN_FILENO);
-		close(STDOUT_FILENO);
-		close(STDERR_FILENO);
 
 		execl(path, path, (char *)NULL);
 		exit(EXIT_FAILURE);

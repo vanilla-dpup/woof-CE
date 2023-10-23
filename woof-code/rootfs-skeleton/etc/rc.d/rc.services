@@ -7,7 +7,7 @@ done
 for S in /etc/rc5.d/*
 do
 	case "${S##*/}" in
-	README|*dbus|*udev|*elogind|*bootlogs|*rc.local) ;;
+	README|*dbus|*udev|*elogind|*bootlogs|*rc.local|*sendsigs|*syslog*|*busybox-klogd) ;;
 	*) [ -x "$S" ] && $S $1 ;;
 	esac
 done

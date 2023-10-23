@@ -129,7 +129,15 @@ STATUS=0
 
 echo -n "Making the filesystem usable..." >/dev/console
 
-/etc/init.d/mountkernfs.sh start
+mount -t tmpfs -onosuid,noexec,size=10%,mode=755 tmpfs /run
+mount -t tmpfs -onodev,noexec,nosuid,size=20%,mode=1777 /run/lock
+mount -t proc -onodev,noexec,nosuid proc /proc
+mount -t sysfs -onodev,noexec,nosuid sysfs /sys
+mount -t pstore pstore /sys/fs/pstore
+
+mount -n -o nosuid,size=10M,mode=0755 -t devtmpfs devtmpfs /dev
+busybox syslogd -C128
+busybox klogd
 
 FREERAM=`free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 4 -d ' '` #w481 110405
 QTRFREERAM=`expr $FREERAM \/ 4`
@@ -199,8 +207,31 @@ done
 echo "LOAD KERNEL MODULES"
 echo -n "Loading kernel modules..." >/dev/console
 
-/etc/init.d/udev start
-/etc/init.d/mountdevsubfs.sh start
+[ -w /sys/kernel/uevent_helper ] && echo > /sys/kernel/uevent_helper
+kmod static-nodes --format=tmpfiles --output=/proc/self/fd/1 | \
+while read type name mode uid gid age arg; do
+	[ -e $name ] && continue
+	case "$type" in
+	c|b|c!|b!) mknod -m $mode $name $type $(echo $arg | sed 's/:/ /') ;;
+	d|d!) mkdir $name ;;
+	esac
+done
+mkdir /run/udev
+/lib/systemd/systemd-udevd --daemon
+udevadm trigger --type=subsystems --action=add
+udevadm trigger --type=devices --action=add
+ln -sf /bin/true /dev/MAKEDEV
+udevadm settle
+
+ln -s /proc/self/fd /dev/fd
+ln -s fd/0 /dev/stdin
+ln -s fd/1 /dev/stdout
+ln -s fd/2 /dev/stderr
+mkdir --mode=755 /dev/shm
+mount -t tmpfs -o nosuid,nodev,noexec,size=20%,mode=1777 tmpfs /dev/shm
+mkdir --mode=755 /dev/pts
+mount -t devpts -o noexec,nosuid,gid=5,mode=600 devpts /dev/pts
+
 status_func 0
 
 if [ $SFSLOCK -eq 2 ]; then
@@ -293,8 +324,13 @@ echo -n "Setting up services (network" >/dev/console
 #had hoped to retire this, but HardInfo, Pupscan need it... 110814 fix test...
 [ -e /proc/bus/usb ] && busybox mount -t usbfs none /proc/bus/usb
 
-/etc/init.d/hostname.sh start
-/etc/init.d/dbus start
+hostname -F /etc/hostname
+
+mkdir -p /var/run/dbus
+chown messagebus /var/run/dbus
+chgrp messagebus /var/run/dbus
+dbus-uuidgen --ensure
+dbus-daemon --system
 
 # enable ktls, in case all internet-facing processes run as spot and cannot load tls
 modprobe tls 2>/dev/null

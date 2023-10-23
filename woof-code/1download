@@ -32,9 +32,9 @@ TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSIO
 rm -rf rootfs
 
 if [ "$USR_SYMLINKS" = "yes" -a ! -e ${TARBALL} ]; then
-	debootstrap --arch=$ARCH --variant=minbase --include=sysvinit-core --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
+	debootstrap --arch=$ARCH --variant=minbase --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
 elif [ ! -e ${TARBALL} ]; then
-	debootstrap --no-merged-usr --arch=$ARCH --variant=minbase --include=sysvinit-core --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
+	debootstrap --no-merged-usr --arch=$ARCH --variant=minbase --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
 fi
 
 # create a tiny installation of the compatible distro
@@ -106,15 +106,12 @@ EOF
 chroot rootfs apt-get update
 chroot rootfs apt-get upgrade -y
 
-# prevent the installation of systemd
-chroot rootfs apt-mark hold systemd
-
 # install all packages
 PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n'`
 chroot rootfs apt-get install -y $PKGS
 
-# add busybox, missing package recommendations, Synaptic and gnome-software
-chroot rootfs apt-get install -y busybox busybox-syslogd net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software fwupd
+# add busybox, missing package recommendations and gnome-software
+chroot rootfs apt-get install -y busybox net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software fwupd
 [ -e rootfs/usr/bin/flatpak ] && chroot rootfs apt-get install -y gnome-software-plugin-flatpak
 
 # impersonate Puppy
