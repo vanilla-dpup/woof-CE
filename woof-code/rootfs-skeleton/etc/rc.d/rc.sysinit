@@ -217,7 +217,7 @@ while read type name mode uid gid age arg; do
 	esac
 done
 mkdir /run/udev
-/lib/systemd/systemd-udevd --daemon
+udevd --daemon
 udevadm trigger --type=subsystems --action=add
 udevadm trigger --type=devices --action=add
 ln -sf /bin/true /dev/MAKEDEV

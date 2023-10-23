@@ -1,0 +1,1 @@
+ln -s ../lib/systemd/systemd-udevd sbin/udevd
