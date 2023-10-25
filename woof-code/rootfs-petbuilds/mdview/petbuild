@@ -1,11 +1,10 @@
 download() {
-    [ -f mdview-3e4c564a88.tar.gz ] || wget -t 3 -T 60 https://chiselapp.com/user/jamesbond/repository/mdview3/tarball/3e4c564a88/mdview-3e4c564a88.tar.gz
+    [ -f mdview-7b037ee1b3.tar.gz ] || wget -t 3 -T 60 https://chiselapp.com/user/jamesbond/repository/mdview3/tarball/7b037ee1b3/mdview-7b037ee1b3.tar.gz
 }
 
 build() {
-    tar -xzf mdview-3e4c564a88.tar.gz
-    cd mdview-3e4c564a88
-    patch -p1 < ../gtk3.patch
+    tar -xzf mdview-7b037ee1b3.tar.gz
+    cd mdview-7b037ee1b3
     make
     install -D -m 755 mdview /usr/bin/mdview
     install -D -m 644 README.md /usr/share/doc/mdview/README.md
