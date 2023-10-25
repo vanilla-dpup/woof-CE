@@ -12,7 +12,6 @@
 #ditto, but flash drive:    tmpfs         pup_save.3fs    pup_xxx.sfs      13
 
 ######################## localization ########################
-L_WINDOWS_HIBERNATED="ERROR: Windows NTFS hibernated partition, cannot mount"
 L_DONE="done"
 L_FAILED="failed"
 L_DUMPING_BOOTINIT_LOG="Dumping last lines of /tmp/bootinit.log..."
@@ -27,7 +26,6 @@ L_WAITING_FOR_DEV='Waiting %s seconds for slow storage devices [%s/%s].' #printf
 L_WAITING_FOR_PART='Waiting for partition [%s]' #printf
 L_PRE_MESSAGE="Loading puppy main sfs file."
 L_ERR_PDRV_INCOMPLETE="%s information is incomplete." #printf
-L_ERR_ONEPART_NOT_MOUNTED="%s is not mounted." #printf
 L_ERR_ONEPART_NOT_OK="%s %s is not Ok." #printf
 L_ERR_ONEPART_MOUNT_SFS_FAILED="%s %s mount of sfs failed." #printf
 L_ERR_AUFS_SFS_FAILED="overlay mount of %s failed." #printf
@@ -35,7 +33,6 @@ L_ERR_TYPE_PUPSAVE="Type a number to choose which personal file to use:"
 L_DROPPED_TO_INITRD_SHELL="Dropped to initramfs shell. Type 'exec switch' to continue booting Puppy."
 L_SWITCH_ROOT="Performing a 'switch_root' to the overlay filesystem..."
 L_0_NONE="0  none"
-L_NO_DISTRO_SPECS="No DISTRO_SPECS file found, assuming that personal storage is empty."
 L_DEBUG_SAVE="To save debug info to a partition, type 'debugsave'"
 
 ##############################################################
