@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=petget
+Exec=petget %f
+Type=Application
+Categories=System
+MimeType=application/pet
+Icon=/usr/share/pixmaps/puppy/package_pet.svg
+NoDisplay=true

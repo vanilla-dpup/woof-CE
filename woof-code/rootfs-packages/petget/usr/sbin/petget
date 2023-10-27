@@ -1,0 +1,82 @@
+#!/bin/bash
+
+if [ -z "$1" ]; then
+	PAIRS=
+	while IFS='|' read ID NAME VER ETC; do
+		PAIRS="${PAIRS} ${ID} ${NAME} ${VER}"
+	done < ~/.packages/user-installed-packages
+
+	if [ -s ~/.packages/user-installed-packages ]; then
+		CHOICE=`yad --title petget --window-icon=gtk-preferences --height=300 --button=gtk-ok:0 --button=gtk-remove:2 --list --column=ID --hide-column=1 --column=Name --column=Version -- $PAIRS`
+	else
+		CHOICE=`yad --title petget --window-icon=gtk-preferences --height=300 --button=gtk-ok --list --column=Name --column=Version`
+	fi
+	[ $? -ne 2 -o -z "$CHOICE" ] && exit 0
+
+	IFS='|' read ID NAME VER <<< "$CHOICE"
+
+	yaf-splash -bg orange -placement top -close never -text "Removing ${NAME}" &
+	PID=$!
+
+	while read ABSPATH; do
+		if [ -d "$ABSPATH" ]; then
+			rmdir "$ABSPATH"
+		else
+			rm -f "$ABSPATH"
+		fi
+	done < <(sort -r ~/.packages/${NAME}.files)
+
+	. /etc/rc.d/PUPSTATE
+	/etc/rc.d/rc.update w
+	rm -f ~/.packages/${NAME}.files
+	sed -i "/^${ID}\|/d" ~/.packages/user-installed-packages
+	[ $PUPMODE -eq 12 ] && sync
+
+	kill $PID
+
+	exit
+fi
+
+if [ "`head -c -32 "$1" | md5sum | cut -f 1 -d ' '`" != "`tail -c 32 "$1"`" ]; then
+	yad --title petget --window-icon=gtk-preferences --button=gtk-ok --text="Package is corrupt."
+	exit 1
+fi
+
+yad --title petget --window-icon=gtk-preferences --button=gtk-yes --button=gtk-no --text="Install ${1##*/}?" || exit
+
+yaf-splash -bg orange -placement top -close never -text "Installing ${1##*/}" &
+PID=$!
+
+[ "`head -c 6 "$1" | od -A none -t x4`" = " 587a37fd 0000005a" ] && flag=J || flag=z
+
+rm -f /pet.specs /pinstall.sh
+head -c -32 "$1" | tar -x${flag}f- -C / --strip=2
+STATUS=$?
+
+if [ $STATUS -ne 0 ]; then
+	kill $PID
+	yad --title petget --window-icon=gtk-preferences --button=gtk-ok --text="Failed to install package."
+	exit 1
+fi
+
+(
+	cd /
+	if [ -f pinstall.sh ]; then
+		bash pinstall.sh
+		rm -f pinstall.sh
+	fi
+)
+
+IFS='|' read ID NAME ETC < /pet.specs
+rm -f /pet.specs
+head -c -32 "$1" | tar -t${flag}f- | cut -f 3- -d / | grep -v -e '^pet\.specs' -e '^pinstall\.sh' -e '^$' | sed s~^~/~g > ~/.packages/${NAME}.files
+mkdir -p ~/.packages
+sed -i "/^${ID}\|/d" ~/.packages/user-installed-packages
+echo "${ID}|${NAME}|${ETC}" >> ~/.packages/user-installed-packages
+sed -i s/^NoDisplay=true/NoDisplay=false/ /usr/share/applications/petget.desktop
+
+. /etc/rc.d/PUPSTATE
+/etc/rc.d/rc.update w
+[ $PUPMODE -eq 12 ] && sync
+
+kill $PID

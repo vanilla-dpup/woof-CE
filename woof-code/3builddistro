@@ -98,7 +98,7 @@ for TEMPLATE in ../../packages-templates/*; do
 done
 cd ..
 
-ROOTFS_PACKAGES="acpid_busybox pup_advert_blocker firewall_ng"
+ROOTFS_PACKAGES="acpid_busybox pup_advert_blocker firewall_ng petget"
 [ -e rootfs-complete/usr/bin/swaybg ] && ROOTFS_PACKAGES="$ROOTFS_PACKAGES swaybg_wallpaper"
 for NAME in $ROOTFS_PACKAGES; do
 	echo "Adding ${NAME}"

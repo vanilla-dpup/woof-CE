@@ -5,6 +5,7 @@
 - [Boot codes](boot-codes.md)
 - [Persistency modes (PUPMODE)](persistency-modes.md)
 - [Configuration files](configuration-files.md)
+- [.pet Packages](pet-packages.md)
 
 ## For Contributors
 
