@@ -17,7 +17,7 @@ This fork strips woof-CE down to the bare essentials:
 * Support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone. Only [PipeWire](https://pipewire.org/) is supported.
 * Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
 * Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap). Build times are much shorter than upstream's.
-* PPM and support for .pet packages are gone: packages in the build come from rootfs-packages or rootfs-petbuilds (built from source).
+* PPM is gone: packages in the build come from the upstream distro, rootfs-packages or rootfs-petbuilds (built from source). petget provides limited support for .pet packages.
 * The only supported kind of kernel packages is the "huge" one, and fdrv is built by moving /usr/lib/firmware out of the main SFS.
 * Support for aufs is gone. Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
