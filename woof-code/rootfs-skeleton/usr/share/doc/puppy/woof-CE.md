@@ -29,10 +29,10 @@ This fork strips woof-CE down to the bare essentials:
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
 * Support for the devx SFS is gone. Development packages are installed inside a copy of the main SFS during the build, but don't make it into the build output.
 * The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country is gone, and so is the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.
-* Themes are gone. [Themes break applications](https://stopthemingmy.app/) and they're hard to maintain.
+* Themes are gone. [Themes break applications](https://stopthemingmy.app/), modern browsers use non-native widgets and themes are hard to maintain.
 * coreutils, util-linux, etc' are not replaced with symlinks to busybox, because this breaks compatibility with the upstream distro.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
-* Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster. Daemons like udev and dbus are started using their init scripts.
+* Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster.
 * Some core Puppy scripts that override the upstream distro (including run-as-spot wrappers created by setup-spot) are moved to /usr/local/{,s}bin and PATH makes the shell prefer them. This makes package updates safe, because they no longer remove Puppy's hooks.
 
 Other changes:
