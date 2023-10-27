@@ -10,14 +10,10 @@
 #130604 passed-in params to have actual names of executables.
 
 SPOTAPPS="$@"
-RUNNINGPUP=0
-echo "$0" | grep -q 'support' && RUNNINGPUP=1 #running in woof.
-PREFIXDIR=''
-[ $RUNNINGPUP -eq 1 ] && PREFIXDIR='rootfs-complete'
 
-SPOT_HOME=$(awk -F: '$1=="spot" {print $6}' ${PREFIXDIR}/etc/passwd)
+SPOT_HOME=$(awk -F: '$1=="spot" {print $6}' /etc/passwd)
 
-touch ${PREFIXDIR}/root/.spot-status
+touch /root/.spot-status
 
 run_as_spot() { #$1:app  $2:filename
 	SCRIPT="/tmp/${2##*/}-as-spot"
@@ -35,11 +31,7 @@ exec run-as-spot \"$1\" \"\$@\"" > "$SCRIPT"
 generic_func() {
  case $ONEAPPvalue in
   true)
-   case $RUNNINGPUP in
-    0)APPpath=${ONEAPPpath};;
-    1)APPpath=`echo ${ONEAPPpath}|sed "s%$PREFIXDIR%%"`;;
-   esac
-   run_as_spot ${APPpath}/${ONEAPPname} /usr/local/bin/${ONEAPPname}
+   run_as_spot ${ONEAPPpath}/${ONEAPPname} /usr/local/bin/${ONEAPPname}
   ;;
   false)
    [ -e /usr/local/bin/${ONEAPPname} ] && rm -f /usr/local/bin/${ONEAPPname}
@@ -55,14 +47,10 @@ do
 
  ONEAPPname="`echo -n "$ONEAPP" | cut -f 1 -d '='`"  #ex: seamonkey
  ONEAPPvalue="`echo -n "$ONEAPP" | cut -f 2 -d '='`" #ex: true
- if [ $RUNNINGPUP -eq 1 ]; then
-  ONEAPPspec="`find ${PREFIXDIR}/bin ${PREFIXDIR}/sbin ${PREFIXDIR}/usr/bin ${PREFIXDIR}/usr/sbin -mindepth 1 -maxdepth 1 -name ${ONEAPPname} | head -n 1`"
- else
-  ONEAPPspec="`find ${PATH//:/ } -mindepth 1 -maxdepth 1 -name ${ONEAPPname} | grep -vF /usr/local/bin/${ONEAPPname} | head -n 1`"
- fi
+ ONEAPPspec="`find ${PATH//:/ } -mindepth 1 -maxdepth 1 -name ${ONEAPPname} | grep -vF /usr/local/bin/${ONEAPPname} | head -n 1`"
  if [ ! "$ONEAPPspec" ];then
   #executable does not exist, so remove from list, if there...
-  sed -i -e "/^${ONEAPPname}=/d" ${PREFIXDIR}/root/.spot-status
+  sed -i -e "/^${ONEAPPname}=/d" /root/.spot-status
   continue
  fi
  ONEAPPpath="$(dirname "$ONEAPPspec")"
@@ -70,18 +58,18 @@ do
  generic_func
 
  if [ $? -ne 0 ];then
-  sed -i -e "/^${ONEAPPname}=/d" ${PREFIXDIR}/root/.spot-status #remove.
+  sed -i -e "/^${ONEAPPname}=/d" /root/.spot-status #remove.
   continue
  fi
 
  #record choice, for future runs of Login&Security Manager...
- ONEAPPcurrent="$(grep "^${ONEAPPname}=" ${PREFIXDIR}/root/.spot-status)"
+ ONEAPPcurrent="$(grep "^${ONEAPPname}=" /root/.spot-status)"
  if [ "$ONEAPPcurrent" = "${ONEAPPname}=${ONEAPPvalue}" ];then
   continue
  elif [ "$ONEAPPcurrent" = "" ];then
-  echo "${ONEAPPname}=${ONEAPPvalue}" >> ${PREFIXDIR}/root/.spot-status
+  echo "${ONEAPPname}=${ONEAPPvalue}" >> /root/.spot-status
  elif [ "$ONEAPPcurrent" != "${ONEAPPname}=${ONEAPPvalue}" ];then
-  sed -i -e "s%^${ONEAPPname}=.*%${ONEAPPname}=${ONEAPPvalue}%" ${PREFIXDIR}/root/.spot-status
+  sed -i -e "s%^${ONEAPPname}=.*%${ONEAPPname}=${ONEAPPvalue}%" /root/.spot-status
  fi
  
  case ${ONEAPPvalue} in true|TRUE|yes|YES|on|ON)
@@ -90,6 +78,6 @@ do
 
 done
 
-[ $CHOWN -eq 1 ] && find ${PREFIXDIR}${SPOT_HOME} \( ! -user spot -or ! -group spot \) -exec chown -h spot:spot {} \;
+[ $CHOWN -eq 1 ] && find ${SPOT_HOME} \( ! -user spot -or ! -group spot \) -exec chown -h spot:spot {} \;
 
 ###END###
