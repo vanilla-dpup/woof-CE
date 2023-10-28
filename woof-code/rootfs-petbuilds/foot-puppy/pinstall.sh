@@ -15,6 +15,7 @@ cat << EOF >> etc/xdg/foot/foot.ini
 # Puppy customization
 [main]
 initial-window-size-chars = 80x24
+font=monospace:size=10
 [colors]
 background = 1a1a1a
 foreground = f8f8f8
