@@ -40,6 +40,7 @@ fi
 cp -f build/initrd.zst /mnt/biosimagep1/
 cp -f build/vmlinuz /mnt/biosimagep1/
 cp -a build/*.sfs /mnt/biosimagep1/
+mkdir /mnt/biosimagep1/${DISTRO_FILE_PREFIX}save
 umount /mnt/biosimagep1 2>/dev/null
 losetup -d ${LOOP}
 mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
@@ -73,6 +74,7 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 
 	mount -o noatime ${LOOP}p2 /mnt/uefiimagep2
 	cp -a build/*.sfs /mnt/uefiimagep2/
+	mkdir /mnt/uefiimagep2/${DISTRO_FILE_PREFIX}save
 	umount /mnt/uefiimagep2 2>/dev/null
 
 	losetup -d ${LOOP}
