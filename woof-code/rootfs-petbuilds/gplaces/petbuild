@@ -1,19 +1,19 @@
 download() {
-    if [ ! -f gplaces-0.17.12.tar ]; then
-        git clone https://github.com/dimkr/gplaces gplaces-0.17.12
-        cd gplaces-0.17.12
-        git checkout v0.17.12
+    if [ ! -f gplaces-0.18.0.tar ]; then
+        git clone https://github.com/dimkr/gplaces gplaces-0.18.0
+        cd gplaces-0.18.0
+        git checkout v0.18.0
         git submodule update --init --recursive
         cd ..
-        rm -rf gplaces-0.17.12/.git* gplaces-0.17.12/bestline/.git*
-        tar -c gplaces-0.17.12 --mtime=@0 --sort=name > gplaces-0.17.12.tar
-        rm -rf gplaces-0.17.12
+        rm -rf gplaces-0.18.0/.git* gplaces-0.18.0/bestline/.git*
+        tar -c gplaces-0.18.0 --mtime=@0 --sort=name > gplaces-0.18.0.tar
+        rm -rf gplaces-0.18.0
     fi
 }
 
 build() {
-    tar -xf gplaces-0.17.12.tar
-    cd gplaces-0.17.12
-    make CC=gcc VERSION=0.17.12 PREFIX=/usr CONFDIR=/etc install
+    tar -xf gplaces-0.18.0.tar
+    cd gplaces-0.18.0
+    make CC=gcc VERSION=0.18.0 PREFIX=/usr CONFDIR=/etc install
     sed -i 's/^Categories=.*/Categories=X-Internet-utility;/' /usr/share/applications/gplaces.desktop
 }
