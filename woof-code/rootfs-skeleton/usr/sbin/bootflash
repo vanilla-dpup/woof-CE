@@ -879,7 +879,7 @@ nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 #-------------------------
 if [ "${FSTYPE2}" ] ; then # fat32 + f2fs
 	PBOOTPART=${USBDRV}2
-	mkdir -p /mnt/${PBOOTPART}
+	mkdir -p /mnt/${PBOOTPART}/${DISTRO_FILE_PREFIX}save
 	mount -t $FSTYPE2 /dev/${PBOOTPART} /mnt/${PBOOTPART}
 	if [ "`mount | grep "/dev/${PBOOTPART}"`" = "" ];then
 		/usr/lib/gtkdialog/box_ok "Bootflash" error "$(gettext 'Error mounting USB drive')"
