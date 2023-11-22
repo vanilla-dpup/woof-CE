@@ -261,10 +261,6 @@ yes|swaybg|swaybg|exe,dev,doc,nls||deps:yes
 "
 fi
 
-PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|sysvinit-core|sysvinit-core|exe>null,dev>null,doc>null,nls>null
-"
-
 if [ "$DISTRO_TARGETARCH" = "x86_64" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|gnu-efi|gnu-efi|exe>dev,dev,doc>dev,nls>dev||deps:yes
