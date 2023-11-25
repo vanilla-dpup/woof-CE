@@ -1,141 +1,80 @@
-From dde5f3c609289491d504fe4bf28fb06aa1529eda Mon Sep 17 00:00:00 2001
+From 579b95e85da8cda1c84a0e629f9b8930c9199130 Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Tue, 10 Oct 2023 20:14:36 +0300
+Date: Sat, 25 Nov 2023 11:58:02 +0200
 Subject: [PATCH] Squashed commit of the following:
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-commit 91aa684b6572b8e901ff2d5999c72647c1dc28e8
-Merge: c75e0da 69e9380
+commit 0317afb0562553d6b689b30a29faba5e0b51107f
+Merge: 68d52fa a7be3f6
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Tue Oct 10 20:14:19 2023 +0300
+Date:   Sat Nov 25 11:57:43 2023 +0200
 
-    Merge branch 'env' into dwl-kiosk-v7
+    Merge branch 'auto-dpi' into patches
 
-commit 69e9380fb737420e87dc32c31b398dec76aa6b21
+commit 68d52fa9b394f33f41e2e029c397bd966235c8ab
+Merge: a4a83af 0a3a71f
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Tue Oct 10 20:13:36 2023 +0300
+Date:   Sat Nov 25 11:57:21 2023 +0200
+
+    Merge branch 'center' into patches
+
+commit a4a83afbb3f4479031c25b0f1c1065a2616766ab
+Merge: f9acb18 183c16f
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:57:19 2023 +0200
+
+    Merge branch 'center-cursor' into patches
+
+commit f9acb185acc6f0fd65e26d89fb3bf90637d4ceee
+Merge: 47e52fd a388fe4
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:57:12 2023 +0200
+
+    Merge branch 'en-keycodes' into patches
+
+commit 47e52fd592ede5b27ac74be532cfcac04cfd9ea1
+Merge: 0229b13 42548d4
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:57:07 2023 +0200
+
+    Merge branch 'env' into patches
+
+commit 0229b133810ac60966f968cb24368468dd26e091
+Merge: fed3d0f c2a90f4
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:56:46 2023 +0200
+
+    Merge branch 'fallback' into patches
+
+commit fed3d0ff52dbc4eb40a2e85467c5b4e8ce319446
+Merge: 148ef0e baaa87f
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:56:40 2023 +0200
+
+    Merge branch 'rootcolor' into patches
+
+commit 148ef0ecd96e4d5eae8a0aebd2e4b82c456665c5
+Merge: 331e1b7 21e1573
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:56:38 2023 +0200
+
+    Merge branch 'snail' into patches
+
+commit 42548d4e5f8c3b41b3a8ad5b4c7001ab58180772
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Sat Nov 25 11:55:58 2023 +0200
 
     allow environment variables to override config.h
 
-commit c75e0da828ce8fd1e87bca8cfd311306d46703dc
-Merge: 58b0dae da34a62
+commit 331e1b73a933d46222955d2421d2bac17a704535
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Tue Oct 10 20:03:21 2023 +0300
+Date:   Sun Dec 25 08:22:04 2022 +0200
 
-    Merge branch 'env' into dwl-kiosk-v7
+    add support for titlebar actions
 
-commit da34a6214c9b070f7af05e6e4a92b419d8efb2b8
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sun Jul 24 20:55:56 2022 +0300
-
-    allow environment variables to override config.h
-
-commit 58b0dae129d85e17d94ca19903a902c7b32237de
-Merge: d8426d4 f695674
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Sep 30 09:33:12 2023 +0300
-
-    Merge branch 'main' of https://github.com/djpohly/dwl into dwl-kiosk-v7
-
-commit d8426d4592c6315a8eed0af95d4f574da8b91d8b
-Merge: 3e5a4a7 960c32a
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Thu Sep 7 08:41:41 2023 +0300
-
-    Merge branch 'main' of https://github.com/djpohly/dwl into dwl-kiosk-v7
-
-commit 3e5a4a78503550c55f38e12a7eccfb26156c226a
-Merge: 83a2d6e 66a957c
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:11:50 2023 +0300
-
-    Merge branch 'output-power-management' of https://github.com/guidocella/dwl into dwl-kiosk-v7
-
-commit 83a2d6e0c5a5a6dc4f50db91c297316e3f9b31f0
-Merge: 0350456 3b6506c
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:08:54 2023 +0300
-
-    Merge branch 'snail' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit 0350456bb8b6e7885a7a3cfccbeb779997a93f31
-Merge: b5f6a67 9b513b0
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:08:14 2023 +0300
-
-    Merge branch 'center-cursor' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit b5f6a67607f799c95a796199cfbe86d94a98d097
-Merge: e8f9e6f c90729d
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:08:09 2023 +0300
-
-    Merge branch 'en-keycodes' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit e8f9e6f2a13ce3797e8689f4bb8d35a92a802a27
-Merge: e2b0857 fd286e3
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:08:03 2023 +0300
-
-    Merge branch 'env' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit e2b08578aaba7800305778701b03efa6af45256a
-Merge: b8208d5 f28c87f
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:06:58 2023 +0300
-
-    Merge branch 'auto-dpi' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit b8208d54c862f14dd78f79fa5b27f845feb005f2
-Merge: 9fc4283 cb6cd7c
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:06:51 2023 +0300
-
-    Merge branch 'fallback' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit 9fc4283437af2e8894043f33dc2165f00ebee90b
-Merge: 0299d77 3168ba7
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:06:30 2023 +0300
-
-    Merge branch 'rootcolor' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit 3168ba76b2f9b910c485488253ecb4227d0c1417
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Fri Mar 17 14:03:17 2023 +0200
-
-    respect rootcolor[]
-
-commit 0299d77dbb07ecd505685ea1b879f2e300ab38f9
-Merge: 40b8d8f 87e928c
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:03:37 2023 +0300
-
-    Merge branch 'toplevel-requests' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit 40b8d8fb5c65ccfb1bda3f1ee662f07db3fa30d8
-Merge: e7f73eb d53b417
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:03:26 2023 +0300
-
-    Merge branch 'center' of https://github.com/dimkr/dwl into dwl-kiosk-v7
-
-commit d53b4176b12dfcf177b075986cd25548b0a83d61
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Tue Aug 9 06:56:00 2022 +0000
-
-    center floating windows
-
-commit e7f73ebfb8359be1c40d689251d211608da625fd
-Merge: ca4a97b 2fcef07
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Jul 15 16:01:29 2023 +0300
-
-    Merge branch 'pointer-constraints' of https://github.com/sevz17/dwl into dwl-kiosk-v7
-
-commit 3b6506cf8c5c2a9fc53d56e5b3b5642fd60bca59
+commit 21e1573af491d6f53cbc3ad1167d7570f7268a3f
 Author: Dima Krasner <dima@dimakrasner.com>
 Date:   Sat Jul 15 15:45:58 2023 +0300
 
@@ -227,116 +166,63 @@ Date:   Sat Jul 15 15:45:58 2023 +0300
     │          │          │     │    │
     └──────────┴──────────┴─────┴────┘
 
-commit 2fcef07f9f20e2ead90c78708e4e41cc1ff51943
-Author: Leonardo Hernández Hernández <leohdz172@proton.me>
-Date:   Tue Jun 20 22:51:24 2023 -0600
-
-    implement pointer constraints
-
-    mostly copied from sway implementation
-
-    Modified-by: A Frederick Christenesn <dwl@ivories.org>
-    Modified-by: pm4rcin <37148802+pm4rcin@users.noreply.github.com>
-    Modified-by: migue07juegos <104018233+migue07juegos@users.noreply.github.com>
-
-commit 66a957c61b84c2753663c5ffed78abcee8a0bca1
+commit baaa87f52785d246894cc90d563eec27bac23596
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Mon Apr 4 01:20:06 2022 +0800
+Date:   Fri Mar 17 14:03:17 2023 +0200
 
-    damage the output after wlopm --on
+    respect rootcolor[]
 
-commit 598d88c868f35444008c458ae95e0e68a10946d1
-Author: Guido Cella <guido@guidocella.xyz>
-Date:   Sun Mar 20 21:19:29 2022 +0100
-
-    Implement the output power management protocol.
-
-    I thought wlr-randr used this, but it doesn't so I don't even know what
-    this is for.
-
-commit fd286e3c2a75a28aefcb35222647e7657b204050
+commit c2a90f4c0aeb27c317167b7d2418611dcbd661c1
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sun Jul 24 20:55:56 2022 +0300
+Date:   Thu Jul 21 21:26:31 2022 +0300
 
-    allow environment variables to override config.h
+    fall back to a lower output mode if needed (swaywm/sway@4cdc4ac)
 
-commit f28c87fa77d59caaf2faf0fa72688da3b32799f9
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Fri Dec 2 19:58:49 2022 +0200
-
-    automatically choose the scale factor if <= 0
-
-commit 9b513b0e9c0f87decedc2128a18f7ff408500437
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Fri Jun 17 06:26:34 2022 +0000
-
-    center the cursor on startup
-
-commit c90729db12398504acde3951b7e62e2f57b07616
+commit a388fe494b782af642d3808e87acba5627d3f917
 Author: Dima Krasner <dima@dimakrasner.com>
 Date:   Sun Jul 24 17:52:07 2022 +0300
 
     always use the English keymap to get keycodes
 
-commit 87e928c1033fae9fbd7f1bd3b9f55f4d898c1a39
+commit 183c16fd6956db94f2a14a074b99f9327718981b
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sun Dec 25 08:22:04 2022 +0200
+Date:   Fri Jun 17 06:26:34 2022 +0000
 
-    add support for titlebar actions
+    center the cursor on startup
 
-commit cb6cd7cc09c5380f62277518936bd804cbf353e4
+commit 0a3a71f830865c364d1d925d6d28b50b6bba638a
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Thu Jul 21 21:26:31 2022 +0300
+Date:   Tue Aug 9 06:56:00 2022 +0000
 
-    fall back to a lower output mode if needed (swaywm/sway@4cdc4ac)
+    center floating windows
+
+commit a7be3f69f742e09421e716e2c67a449e40e21337
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Fri Dec 2 19:58:49 2022 +0200
+
+    automatically choose the scale factor if <= 0
 ---
- Makefile                                      |  13 +-
- config.def.h                                  |  43 +-
- dwl.c                                         | 589 ++++++++++++++++--
- env.c                                         | 217 +++++++
- ...lr-output-power-management-unstable-v1.xml | 128 ++++
- 5 files changed, 928 insertions(+), 62 deletions(-)
+ Makefile     |   1 +
+ config.def.h |  46 ++++-----
+ dwl.c        | 287 ++++++++++++++++++++++++++++++++++++++++++++++++---
+ env.c        | 217 ++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 513 insertions(+), 38 deletions(-)
  create mode 100644 env.c
- create mode 100644 protocols/wlr-output-power-management-unstable-v1.xml
 
 diff --git a/Makefile b/Makefile
-index 5320e42b..d5ee518c 100644
+index f0ff805..506ed09 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -9,14 +9,15 @@ DWLDEVCFLAGS = -pedantic -Wall -Wextra -Wdeclaration-after-statement -Wno-unused
- 	-Werror=strict-prototypes -Werror=implicit -Werror=return-type -Werror=incompatible-pointer-types
- 
- # CFLAGS / LDFLAGS
--PKGS      = wlroots wayland-server xkbcommon libinput $(XLIBS)
-+PKGS      = wlroots wayland-server xkbcommon libinput pixman-1 $(XLIBS)
- DWLCFLAGS = `$(PKG_CONFIG) --cflags $(PKGS)` $(DWLCPPFLAGS) $(DWLDEVCFLAGS) $(CFLAGS)
--LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` $(LIBS)
-+LDLIBS    = `$(PKG_CONFIG) --libs $(PKGS)` -lm $(LIBS)
- 
- all: dwl
+@@ -17,6 +17,7 @@ all: dwl
  dwl: dwl.o util.o
  	$(CC) dwl.o util.o $(LDLIBS) $(LDFLAGS) $(DWLCFLAGS) -o $@
--dwl.o: dwl.c config.mk config.h client.h xdg-shell-protocol.h wlr-layer-shell-unstable-v1-protocol.h
-+dwl.o: dwl.c config.mk config.h client.h xdg-shell-protocol.h wlr-layer-shell-unstable-v1-protocol.h pointer-constraints-unstable-v1-protocol.h wlr-output-power-management-unstable-v1-protocol.h
+ dwl.o: dwl.c config.mk config.h client.h cursor-shape-v1-protocol.h xdg-shell-protocol.h wlr-layer-shell-unstable-v1-protocol.h
 +dwl.o: env.c
  util.o: util.c util.h
  
  # wayland-scanner is a tool which generates C headers and rigging for Wayland
-@@ -31,6 +32,12 @@ xdg-shell-protocol.h:
- wlr-layer-shell-unstable-v1-protocol.h:
- 	$(WAYLAND_SCANNER) server-header \
- 		protocols/wlr-layer-shell-unstable-v1.xml $@
-+pointer-constraints-unstable-v1-protocol.h:
-+	$(WAYLAND_SCANNER) server-header \
-+		$(WAYLAND_PROTOCOLS)/unstable/pointer-constraints/pointer-constraints-unstable-v1.xml $@
-+wlr-output-power-management-unstable-v1-protocol.h:
-+	$(WAYLAND_SCANNER) server-header \
-+		protocols/wlr-output-power-management-unstable-v1.xml $@
- 
- config.h:
- 	cp config.def.h $@
 diff --git a/config.def.h b/config.def.h
-index 4e30885b..3da4f88c 100644
+index db0babc..3da4f88 100644
 --- a/config.def.h
 +++ b/config.def.h
 @@ -6,10 +6,11 @@
@@ -372,7 +258,7 @@ index 4e30885b..3da4f88c 100644
  };
  
  /* keyboard */
-@@ -128,33 +130,34 @@ static const Key keys[] = {
+@@ -128,36 +130,34 @@ static const Key keys[] = {
  	{ MODKEY,                    XKB_KEY_l,          setmfact,       {.f = +0.05} },
  	{ MODKEY,                    XKB_KEY_Return,     zoom,           {0} },
  	{ MODKEY,                    XKB_KEY_Tab,        view,           {0} },
@@ -417,68 +303,29 @@ index 4e30885b..3da4f88c 100644
  
  	/* Ctrl-Alt-Backspace and Ctrl-Alt-Fx used to be handled by X server */
  	{ WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_Terminate_Server, quit, {0} },
+-	/* Ctrl-Alt-Fx is used to switch to another VT, if you don't know what a VT is
+-	 * do not remove them.
+-	 */
 -#define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_XF86Switch_VT_##n, chvt, {.ui = (n)} }
 +#define CHVT(n) { WLR_MODIFIER_CTRL|WLR_MODIFIER_ALT,XKB_KEY_F##n, chvt, {.ui = (n)} }
  	CHVT(1), CHVT(2), CHVT(3), CHVT(4), CHVT(5), CHVT(6),
  	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
  };
 diff --git a/dwl.c b/dwl.c
-index a7d41b08..bafc3aec 100644
+index ef27a1d..9f85bf0 100644
 --- a/dwl.c
 +++ b/dwl.c
-@@ -1,10 +1,16 @@
- /*
-  * See LICENSE file for copyright and license details.
-  */
-+
-+#ifndef POINTERCONSTRAINTS
-+#define POINTERCONSTRAINTS
-+#endif
-+
- #include <getopt.h>
- #include <libinput.h>
- #include <limits.h>
- #include <linux/input-event-codes.h>
-+#include <pixman-1/pixman.h>
- #include <signal.h>
- #include <stdio.h>
- #include <stdlib.h>
-@@ -30,12 +36,16 @@
- #include <wlr/types/wlr_keyboard.h>
- #include <wlr/types/wlr_layer_shell_v1.h>
- #include <wlr/types/wlr_output.h>
-+#include <wlr/interfaces/wlr_output.h>
- #include <wlr/types/wlr_output_layout.h>
- #include <wlr/types/wlr_output_management_v1.h>
-+#include <wlr/types/wlr_output_power_management_v1.h>
- #include <wlr/types/wlr_pointer.h>
-+#include <wlr/types/wlr_pointer_constraints_v1.h>
- #include <wlr/types/wlr_presentation_time.h>
- #include <wlr/types/wlr_primary_selection.h>
- #include <wlr/types/wlr_primary_selection_v1.h>
-+#include <wlr/types/wlr_relative_pointer_v1.h>
- #include <wlr/types/wlr_scene.h>
- #include <wlr/types/wlr_screencopy_v1.h>
- #include <wlr/types/wlr_seat.h>
-@@ -51,6 +61,7 @@
- #include <wlr/types/wlr_xdg_output_v1.h>
- #include <wlr/types/wlr_xdg_shell.h>
- #include <wlr/util/log.h>
-+#include <wlr/util/region.h>
- #include <xkbcommon/xkbcommon.h>
- #ifdef XWAYLAND
- #include <wlr/xwayland.h>
-@@ -117,6 +128,9 @@ typedef struct {
- 	struct wl_listener set_title;
+@@ -119,6 +119,9 @@ typedef struct {
  	struct wl_listener fullscreen;
  	struct wlr_box prev; /* layout-relative, includes border */
+ 	struct wlr_box bounds;
 +	struct wl_listener request_move;
 +	struct wl_listener request_resize;
 +	struct wl_listener request_minimize;
  #ifdef XWAYLAND
  	struct wl_listener activate;
- 	struct wl_listener configure;
-@@ -126,6 +140,7 @@ typedef struct {
+ 	struct wl_listener associate;
+@@ -130,6 +133,7 @@ typedef struct {
  	uint32_t tags;
  	int isfloating, isurgent, isfullscreen;
  	uint32_t resize; /* configure serial of a pending resize */
@@ -486,79 +333,17 @@ index a7d41b08..bafc3aec 100644
  } Client;
  
  typedef struct {
-@@ -203,6 +218,14 @@ typedef struct {
- 	int x, y;
- } MonitorRule;
- 
-+typedef struct {
-+	struct wlr_pointer_constraint_v1 *constraint;
-+	Client *focused;
-+
-+	struct wl_listener set_region;
-+	struct wl_listener destroy;
-+} PointerConstraint;
-+
- typedef struct {
- 	const char *id;
- 	const char *title;
-@@ -229,6 +252,8 @@ static void arrangelayer(Monitor *m, struct wl_list *list,
+@@ -235,6 +239,7 @@ static void arrangelayer(Monitor *m, struct wl_list *list,
  static void arrangelayers(Monitor *m);
  static void axisnotify(struct wl_listener *listener, void *data);
  static void buttonpress(struct wl_listener *listener, void *data);
 +static void center(Client *c, const struct wlr_box *box);
-+static void checkconstraintregion(void);
  static void chvt(const Arg *arg);
  static void checkidleinhibitor(struct wlr_surface *exclude);
  static void cleanup(void);
-@@ -238,6 +263,7 @@ static void closemon(Monitor *m);
- static void commitlayersurfacenotify(struct wl_listener *listener, void *data);
- static void commitnotify(struct wl_listener *listener, void *data);
- static void createdecoration(struct wl_listener *listener, void *data);
-+static void commitpointerconstraint(struct wl_listener *listener, void *data);
- static void createidleinhibitor(struct wl_listener *listener, void *data);
- static void createkeyboard(struct wlr_keyboard *keyboard);
- static void createlayersurface(struct wl_listener *listener, void *data);
-@@ -245,13 +271,17 @@ static void createlocksurface(struct wl_listener *listener, void *data);
- static void createmon(struct wl_listener *listener, void *data);
- static void createnotify(struct wl_listener *listener, void *data);
- static void createpointer(struct wlr_pointer *pointer);
-+static void createpointerconstraint(struct wl_listener *listener, void *data);
-+static void cursorconstrain(struct wlr_pointer_constraint_v1 *constraint);
- static void cursorframe(struct wl_listener *listener, void *data);
-+static void cursorwarptoconstrainthint(void);
- static void destroydragicon(struct wl_listener *listener, void *data);
- static void destroyidleinhibitor(struct wl_listener *listener, void *data);
- static void destroylayersurfacenotify(struct wl_listener *listener, void *data);
- static void destroylock(SessionLock *lock, int unlocked);
- static void destroylocksurface(struct wl_listener *listener, void *data);
- static void destroynotify(struct wl_listener *listener, void *data);
-+static void destroypointerconstraint(struct wl_listener *listener, void *data);
- static void destroysessionlock(struct wl_listener *listener, void *data);
- static void destroysessionmgr(struct wl_listener *listener, void *data);
- static Monitor *dirtomon(enum wlr_direction dir);
-@@ -274,15 +304,18 @@ static void mapnotify(struct wl_listener *listener, void *data);
- static void maximizenotify(struct wl_listener *listener, void *data);
- static void monocle(Monitor *m);
- static void motionabsolute(struct wl_listener *listener, void *data);
--static void motionnotify(uint32_t time);
-+static void motionnotify(uint32_t time, struct wlr_input_device *device, double sx,
-+		double sy, double sx_unaccel, double sy_unaccel);
- static void motionrelative(struct wl_listener *listener, void *data);
- static void moveresize(const Arg *arg);
- static void outputmgrapply(struct wl_listener *listener, void *data);
- static void outputmgrapplyortest(struct wlr_output_configuration_v1 *config, int test);
- static void outputmgrtest(struct wl_listener *listener, void *data);
-+static void pointerconstraintsetregion(struct wl_listener *listener, void *data);
- static void pointerfocus(Client *c, struct wlr_surface *surface,
- 		double sx, double sy, uint32_t time);
- static void printstatus(void);
-+static void powermgrsetmodenotify(struct wl_listener *listener, void *data);
- static void quit(const Arg *arg);
- static void rendermon(struct wl_listener *listener, void *data);
- static void requeststartdrag(struct wl_listener *listener, void *data);
-@@ -292,18 +325,25 @@ static void setcursor(struct wl_listener *listener, void *data);
- static void setfloating(Client *c, int floating);
+@@ -301,18 +306,25 @@ static void setfloating(Client *c, int floating);
  static void setfullscreen(Client *c, int fullscreen);
+ static void setgamma(struct wl_listener *listener, void *data);
  static void setlayout(const Arg *arg);
 +static void setmaximized(Client *c, int maximized);
  static void setmfact(const Arg *arg);
@@ -582,39 +367,15 @@ index a7d41b08..bafc3aec 100644
  static void toggletag(const Arg *arg);
  static void toggleview(const Arg *arg);
  static void unlocksession(struct wl_listener *listener, void *data);
-@@ -335,6 +375,7 @@ static const int layermap[] = { LyrBg, LyrBottom, LyrTop, LyrOverlay };
- static struct wlr_renderer *drw;
+@@ -344,6 +356,7 @@ static struct wlr_renderer *drw;
  static struct wlr_allocator *alloc;
  static struct wlr_compositor *compositor;
+ static struct wlr_session *session;
 +static struct wlr_scene_rect *root;
  
  static struct wlr_xdg_shell *xdg_shell;
  static struct wlr_xdg_activation_v1 *activation;
-@@ -349,6 +390,13 @@ static struct wlr_layer_shell_v1 *layer_shell;
- static struct wlr_output_manager_v1 *output_mgr;
- static struct wlr_virtual_keyboard_manager_v1 *virtual_keyboard_mgr;
- 
-+static struct wlr_relative_pointer_manager_v1 *relative_pointer_mgr;
-+static struct wlr_pointer_constraints_v1 *pointer_constraints;
-+static struct wl_listener pointer_constraint_commit;
-+static PointerConstraint *active_constraint;
-+static pixman_region32_t active_confine;
-+static int active_confine_requires_warp;
-+
- static struct wlr_cursor *cursor;
- static struct wlr_xcursor_manager *cursor_mgr;
- 
-@@ -356,6 +404,9 @@ static struct wlr_session_lock_manager_v1 *session_lock_mgr;
- static struct wlr_scene_rect *locked_bg;
- static struct wlr_session_lock_v1 *cur_lock;
- 
-+static struct wlr_output_power_manager_v1 *power_mgr;
-+static struct wl_listener power_mgr_set_mode = {.notify = powermgrsetmodenotify};
-+
- static struct wlr_seat *seat;
- static struct wl_list keyboards;
- static unsigned int cursor_mode;
-@@ -367,6 +418,11 @@ static struct wlr_box sgeom;
+@@ -377,6 +390,11 @@ static struct wlr_box sgeom;
  static struct wl_list mons;
  static Monitor *selmon;
  
@@ -623,18 +384,10 @@ index a7d41b08..bafc3aec 100644
 +static struct xkb_keymap *en_keymap;
 +static struct xkb_state *en_state;
 +
- /* global event handlers */
- static struct wl_listener cursor_axis = {.notify = axisnotify};
- static struct wl_listener cursor_button = {.notify = buttonpress};
-@@ -380,6 +436,7 @@ static struct wl_listener layout_change = {.notify = updatemons};
- static struct wl_listener new_input = {.notify = inputdevice};
- static struct wl_listener new_virtual_keyboard = {.notify = virtualkeyboard};
- static struct wl_listener new_output = {.notify = createmon};
-+static struct wl_listener new_pointer_constraint = {.notify = createpointerconstraint};
- static struct wl_listener new_xdg_surface = {.notify = createnotify};
- static struct wl_listener new_xdg_decoration = {.notify = createdecoration};
- static struct wl_listener new_layer_shell_surface = {.notify = createlayersurface};
-@@ -413,6 +470,8 @@ static xcb_atom_t netatom[NetLast];
+ #ifdef XWAYLAND
+ static void activatex11(struct wl_listener *listener, void *data);
+ static void associatex11(struct wl_listener *listener, void *data);
+@@ -396,6 +414,8 @@ static xcb_atom_t netatom[NetLast];
  /* attempt to encapsulate suck into one file */
  #include "client.h"
  
@@ -643,7 +396,7 @@ index a7d41b08..bafc3aec 100644
  /* function implementations */
  void
  applybounds(Client *c, struct wlr_box *bbox)
-@@ -467,6 +526,10 @@ applyrules(Client *c)
+@@ -440,6 +460,10 @@ applyrules(Client *c)
  					mon = m;
  		}
  	}
@@ -654,33 +407,7 @@ index a7d41b08..bafc3aec 100644
  	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
  	setmon(c, mon, newtags);
  }
-@@ -486,7 +549,7 @@ arrange(Monitor *m)
- 
- 	if (m->lt[m->sellt]->arrange)
- 		m->lt[m->sellt]->arrange(m);
--	motionnotify(0);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- 	checkidleinhibitor(NULL);
- }
- 
-@@ -589,7 +652,6 @@ buttonpress(struct wl_listener *listener, void *data)
- 		xytonode(cursor->x, cursor->y, NULL, &c, NULL, NULL, NULL);
- 		if (c && (!client_is_unmanaged(c) || client_wants_focus(c)))
- 			focusclient(c, 1);
--
- 		keyboard = wlr_seat_get_keyboard(seat);
- 		mods = keyboard ? wlr_keyboard_get_modifiers(keyboard) : 0;
- 		for (b = buttons; b < END(buttons); b++) {
-@@ -608,7 +670,7 @@ buttonpress(struct wl_listener *listener, void *data)
- 			 * we will send an enter event after which the client will provide us
- 			 * a cursor surface */
- 			wlr_seat_pointer_clear_focus(seat);
--			motionnotify(0);
-+			motionnotify(0, NULL, 0, 0, 0, 0);
- 			/* Drop the window off on its new monitor */
- 			selmon = xytomon(cursor->x, cursor->y);
- 			setmon(grabc, selmon, 0);
-@@ -624,6 +686,60 @@ buttonpress(struct wl_listener *listener, void *data)
+@@ -597,6 +621,24 @@ buttonpress(struct wl_listener *listener, void *data)
  			event->time_msec, event->button, event->state);
  }
  
@@ -702,69 +429,20 @@ index a7d41b08..bafc3aec 100644
 +	wlr_scene_node_set_position(&c->scene->node, c->geom.x, c->geom.y);
 +}
 +
-+void
-+checkconstraintregion(void)
-+{
-+	struct wlr_pointer_constraint_v1 *constraint = active_constraint->constraint;
-+	pixman_region32_t *region = &constraint->region;
-+	Client *c = NULL;
-+	double sx, sy;
-+	toplevel_from_wlr_surface(constraint->surface, &c, NULL);
-+	if (active_confine_requires_warp && c) {
-+		active_confine_requires_warp = 0;
-+
-+		sx = cursor->x + c->geom.x;
-+		sy = cursor->y + c->geom.y;
-+
-+		if (!pixman_region32_contains_point(region,
-+				floor(sx), floor(sy), NULL)) {
-+			int nboxes;
-+			pixman_box32_t *boxes = pixman_region32_rectangles(region, &nboxes);
-+			if (nboxes > 0) {
-+				sx = (boxes[0].x1 + boxes[0].x2) / 2.;
-+				sy = (boxes[0].y1 + boxes[0].y2) / 2.;
-+
-+				wlr_cursor_warp_closest(cursor, NULL,
-+					sx - c->geom.x, sy - c->geom.y);
-+			}
-+		}
-+	}
-+
-+	/* A locked pointer will result in an empty region, thus disallowing all movement. */
-+	if (constraint->type == WLR_POINTER_CONSTRAINT_V1_CONFINED) {
-+		pixman_region32_copy(&active_confine, region);
-+	} else {
-+		pixman_region32_clear(&active_confine);
-+	}
-+}
-+
  void
  chvt(const Arg *arg)
  {
-@@ -669,6 +785,9 @@ cleanup(void)
- 	wlr_output_layout_destroy(output_layout);
- 	wlr_seat_destroy(seat);
- 	wl_display_destroy(dpy);
+@@ -639,6 +681,9 @@ cleanup(void)
+ 	/* Destroy after the wayland display (when the monitors are already destroyed)
+ 	   to avoid destroying them with an invalid scene output. */
+ 	wlr_scene_node_destroy(&scene->tree.node);
 +	xkb_state_unref(en_state);
 +	xkb_keymap_unref(en_keymap);
 +	xkb_context_unref(en_context);
  }
  
  void
-@@ -781,6 +900,12 @@ createdecoration(struct wl_listener *listener, void *data)
- 	wlr_xdg_toplevel_decoration_v1_set_mode(dec, WLR_XDG_TOPLEVEL_DECORATION_V1_MODE_SERVER_SIDE);
- }
- 
-+void
-+commitpointerconstraint(struct wl_listener *listener, void *data)
-+{
-+	checkconstraintregion();
-+}
-+
- void
- createidleinhibitor(struct wl_listener *listener, void *data)
- {
-@@ -897,6 +1022,7 @@ createmon(struct wl_listener *listener, void *data)
+@@ -870,6 +915,7 @@ createmon(struct wl_listener *listener, void *data)
  	/* This event is raised by the backend when a new output (aka a display or
  	 * monitor) becomes available. */
  	struct wlr_output *wlr_output = data;
@@ -772,12 +450,11 @@ index a7d41b08..bafc3aec 100644
  	const MonitorRule *r;
  	size_t i;
  	Monitor *m = wlr_output->data = ecalloc(1, sizeof(*m));
-@@ -912,8 +1038,21 @@ createmon(struct wl_listener *listener, void *data)
+@@ -885,7 +931,20 @@ createmon(struct wl_listener *listener, void *data)
  		if (!r->name || strstr(wlr_output->name, r->name)) {
  			m->mfact = r->mfact;
  			m->nmaster = r->nmaster;
 -			wlr_output_set_scale(wlr_output, r->scale);
--			wlr_xcursor_manager_load(cursor_mgr, r->scale);
 +			if (r->scale > 0)
 +				wlr_output_set_scale(wlr_output, r->scale);
 +			else {
@@ -792,11 +469,10 @@ index a7d41b08..bafc3aec 100644
 +				else
 +					wlr_output_set_scale(wlr_output, 1);
 +			}
-+			wlr_xcursor_manager_load(cursor_mgr, wlr_output->scale);
  			m->lt[0] = m->lt[1] = r->lt;
  			wlr_output_set_transform(wlr_output, r->rr);
  			m->m.x = r->x;
-@@ -926,7 +1065,17 @@ createmon(struct wl_listener *listener, void *data)
+@@ -898,7 +957,17 @@ createmon(struct wl_listener *listener, void *data)
  	 * monitor supports only a specific set of modes. We just pick the
  	 * monitor's preferred mode; a more sophisticated compositor would let
  	 * the user configure it. */
@@ -815,7 +491,7 @@ index a7d41b08..bafc3aec 100644
  
  	/* Set up event listeners */
  	LISTEN(&wlr_output->events.frame, &m->frame, rendermon);
-@@ -1012,6 +1161,12 @@ createnotify(struct wl_listener *listener, void *data)
+@@ -984,6 +1053,12 @@ createnotify(struct wl_listener *listener, void *data)
  			fullscreennotify);
  	LISTEN(&xdg_surface->toplevel->events.request_maximize, &c->maximize,
  			maximizenotify);
@@ -828,7 +504,7 @@ index a7d41b08..bafc3aec 100644
  }
  
  void
-@@ -1053,11 +1208,81 @@ createpointer(struct wlr_pointer *pointer)
+@@ -1025,6 +1100,8 @@ createpointer(struct wlr_pointer *pointer)
  			libinput_device_config_accel_set_profile(libinput_device, accel_profile);
  			libinput_device_config_accel_set_speed(libinput_device, accel_speed);
  		}
@@ -837,131 +513,7 @@ index a7d41b08..bafc3aec 100644
  	}
  
  	wlr_cursor_attach_input_device(cursor, &pointer->base);
- }
- 
-+void
-+createpointerconstraint(struct wl_listener *listener, void *data)
-+{
-+	struct wlr_pointer_constraint_v1 *wlr_constraint = data;
-+	PointerConstraint *constraint = ecalloc(1, sizeof(*constraint));
-+	Client *c = NULL, *sel = focustop(selmon);
-+	toplevel_from_wlr_surface(wlr_constraint->surface, &c, NULL);
-+	constraint->constraint = wlr_constraint;
-+	wlr_constraint->data = constraint;
-+
-+	LISTEN(&wlr_constraint->events.set_region, &constraint->set_region,
-+			pointerconstraintsetregion);
-+	LISTEN(&wlr_constraint->events.destroy, &constraint->destroy,
-+			destroypointerconstraint);
-+
-+	if (c == sel)
-+		cursorconstrain(wlr_constraint);
-+}
-+
-+void
-+cursorconstrain(struct wlr_pointer_constraint_v1 *wlr_constraint)
-+{
-+	PointerConstraint *constraint = wlr_constraint->data;
-+
-+	if (active_constraint == constraint)
-+		return;
-+
-+	wl_list_remove(&pointer_constraint_commit.link);
-+	if (active_constraint) {
-+		if (!wlr_constraint)
-+			cursorwarptoconstrainthint();
-+
-+		wlr_pointer_constraint_v1_send_deactivated(active_constraint->constraint);
-+	}
-+
-+	active_constraint = constraint;
-+
-+	if (!wlr_constraint) {
-+		wl_list_init(&pointer_constraint_commit.link);
-+		return;
-+	}
-+
-+	active_confine_requires_warp = 1;
-+
-+	/* Stolen from sway/input/cursor.c:1435
-+	 *
-+	 * FIXME: Big hack, stolen from wlr_pointer_constraints_v1.c:121.
-+	 * This is necessary because the focus may be set before the surface
-+	 * has finished committing, which means that warping won't work properly,
-+	 * since this code will be run *after* the focus has been set.
-+	 * That is why we duplicate the code here.
-+	 */
-+	if (pixman_region32_not_empty(&wlr_constraint->current.region)) {
-+		pixman_region32_intersect(&wlr_constraint->region,
-+			&wlr_constraint->surface->input_region, &wlr_constraint->current.region);
-+	} else {
-+		pixman_region32_copy(&wlr_constraint->region,
-+			&wlr_constraint->surface->input_region);
-+	}
-+
-+	checkconstraintregion();
-+
-+	wlr_pointer_constraint_v1_send_activated(wlr_constraint);
-+
-+	LISTEN(&wlr_constraint->surface->events.commit, &pointer_constraint_commit,
-+			commitpointerconstraint);
-+}
-+
- void
- cursorframe(struct wl_listener *listener, void *data)
- {
-@@ -1069,6 +1294,32 @@ cursorframe(struct wl_listener *listener, void *data)
- 	wlr_seat_pointer_notify_frame(seat);
- }
- 
-+void
-+cursorwarptoconstrainthint(void)
-+{
-+	struct wlr_pointer_constraint_v1 *constraint = active_constraint->constraint;
-+
-+	if (constraint->current.committed &
-+			WLR_POINTER_CONSTRAINT_V1_STATE_CURSOR_HINT) {
-+		double lx, ly;
-+		double sx = lx = constraint->current.cursor_hint.x;
-+		double sy = ly = constraint->current.cursor_hint.y;
-+
-+		Client *c = NULL;
-+		toplevel_from_wlr_surface(constraint->surface, &c, NULL);
-+		if (c) {
-+			lx -= c->geom.x;
-+			ly -= c->geom.y;
-+		}
-+
-+		wlr_cursor_warp(cursor, NULL, lx, ly);
-+
-+		/* Warp the pointer as well, so that on the next pointer rebase we don't
-+		 * send an unexpected synthetic motion event to clients. */
-+		wlr_seat_pointer_warp(seat, sx, sy);
-+	}
-+}
-+
- void
- destroydragicon(struct wl_listener *listener, void *data)
- {
-@@ -1076,7 +1327,7 @@ destroydragicon(struct wl_listener *listener, void *data)
- 	wlr_scene_node_destroy(icon->data);
- 	/* Focus enter isn't sent during drag, so refocus the focused node. */
- 	focusclient(focustop(selmon), 1);
--	motionnotify(0);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- }
- 
- void
-@@ -1111,7 +1362,7 @@ destroylock(SessionLock *lock, int unlock)
- 	wlr_scene_node_set_enabled(&locked_bg->node, 0);
- 
- 	focusclient(focustop(selmon), 0);
--	motionnotify(0);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- 
- destroy:
- 	wl_list_remove(&lock->new_surface.link);
-@@ -1155,6 +1406,10 @@ destroynotify(struct wl_listener *listener, void *data)
+@@ -1123,6 +1200,10 @@ destroynotify(struct wl_listener *listener, void *data)
  	wl_list_remove(&c->destroy.link);
  	wl_list_remove(&c->set_title.link);
  	wl_list_remove(&c->fullscreen.link);
@@ -971,44 +523,8 @@ index a7d41b08..bafc3aec 100644
 +	wl_list_remove(&c->request_minimize.link);
  #ifdef XWAYLAND
  	if (c->type != XDGShell) {
- 		wl_list_remove(&c->configure.link);
-@@ -1165,6 +1420,26 @@ destroynotify(struct wl_listener *listener, void *data)
- 	free(c);
- }
- 
-+void
-+destroypointerconstraint(struct wl_listener *listener, void *data)
-+{
-+	PointerConstraint *constraint = wl_container_of(listener, constraint, destroy);
-+	wl_list_remove(&constraint->set_region.link);
-+	wl_list_remove(&constraint->destroy.link);
-+
-+	if (active_constraint == constraint) {
-+		cursorwarptoconstrainthint();
-+
-+		if (pointer_constraint_commit.link.next)
-+			wl_list_remove(&pointer_constraint_commit.link);
-+
-+		wl_list_init(&pointer_constraint_commit.link);
-+		active_constraint = NULL;
-+	}
-+
-+	free(constraint);
-+}
-+
- void
- destroysessionlock(struct wl_listener *listener, void *data)
- {
-@@ -1261,7 +1536,7 @@ focusclient(Client *c, int lift)
- 	}
- 
- 	/* Change cursor surface */
--	motionnotify(0);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- 
- 	/* Have a client, so focus its top-level wlr_surface */
- 	client_notify_enter(client_surface(c), wlr_seat_get_keyboard(seat));
-@@ -1420,7 +1695,7 @@ keypress(struct wl_listener *listener, void *data)
+ 		wl_list_remove(&c->activate.link);
+@@ -1395,7 +1476,7 @@ keypress(struct wl_listener *listener, void *data)
  	/* Get a list of keysyms based on the keymap for this keyboard */
  	const xkb_keysym_t *syms;
  	int nsyms = xkb_state_key_get_syms(
@@ -1017,17 +533,7 @@ index a7d41b08..bafc3aec 100644
  
  	int handled = 0;
  	uint32_t mods = wlr_keyboard_get_modifiers(kb->wlr_keyboard);
-@@ -1526,7 +1801,8 @@ void
- maplayersurfacenotify(struct wl_listener *listener, void *data)
- {
- 	LayerSurface *l = wl_container_of(listener, l, map);
--	motionnotify(0);
-+	wlr_surface_send_enter(l->layer_surface->surface, l->mon->wlr_output);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- }
- 
- void
-@@ -1589,6 +1865,7 @@ mapnotify(struct wl_listener *listener, void *data)
+@@ -1556,6 +1637,7 @@ mapnotify(struct wl_listener *listener, void *data)
  		c->isfloating = 1;
  		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
  		setmon(c, p->mon, p->tags);
@@ -1035,7 +541,7 @@ index a7d41b08..bafc3aec 100644
  	} else {
  		applyrules(c);
  	}
-@@ -1604,13 +1881,10 @@ mapnotify(struct wl_listener *listener, void *data)
+@@ -1571,18 +1653,10 @@ unset_fullscreen:
  void
  maximizenotify(struct wl_listener *listener, void *data)
  {
@@ -1043,112 +549,21 @@ index a7d41b08..bafc3aec 100644
 -	 * typically because the user clicked on the maximize button on
 -	 * client-side decorations. dwl doesn't support maximization, but
 -	 * to conform to xdg-shell protocol we still must send a configure.
+-	 * Since xdg-shell protocol v5 we should ignore request of unsupported
+-	 * capabilities, just schedule a empty configure when the client uses <5
+-	 * protocol version
 -	 * wlr_xdg_surface_schedule_configure() is used to send an empty reply. */
  	Client *c = wl_container_of(listener, c, maximize);
--	wlr_xdg_surface_schedule_configure(c->surface.xdg);
+-	if (wl_resource_get_version(c->surface.xdg->resource)
+-			< XDG_TOPLEVEL_WM_CAPABILITIES_SINCE_VERSION)
+-		wlr_xdg_surface_schedule_configure(c->surface.xdg);
 +
 +	if (c->mon)
 +		setmaximized(c, !c->ismaximized);
  }
  
  void
-@@ -1641,21 +1915,61 @@ motionabsolute(struct wl_listener *listener, void *data)
- 	 * so we have to warp the mouse there. There is also some hardware which
- 	 * emits these events. */
- 	struct wlr_pointer_motion_absolute_event *event = data;
--	wlr_cursor_warp_absolute(cursor, &event->pointer->base, event->x, event->y);
--	motionnotify(event->time_msec);
-+	double lx, ly, dx, dy;
-+	wlr_cursor_absolute_to_layout_coords(cursor, &event->pointer->base, event->x, event->y, &lx, &ly);
-+	dx = lx - cursor->x;
-+	dy = ly - cursor->y;
-+
-+	motionnotify(event->time_msec, &event->pointer->base, dx, dy, dx, dy);
- }
- 
- void
--motionnotify(uint32_t time)
-+motionnotify(uint32_t time, struct wlr_input_device *device, double dx, double dy,
-+		double dx_unaccel, double dy_unaccel)
- {
- 	double sx = 0, sy = 0;
-+	double sx_confined, sy_confined;
- 	Client *c = NULL, *w = NULL;
- 	LayerSurface *l = NULL;
- 	int type;
- 	struct wlr_surface *surface = NULL;
-+	struct wlr_pointer_constraint_v1 *constraint = NULL;
-+
-+	/* Find the client under the pointer and send the event along. */
-+	xytonode(cursor->x, cursor->y, &surface, &c, NULL, &sx, &sy);
-+
-+	if (cursor_mode == CurPressed && !seat->drag) {
-+		if ((type = toplevel_from_wlr_surface(
-+				 seat->pointer_state.focused_surface, &w, &l)) >= 0) {
-+			c = w;
-+			surface = seat->pointer_state.focused_surface;
-+			sx = cursor->x - (type == LayerShell ? l->geom.x : w->geom.x);
-+			sy = cursor->y - (type == LayerShell ? l->geom.y : w->geom.y);
-+		}
-+	}
- 
- 	/* time is 0 in internal calls meant to restore pointer focus. */
- 	if (time) {
-+		wlr_relative_pointer_manager_v1_send_relative_motion(
-+				relative_pointer_mgr, seat, (uint64_t)time * 1000,
-+				dx, dy, dx_unaccel, dy_unaccel);
-+
-+		wl_list_for_each(constraint, &pointer_constraints->constraints, link)
-+			cursorconstrain(constraint);
-+
-+		if (active_constraint) {
-+			constraint = active_constraint->constraint;
-+			if (constraint->surface == surface
-+					&& wlr_region_confine(&active_confine, sx, sy, sx + dx,
-+					sy + dy, &sx_confined, &sy_confined)) {
-+				dx = sx_confined - sx;
-+				dy = sy_confined - sy;
-+			} else {
-+				return;
-+			}
-+		}
-+		wlr_cursor_move(cursor, device, dx, dy);
-+
- 		IDLE_NOTIFY_ACTIVITY;
- 
- 		/* Update selmon (even while dragging a window) */
-@@ -1678,19 +1992,6 @@ motionnotify(uint32_t time)
- 		return;
- 	}
- 
--	/* Find the client under the pointer and send the event along. */
--	xytonode(cursor->x, cursor->y, &surface, &c, NULL, &sx, &sy);
--
--	if (cursor_mode == CurPressed && !seat->drag) {
--		if ((type = toplevel_from_wlr_surface(
--				 seat->pointer_state.focused_surface, &w, &l)) >= 0) {
--			c = w;
--			surface = seat->pointer_state.focused_surface;
--			sx = cursor->x - (type == LayerShell ? l->geom.x : w->geom.x);
--			sy = cursor->y - (type == LayerShell ? l->geom.y : w->geom.y);
--		}
--	}
--
- 	/* If there's no client surface under the cursor, set the cursor image to a
- 	 * default. This is what makes the cursor image appear when you move it
- 	 * off of a client or over its border. */
-@@ -1711,8 +2012,8 @@ motionrelative(struct wl_listener *listener, void *data)
- 	 * special configuration applied for the specific input device which
- 	 * generated the event. You can pass NULL for the device if you want to move
- 	 * the cursor around without any input. */
--	wlr_cursor_move(cursor, &event->pointer->base, event->delta_x, event->delta_y);
--	motionnotify(event->time_msec);
-+	motionnotify(event->time_msec, &event->pointer->base, event->delta_x, event->delta_y,
-+			event->unaccel_dx, event->unaccel_dy);
- }
- 
- void
-@@ -1726,6 +2027,8 @@ moveresize(const Arg *arg)
+@@ -1698,6 +1772,8 @@ moveresize(const Arg *arg)
  
  	/* Float the window and tell motionnotify to grab it */
  	setfloating(grabc, 1);
@@ -1157,39 +572,7 @@ index a7d41b08..bafc3aec 100644
  	switch (cursor_mode = arg->ui) {
  	case CurMove:
  		grabcx = cursor->x - grabc->geom.x;
-@@ -1814,6 +2117,14 @@ outputmgrtest(struct wl_listener *listener, void *data)
- 	outputmgrapplyortest(config, 1);
- }
- 
-+void
-+pointerconstraintsetregion(struct wl_listener *listener, void *data)
-+{
-+	PointerConstraint *constraint = wl_container_of(listener, constraint, set_region);
-+	active_confine_requires_warp = 1;
-+	constraint->constraint->surface->data = NULL;
-+}
-+
- void
- pointerfocus(Client *c, struct wlr_surface *surface, double sx, double sy,
- 		uint32_t time)
-@@ -1883,6 +2194,16 @@ printstatus(void)
- 	fflush(stdout);
- }
- 
-+void
-+powermgrsetmodenotify(struct wl_listener *listener, void *data)
-+{
-+	struct wlr_output_power_v1_set_mode_event *event = data;
-+	wlr_output_enable(event->output, event->mode);
-+	if (event->mode)
-+		wlr_output_damage_whole(event->output);
-+	wlr_output_commit(event->output);
-+}
-+
- void
- quit(const Arg *arg)
- {
-@@ -1989,7 +2310,10 @@ run(char *startup_cmd)
+@@ -2000,7 +2076,10 @@ run(char *startup_cmd)
  	 * instead of (0, 0) and then jumping. still may not be fully
  	 * initialized, as the image/coordinates are not transformed for the
  	 * monitor when displayed here */
@@ -1198,10 +581,10 @@ index a7d41b08..bafc3aec 100644
 +		wlr_cursor_warp_closest(cursor, NULL, selmon->w.x + selmon->w.width / 2, selmon->w.y + selmon->w.height / 2);
 +	else
 +		wlr_cursor_warp_closest(cursor, NULL, cursor->x, cursor->y);
- 	wlr_xcursor_manager_set_cursor_image(cursor_mgr, cursor_image, cursor);
+ 	wlr_cursor_set_xcursor(cursor, cursor_mgr, "default");
  
  	/* Run the Wayland event loop. This does not return until you exit the
-@@ -2028,6 +2352,8 @@ setfloating(Client *c, int floating)
+@@ -2052,6 +2131,8 @@ setfloating(Client *c, int floating)
  		return;
  	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen
  			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
@@ -1210,7 +593,7 @@ index a7d41b08..bafc3aec 100644
  	arrange(c->mon);
  	printstatus();
  }
-@@ -2069,6 +2395,25 @@ setlayout(const Arg *arg)
+@@ -2102,6 +2183,25 @@ setlayout(const Arg *arg)
  	printstatus();
  }
  
@@ -1236,7 +619,7 @@ index a7d41b08..bafc3aec 100644
  /* arg > 1.0 will set mfact absolutely */
  void
  setmfact(const Arg *arg)
-@@ -2158,6 +2503,7 @@ setup(void)
+@@ -2187,6 +2287,7 @@ setup(void)
  
  	/* Initialize the scene graph used to lay out windows */
  	scene = wlr_scene_create();
@@ -1244,17 +627,7 @@ index a7d41b08..bafc3aec 100644
  	for (i = 0; i < NUM_LAYERS; i++)
  		layers[i] = wlr_scene_tree_create(&scene->tree);
  	drag_icon = wlr_scene_tree_create(&scene->tree);
-@@ -2193,6 +2539,9 @@ setup(void)
- 	activation = wlr_xdg_activation_v1_create(dpy);
- 	wl_signal_add(&activation->events.request_activate, &request_activate);
- 
-+	power_mgr = wlr_output_power_manager_v1_create(dpy);
-+	wl_signal_add(&power_mgr->events.set_mode, &power_mgr_set_mode);
-+
- 	/* Creates an output layout, which a wlroots utility for working with an
- 	 * arrangement of screens in a physical layout. */
- 	output_layout = wlr_output_layout_create();
-@@ -2279,6 +2628,10 @@ setup(void)
+@@ -2328,6 +2429,10 @@ setup(void)
  	 * let us know when new input devices are available on the backend.
  	 */
  	wl_list_init(&keyboards);
@@ -1262,22 +635,10 @@ index a7d41b08..bafc3aec 100644
 +	en_keymap = xkb_keymap_new_from_names(en_context, &en_rules,
 +		XKB_KEYMAP_COMPILE_NO_FLAGS);
 +	en_state = xkb_state_new(en_keymap);
- 	wl_signal_add(&backend->events.new_input, &new_input);
+ 	LISTEN_STATIC(&backend->events.new_input, inputdevice);
  	virtual_keyboard_mgr = wlr_virtual_keyboard_manager_v1_create(dpy);
- 	wl_signal_add(&virtual_keyboard_mgr->events.new_virtual_keyboard,
-@@ -2294,6 +2647,11 @@ setup(void)
- 	wl_signal_add(&output_mgr->events.apply, &output_mgr_apply);
- 	wl_signal_add(&output_mgr->events.test, &output_mgr_test);
- 
-+	relative_pointer_mgr = wlr_relative_pointer_manager_v1_create(dpy);
-+	pointer_constraints = wlr_pointer_constraints_v1_create(dpy);
-+	wl_signal_add(&pointer_constraints->events.new_constraint, &new_pointer_constraint);
-+	wl_list_init(&pointer_constraint_commit.link);
-+
- 	wlr_scene_set_presentation(scene, wlr_presentation_create(dpy, backend));
- 
- #ifdef XWAYLAND
-@@ -2313,6 +2671,106 @@ setup(void)
+ 	LISTEN_STATIC(&virtual_keyboard_mgr->events.new_virtual_keyboard, virtualkeyboard);
+@@ -2361,6 +2466,106 @@ setup(void)
  #endif
  }
  
@@ -1384,12 +745,8 @@ index a7d41b08..bafc3aec 100644
  void
  spawn(const Arg *arg)
  {
-@@ -2332,9 +2790,26 @@ startdrag(struct wl_listener *listener, void *data)
- 		return;
- 
- 	drag->icon->data = &wlr_scene_subsurface_tree_create(drag_icon, drag->icon->surface)->node;
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- 	wl_signal_add(&drag->icon->events.destroy, &drag_icon_destroy);
+@@ -2383,6 +2588,22 @@ startdrag(struct wl_listener *listener, void *data)
+ 	LISTEN_STATIC(&drag->icon->events.destroy, destroydragicon);
  }
  
 +void
@@ -1411,7 +768,7 @@ index a7d41b08..bafc3aec 100644
  void
  tag(const Arg *arg)
  {
-@@ -2406,6 +2881,31 @@ togglefullscreen(const Arg *arg)
+@@ -2454,6 +2675,31 @@ togglefullscreen(const Arg *arg)
  		setfullscreen(sel, !sel->isfullscreen);
  }
  
@@ -1443,25 +800,7 @@ index a7d41b08..bafc3aec 100644
  void
  toggletag(const Arg *arg)
  {
-@@ -2459,7 +2959,7 @@ unmaplayersurfacenotify(struct wl_listener *listener, void *data)
- 	if (layersurface->layer_surface->surface ==
- 			seat->keyboard_state.focused_surface)
- 		focusclient(focustop(selmon), 1);
--	motionnotify(0);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- }
- 
- void
-@@ -2486,7 +2986,7 @@ unmapnotify(struct wl_listener *listener, void *data)
- 	wl_list_remove(&c->commit.link);
- 	wlr_scene_node_destroy(&c->scene->node);
- 	printstatus();
--	motionnotify(0);
-+	motionnotify(0, NULL, 0, 0, 0, 0);
- }
- 
- void
-@@ -2504,6 +3004,8 @@ updatemons(struct wl_listener *listener, void *data)
+@@ -2551,6 +2797,8 @@ updatemons(struct wl_listener *listener, void *data)
  	Client *c;
  	struct wlr_output_configuration_head_v1 *config_head;
  	Monitor *m;
@@ -1470,7 +809,7 @@ index a7d41b08..bafc3aec 100644
  
  	/* First remove from the layout the disabled monitors */
  	wl_list_for_each(m, &mons, link) {
-@@ -2735,6 +3237,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
+@@ -2801,6 +3049,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
  	LISTEN(&xsurface->events.set_title, &c->set_title, updatetitle);
  	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
  	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
@@ -1484,8 +823,8 @@ index a7d41b08..bafc3aec 100644
 +			toggleminimize);
  }
  
- xcb_atom_t
-@@ -2819,6 +3329,7 @@ main(int argc, char *argv[])
+ void
+@@ -2894,6 +3150,7 @@ main(int argc, char *argv[])
  	/* Wayland requires XDG_RUNTIME_DIR for creating its communications socket */
  	if (!getenv("XDG_RUNTIME_DIR"))
  		die("XDG_RUNTIME_DIR must be set");
@@ -1495,7 +834,7 @@ index a7d41b08..bafc3aec 100644
  	cleanup();
 diff --git a/env.c b/env.c
 new file mode 100644
-index 00000000..618f81ea
+index 0000000..618f81e
 --- /dev/null
 +++ b/env.c
 @@ -0,0 +1,217 @@
@@ -1716,137 +1055,6 @@ index 00000000..618f81ea
 +	if (val && sscanf(val, "%u", &tmp) == 1)
 +		borderpx = tmp;
 +}
-diff --git a/protocols/wlr-output-power-management-unstable-v1.xml b/protocols/wlr-output-power-management-unstable-v1.xml
-new file mode 100644
-index 00000000..a9778399
---- /dev/null
-+++ b/protocols/wlr-output-power-management-unstable-v1.xml
-@@ -0,0 +1,128 @@
-+<?xml version="1.0" encoding="UTF-8"?>
-+<protocol name="wlr_output_power_management_unstable_v1">
-+  <copyright>
-+    Copyright © 2019 Purism SPC
-+
-+    Permission is hereby granted, free of charge, to any person obtaining a
-+    copy of this software and associated documentation files (the "Software"),
-+    to deal in the Software without restriction, including without limitation
-+    the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+    and/or sell copies of the Software, and to permit persons to whom the
-+    Software is furnished to do so, subject to the following conditions:
-+
-+    The above copyright notice and this permission notice (including the next
-+    paragraph) shall be included in all copies or substantial portions of the
-+    Software.
-+
-+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-+    THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+    DEALINGS IN THE SOFTWARE.
-+  </copyright>
-+
-+  <description summary="Control power management modes of outputs">
-+    This protocol allows clients to control power management modes
-+    of outputs that are currently part of the compositor space. The
-+    intent is to allow special clients like desktop shells to power
-+    down outputs when the system is idle.
-+
-+    To modify outputs not currently part of the compositor space see
-+    wlr-output-management.
-+
-+    Warning! The protocol described in this file is experimental and
-+    backward incompatible changes may be made. Backward compatible changes
-+    may be added together with the corresponding interface version bump.
-+    Backward incompatible changes are done by bumping the version number in
-+    the protocol and interface names and resetting the interface version.
-+    Once the protocol is to be declared stable, the 'z' prefix and the
-+    version number in the protocol and interface names are removed and the
-+    interface version number is reset.
-+  </description>
-+
-+  <interface name="zwlr_output_power_manager_v1" version="1">
-+    <description summary="manager to create per-output power management">
-+      This interface is a manager that allows creating per-output power
-+      management mode controls.
-+    </description>
-+
-+    <request name="get_output_power">
-+      <description summary="get a power management for an output">
-+        Create a output power management mode control that can be used to
-+        adjust the power management mode for a given output.
-+      </description>
-+      <arg name="id" type="new_id" interface="zwlr_output_power_v1"/>
-+      <arg name="output" type="object" interface="wl_output"/>
-+    </request>
-+
-+    <request name="destroy" type="destructor">
-+      <description summary="destroy the manager">
-+        All objects created by the manager will still remain valid, until their
-+        appropriate destroy request has been called.
-+      </description>
-+    </request>
-+  </interface>
-+
-+  <interface name="zwlr_output_power_v1" version="1">
-+    <description summary="adjust power management mode for an output">
-+      This object offers requests to set the power management mode of
-+      an output.
-+    </description>
-+
-+    <enum name="mode">
-+      <entry name="off" value="0"
-+             summary="Output is turned off."/>
-+      <entry name="on" value="1"
-+             summary="Output is turned on, no power saving"/>
-+    </enum>
-+
-+    <enum name="error">
-+      <entry name="invalid_mode" value="1" summary="inexistent power save mode"/>
-+    </enum>
-+
-+    <request name="set_mode">
-+      <description summary="Set an outputs power save mode">
-+        Set an output's power save mode to the given mode. The mode change
-+        is effective immediately. If the output does not support the given
-+        mode a failed event is sent.
-+      </description>
-+      <arg name="mode" type="uint" enum="mode" summary="the power save mode to set"/>
-+    </request>
-+
-+    <event name="mode">
-+      <description summary="Report a power management mode change">
-+        Report the power management mode change of an output.
-+
-+        The mode event is sent after an output changed its power
-+        management mode. The reason can be a client using set_mode or the
-+        compositor deciding to change an output's mode.
-+        This event is also sent immediately when the object is created
-+        so the client is informed about the current power management mode.
-+      </description>
-+      <arg name="mode" type="uint" enum="mode"
-+           summary="the output's new power management mode"/>
-+    </event>
-+
-+    <event name="failed">
-+      <description summary="object no longer valid">
-+        This event indicates that the output power management mode control
-+        is no longer valid. This can happen for a number of reasons,
-+        including:
-+        - The output doesn't support power management
-+        - Another client already has exclusive power management mode control
-+          for this output
-+        - The output disappeared
-+
-+        Upon receiving this event, the client should destroy this object.
-+      </description>
-+    </event>
-+
-+    <request name="destroy" type="destructor">
-+      <description summary="destroy this power management">
-+        Destroys the output power management mode control object.
-+      </description>
-+    </request>
-+  </interface>
-+</protocol>
+-- 
+2.42.0
+

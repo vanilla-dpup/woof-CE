@@ -1,17 +1,17 @@
 download() {
-    [ -f dwl-8c79f8dc155ba696572be30ee8c2ddfc577ae418.tar.gz ] || wget -t 3 -T 60 -O dwl-8c79f8dc155ba696572be30ee8c2ddfc577ae418.tar.gz https://github.com/djpohly/dwl/archive/8c79f8dc155ba696572be30ee8c2ddfc577ae418.tar.gz
-    [ -f wlroots-0.16.2.tar.gz ] || wget -t 3 -T 60 https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.16.2/downloads/wlroots-0.16.2.tar.gz
+    [ -f dwl-d08e6a3a7e9ccf47720b2e63f298c97292f85ebf.tar.gz ] || wget -t 3 -T 60 -O dwl-d08e6a3a7e9ccf47720b2e63f298c97292f85ebf.tar.gz https://codeberg.org/dwl/dwl/archive/d08e6a3a7e9ccf47720b2e63f298c97292f85ebf.tar.gz
+    [ -f wlroots-0.17.0.tar.gz ] || wget -t 3 -T 60 https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.17.0/downloads/wlroots-0.17.0.tar.gz
 }
 
 build() {
-    tar -xzf wlroots-0.16.2.tar.gz
-    cd wlroots-0.16.2
+    tar -xzf wlroots-0.17.0.tar.gz
+    cd wlroots-0.17.0
     meson --buildtype=release --prefix=/opt/wlroots --default-library=static -Dbackends=drm,libinput -Dexamples=false build
     ninja -C build install
     cd ..
 
-    tar -xzf dwl-8c79f8dc155ba696572be30ee8c2ddfc577ae418.tar.gz
-    cd dwl-8c79f8dc155ba696572be30ee8c2ddfc577ae418
+    tar -xzf dwl-d08e6a3a7e9ccf47720b2e63f298c97292f85ebf.tar.gz
+    cd dwl
     patch -p1 < ../patches.patch
     sed -e s/^#XWAYLAND/XWAYLAND/ -e s/^#XLIBS/XLIBS/ -i config.mk
     cp -f ../config.h .
