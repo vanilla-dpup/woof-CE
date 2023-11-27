@@ -1,12 +1,12 @@
-From e568c4b53d997f4ae2c6b5c902fb80848d8bf25b Mon Sep 17 00:00:00 2001
+From e95be16c082714cea70c570e29fc84b8372e1033 Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Sat, 25 Nov 2023 20:13:23 +0200
+Date: Mon, 27 Nov 2023 19:58:59 +0200
 Subject: [PATCH] Squashed commit of the following:
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-commit cee71c6e9ee8ea2b908e824ca67a9111d4d5d5f9
+commit c98ad53e3704cab6a5cc946b268bf62264c511d0
 Author: Guido Cella <guido@guidocella.xyz>
 Date:   Sun Mar 20 21:19:29 2022 +0100
 
@@ -15,75 +15,49 @@ Date:   Sun Mar 20 21:19:29 2022 +0100
     I thought wlr-randr used this, but it doesn't so I don't even know what
     this is for.
 
-commit 0317afb0562553d6b689b30a29faba5e0b51107f
-Merge: 68d52fa a7be3f6
+commit eb10ca2e9342816e266dde0c8048ca7f32538b42
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:57:43 2023 +0200
+Date:   Fri Dec 2 19:58:49 2022 +0200
 
-    Merge branch 'auto-dpi' into patches
+    automatically choose the scale factor if <= 0
 
-commit 68d52fa9b394f33f41e2e029c397bd966235c8ab
-Merge: a4a83af 0a3a71f
+commit 69c45df63d9b556fd0041f216822fdf832252421
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:57:21 2023 +0200
+Date:   Tue Aug 9 06:56:00 2022 +0000
 
-    Merge branch 'center' into patches
+    center floating windows
 
-commit a4a83afbb3f4479031c25b0f1c1065a2616766ab
-Merge: f9acb18 183c16f
+commit cb561f130ccb9cf352ba9d8a92a56c4758da7b70
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:57:19 2023 +0200
+Date:   Fri Jun 17 06:26:34 2022 +0000
 
-    Merge branch 'center-cursor' into patches
+    center the cursor on startup
 
-commit f9acb185acc6f0fd65e26d89fb3bf90637d4ceee
-Merge: 47e52fd a388fe4
+commit 8ec3295c683edc4edd24f88696c6c11cb27bf322
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:57:12 2023 +0200
+Date:   Sun Jul 24 17:52:07 2022 +0300
 
-    Merge branch 'en-keycodes' into patches
+    always use the English keymap to get keycodes
 
-commit 47e52fd592ede5b27ac74be532cfcac04cfd9ea1
-Merge: 0229b13 42548d4
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:57:07 2023 +0200
-
-    Merge branch 'env' into patches
-
-commit 0229b133810ac60966f968cb24368468dd26e091
-Merge: fed3d0f c2a90f4
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:56:46 2023 +0200
-
-    Merge branch 'fallback' into patches
-
-commit fed3d0ff52dbc4eb40a2e85467c5b4e8ce319446
-Merge: 148ef0e baaa87f
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:56:40 2023 +0200
-
-    Merge branch 'rootcolor' into patches
-
-commit 148ef0ecd96e4d5eae8a0aebd2e4b82c456665c5
-Merge: 331e1b7 21e1573
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sat Nov 25 11:56:38 2023 +0200
-
-    Merge branch 'snail' into patches
-
-commit 42548d4e5f8c3b41b3a8ad5b4c7001ab58180772
+commit 43a05d9eb3bf76eb2658b4f2b3ff8f4fa1ddf04d
 Author: Dima Krasner <dima@dimakrasner.com>
 Date:   Sat Nov 25 11:55:58 2023 +0200
 
     allow environment variables to override config.h
 
-commit 331e1b73a933d46222955d2421d2bac17a704535
+commit f78946637deeb0c859ca00ee72eae48443a57e14
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sun Dec 25 08:22:04 2022 +0200
+Date:   Thu Jul 21 21:26:31 2022 +0300
 
-    add support for titlebar actions
+    fall back to a lower output mode if needed (swaywm/sway@4cdc4ac)
 
-commit 21e1573af491d6f53cbc3ad1167d7570f7268a3f
+commit aaf643e7ac745763ccd8e65fb0652354eb82d50e
+Author: Dima Krasner <dima@dimakrasner.com>
+Date:   Fri Mar 17 14:03:17 2023 +0200
+
+    respect rootcolor[]
+
+commit 9ffda57ab048587fb7cc463f2c0916e6bb38f5b3
 Author: Dima Krasner <dima@dimakrasner.com>
 Date:   Sat Jul 15 15:45:58 2023 +0300
 
@@ -175,41 +149,11 @@ Date:   Sat Jul 15 15:45:58 2023 +0300
     │          │          │     │    │
     └──────────┴──────────┴─────┴────┘
 
-commit baaa87f52785d246894cc90d563eec27bac23596
+commit 90696ebef36d8b90cdf37d4dbc7d748326ce1609
 Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Fri Mar 17 14:03:17 2023 +0200
+Date:   Sun Dec 25 08:22:04 2022 +0200
 
-    respect rootcolor[]
-
-commit c2a90f4c0aeb27c317167b7d2418611dcbd661c1
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Thu Jul 21 21:26:31 2022 +0300
-
-    fall back to a lower output mode if needed (swaywm/sway@4cdc4ac)
-
-commit a388fe494b782af642d3808e87acba5627d3f917
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Sun Jul 24 17:52:07 2022 +0300
-
-    always use the English keymap to get keycodes
-
-commit 183c16fd6956db94f2a14a074b99f9327718981b
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Fri Jun 17 06:26:34 2022 +0000
-
-    center the cursor on startup
-
-commit 0a3a71f830865c364d1d925d6d28b50b6bba638a
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Tue Aug 9 06:56:00 2022 +0000
-
-    center floating windows
-
-commit a7be3f69f742e09421e716e2c67a449e40e21337
-Author: Dima Krasner <dima@dimakrasner.com>
-Date:   Fri Dec 2 19:58:49 2022 +0200
-
-    automatically choose the scale factor if <= 0
+    add support for titlebar actions
 ---
  Makefile                                      |   6 +-
  config.def.h                                  |  46 +--
@@ -335,7 +279,7 @@ index db0babc..3da4f88 100644
  	CHVT(7), CHVT(8), CHVT(9), CHVT(10), CHVT(11), CHVT(12),
  };
 diff --git a/dwl.c b/dwl.c
-index ef27a1d..a97c34e 100644
+index 69da91d..434ef81 100644
 --- a/dwl.c
 +++ b/dwl.c
 @@ -33,6 +33,7 @@
@@ -454,7 +398,7 @@ index ef27a1d..a97c34e 100644
  	wlr_scene_node_reparent(&c->scene->node, layers[c->isfloating ? LyrFloat : LyrTile]);
  	setmon(c, mon, newtags);
  }
-@@ -597,6 +624,24 @@ buttonpress(struct wl_listener *listener, void *data)
+@@ -594,6 +621,24 @@ buttonpress(struct wl_listener *listener, void *data)
  			event->time_msec, event->button, event->state);
  }
  
@@ -479,7 +423,7 @@ index ef27a1d..a97c34e 100644
  void
  chvt(const Arg *arg)
  {
-@@ -639,6 +684,9 @@ cleanup(void)
+@@ -636,6 +681,9 @@ cleanup(void)
  	/* Destroy after the wayland display (when the monitors are already destroyed)
  	   to avoid destroying them with an invalid scene output. */
  	wlr_scene_node_destroy(&scene->tree.node);
@@ -489,7 +433,7 @@ index ef27a1d..a97c34e 100644
  }
  
  void
-@@ -870,6 +918,7 @@ createmon(struct wl_listener *listener, void *data)
+@@ -856,6 +904,7 @@ createmon(struct wl_listener *listener, void *data)
  	/* This event is raised by the backend when a new output (aka a display or
  	 * monitor) becomes available. */
  	struct wlr_output *wlr_output = data;
@@ -497,7 +441,7 @@ index ef27a1d..a97c34e 100644
  	const MonitorRule *r;
  	size_t i;
  	Monitor *m = wlr_output->data = ecalloc(1, sizeof(*m));
-@@ -885,7 +934,20 @@ createmon(struct wl_listener *listener, void *data)
+@@ -871,7 +920,20 @@ createmon(struct wl_listener *listener, void *data)
  		if (!r->name || strstr(wlr_output->name, r->name)) {
  			m->mfact = r->mfact;
  			m->nmaster = r->nmaster;
@@ -519,7 +463,7 @@ index ef27a1d..a97c34e 100644
  			m->lt[0] = m->lt[1] = r->lt;
  			wlr_output_set_transform(wlr_output, r->rr);
  			m->m.x = r->x;
-@@ -898,7 +960,17 @@ createmon(struct wl_listener *listener, void *data)
+@@ -884,7 +946,17 @@ createmon(struct wl_listener *listener, void *data)
  	 * monitor supports only a specific set of modes. We just pick the
  	 * monitor's preferred mode; a more sophisticated compositor would let
  	 * the user configure it. */
@@ -538,7 +482,7 @@ index ef27a1d..a97c34e 100644
  
  	/* Set up event listeners */
  	LISTEN(&wlr_output->events.frame, &m->frame, rendermon);
-@@ -984,6 +1056,12 @@ createnotify(struct wl_listener *listener, void *data)
+@@ -970,6 +1042,12 @@ createnotify(struct wl_listener *listener, void *data)
  			fullscreennotify);
  	LISTEN(&xdg_surface->toplevel->events.request_maximize, &c->maximize,
  			maximizenotify);
@@ -551,7 +495,7 @@ index ef27a1d..a97c34e 100644
  }
  
  void
-@@ -1025,6 +1103,8 @@ createpointer(struct wlr_pointer *pointer)
+@@ -1011,6 +1089,8 @@ createpointer(struct wlr_pointer *pointer)
  			libinput_device_config_accel_set_profile(libinput_device, accel_profile);
  			libinput_device_config_accel_set_speed(libinput_device, accel_speed);
  		}
@@ -560,7 +504,7 @@ index ef27a1d..a97c34e 100644
  	}
  
  	wlr_cursor_attach_input_device(cursor, &pointer->base);
-@@ -1123,6 +1203,10 @@ destroynotify(struct wl_listener *listener, void *data)
+@@ -1110,6 +1190,10 @@ destroynotify(struct wl_listener *listener, void *data)
  	wl_list_remove(&c->destroy.link);
  	wl_list_remove(&c->set_title.link);
  	wl_list_remove(&c->fullscreen.link);
@@ -571,7 +515,7 @@ index ef27a1d..a97c34e 100644
  #ifdef XWAYLAND
  	if (c->type != XDGShell) {
  		wl_list_remove(&c->activate.link);
-@@ -1395,7 +1479,7 @@ keypress(struct wl_listener *listener, void *data)
+@@ -1382,7 +1466,7 @@ keypress(struct wl_listener *listener, void *data)
  	/* Get a list of keysyms based on the keymap for this keyboard */
  	const xkb_keysym_t *syms;
  	int nsyms = xkb_state_key_get_syms(
@@ -580,7 +524,7 @@ index ef27a1d..a97c34e 100644
  
  	int handled = 0;
  	uint32_t mods = wlr_keyboard_get_modifiers(kb->wlr_keyboard);
-@@ -1556,6 +1640,7 @@ mapnotify(struct wl_listener *listener, void *data)
+@@ -1543,6 +1627,7 @@ mapnotify(struct wl_listener *listener, void *data)
  		c->isfloating = 1;
  		wlr_scene_node_reparent(&c->scene->node, layers[LyrFloat]);
  		setmon(c, p->mon, p->tags);
@@ -588,7 +532,7 @@ index ef27a1d..a97c34e 100644
  	} else {
  		applyrules(c);
  	}
-@@ -1571,18 +1656,10 @@ unset_fullscreen:
+@@ -1558,18 +1643,10 @@ unset_fullscreen:
  void
  maximizenotify(struct wl_listener *listener, void *data)
  {
@@ -610,7 +554,7 @@ index ef27a1d..a97c34e 100644
  }
  
  void
-@@ -1698,6 +1775,8 @@ moveresize(const Arg *arg)
+@@ -1685,6 +1762,8 @@ moveresize(const Arg *arg)
  
  	/* Float the window and tell motionnotify to grab it */
  	setfloating(grabc, 1);
@@ -619,7 +563,7 @@ index ef27a1d..a97c34e 100644
  	switch (cursor_mode = arg->ui) {
  	case CurMove:
  		grabcx = cursor->x - grabc->geom.x;
-@@ -1855,6 +1934,14 @@ printstatus(void)
+@@ -1842,6 +1921,14 @@ printstatus(void)
  	fflush(stdout);
  }
  
@@ -634,7 +578,7 @@ index ef27a1d..a97c34e 100644
  void
  quit(const Arg *arg)
  {
-@@ -2000,7 +2087,10 @@ run(char *startup_cmd)
+@@ -1987,7 +2074,10 @@ run(char *startup_cmd)
  	 * instead of (0, 0) and then jumping. still may not be fully
  	 * initialized, as the image/coordinates are not transformed for the
  	 * monitor when displayed here */
@@ -646,7 +590,7 @@ index ef27a1d..a97c34e 100644
  	wlr_cursor_set_xcursor(cursor, cursor_mgr, "default");
  
  	/* Run the Wayland event loop. This does not return until you exit the
-@@ -2052,6 +2142,8 @@ setfloating(Client *c, int floating)
+@@ -2039,6 +2129,8 @@ setfloating(Client *c, int floating)
  		return;
  	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen
  			? LyrFS : c->isfloating ? LyrFloat : LyrTile]);
@@ -655,7 +599,7 @@ index ef27a1d..a97c34e 100644
  	arrange(c->mon);
  	printstatus();
  }
-@@ -2102,6 +2194,25 @@ setlayout(const Arg *arg)
+@@ -2089,6 +2181,25 @@ setlayout(const Arg *arg)
  	printstatus();
  }
  
@@ -681,7 +625,7 @@ index ef27a1d..a97c34e 100644
  /* arg > 1.0 will set mfact absolutely */
  void
  setmfact(const Arg *arg)
-@@ -2187,6 +2298,7 @@ setup(void)
+@@ -2174,6 +2285,7 @@ setup(void)
  
  	/* Initialize the scene graph used to lay out windows */
  	scene = wlr_scene_create();
@@ -689,7 +633,7 @@ index ef27a1d..a97c34e 100644
  	for (i = 0; i < NUM_LAYERS; i++)
  		layers[i] = wlr_scene_tree_create(&scene->tree);
  	drag_icon = wlr_scene_tree_create(&scene->tree);
-@@ -2243,6 +2355,9 @@ setup(void)
+@@ -2230,6 +2342,9 @@ setup(void)
  	gamma_control_mgr = wlr_gamma_control_manager_v1_create(dpy);
  	LISTEN_STATIC(&gamma_control_mgr->events.set_gamma, setgamma);
  
@@ -699,7 +643,7 @@ index ef27a1d..a97c34e 100644
  	/* Creates an output layout, which a wlroots utility for working with an
  	 * arrangement of screens in a physical layout. */
  	output_layout = wlr_output_layout_create();
-@@ -2328,6 +2443,10 @@ setup(void)
+@@ -2315,6 +2430,10 @@ setup(void)
  	 * let us know when new input devices are available on the backend.
  	 */
  	wl_list_init(&keyboards);
@@ -710,7 +654,7 @@ index ef27a1d..a97c34e 100644
  	LISTEN_STATIC(&backend->events.new_input, inputdevice);
  	virtual_keyboard_mgr = wlr_virtual_keyboard_manager_v1_create(dpy);
  	LISTEN_STATIC(&virtual_keyboard_mgr->events.new_virtual_keyboard, virtualkeyboard);
-@@ -2361,6 +2480,106 @@ setup(void)
+@@ -2348,6 +2467,106 @@ setup(void)
  #endif
  }
  
@@ -817,7 +761,7 @@ index ef27a1d..a97c34e 100644
  void
  spawn(const Arg *arg)
  {
-@@ -2383,6 +2602,22 @@ startdrag(struct wl_listener *listener, void *data)
+@@ -2370,6 +2589,22 @@ startdrag(struct wl_listener *listener, void *data)
  	LISTEN_STATIC(&drag->icon->events.destroy, destroydragicon);
  }
  
@@ -840,7 +784,7 @@ index ef27a1d..a97c34e 100644
  void
  tag(const Arg *arg)
  {
-@@ -2454,6 +2689,31 @@ togglefullscreen(const Arg *arg)
+@@ -2441,6 +2676,31 @@ togglefullscreen(const Arg *arg)
  		setfullscreen(sel, !sel->isfullscreen);
  }
  
@@ -872,7 +816,7 @@ index ef27a1d..a97c34e 100644
  void
  toggletag(const Arg *arg)
  {
-@@ -2551,6 +2811,8 @@ updatemons(struct wl_listener *listener, void *data)
+@@ -2536,6 +2796,8 @@ updatemons(struct wl_listener *listener, void *data)
  	Client *c;
  	struct wlr_output_configuration_head_v1 *config_head;
  	Monitor *m;
@@ -881,7 +825,7 @@ index ef27a1d..a97c34e 100644
  
  	/* First remove from the layout the disabled monitors */
  	wl_list_for_each(m, &mons, link) {
-@@ -2801,6 +3063,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
+@@ -2786,6 +3048,14 @@ createnotifyx11(struct wl_listener *listener, void *data)
  	LISTEN(&xsurface->events.set_title, &c->set_title, updatetitle);
  	LISTEN(&xsurface->events.destroy, &c->destroy, destroynotify);
  	LISTEN(&xsurface->events.request_fullscreen, &c->fullscreen, fullscreennotify);
@@ -896,7 +840,7 @@ index ef27a1d..a97c34e 100644
  }
  
  void
-@@ -2894,6 +3164,7 @@ main(int argc, char *argv[])
+@@ -2879,6 +3149,7 @@ main(int argc, char *argv[])
  	/* Wayland requires XDG_RUNTIME_DIR for creating its communications socket */
  	if (!getenv("XDG_RUNTIME_DIR"))
  		die("XDG_RUNTIME_DIR must be set");
