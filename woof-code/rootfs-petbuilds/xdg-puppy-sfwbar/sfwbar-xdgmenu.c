@@ -109,7 +109,7 @@ void process_directory(GMenuTreeDirectory *directory)
 
 start:
    g_printf(
-		  "\tsubmenu(\" %s%%/usr/share/pixmaps/puppy/%s\",\"%s\") {\n",
+		  "\tsubmenu(\" %s%%%s\",\"%s\") {\n",
 		  gmenu_tree_directory_get_name(directory),
 		  gmenu_tree_directory_get_icon(directory),
 		  gmenu_tree_directory_get_name(directory));
