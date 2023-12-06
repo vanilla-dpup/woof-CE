@@ -1,100 +1,5 @@
 #!/bin/bash
 
-function git_aufs_util_branch() {
-	# aufs-util branch - must keep this updated - git://git.code.sf.net/p/aufs/aufs-util.git
-	for i in 6.0 5.8 5.0 4.19 4.14 4.9 4.4 4.1 4.0 3.18 3.14 3.9 3.2
-	do
-		if vercmp ${kernel_version} ge ${i} ; then
-			aufs_util_branch=${i}
-			break
-		fi
-	done
-}
-
-# sets $aufsv
-function git_aufs_branch() {
- #  aufs_git_4="git://github.com/sfjro/aufs4-standalone.git"
- #  aufs_git_5="git://github.com/sfjro/aufs5-standalone.git"
- #---
- # $kernel_version       is set by build.sh
- # $kernel_major_version is set by build.sh
- case ${kernel_major_version} in
-	3.*) aufsv=${kernel_major_version} ;; # 3.14, 3.18      etc
-	4.*) aufsv=${kernel_major_version} ;; # 4.1,  4.4, 4.14 etc
- esac
-
- case ${kernel_major_version} in
-	#### k3.x #####
-	3.2)  aufsv=3.2                #unknown actual value
-		vercmp ${kernel_version} ge 3.2.30 && aufsv='3.2.x'
-		;;
-	3.10) aufsv=3.10
-		vercmp ${kernel_version} ge 3.10.26 && aufsv='3.10.x'
-		;;
-	3.12) aufsv=3.12
-		vercmp ${kernel_version} ge 3.12.7 && aufsv='3.12.x'
-		vercmp ${kernel_version} ge 3.12.31 && aufsv='3.12.31+'
-		;;
-	3.14) aufsv=3.14
-		vercmp ${kernel_version} ge 3.14.21 && aufsv='3.14.21+'
-		vercmp ${kernel_version} ge 3.14.40 && aufsv='3.14.40+'
-		;;
-	3.18) aufsv=3.18
-		vercmp ${kernel_version} ge 3.18.1 && aufsv='3.18.1+'
-		vercmp ${kernel_version} ge 3.18.25 && aufsv='3.18.25+'
-		;;
-
-	#### k4.x #####
-	4.1)  aufsv=4.1
-		vercmp ${kernel_version} ge 4.1.13 && aufsv='4.1.13+'
-		;;
-	4.9)  aufsv=4.9
-		vercmp ${kernel_version} ge 4.9.9 && aufsv='4.9.9+'
-		vercmp ${kernel_version} ge 4.9.94 && aufsv='4.9.94+'
-		;;
-	4.11) aufsv=4.11.0-untested
-		vercmp ${kernel_version} ge 4.11.7 && aufsv='4.11.7+'
-		;;
-	4.14) aufsv=4.14
-		vercmp ${kernel_version} ge 4.14.56 && aufsv='4.14.56+'
-		vercmp ${kernel_version} ge 4.14.73 && aufsv='4.14.73+'
-		;;
-	4.18) aufsv=4.18
-		vercmp ${kernel_version} ge 4.18.11 && aufsv='4.18.11+'
-		;;
-	4.19) aufsv=4.19
-		vercmp ${kernel_version} ge 4.19.17 && aufsv='4.19.17+'
-		vercmp ${kernel_version} ge 4.19.63 && aufsv='4.19.63+'
-		;;
-	4.20) aufsv=4.20
-		vercmp ${kernel_version} ge 4.20.4 && aufsv='4.20.4+'
-		;;
-
-	#### k5.x #####
-	5.2)  aufsv=5.2
-		vercmp ${kernel_version} ge 5.2.5 && aufsv='5.2.5+'
-		;;
-	5.4)  aufsv=5.4 
-		vercmp ${kernel_version} ge 5.4.3 && aufsv='5.4.3'
-		;;
-	5.10)  aufsv=5.10
-		vercmp ${kernel_version} ge 5.10.82 && aufsv='5.10.82'
-		vercmp ${kernel_version} ge 5.10.117 && aufsv='5.10.117'
-		vercmp ${kernel_version} ge 5.10.140 && aufsv='5.10.140'
-		;;
-	5.15)  aufsv=5.15
-		vercmp ${kernel_version} ge 5.15.5 && aufsv='5.15.5'
-		vercmp ${kernel_version} ge 5.15.36 && aufsv='5.15.36'
-		vercmp ${kernel_version} ge 5.15.41 && aufsv='5.15.41'
-		;;
-	5.17)  aufsv=5.17
-		vercmp ${kernel_version} ge 5.17.3 && aufsv='5.17.3'
-		;;
-	*)     aufsv=${kernel_major_version} ;;
-esac
-}
-#======================================================================
-
 function log_ver() {
 	touch ${BUILD_LOG}
 	(
@@ -107,30 +12,6 @@ function log_ver() {
 	mksquashfs -version | head -1
 	echo
 	) | tee -a ${BUILD_LOG}
-}
-
-function get_latest_kernels() {
-	TMP=/tmp/kernels.txt
-	rm -f $TMP
-	x=0
-	s=
-	curl -s https://www.kernel.org | while read a ; do
-		if [ $x = 1 ]; then
-			echo $a | grep -q 'EOL' && x=0 && continue
-			e=${a#*\>}
-			e=${e#*\>}
-			e=${e%%\<*}
-			echo "$e ($s)" >> $TMP
-			x=0
-		fi
-		if echo "$a" | grep -qE 'longterm:|stable:' ;then
-			x=$(($x + 1))
-			echo "$a" | grep -q 'stable:' && s=stable || s=longterm
-		else
-			continue
-		fi
-	done	
-	cat $TMP
 }
 
 #======================================================================
@@ -333,7 +214,6 @@ function configure_git_kernel() {
 	config_set builtin CONFIG_NLS_CODEPAGE_852 DOTconfig
 	config_set builtin CONFIG_SQUASHFS DOTconfig
 	config_set builtin CONFIG_TMPFS_XATTR DOTconfig
-	echo 'CONFIG_AUFS_FS=y' >> DOTconfig
 	echo 'CONFIG_ARM=y' >> DOTconfig
 
 }

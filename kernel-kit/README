@@ -36,7 +36,6 @@ distro which is compatible with the target distro.
 
 REQUIRED:
 gcc - for compilation
-git - for aufs sources
 mksquashfs - for compressing the kernel source sfs, will build without
 
 CREDIT
@@ -53,7 +52,7 @@ First, read & edit the build.conf file for your preferences
 It is recommended to use a $custom_suffix and $package_name_suffix
 
 Second, run "./build.sh"
-The kernel source will download, aufs will be downloaded from git
+The kernel source will download
 The patches will be applied automatically and halt the script if 
 there are failures.
 The script will pause once all patches are applied so you 
@@ -114,8 +113,8 @@ Dm-crypt
 The 'huge' kernel builds require a number of drivers built into the kernel
 image (vmlinuz in x86/x86_64; zImage, uImage or kernel.img in ARM). Things
 that must be builtin are filesystems (ext2/3/4, f2fs, NTFS, FAT and others 
-which you may want to support as a boot partition) , AUFS, NLS support, 
+which you may want to support as a boot partition) , NLS support, 
 keyboard drivers and possibly others.
 eg:
-CONFIG_AUFS_FS=y
+CONFIG_OVERLAY_FS=y
 ===============================================================================

@@ -74,11 +74,9 @@ chroot rootfs-complete adduser spot audio
 
 rm -rf rootfs-skeleton
 cp -a ../rootfs-skeleton .
-if [ "$USR_SYMLINKS" = "yes" ]; then
-	mv -f rootfs-skeleton/bin/* rootfs-skeleton/usr/bin/
-	mv -f rootfs-skeleton/sbin/* rootfs-skeleton/usr/sbin/
-	rmdir rootfs-skeleton/{bin,sbin}
-fi
+mv -f rootfs-skeleton/bin/* rootfs-skeleton/usr/bin/
+mv -f rootfs-skeleton/sbin/* rootfs-skeleton/usr/sbin/
+rmdir rootfs-skeleton/{bin,sbin}
 cp -a rootfs-skeleton/* rootfs-complete/
 sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" rootfs-complete/usr/share/doc/puppy/*.md 
 install -m 644 ../README.md rootfs-complete/usr/share/doc/puppy/woof-CE.md

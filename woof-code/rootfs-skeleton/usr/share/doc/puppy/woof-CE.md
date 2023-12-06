@@ -13,6 +13,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 This fork strips woof-CE down to the bare essentials:
 
 * Only dpup ([Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based Puppy) is supported.
+* Support for the old file system layout, with separate /lib and /usr/lib, is gone. Only the merged layout is supported.
 * Support for X.Org and tools that modify xorg.conf is gone. Only Wayland is supported.
 * Support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone. Only [PipeWire](https://pipewire.org/) is supported.
 * Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.

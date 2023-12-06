@@ -26,23 +26,14 @@ cd sandbox3
 
 CACHE_DIR=`pwd`/../../local-repositories/debootstrap/${DISTRO_TARGETARCH}
 mkdir -p "$CACHE_DIR"
-TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz"
-[ "$USR_SYMLINKS" != "yes" ] || TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}-usrmerge.tar.gz"
+TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}-usrmerge.tar.gz"
 
 rm -rf rootfs
 
-if [ "$USR_SYMLINKS" = "yes" -a ! -e ${TARBALL} ]; then
-	debootstrap --arch=$ARCH --variant=minbase --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
-elif [ ! -e ${TARBALL} ]; then
-	debootstrap --no-merged-usr --arch=$ARCH --variant=minbase --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
-fi
+[ -e ${TARBALL} ] || debootstrap --arch=$ARCH --variant=minbase --make-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
 
 # create a tiny installation of the compatible distro
-if [ "$USR_SYMLINKS" = "yes" ]; then
-	debootstrap --arch=$ARCH --variant=minbase --unpack-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
-else
-	debootstrap --no-merged-usr --arch=$ARCH --variant=minbase --unpack-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
-fi
+debootstrap --arch=$ARCH --variant=minbase --unpack-tarball=${TARBALL} ${DISTRO_COMPAT_VERSION} rootfs ${MIRROR}
 
 rm -f rootfs/etc/resolv.conf
 cat /etc/resolv.conf > rootfs/etc/resolv.conf
