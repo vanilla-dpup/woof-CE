@@ -5,6 +5,7 @@
 - [Boot codes](boot-codes.md)
 - [Persistency](persistency.md)
 - [Configuration files](configuration-files.md)
+- [SFS Modules](sfs_load.md)
 - [.pet Packages](pet-packages.md)
 
 ## For Contributors
