@@ -78,7 +78,7 @@ mv -f rootfs-skeleton/bin/* rootfs-skeleton/usr/bin/
 mv -f rootfs-skeleton/sbin/* rootfs-skeleton/usr/sbin/
 rmdir rootfs-skeleton/{bin,sbin}
 cp -a rootfs-skeleton/* rootfs-complete/
-sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" rootfs-complete/usr/share/doc/puppy/*.md 
+sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" -e "s/DISTRO_FILE_PREFIX/$DISTRO_FILE_PREFIX/g" rootfs-complete/usr/share/doc/puppy/*.md
 install -m 644 ../README.md rootfs-complete/usr/share/doc/puppy/woof-CE.md
 install -m 644 ../LICENSE rootfs-complete/usr/share/doc/puppy/LICENSE
 
