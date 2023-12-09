@@ -618,7 +618,7 @@ fi
 #---------------------------------------------------------------------
 
 log_msg "Creating the kernel package"
-$MAKE INSTALL_MOD_PATH=${linux_kernel_dir} INSTALL_MOD_STRIP=1 modules_install >> ${BUILD_LOG} 2>&1
+$MAKE INSTALL_MOD_PATH=${linux_kernel_dir}/usr INSTALL_MOD_STRIP=1 modules_install >> ${BUILD_LOG} 2>&1
 rm -f ${linux_kernel_dir}/usr/lib/modules/${kernel_version}${custom_suffix}/{build,source}
 mkdir -p ${linux_kernel_dir}/boot
 mkdir -p ${linux_kernel_dir}/etc/modules
