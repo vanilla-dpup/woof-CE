@@ -1,12 +1,12 @@
 # SFS Modules
 
-SFS modules are [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) images containing a directory hierarchy. DISTRO_NAME uses [overlayfs](https://docs.kernel.org/filesystems/overlayfs.html) to stack SFSs on top each other and present their contents as a unified directory hierarchy.
+SFS modules are [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) images containing a read-only directory hierarchy. DISTRO_NAME uses [overlayfs](https://docs.kernel.org/filesystems/overlayfs.html) to stack SFSs on top of each other and present their contents as a unified directory hierarchy.
 
 ## Loading
 
-The early init script loads all SFSs in the save partition or boot partition, from the partition root or `psubdir` (see [Boot Codes](boot-codes.md)).
+The early init script loads all SFSs in the save partition or boot partition, from the partition root or `psubdir` (see [Boot Codes](boot-codes.md)). To speed up access to files inside loaded SFSs that reside on slow media like flash drives, the init script reads them into the page cache (see documentation for `pfix=nocopy`).
 
-It is possible to load a SFS without copying it to the right location and rebooting the system, but this is implemented differently, with various limitations (like inability to replace existing files), and may require writing to disk.
+It is possible to load a SFS by opening it using the file manager, without copying it to the right location and rebooting the system, but this is implemented differently, with various limitations (like inability to replace existing files), the SFS is not cached and the loading operation may require writing to disk.
 
 ## Stacking Order
 
@@ -24,7 +24,7 @@ For backward compatibility with [Puppy Linux](https://puppylinux.com), DISTRO_NA
 
 All SFss except those marked with (!) are optional and DISTRO_NAME should be able to boot without them.
 
-Users interested in running a customized, non-persistent DISTRO_NAME (see [Persistency](persistency.md)), can achieve this using the SFSs above puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. For example, if adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs contains etc/rc.d/rc.sysinit, this file overrides the one in puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs and the contents of /etc/rc.d/rc.sysinit match those of the file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. Any file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs that is not present in any SFS below it is "added" to /.
+Users interested in running a customized, non-persistent DISTRO_NAME, can achieve this using the SFSs above puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. For example, if adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs contains etc/rc.d/rc.sysinit, this file overrides the one in puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs and the contents of /etc/rc.d/rc.sysinit match those of the file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. Any file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs that is not present in any SFS below it is "added" to /. To create a snapshot of a non-persistent session of DISTRO_NAME, create adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs from the contents of /initrd/pup_rw (see [Persistency](persistency.md)).
 
 All other SFSs are sorted numerically before they're appended to the stack, after zdrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs:
 
