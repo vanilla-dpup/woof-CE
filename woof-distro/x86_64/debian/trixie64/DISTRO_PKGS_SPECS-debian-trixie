@@ -255,6 +255,7 @@ yes|yambar|yambar|exe,dev,doc,nls||deps:yes
 else
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|labwc|labwc|exe,dev,doc,nls||deps:yes
+yes|libgnome-menu|libgnome-menu-3-dev|exe,dev,doc,nls||deps:yes # dependency of xdg-puppy-{labwc,sfwbar}
 yes|lxterminal|lxterminal|exe,dev,doc,nls||deps:yes
 yes|numix-gtk-theme|numix-gtk-theme|exe,dev,doc,nls||deps:yes
 yes|sfwbar-deps|libjson-c-dev|exe,dev,doc,nls||deps:yes
