@@ -67,13 +67,6 @@ do
 	mv -f ${TMPDEST} ${ONEDEST}
 done
 
-# support labwc menu iconfont
-if type labwc >/dev/null 2>&1 ;then
-	if [ -e "/usr/share/fonts/default/TTF/pupmoon.ttf" ];then # icon font
-		[ -x "/usr/sbin/iconmenu" ] && iconmenu
-	fi
-fi
-
 #w001 support for fbpanel, lxpanel, openbox, fluxbox, pekwm...
 [ `which fbpanel_menu_refresh` ] && fbpanel_menu_refresh
 [ `which jwm2fluxbox` ] && jwm2fluxbox  ##current fluxbox_menu_refresh doesn't support menu icons while this does
