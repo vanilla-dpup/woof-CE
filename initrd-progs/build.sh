@@ -12,9 +12,7 @@ generate_initrd() {
 			cp -anLf ../../sandbox3/rootfs-complete${LIB} lib/
 		done
 	done
-
 	cp -f ../DISTRO_SPECS .
-	[ -x ../init ] && cp -f ../init .
 
 	. ./DISTRO_SPECS
 	case "$DISTRO_TARGETARCH" in *64) ln -s lib lib64 ;; esac
