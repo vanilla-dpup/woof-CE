@@ -218,7 +218,7 @@ EOF
 
 cd ../initrd-progs
 cp -f ../sandbox3/rootfs-complete/etc/DISTRO_SPECS .
-./build.sh -arch ${DISTRO_TARGETARCH}
+./build.sh || exit 1
 
 cd ../kernel-kit/output
 tar -xjf huge-*-kernel-kit.tar.bz2
