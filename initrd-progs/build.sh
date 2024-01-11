@@ -19,6 +19,11 @@ generate_initrd() {
 	. ./DISTRO_SPECS
 	case "$DISTRO_TARGETARCH" in *64) ln -s lib lib64 ;; esac
 
+	chroot . busybox --help > /dev/null
+	chroot . cryptsetup -V > /dev/null
+	chroot . e2fsck -V 2>/dev/null
+	chroot . fsck.fat --help 2>/dev/null
+
 	find . | cpio -o -H newc > ../initrd
 	cd ..
 	zstd -19 -f initrd
