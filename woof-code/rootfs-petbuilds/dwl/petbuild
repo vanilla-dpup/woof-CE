@@ -1,15 +1,8 @@
 download() {
     [ -f dwl-6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz ] || wget -t 3 -T 60 -O dwl-6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz https://codeberg.org/dwl/dwl/archive/6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz
-    [ -f wlroots-0.17.1.tar.gz ] || wget -t 3 -T 60 https://gitlab.freedesktop.org/wlroots/wlroots/-/releases/0.17.1/downloads/wlroots-0.17.1.tar.gz
 }
 
 build() {
-    tar -xzf wlroots-0.17.1.tar.gz
-    cd wlroots-0.17.1
-    meson --buildtype=release --prefix=/opt/wlroots --default-library=static -Dbackends=drm,libinput -Dexamples=false build
-    ninja -C build install
-    cd ..
-
     tar -xzf dwl-6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz
     cd dwl
     patch -p1 < ../patches.patch

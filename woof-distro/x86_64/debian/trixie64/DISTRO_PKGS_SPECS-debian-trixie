@@ -249,7 +249,7 @@ if [ "$DISTRO_VARIANT" = "dwl" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|foot|foot|exe,dev,doc,nls||deps:yes
 yes|tofi|tofi|exe,dev,doc,nls||deps:yes
-yes|wlroots-deps|libegl-dev,libgbm-dev,libgles-dev,libinput-dev,libseat-dev,libpixman-1-dev,libxcb1-dev,libxcb-composite0-dev,libxcb-dri3-dev,libxcb-icccm4-dev,libxcb-present-dev,libxcb-render0-dev,libxcb-render-util0-dev,libxcb-res0-dev,libxcb-shm0-dev,libxcb-xfixes0-dev,libxcb-xinput-dev,libxkbcommon-dev,libdisplay-info-dev,libxcb-ewmh-dev,libliftoff-dev,libvulkan-dev|exe,dev,doc,nls||deps:yes
+yes|wlroots|libwlroots-dev|exe,dev,doc,nls||deps:yes
 yes|yambar|yambar|exe,dev,doc,nls||deps:yes
 "
 else
@@ -267,12 +267,6 @@ if [ "$DISTRO_TARGETARCH" = "x86_64" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|gnu-efi|gnu-efi|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|shim-signed|shim-signed,grub-efi-amd64-signed|exe>dev,dev,doc>dev,nls>dev||deps:yes
-"
-fi
-
-if [ "$DISTRO_VARIANT" = "dwl" ]; then
-    PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|hwdata|hwdata|exe>dev,dev,doc>dev,nls>dev||deps:yes # build-time dependency of wlroots
 "
 fi
 
