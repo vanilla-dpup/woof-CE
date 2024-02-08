@@ -4,5 +4,5 @@ download() {
 
 build() {
     mkdir -p /usr/local/sbin
-    $CC $CFLAGS -D_GNU_SOURCE init.c $LDFLAGS -o /usr/local/sbin/init
+    $CC $CFLAGS `pkg-config --cflags pam pam_misc` -D_GNU_SOURCE init.c $LDFLAGS `pkg-config --libs pam pam_misc` -o /usr/local/sbin/init
 }

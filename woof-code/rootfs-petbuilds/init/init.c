@@ -12,6 +12,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/prctl.h>
+#include <security/pam_appl.h>
+#include <security/pam_misc.h>
 
 #define CLEAR_TTY "\033[2J\033[H"
 #define RESPAWN_DELAY 1
@@ -36,11 +39,15 @@ static void cat(const char *path)
 static void fakelogin(void)
 {
 	static char buf[512];
+	static struct pam_conv conv = {misc_conv, NULL};
 	FILE *fp;
 	struct passwd *user;
 	char *sep, *end;
+	pam_handle_t *pamh;
+	pid_t pid;
+	int ret, status;
 
-	if (!(user = getpwuid(geteuid()))) return;
+	if (prctl(PR_SET_NAME, "fakelogin") < 0 || !(user = getpwuid(geteuid()))) return;
 
 	clearenv();
 
@@ -71,9 +78,20 @@ static void fakelogin(void)
 		fclose(fp);
 	}
 
+	if (pam_start("fakelogin", "root", &conv, &pamh) != PAM_SUCCESS) return;
+	if ((ret = pam_open_session(pamh, 0)) != PAM_SUCCESS) {
+		pam_end(pamh, ret);
+		return;
+	}
+
 	cat("/etc/motd");
 
-	execlp(user->pw_shell, user->pw_shell, "-l", (char *)NULL);
+	if ((pid = fork()) == 0) {
+		execlp(user->pw_shell, user->pw_shell, "-l", (char *)NULL);
+		exit(EXIT_FAILURE);
+	} else if (pid > 0) while (waitpid(pid, &status, 0) < 0 && errno == EINTR);
+
+	pam_end(pamh, pam_close_session(pamh, 0));
 }
 
 static void do_cttyhack(const int first)
