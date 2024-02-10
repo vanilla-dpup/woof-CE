@@ -123,6 +123,7 @@ yes|libgcrypt|libgcrypt20,libgcrypt20-dev|exe,dev,doc,nls||deps:yes # needed by 
 yes|libgtk-layer-shell|libgtk-layer-shell-dev|exe,dev,doc,nls||deps:yes
 yes|libjpeg62|libjpeg62-turbo,libjpeg62-turbo-dev,libjpeg-dev|exe,dev,doc,nls||deps:yes
 yes|libmpfr|libmpfr6|exe,dev,doc,nls||deps:yes
+yes|libpam|libpam0g-dev|exe,dev,doc,nls||deps:yes
 yes|librsvg|librsvg2-2,librsvg2-dev,librsvg2-bin,librsvg2-common|exe,dev,doc,nls||deps:yes #shows gtk3 as dep, but might work without.
 yes|libstdc++6|libstdc++6|exe,dev,doc,nls||deps:yes
 yes|libudev|libudev1,libudev-dev|exe,dev,doc,nls||deps:yes
