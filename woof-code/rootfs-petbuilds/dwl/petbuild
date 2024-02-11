@@ -1,9 +1,9 @@
 download() {
-    [ -f dwl-6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz ] || wget -t 3 -T 60 -O dwl-6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz https://codeberg.org/dwl/dwl/archive/6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz
+    [ -f dwl-8006e7920085947673517c3e296a1e308f935f75.tar.gz ] || wget -t 3 -T 60 -O dwl-8006e7920085947673517c3e296a1e308f935f75.tar.gz https://codeberg.org/dwl/dwl/archive/8006e7920085947673517c3e296a1e308f935f75.tar.gz
 }
 
 build() {
-    tar -xzf dwl-6cbf8e9b80d8be140bd4a71268b483ac1b5c9d5f.tar.gz
+    tar -xzf dwl-8006e7920085947673517c3e296a1e308f935f75.tar.gz
     cd dwl
     patch -p1 < ../patches.patch
     sed -e s/^#XWAYLAND/XWAYLAND/ -e s/^#XLIBS/XLIBS/ -i config.mk
