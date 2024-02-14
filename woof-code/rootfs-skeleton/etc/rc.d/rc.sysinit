@@ -327,6 +327,8 @@ echo -n "Setting up services (network" >/dev/console
 
 hostname -F /etc/hostname
 
+busybox hwclock -s
+
 mkdir -p /var/run/dbus
 chown messagebus /var/run/dbus
 chgrp messagebus /var/run/dbus
