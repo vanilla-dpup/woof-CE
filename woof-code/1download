@@ -93,6 +93,7 @@ esac
 cat << EOF > rootfs/etc/apt/apt.conf.d/00puppy
 APT::Install-Recommends "false";
 APT::Install-Suggests "false";
+APT::Autoremove::SuggestsImportant "false";
 EOF
 chroot rootfs apt-get update
 chroot rootfs apt-get upgrade -y
