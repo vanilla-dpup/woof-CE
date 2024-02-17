@@ -1,51 +1,68 @@
 # woof - the Puppy builder
 
-This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE).
+This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE), the build system used to produce [Puppy Linux](https://puppylinux.com) releases.
 
 The goal is to build something similar to [DebianDog](https://debiandog.github.io/doglinux/), a highly [Debian](https://www.debian.org/)-compatible "live" distro with a layered file system, but with core features of [Puppy Linux](https://puppylinux.com), a distro that -
 * Provides a lightweight desktop environment and a variety of applications
 * Provides a fully functional package manager, [Flatpak](https://flatpak.org/) and support for extra read-only layers (sfs_load)
 * Supports non-persistent, fully persistent or "persistent-on-demand" sessions where the user can decide whether or not to save, and when
-* Has just a drop or two of Puppy's secret sauce: all kinds of legacy cruft, technical debt and complex in-house solutions are gone, to reduce size, speed things up, increase compatibility with Debian, make updates safe and ensure the project's sustainability with very few developers
+* Provides the features that make Puppy great, but without losing compatibility with Debian, breaking updates or creating a big maintenance burden
 
-## Overview
+## Features
 
-This fork strips woof-CE down to the bare essentials:
+### Simplicity
 
-* Only dpup ([Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based Puppy) is supported.
-* Support for the old file system layout, with separate /lib and /usr/lib, is gone. Only the merged layout is supported.
-* Support for X.Org and tools that modify xorg.conf is gone. Only Wayland is supported.
-* Support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone. Only [PipeWire](https://pipewire.org/) is supported.
-* Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
-* Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap). Build times are much shorter than upstream's.
-* PPM is gone: packages in the build come from the upstream distro, rootfs-packages or rootfs-petbuilds (built from source). petget provides limited support for .pet packages.
-* The only supported kind of kernel packages is the "huge" one, and fdrv is built by moving /usr/lib/firmware out of the main SFS.
-* Support for aufs is gone. Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported.
-* ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
+* SFSs don't need to be "queued" by the user for loading at boot time: instead, the init script loads all SFSs under psubdir (if specified) and the partition root, under both the save partition or the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order. The stacking order of the traditional *drv SFS is retained, for backward compatibility.
 * Support for PUPMODEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
-* The partition containing Puppy files can be specified only using `pupsfs=$UUID`.
-* Support for SAVEMARK and SAVESPEC is gone. The partition containing the save file/folder can be specified only using `psave=$UUID`.
-* Support for pimod and pwireless is gone.
-* ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
-* Support for the devx SFS is gone. Development packages are installed inside a copy of the main SFS during the build, but don't make it into the build output.
-* The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country is gone, and so is the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.
-* Themes are gone. [Themes break applications](https://stopthemingmy.app/), modern browsers use non-native widgets and themes are hard to maintain.
-* coreutils, util-linux, etc' are not replaced with symlinks to busybox, because this breaks compatibility with the upstream distro.
+* Support for the devx SFS is gone and development packages can be installed individually, without having to download the entire devx.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
-* Legacy cruft is removed from the init script (/etc/rc.d/rc.sysinit) and it's much faster.
+* The bootable images produced by woof-CE contain an empty save folder and Bootflash creates an empty save folder if possible, to reduce the number of questions users need to answer.
+* `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`.
+* SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`.
+* Rarely-used boot codes like `pimod` and `pwireless` are gone.
+
+### Compatibility
+
+* coreutils, util-linux, etc' are not replaced with symlinks to busybox, because this breaks compatibility with the upstream distro.
 * Some core Puppy scripts that override the upstream distro (including run-as-spot wrappers created by setup-spot) are moved to /usr/local/{,s}bin and PATH makes the shell prefer them. This makes package updates safe, because they no longer remove Puppy's hooks.
+* The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country is gone, and so is the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.
+* Themes are supported, but not included by default: [themes break applications](https://stopthemingmy.app/), they're hard to maintain and non-native widgets in modern browsers or Flatpak applications make theming inconsistency nearly impossible.
+* petget provides limited support for .pet packages.
 
-Other changes:
+### Resource Consumption
 
-* All save files (including encrypted ones) use ext4, with or without journaling.
-* Bootflash in upstream supports FAT32 and f2fs, using syslinux, extlinux or efilinux. This fork adds ext4 support.
-* If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
-* The bootable images produced by woof-CE contain an empty save folder and Bootflash creates an empty save folder if possible, to reduce the number of questions users need to answer. It is assumed that the most common use case of Puppy is installation to a flash drive, with PUPMODE 13 and a save folder.
-* Copying of SFSs to RAM (`pfix=ram|copy` or automatic) happens later in the boot process and it's implemented differently. SFSs are cached in the background and not copied to the ramdisk (see woof-code/rootfs-petbuilds/sfslock), leaving more usable ramdisk space, speeding up the boot process and the memory spent on SFSs is freed automatically (using OOM score adjustment) if needed. However, this also means that the boot partition remains mounted even when using `pfix=ram`. In addition, SFSs are prioritized and lower priority SFSs are not cached when cached SFSs occupy half of available RAM.
 * Copying of SFSs is enabled automatically only if Puppy files reside on storage that doesn't support TRIM and assumed to be a slow device, like a hard drive, a memory card, a flash drive or a DRAM-less SSD.
-* EXTRASFSLIST is now managed automatically and SFSs don't need to be "queued" by the user for loading at boot time. Instead, the init script loads all SFSs under psubdir (if specified) and the partition root, under both the save partition or the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order. The stacking order of the traditional *drv SFS is retained, for backward compatibility.
+* SFSs are not copied to a ramdisk (`pfix=ram|copy` or automatic) but locked in page cache (see woof-code/rootfs-petbuilds/sfslock) instead, freeing ramdisk space.
+* The RAM occupied by cached SFSs is freed automatically (using OOM score adjustment) if needed.
+* SFSs are prioritized and lower priority SFSs are not cached when cached SFSs occupy half of available RAM.
+* If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
+
+### Speed
+
+* The init script (/etc/rc.d/rc.sysinit) is shorter and much faster.
+* Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
+* Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap). Build times are much shorter than upstream's.
+
+### Security
+
 * The [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox that restricts file system access for applications running as spot is stricter and also prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777, but without this new restriction, spot can access /initrd/mnt/dev_save/*save/upper/root instead, to bypass the sandbox. This breaks compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
+* Most legacy X11 applications work thanks to [Xwayland](https://wayland.freedesktop.org/xserver.html), which is unprivileged and sandboxed.
+
+### Modernization
+
+* Only dpup ([Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based Puppy) is supported.
+* Only Wayland is supported: support for X.Org and tools that modify xorg.conf is gone.
+* Only [PipeWire](https://pipewire.org/) is supported: support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone.
+* Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
+* usrmerge is mandatory: support for the deprecated file system layout with separate /lib and /usr/lib, is gone.
+* Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported: support for aufs is gone.
+* PPM is gone: packages in the build come from the upstream distro, rootfs-packages or rootfs-petbuilds (built from source).
+* Support for kernel package types other than the "huge" one is gone.
+* kernel-kit's firmware picker is gone: fdrv is built by moving /usr/lib/firmware out of the main SFS.
+* ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
+* ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
+* ext2 and ext3 save files are gone: all save files (including encrypted ones) use ext4, with or without journaling, and Bootflash supports ext4.
 * initrd is zstd-compressed and built from rootfs binaries instead of a prebuilt, outdated and unmaintained set of static executables.
 
 ## Directory Structure
