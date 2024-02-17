@@ -883,8 +883,7 @@ fi
 mkdir -p /pup_new/initrd/mnt/tmpfs/tmp
 if [ -d /pup_new/initrd/mnt/tmpfs/tmp ];then #extra paranoid precaution
  chmod 1777 /pup_new/initrd/mnt/tmpfs/tmp
- rm -rf /pup_new/tmp
- ln -sv /initrd/mnt/tmpfs/tmp /pup_new/tmp #for after switch
+ mount --bind /pup_new/initrd/mnt/tmpfs/tmp /pup_new/tmp #for after switch
 fi
 
 #---
