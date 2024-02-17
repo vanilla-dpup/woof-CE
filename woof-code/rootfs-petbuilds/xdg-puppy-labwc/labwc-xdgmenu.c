@@ -43,7 +43,7 @@
  * Declarations
  */
 static void show_help();
-static void process_directory(GMenuTreeDirectory *directory, int root);
+static void process_directory(GMenuTreeDirectory *directory, GHashTable *history, int root);
 static void process_entry(GMenuTreeEntry *entry);
 
 /*=============================================================================
@@ -71,7 +71,9 @@ int main (int argc, char **argv)
 
     GMenuTreeDirectory *rootDirectory = gmenu_tree_get_root_directory(menuTree);
 
-    process_directory(rootDirectory, 1);
+    GHashTable *history = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+    process_directory(rootDirectory, history, 1);
+    g_hash_table_destroy(history);
 
     gmenu_tree_item_unref (rootDirectory);
 
@@ -95,7 +97,7 @@ void show_help()
 /*=============================================================================
  * This function processes a directory entry and all it's child nodes
  */
-void process_directory(GMenuTreeDirectory *directory, int root)
+void process_directory(GMenuTreeDirectory *directory, GHashTable *history, int root)
 {
     GMenuTreeIter *entryList = gmenu_tree_directory_iter (directory);
     GMenuTreeItemType entryType;
@@ -123,7 +125,6 @@ start:
 
     GMenuTreeEntry *entry;
     const char *path;
-    GHashTable *history = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
      entryList = gmenu_tree_directory_iter(directory);
      while ((entryType = gmenu_tree_iter_next(entryList)) != GMENU_TREE_ITEM_INVALID)
@@ -131,7 +132,7 @@ start:
         switch (entryType)
         {
             case GMENU_TREE_ITEM_DIRECTORY:
-				process_directory(gmenu_tree_iter_get_directory(entryList), 0);
+				process_directory(gmenu_tree_iter_get_directory(entryList), history, 0);
                 break;
             case GMENU_TREE_ITEM_ENTRY:
                 entry = gmenu_tree_iter_get_entry(entryList);
@@ -147,7 +148,6 @@ start:
         }
     }
 
-    g_hash_table_destroy(history);
     if (root)
     {
         g_printf("</menu>\n");
