@@ -138,6 +138,9 @@ rm -f rootfs-complete/usr/share/doc/changelog*.gz
 rm -f rootfs-complete/etc/fonts/conf.d/10-hinting-slight.conf rootfs-complete/etc/fonts/conf.d/10-autohint.conf
 ln -s /usr/share/fontconfig/conf.avail/10-hinting-none.conf rootfs-complete/etc/fonts/conf.d/
 
+# workaround for #1064267
+rm -f rootfs-complete/etc/fonts/conf.d/70-no-bitmaps.conf
+
 cat << EOF > rootfs-complete/etc/issue
 $DISTRO_NAME
 
