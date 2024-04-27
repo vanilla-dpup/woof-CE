@@ -97,7 +97,7 @@ yes|glibc|libc-bin,libc6,libc6-dev,tzdata|exe,dev,doc,nls||deps:yes
 yes|glibc_locales|locales|exe,dev,doc,nls>exe||deps:yes
 yes|gnome-icon-theme|gnome-icon-theme|exe>null,dev>null,doc>null,nls>null
 yes|gdisk|gdisk|exe,dev,doc,nls||deps:yes
-yes|gnutls|libgnutls30,libgnutls28-dev|exe,dev,doc,nls||deps:yes
+yes|gnutls|libgnutls30t64,libgnutls28-dev|exe,dev,doc,nls||deps:yes
 yes|gpart|gpart|exe,dev,doc,nls||deps:yes
 yes|gparted|gparted|exe,dev,doc,nls||deps:yes
 yes|grep|grep|exe,dev>null,doc,nls||deps:yes
