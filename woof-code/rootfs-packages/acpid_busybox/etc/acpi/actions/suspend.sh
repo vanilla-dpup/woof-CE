@@ -7,7 +7,7 @@
 ACPI_CONFIG=/etc/acpi/acpi.conf
 [ -s "$ACPI_CONFIG" ] && . "$ACPI_CONFIG"
 
-case "$(awk '{print $2}' /proc/acpi/button/lid/LID0/state)" in
+case "$(awk '{print $2}' /proc/acpi/button/lid/LID*/state | head -n 1)" in
 # if the lid is closed:
 #  if an external monitor is connected and enabled:
 #   turn off the internal display
@@ -16,9 +16,9 @@ case "$(awk '{print $2}' /proc/acpi/button/lid/LID0/state)" in
 closed)
   if [ -n "`comm -12 <(grep -l '^connected$' /sys/class/drm/*/status | cut -f 5 -d / | sort) <(grep -l '^enabled$' /sys/class/drm/*/enabled | cut -f 5 -d / | sort) | grep -Fv -e eDP -e LVDS`" ]; then
     if [ -n "$WAYLAND_DISPLAY" ]; then
-      wlr-randr --output eDP-1 --off || wlr-randr --output eDP1 --off || wlr-randr --output LVDS-1 --off || wlr-randr --output LVDS1 --off
+      wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
     elif [ -n "$DISPLAY" ]; then
-      xrandr --output eDP-1 --off || xrandr --output eDP1 --off || xrandr --output LVDS-1 --off || xrandr --output LVDS1 --off
+      xrandr --output "`xrandr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
     fi
     touch /tmp/.lid-closed
     DISABLE_SUSPEND=y
@@ -30,9 +30,9 @@ closed)
 open)
   if [ -f /tmp/.lid-closed ]; then
     if [ -n "$WAYLAND_DISPLAY" ]; then
-      wlr-randr --output eDP-1 --on || wlr-randr --output eDP1 --on || wlr-randr --output LVDS-1 --on || wlr-randr --output LVDS1 --on
+      wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
     elif [ -n "$DISPLAY" ]; then
-      xrandr --output eDP-1 --auto || xrandr --output eDP1 --auto || xrandr --output LVDS-1 --auto || xrandr --output LVDS1 --auto
+      xrandr --output "`xrandr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --auto
     fi
     rm -f /tmp/.lid-closed
   fi
