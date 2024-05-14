@@ -208,6 +208,7 @@ yes|seatd|seatd|exe,dev,doc,nls||deps:yes
 yes|slurp|slurp|exe,dev,doc,nls||deps:yes
 yes|swayidle|swayidle|exe>null,dev>null,doc>null,nls>null||deps:yes # using swayidle petbuild without logind support
 yes|swaylock|swaylock|exe>null,dev>null,doc>null,nls>null # using swaylock petbuild with root patch
+yes|wdisplays|wdisplays|exe,dev,doc,nls||deps:yes
 yes|wlopm|wlopm|exe,dev,doc,nls||deps:yes
 yes|wlr-randr|wlr-randr|exe,dev,doc,nls||deps:yes
 yes|xdg-desktop-portal-gtk|xdg-desktop-portal-gtk|exe,dev,doc,nls||deps:yes
