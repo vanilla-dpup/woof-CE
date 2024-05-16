@@ -4,111 +4,22 @@
 
 export TEXTDOMAIN=logout_gui
 
-[ -n "$WAYLAND_DISPLAY" ] && X=Wayland || X=Xorg
-MSG_X="$(gettext "Active graphical server"): <b>$X</b>"
-if [ -n "$WAYLAND_DISPLAY" ]; then
-	MSG_WM="$(gettext "Active window manager"): <b>$(cat /etc/windowmanager)</b>"
-	RESTART_MENUAPP=''
-	MENUAPP=''
-elif pidof jwm >/dev/null 2>&1 ; then
-	MSG_WM="$(gettext "Active window manager"): <b>JWM</b>"
-	RESTART_MENUAPP="$(gettext 'Restart window manager')"
-	MENUAPP=jwm
-elif pidof lxpanel >/dev/null 2>&1 ; then
-	RESTART_MENUAPP="$(gettext 'Restart LXPanel')"
-	MENUAPP=lxpanel
-	if pidof openbox >/dev/null 2>&1 ; then
-		MSG_WM="$(gettext "Active window manager"): <b>Openbox</b>"
-		RESTART_MENUAPP="$(gettext 'Restart LXPanel+Openbox')"
-	fi
-elif pidof openbox >/dev/null 2>&1 ; then
-	MSG_WM="$(gettext "Active window manager"): <b>Openbox</b>"
-	RESTART_MENUAPP="$(gettext 'Restart Openbox')"
-	MENUAPP=openbox
-	MENUAPP=''
-fi
+MSG_X="$(gettext "Active graphical server"): <b>Wayland</b>"
+MSG_WM="$(gettext "Active window manager"): <b>$(cat /etc/windowmanager)</b>"
 
-S='
-<window title="'$(gettext 'Puppy Log Out')'" icon-name="gtk-preferences" window-position="1" resizable="false">
-<vbox space-expand="true" space-fill="true">
-  '"`/usr/lib/gtkdialog/xml_info fixed puppy_config.svg 60 "$MSG_WM" "$MSG_X"`"'
-  <vbox spacing="10" space-expand="true" space-fill="true">
-  <frame>
-    <hbox spacing="10" homogeneous="true" space-expand="true" space-fill="true">
-      <button image-position="2">
-        <label>'$(gettext 'Reboot')'</label>
-        '"`/usr/lib/gtkdialog/xml_button-icon reboot.svg huge`"'
-        <action>exit:reboot</action>
-      </button>
-      <button image-position="2">
-        <label>'$(gettext 'Shut Down')'</label>
-         '"`/usr/lib/gtkdialog/xml_button-icon shutdown.svg huge`"'
-        <action>exit:poweroff</action>
-      </button>
-    </hbox>
-  
-    <hbox spacing="10" homogeneous="true" space-expand="true" space-fill="true">
-      <button image-position="2">
-        <label>'$(gettext 'Restart graphical server')'</label>
-        '"`/usr/lib/gtkdialog/xml_button-icon graphics_restart.svg huge`"'
-        <action>exit:restartx</action>
-      </button>
-      <button image-position="2">
-        <label>'$(gettext 'Exit to Prompt')'</label>
-        '"`/usr/lib/gtkdialog/xml_button-icon terminal.svg huge`"'
-        <action>exit:logout</action>
-      </button>
-    </hbox>
-    
-    <hbox spacing="10" homogeneous="true" space-expand="true" space-fill="true">'
-      if [ "$MENUAPP" ]; then S=$S'
-        <button image-position="2">
-          <label>'${RESTART_MENUAPP}'</label>
-          '"`/usr/lib/gtkdialog/xml_button-icon wm_restart.svg huge`"'
-          <action>exit:restartmenuapp</action>
-        </button>'
-      elif ps -eo pid,comm | grep -qF 'jwm' || ps -eo pid,comm | grep -qF 'labwc'; then S=$S'
-        <button image-position="2">
-          <label>'$(gettext 'Rebuild Menu')'</label>
-          '"`/usr/lib/gtkdialog/xml_button-icon menu.svg huge`"'
-          <action>exit:refreshwm</action>
-        </button>'
-      else
-        S=$S'<text><label>""</label></text>'
-      fi
-      S=$S'
-        <button image-position="2">
-          <label>'$(gettext 'Lock screen')'</label>
-          '"`/usr/lib/gtkdialog/xml_button-icon screen_lock.svg huge`"'
-          <action>puplock</action>
-        </button>'
-  
-    S=$S'</hbox>
-  </frame>
-  </vbox>
-</vbox>
-</window>'
-
-export logout="$S"
-
-. /usr/lib/gtkdialog/xml_info gtk > /dev/null #build bg_pixmap for gtk-theme
-retvals="`gtkdialog -p logout --styles=/tmp/gtkrc_xml_info.css`"
-eval "$retvals"
-case $EXIT in
-  logout)exec wmexit ;;
-  reboot)exec wmreboot ;;
-  poweroff)exec wmpoweroff ;;
-  restartx)restartwm ;;
-  restartmenuapp)
-	case $MENUAPP in
-		openbox) openbox --restart ;;
-		jwm) jwm -restart ;;
-		lxpanel)
-			lxpanelctl restart
-			pidof openbox >/dev/null 2>&1 && openbox --restart
-			;;
-	esac
-	;;
-  refreshwm)fixmenus; pidof jwm >/dev/null 2>&1 && jwm -reload;pidof labwc >/dev/null 2>&1 && killall -SIGHUP labwc ;;
-  *)exit ;;
-esac
+exec yad \
+    --title "$(gettext 'Puppy Log Out')" \
+    --window-icon=gtk-preferences \
+    --text="${MSG_WM=}\n${MSG_X=}" \
+    --text-align=center \
+    --form \
+    --align=center \
+    --columns=2 \
+    --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN@2 "wmreboot; kill \$YAD_PID" \
+    --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN@3 "wmpoweroff; kill \$YAD_PID" \
+    --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN@4 "restartwm; kill \$YAD_PID" \
+    --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN@5 "wmexit; kill \$YAD_PID" \
+    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN@6 "fixmenus; killall -HUP labwc; kill \$YAD_PID" \
+    --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN@7 "puplock; kill \$YAD_PID" \
+    --no-buttons \
+    --use-interp
