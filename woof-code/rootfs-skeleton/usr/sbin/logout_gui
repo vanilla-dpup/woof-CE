@@ -15,11 +15,11 @@ exec yad \
     --form \
     --align=center \
     --columns=2 \
-    --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN@2 "wmreboot; kill \$YAD_PID" \
-    --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN@3 "wmpoweroff; kill \$YAD_PID" \
-    --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN@4 "restartwm; kill \$YAD_PID" \
-    --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN@5 "wmexit; kill \$YAD_PID" \
-    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN@6 "fixmenus; killall -HUP labwc; kill \$YAD_PID" \
-    --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN@7 "puplock; kill \$YAD_PID" \
+    --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN "wmreboot; kill \$YAD_PID" \
+    --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN "wmpoweroff; kill \$YAD_PID" \
+    --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN "restartwm; kill \$YAD_PID" \
+    --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN "wmexit; kill \$YAD_PID" \
+    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "fixmenus; killall -HUP labwc; kill \$YAD_PID" \
+    --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN "puplock; kill \$YAD_PID" \
     --no-buttons \
     --use-interp
