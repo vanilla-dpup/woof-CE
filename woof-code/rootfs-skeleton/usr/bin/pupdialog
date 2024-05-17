@@ -248,19 +248,8 @@ if [ $nTIMEOUT -a $nTIMEOUT -ne 0  ];then #assume 0 means never timeout.
  #note, jwm will use module16.xpm as the window icon...
  /tmp/pupdialog_exec --center --class="module16" --program=PUP${$}DLG --styles=/tmp/pupdialog_gtk3.css > /tmp/pupdialog_retvals${$} &
  dlgPID=$!
- while [ $nTIMEOUT -ne 0 ];do
-  sleep 1
-  [ "`busybox ps | awk '{print $1}' | grep "^${dlgPID}$"`" == "" ] && break #already killed.
-  nTIMEOUT=$(($nTIMEOUT - 1))
-  if [ "$COUNTDOWN" ];then
-   BKCOL="yellow"
-   [ $nTIMEOUT -lt 31 ] && BKCOL="orange"
-   [ $nTIMEOUT -lt 11 ] && BKCOL="red"
-   SPLASHSTR="`echo -n "$COUNTDOWN" | sed -e "s%TIME%${nTIMEOUT}%"`"
-   /usr/lib/gtkdialog/box_splash -timeout 2 -bg ${BKCOL} -placement top -close never -fontsize large -text " ${SPLASHSTR} " >/dev/null &
-  fi
- done
- if [ $nTIMEOUT -eq 0 ];then #has timed out.
+ yad --layer=overlay --edge=top --text=" ${SPLASHSTR}" --no-buttons --timeout=${nTIMEOUT} --timeout-indicator=bottom >/dev/null
+ if [ $? -eq 70 ];then #has timed out.
   kill $dlgPID
   rm -f /tmp/pupdialog_gtkrc${$}
   rm -f /tmp/pupdialog_retvals${$}

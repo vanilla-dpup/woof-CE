@@ -1,0 +1,297 @@
+From 64f67bcca4a5328d4a999d21f489c744eea7c955 Mon Sep 17 00:00:00 2001
+From: Dima Krasner <dima@dimakrasner.com>
+Date: Fri, 17 May 2024 12:26:02 +0300
+Subject: [PATCH] add Meson port with layer-shell support
+
+---
+ data/icons/meson.build |  4 +++
+ data/meson.build       |  3 ++
+ data/yad.1             |  6 ++++
+ meson.build            | 12 +++++++
+ meson_options.txt      |  1 +
+ po/meson.build         |  3 ++
+ src/main.c             | 74 ++++++++++++++++++++++++++++++++++++++++++
+ src/meson.build        | 56 ++++++++++++++++++++++++++++++++
+ src/option.c           | 10 ++++++
+ src/yad.h              |  4 +++
+ 10 files changed, 173 insertions(+)
+ create mode 100644 data/icons/meson.build
+ create mode 100644 data/meson.build
+ create mode 100644 meson.build
+ create mode 100644 meson_options.txt
+ create mode 100644 po/meson.build
+ create mode 100644 src/meson.build
+
+diff --git a/data/icons/meson.build b/data/icons/meson.build
+new file mode 100644
+index 0000000..3957a49
+--- /dev/null
++++ b/data/icons/meson.build
+@@ -0,0 +1,4 @@
++foreach size : [16, 24, 32, 48, 96, 128]
++	install_data(f'@size@x@size@/yad.png',
++	             install_dir : f'share/icons/hicolor/@size@x@size@/apps')
++endforeach
+diff --git a/data/meson.build b/data/meson.build
+new file mode 100644
+index 0000000..49da2f8
+--- /dev/null
++++ b/data/meson.build
+@@ -0,0 +1,3 @@
++install_man('yad.1')
++
++subdir('icons')
+diff --git a/data/yad.1 b/data/yad.1
+index 7e5ff15..544de01 100644
+--- a/data/yad.1
++++ b/data/yad.1
+@@ -97,6 +97,12 @@ Use standard X Window geometry notation for placing dialog.
+ When this option is used, \fIwidth\fP, \fIheight\fP, \fIposx\fP, \fIposy\fP, \fImouse\fP and \fIcenter\fP options are
+ ignored.
+ .TP
++.B \-\-layer=\fILAYER\fP
++Set the layer of dialog window. \fILAYER\fP can be one of the \fIbackground\fP, \fIbottom\fP, \fItop\fP or \fIoverlay\fP.
++.TP
++.B \-\-edge=\fIEDGE\fP
++Set the screen edge of dialog window. \fIEDGE\fP can be one of the \fItop\fP, \fIbottom\fP, \fIleft\fP, \fIright\fP, \fItopleft\fP, \fItopright\fP, \fIbottomleft\fP or \fIbottomright\fP.
++.TP
+ .B \-\-timeout=\fITIMEOUT\fP
+ Set the dialog timeout in seconds.
+ .TP
+diff --git a/meson.build b/meson.build
+new file mode 100644
+index 0000000..00800d0
+--- /dev/null
++++ b/meson.build
+@@ -0,0 +1,12 @@
++project('yad', 'c', version: '0.42.81', license: 'GPLv3')
++
++cc = meson.get_compiler('c')
++m = cc.find_library('m')
++
++gtk = dependency('gtk+-3.0')
++gtk_print = dependency('gtk+-unix-print-3.0')
++gtk_layer_shell = dependency('gtk-layer-shell-0', required: false)
++
++subdir('po')
++subdir('src')
++subdir('data')
+diff --git a/meson_options.txt b/meson_options.txt
+new file mode 100644
+index 0000000..75661da
+--- /dev/null
++++ b/meson_options.txt
+@@ -0,0 +1 @@
++option('rgb', type: 'string', value: '/etc/X11/rgb.txt', description: 'Set path to rgb.txt file')
+diff --git a/po/meson.build b/po/meson.build
+new file mode 100644
+index 0000000..2ceeb76
+--- /dev/null
++++ b/po/meson.build
+@@ -0,0 +1,3 @@
++i18n = import('i18n')
++add_project_arguments('-DGETTEXT_PACKAGE="yad"', language:'c')
++i18n.gettext('yad')
+diff --git a/src/main.c b/src/main.c
+index b1419b0..cffd07d 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -33,6 +33,10 @@
+ 
+ #include "yad.h"
+ 
++#ifdef HAVE_GTK_LAYER_SHELL
++#  include <gtk-layer-shell.h>
++#endif
++
+ YadOptions options;
+ static GtkWidget *dialog = NULL;
+ static GtkWidget *text = NULL;
+@@ -340,9 +344,79 @@ static GtkWidget *
+ create_dialog (void)
+ {
+   GtkWidget *dlg, *vbox, *layout;
++#ifdef HAVE_GTK_LAYER_SHELL
++  GtkLayerShellLayer layer = GTK_LAYER_SHELL_LAYER_ENTRY_NUMBER;
++  GtkLayerShellEdge edge = GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER;
++  GtkLayerShellEdge corner = GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER;
++#endif
+ 
+   /* create dialog window */
+   dlg = gtk_window_new (GTK_WINDOW_TOPLEVEL);
++
++#ifdef HAVE_GTK_LAYER_SHELL
++  if (options.data.layer)
++    {
++      if (strcmp(options.data.layer, "background") == 0)
++        layer = GTK_LAYER_SHELL_LAYER_BACKGROUND;
++      else if (strcmp(options.data.layer, "bottom") == 0)
++        layer = GTK_LAYER_SHELL_LAYER_BOTTOM;
++      else if (strcmp(options.data.layer, "top") == 0)
++        layer = GTK_LAYER_SHELL_LAYER_TOP;
++      else if (strcmp(options.data.layer, "overlay") == 0)
++        layer = GTK_LAYER_SHELL_LAYER_OVERLAY;
++   }
++
++  if (options.data.edge)
++    {
++      if (strcmp(options.data.edge, "top") == 0)
++        edge = GTK_LAYER_SHELL_EDGE_TOP;
++      else if (strcmp(options.data.edge, "bottom") == 0)
++        edge = GTK_LAYER_SHELL_EDGE_BOTTOM;
++      else if (strcmp(options.data.edge, "left") == 0)
++        edge = GTK_LAYER_SHELL_EDGE_LEFT;
++      else if (strcmp(options.data.edge, "right") == 0)
++        edge = GTK_LAYER_SHELL_EDGE_RIGHT;
++      else if (strcmp(options.data.edge, "topleft") == 0)
++        {
++          edge = GTK_LAYER_SHELL_EDGE_LEFT;
++          corner = GTK_LAYER_SHELL_EDGE_TOP;
++        }
++      else if (strcmp(options.data.edge, "topright") == 0)
++        {
++          edge = GTK_LAYER_SHELL_EDGE_RIGHT;
++          corner = GTK_LAYER_SHELL_EDGE_TOP;
++        }
++      else if (strcmp(options.data.edge, "bottomleft") == 0)
++        {
++          edge = GTK_LAYER_SHELL_EDGE_LEFT;
++          corner = GTK_LAYER_SHELL_EDGE_BOTTOM;
++        }
++      else if (strcmp(options.data.edge, "bottomright") == 0)
++        {
++          edge = GTK_LAYER_SHELL_EDGE_RIGHT;
++          corner = GTK_LAYER_SHELL_EDGE_BOTTOM;
++        }
++    }
++
++     if (layer != GTK_LAYER_SHELL_LAYER_ENTRY_NUMBER || edge != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER || corner != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER)
++       gtk_layer_init_for_window(GTK_WINDOW(dlg));
++
++     if (layer != GTK_LAYER_SHELL_LAYER_ENTRY_NUMBER)
++       gtk_layer_set_layer(GTK_WINDOW(dlg), layer);
++
++     if (edge != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER)
++       {
++         gtk_layer_set_exclusive_zone(GTK_WINDOW(dlg), 0);
++         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_LEFT, 20);
++         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_RIGHT, 20);
++         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_TOP, 10);
++         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_BOTTOM, 20);
++         gtk_layer_set_anchor(GTK_WINDOW(dlg), edge, TRUE);
++         if (corner != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER)
++           gtk_layer_set_anchor(GTK_WINDOW(dlg), corner, TRUE);
++       }
++#endif
++
+   if (options.data.splash)
+     gtk_window_set_type_hint (GTK_WINDOW (dlg), GDK_WINDOW_TYPE_HINT_SPLASHSCREEN);
+   gtk_window_set_title (GTK_WINDOW (dlg), options.data.dialog_title);
+diff --git a/src/meson.build b/src/meson.build
+new file mode 100644
+index 0000000..97f99f1
+--- /dev/null
++++ b/src/meson.build
+@@ -0,0 +1,56 @@
++src = [
++	'about.c',
++	'calendar.c',
++	'color.c',
++	'cpicker.c',
++	'dnd.c',
++	'entry.c',
++	'file.c',
++	'font.c',
++	'form.c',
++	'icons.c',
++	'list.c',
++	'main.c',
++	'notebook.c',
++	'notification.c',
++	'option.c',
++	'paned.c',
++	'picture.c',
++	'print.c',
++	'progress.c',
++	'scale.c',
++	'text.c',
++	'util.c',
++]
++
++cfg = configuration_data()
++
++cfg.set_quoted('PACKAGE_NAME', meson.project_name())
++cfg.set_quoted('PACKAGE_VERSION', meson.project_version())
++cfg.set_quoted('PACKAGE_URL', 'http://github.com/step-/yad')
++cfg.set_quoted('RGB_FILE', get_option('rgb'))
++cfg.set('HAVE_TRAY', 1)
++
++dep = [
++	meson.get_compiler('c').find_library('m'),
++	dependency('gtk+-3.0'),
++	dependency('gtk+-unix-print-3.0'),
++]
++
++gtk_layer_shell = dependency('gtk-layer-shell-0', required: false)
++if gtk_layer_shell.found()
++	dep += gtk_layer_shell
++	cfg.set('HAVE_GTK_LAYER_SHELL', 1)
++endif
++
++configure_file(
++	output : 'config.h',
++	configuration : cfg,
++)
++
++yad = executable(
++	'yad',
++	src,
++	dependencies: dep,
++	install: true,
++)
+diff --git a/src/option.c b/src/option.c
+index cd6ae56..9d707c4 100644
+--- a/src/option.c
++++ b/src/option.c
+@@ -100,6 +100,12 @@ static GOptionEntry general_options[] = {
+     N_("Set the Y position of a window"), N_("NUMBER") },
+   { "geometry", 0, 0, G_OPTION_ARG_STRING, &options.data.geometry,
+     N_("Set the window geometry"), N_("WxH+X+Y") },
++#ifdef HAVE_GTK_LAYER_SHELL
++  { "layer", 0, 0, G_OPTION_ARG_STRING, &options.data.layer,
++    N_("Set the dialog layer"), N_("LAYER") },
++  { "edge", 0, 0, G_OPTION_ARG_STRING, &options.data.edge,
++    N_("Set the dialog screen edge"), N_("EDGE") },
++#endif
+   { "timeout", 0, 0, G_OPTION_ARG_INT, &options.data.timeout,
+     N_("Set dialog timeout in seconds"), N_("TIMEOUT") },
+   { "timeout-indicator", 0, 0, G_OPTION_ARG_STRING, &options.data.to_indicator,
+@@ -1517,6 +1523,10 @@ yad_options_init (void)
+   options.data.use_posy = FALSE;
+   options.data.posy = 0;
+   options.data.geometry = NULL;
++#ifdef HAVE_GTK_LAYER_SHELL
++  options.data.layer = NULL;
++  options.data.edge = NULL;
++#endif
+   options.data.dialog_text = NULL;
+   options.data.text_align = GTK_JUSTIFY_LEFT;
+   options.data.dialog_image = NULL;
+diff --git a/src/yad.h b/src/yad.h
+index 22a41ad..475dc91 100644
+--- a/src/yad.h
++++ b/src/yad.h
+@@ -230,6 +230,10 @@ typedef struct {
+   gboolean use_posy;
+   gint posy;
+   gchar *geometry;
++#ifdef HAVE_GTK_LAYER_SHELL
++  gchar *layer;
++  gchar *edge;
++#endif
+   guint timeout;
+   gchar *to_indicator;
+   gchar *dialog_text;
+-- 
+2.43.0
+

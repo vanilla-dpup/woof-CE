@@ -5,8 +5,8 @@ BATDIR=$(find -L /sys/class/power_supply -maxdepth 1 -type d -name 'BAT*')
 
 case $1 in
   s)
-	gtkdialog-splash  -font mono -fontsize 12 -icon gtk-info -icon_width 60 -title -bg "thistle" -close box -text \
-	"$(cd $BATDIR ; for i in * ; do [ "$i" = 'uevent' ] && continue; [ -d "$i" ] && continue; echo -n "${i}: " && cat $i ; done)" &
+	yad --title=powerapplet.sh --window-icon=dialog-information --button=gtk-ok \
+	--text="$(cd $BATDIR ; for i in * ; do [ "$i" = 'uevent' ] && continue; [ -d "$i" ] && continue; echo -n "${i}: " && cat $i ; done)" &
   ;;
   *)
     FULL=$(find -L $BATDIR -maxdepth 1 -type f -name '*_full')

@@ -242,7 +242,3 @@ done
 cp -af $TEMPDIR/command $CFGDIR/wmon_cmd || exit_error failure
 # execute
 . $CFGDIR/wmon_cmd
-if pidof -s ROX-Filer > /dev/null; then
-        /usr/lib/gtkdialog/box_yesno --yes-first "Wmonitors" "$(gettext 'For the changes to effect you must restart X... Would you like to restart X now?')"
-        [ $? -eq 0 ] && restartwm
-fi

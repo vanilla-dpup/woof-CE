@@ -223,7 +223,7 @@ cd "$WD"
 error_msg () {
 	if [ "$SHUTDOWN" = "no" -a "$XRUNNING" = "yes" ];then
 		export DISPLAY=':0'
-		/usr/lib/gtkdialog/box_splash -timeout 30 -close box -icon gtk-dialog-warning -bg red -text "$1"
+		yad --image=dialog-warning --layer=overlay --edge=top --text="$1" --no-buttons --timeout=30
 	else
 		echo "$1"
 	fi

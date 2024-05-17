@@ -169,7 +169,7 @@ choosepartfunc() {
  #nothing to save to...
  if [ "$PARTSLIST" = "" ];then
   if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
-   /usr/lib/gtkdialog/box_splash -bg red -close box -fontsize large -timeout 10 -text "$T_nosave"
+   yad --image=dialog-error --layer=overlay --edge=top --text="$T_nosave" --no-buttons --timeout=10
   else
    clear
    echo "T_nosave"
@@ -179,7 +179,7 @@ choosepartfunc() {
  fi
  T_waitprobing="$(gettext 'Please wait, probing partitions...')"
  if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ]; then
-  /usr/lib/gtkdialog/box_splash -close never -fontsize large -text "$T_waitprobing" &
+  yad --image=system-run --layer=overlay --edge=top --text="$T_waitprobing" --no-buttons &
   ppPID=$!
  fi
  SCHOICES=""; DEFTAG=""
@@ -266,7 +266,7 @@ $(gettext "Instead, you should first run Microsoft Windows -- most often this pr
  [ -s /tmp/schoices.txt ] && SCHOICES="`cat /tmp/schoices.txt`"
  if [ "$SCHOICES" = "" ];then
   if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
-   /usr/lib/gtkdialog/box_splash -bg red -close box -fontsize large -timeout 10 -text "$T_nosave"
+   yad --image=dialog-error --layer=overlay --edge=top --text="$T_nosave" --no-buttons --timeout=10
   else
    clear
    echo "$T_nosave"
@@ -436,7 +436,7 @@ $(gettext 'Unless you have a good reason to use encryption, it is recommended no
 This must be remembered and entered at every bootup.')"
   while [ 1 ];do
     if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
-      MYPASSWORD="$(/usr/lib/gtkdialog/box_passwd --show --default "puppyisgreat" "$T_passtitle" "$T_passtext")"
+      MYPASSWORD="$(yad --title="$T_passtitle" --icon=dialog-question --text="$T_passtext" --entry --hide-text --button=gtk-ok)"
     else
       MYPASSWORD="`${DIALOGEXE} ${BACKGROUNDYELLOW} ${TITLEPARAM} "$T_passtitle" --screen-center --stdout --no-cancel --inputbox "$T_passtext" 0 0 "puppyisgreat"`" #110926
     fi
@@ -596,7 +596,7 @@ If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
   mkfs.${SFFS} -q -m 0 -F /dev/mapper/savefile ${SFFSOPTS} &>>/tmp/mk2fs.log
   if [ $? -ne 0 ] ; then
     pupkill $w1PID
-    /usr/lib/gtkdialog/box_ok "$(gettext 'Error')" error "$(gettext 'Unable to create filesystem')"
+    yad --title=Error --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Unable to create filesystem')" --button=gtk-ok
     defaulttextviewer /tmp/mk2fs.log
   fi
   sync

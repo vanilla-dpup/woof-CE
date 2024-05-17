@@ -65,14 +65,14 @@ case $1 in
 		PUPSWAP_HELP_1="$(gettext "As well as the swap partition, Linux also supports a swap file that you can create, prepare, and mount in a fashion similar to that of a swap partition. The advantage of swap files is that you don't need to find an empty partition or repartition a disk to add additional swap space.")"
 		PUPSWAP_HELP_2="$(gettext "It is possible to run a Linux system without a swap space, and the system will run well if you have a large amount of memory -- but if you run out of physical memory then the system will crash, as it has nothing else it can do, so it is advisable to have a swap space, especially since disk space is relatively cheap")"
 		echo -e "${PUPSWAP_HELP_1}\n\n${PUPSWAP_HELP_2}" > /tmp/box_help
-		/usr/lib/gtkdialog/box_help
+		yad --title="Puppy Help" --window-icon=dialog-information --text-info --filename=/tmp/box_help --wrap --button=gtk-ok
 		;;
 esac
 
 #===============================================================
 
 if [ $PUPMODE -eq 5 -a "$BOOTMANAGER" != "" ] ; then
-	/usr/lib/gtkdialog/box_ok "pupswap" info "$(gettext "It's not advised to use this tool on first boot but you can play with it nonetheless...")"
+	yad --title=pupswap --window-icon=dialog-information --image=dialog-information --text="$(gettext "It's not advised to use this tool on first boot but you can play with it nonetheless...")" --button=gtk-ok
 fi
 
 #===============================================================
@@ -250,7 +250,7 @@ fi
 if [ ! -d "$SWAP_PART" ] ; then
 	msg="$(gettext 'Invalid directory...')"
 	if [ $GUI ] ; then
-		exec /usr/lib/gtkdialog/box_ok "pupswap" error "$msg"
+		exec yad --title=pupswap --window-icon=dialog-error --image=dialog-error --text="$msg" --button=gtk-ok
 	else
 		exec dialog --title "pupswap" --msgbox "$msg" 7 40
 	fi
@@ -260,7 +260,7 @@ SWAP_SIZE_MB=${SWAP_SIZE_MB%MB}
 if [ ! "$SWAP_SIZE_MB" ] ; then
 	msg="$(gettext 'Now swap size specificied...')"
 	if [ $GUI ] ; then
-		exec /usr/lib/gtkdialog/box_ok "pupswap" error "$msg"
+		exec yad --title=pupswap --window-icon=dialog-error --image=dialog-error --text="$msg" --button=gtk-ok
 	else
 		exec dialog --title "pupswap" --msgbox "$msg" 7 40
 	fi
@@ -275,7 +275,7 @@ $(gettext 'Do you want to 1) unload and 2) replace the file?')
 
 $(gettext '(will delete the file before attempting to create the new one)')"
 	if [ $GUI ] ; then
-		/usr/lib/gtkdialog/box_yesno "pupswap" "$msg"
+		yad --title=pupswap --window-icon=dialog-question --image=dialog-question --text="$msg" --button=gtk-yes --button=gtk-no
 	else
 		dialog --title "pupswap" --yes-label $(gettext 'Yes') \
 			--no-label $(gettext 'No') --yesno "$msg" 0 0
@@ -290,7 +290,7 @@ $(gettext 'Do you want to replace it?')
 
 $(gettext '(will delete the file before attempting to create the new one)')"
 	if [ $GUI ] ; then
-		/usr/lib/gtkdialog/box_yesno "pupswap" "$msg"
+		yad --title=pupswap --window-icon=dialog-question --image=dialog-question --text="$msg" --button=gtk-yes --button=gtk-no
 	else
 		dialog --title "pupswap" --yes-label $(gettext 'Yes') \
 			--no-label $(gettext 'No') --yesno "$msg" 0 0
@@ -307,7 +307,7 @@ if [[ $FREEM -lt $SWAP_SIZE_MB ]] ; then
 
 $(printf "$(gettext 'But you chose to create a swap file of %sMB')" "$SWAP_SIZE_MB")"
 	if [ $GUI ] ; then
-		exec /usr/lib/gtkdialog/box_ok "$msg0" error "$msg1"
+		exec yad --title="$msg0" --window-icon=dialog-error --image=dialog-error --text="$msg1" --button=gtk-ok
 	else
 		exec dialog --title "$msg0" --msgbox "$msg1" 0 0
 	fi
@@ -315,7 +315,7 @@ fi
 
 msg="$(printf "$(gettext 'Creating %s/pupswap.swp...')" "${SWAP_PART}")"
 if [ $GUI ] ; then
-	gtkdialog-splash -close never -text "$msg" &
+	yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons &
 	pid=$!
 else
 	echo -e "\n\n$msg"
@@ -328,7 +328,7 @@ if [ $? -eq 0 ] ; then
 	msg="$(gettext 'pupswap.swp successfully created')"
 	if [ $GUI ] ; then
 		kill -9 $pid
-		/usr/lib/gtkdialog/box_splash -close never -bg green -timeout 3 -text "$msg"
+		yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
 	else
 		echo -e "\n$msg" && sleep 3
 	fi
@@ -336,7 +336,7 @@ else
 	msg="$(gettext 'Error(s) creating pupswap.swp')"
 	if [ $GUI ] ; then
 		kill -9 $pid
-		/usr/lib/gtkdialog/box_splash -close never -bg red -timeout 3 -text "$msg"
+		yad --image=dialog-error --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
 	else
 		echo -e "\n$msg" && sleep 3
 	fi
@@ -350,7 +350,7 @@ TOTALSWAP=`free | grep -o 'Swap: .*' | tr -s ' ' | cut -f 2 -d ' '`
 if [ $TOTALSWAP -eq 0 ] ; then
 	msg="$(printf "$(gettext 'Do you want to load %s?')" "${SWAP_PART}/pupswap.swp")"
 	if [ $GUI ] ; then
-		/usr/lib/gtkdialog/box_yesno --yes-first "pupswap" "$msg"
+		yad --title=pupswap --window-icon=dialog-question --image=dialog-question --text="$msg" --button=gtk-yes --button=gtk-no
 	else
 		dialog --title "pupswap" --yes-label $(gettext 'Yes') --no-label $(gettext 'No') --yesno "$msg" 0 0
 	fi
@@ -359,11 +359,11 @@ if [ $TOTALSWAP -eq 0 ] ; then
 	if [ $? -eq 0 ] ; then
 		msg="$(printf "$(gettext "'%s' successfully loaded!")" "${SWAP_PART}/pupswap.swp")"
 		echo -e "\n$msg"
-		[ $GUI ] && /usr/lib/gtkdialog/box_splash -close never -bg green -timeout 3 -text "$msg"
+		[ $GUI ] && yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
 	else
 		msg="$(printf "$(gettext "ERROR loading '%s'")" "${SWAP_PART}/pupswap.swp")"
 		echo -e "\n$msg"
-		[ $GUI ] && /usr/lib/gtkdialog/box_splash -close never -bg red -timeout 3 -text "$msg"
+		[ $GUI ] && yad --image=dialog-error --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
 	fi
 fi
 

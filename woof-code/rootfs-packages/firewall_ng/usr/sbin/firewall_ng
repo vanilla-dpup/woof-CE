@@ -24,9 +24,11 @@ wall_state() {
 
 # error splash
 error_cond() {
-	col=crimson
-	[ -n "$2" ] && col=green
-	gtkdialog-splash -bg $col -timeout 2 -close box -text "$1" &
+	if [ -z "$2" ]; then
+		yad --image=dialog-error --layer=overlay --edge=top --text="$1" --no-buttons --timeout=2
+	else
+		yad --image=dialog-information --layer=overlay --edge=top --text="$1" --no-buttons --timeout=2
+	fi
 	exit
 }
 export -f error_cond
@@ -1452,7 +1454,7 @@ fi
 [ "$MAIN" = "false" -a "$CONFIG_SSH" = "false" -a "$CONFIG_CUPS" = "false" -a "$CONFIG_SAMBA" = "false" -a "$CONFIG_SAMBA_CLIENT" = "false" -a "$CONFIG_DLNA" = "false" -a "$CONFIG_NTP" = "false" -a "$CONFIG_FTP" = "false" -a "$CONFIG_HTTP" = "false" -a "$CONFIG_DNS" = "false" -a "$CONFIG_DHCP" = "false" -a "$CONFIG_NFS" = "false" ] && exit
 
 # run it!
-gtkdialog-splash -bg yellow -timeout 2 -text "Starting firewall" &
+yad --image=system-run --layer=overlay --edge=top --text="Starting firewall" --no-buttons --timeout=2 &
 urxvt -bg yellow -fg black -geometry 60X10+1+1 --hold -e /etc/init.d/rc.firewall start &
 p=$!
 sleep 6

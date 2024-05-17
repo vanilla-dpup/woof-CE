@@ -33,12 +33,12 @@ restart_sfwbar() {
 
 disable_launch() {
 	sed -i '2s/true/false/' $HOME/.config/sfwbar/launcher.widget
-	gtkdialog-splash -bg pink -placement top -timeout 2 -text "$(gettext "Disabling launcher.")" &
+	yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Disabling launcher.')" --no-buttons --timeout=2 &
 }
 
 enable_launch() {
 	sed -i '2s/false/true/' $HOME/.config/sfwbar/launcher.widget
-	gtkdialog-splash -bg green -placement top -timeout 2 -text "$(gettext "Enabling launcher.")" &
+	yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Enabling launcher.')" --no-buttons --timeout=2 &
 }
 
 orient_bar() {
@@ -150,7 +150,7 @@ DEFRAD=${DEFRAD/px/}
 DEFSIZE=${DEFSIZE/px/}
 
 if [ "$FULL" = 'true' ]; then
-	gtkdialog-splash -bg green -close never -placement top -text "$(gettext "Please wait a moment.")" &
+	yad --layer=overlay --edge=top --text="$(gettext 'Please wait a moment.')" --no-buttons &
 	gpid=$!
 
 	# puppy apps
@@ -366,8 +366,10 @@ if [ "$DEFSIZE" != "$NEWSIZE" ]; then
 	update_size $NEWSIZE
 fi
 # bar
-[ "$POS" = "$BARPOS" ] && \
-	gtkdialog-splash -bg pink -close box -text "$(gettext "Error: Bar and launcher postion must be different.")" && exit
+if [ "$POS" = "$BARPOS" ]; then
+	yad --image=dialog-warning --layer=overlay --edge=top --text="$(gettext 'Error: Bar and launcher postion must be different.')" --button=gtk-ok
+	exit
+fi
 
 if echo $TGT_STR | grep -qv "$BARPOS"; then
 	orient_bar ${TGT_LN} $DEF_BARPOS $BARPOS #change orientation
@@ -387,9 +389,11 @@ elif [ "$DISABLE" = 'false' ]; then
 		rm -f /tmp/sfwlaunchSEL.lst
 		
 		if [ -z "$SELECTIONS" -a "$CHECK" = 'false' ]; then
-			gtkdialog-splash -bg pink -close box -text "$(gettext "Error: No apps chosen. Check 'Keep current launcher' to restore the previous configuration.")" && exec $0
+			yad --image=dialog-warning --layer=overlay --edge=top --text="$(gettext "Error: No apps chosen. Check 'Keep current launcher' to restore the previous configuration.")" --button=gtk-ok
+			exec $0
 		elif [ -z "$SELECTIONSPUP" -a "$CHECK" = 'true' ]; then
-			gtkdialog-splash -bg pink -close box -text "$(gettext "Error: No Puppy apps chosen. Check 'Keep current launcher' to restore the previous configuration.")" exec $0
+			yad --image=dialog-warning --layer=overlay --edge=top --text="$(gettext "Error: No Puppy apps chosen. Check 'Keep current launcher' to restore the previous configuration.")" --button=gtk-ok
+			exec $0
 		fi
 		
 		# count the entries
@@ -409,7 +413,10 @@ elif [ "$DISABLE" = 'false' ]; then
 			done
 		fi
 		NR=$((`cat /tmp/NR` - 1))
-		([ $NR -gt 10 ] || [ $NR -lt 2 ]) && gtkdialog-splash -bg pink -close box -text "$(gettext "Error: $NR entries. Please choose 2 or more or 10 or less.")" && exec $0
+		if [ $NR -gt 10 ] || [ $NR -lt 2 ]; then
+			yad --image=dialog-warning --layer=overlay --edge=top --text="$(gettext "Error: $NR entries. Please choose 2 or more or 10 or less.")" --button-ok
+			exec $0
+		fi
 		
 		# confirm and re-order gui
 		export CONFIRM='<window title="'$(gettext 'Confirm?')'" icon-name="sfwconfig">

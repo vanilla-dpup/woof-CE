@@ -24,7 +24,7 @@ fi
 if [ "$USBDRV" = "" ];then
 	FDS=$(probedisk -extended-usb -card-as-usbflash -plus-size -hr | grep usbflash)
 	if [ -z "$FDS" ] ; then
-		/usr/lib/gtkdialog/box_ok "Bootflash" error "$(gettext 'No USB drive plugged in')"
+		yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'No USB drive plugged in')" --button=gtk-ok
 		exit 1
 	fi
 	echo "$FDS" | sed 's|/dev/||' | \
@@ -54,8 +54,9 @@ ensure_unmounted() {
 	umount $1 2>/dev/null ; sync ; sleep 1
 	umount $2 2>/dev/null ; sync
 	if [ "`mount | grep "^${1}"`" ] ; then
-		/usr/lib/gtkdialog/box_ok "Bootflash" error "$(gettext "${USBDRV} is being used")" \
-			"$(gettext "${USBDRV} please unmount all the drive partitions and run this script again")"
+		yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --buton=gtk-ok \
+			--text="$(gettext "${USBDRV} is being used")
+$(gettext "${USBDRV} please unmount all the drive partitions and run this script again")"
 		exit 1
 	fi
 }
@@ -379,7 +380,7 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	#-----
 	if [ "$ASK" ] ; then
 		cd $HOME
-		CHOICE=$(/usr/lib/gtkdialog/file_chooser --directory "Puppy Directory" "$(gettext "Please select a directory containing $DISTRO_NAME $DISTRO_VERSION ")")
+		CHOICE=$(yad --title="Puppy Directory" --file --directory --text="$(gettext "Please select a directory containing $DISTRO_NAME $DISTRO_VERSION ")")
 		[ $? -ne 0 ] && exit 1
 		#--
 		if [ -f ${CHOICE}${PSUBDIR}/${DISTRO_PUPPYSFS} ] ; then
@@ -715,24 +716,24 @@ case $EXIT in
 		#========================
 		#   DD IMG TO USB DRV
 		#========================
-		img_file=$(/usr/lib/gtkdialog/file_chooser --last-path "Select *.img / *.img.gz / *.img.xz file")
+		img_file=$(yad --title="Select file" --file --text="Select *.img / *.img.gz / *.img.xz file")
 		if [ ! "$img_file" ] ; then
 			exit
 		fi
 		case $img_file in *.img|*.img.gz|*.img.xz) ok=1 ;;
-			*) exec /usr/lib/gtkdialog/box_ok "Error" error "$(gettext 'Only .img/.img.gz/img.xz are supported..')" ;;
+			*) exec yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Only .img/.img.gz/img.xz are supported..')" --button=gtk-ok ;;
 		esac
 		MYSELECTION="`echo "$xSELECTIONS" | grep "^${USBDRV} " | tr '"' ' ' | tr -s ' '`" #'geany
-		/usr/lib/gtkdialog/box_yesno --warning --yes-label "$(gettext 'Write IMG to USB')" \
-			--no-label "$(gettext 'Cancel')" "$(gettext 'Write IMG to USB')" \
-			"IMG: ${img_file##*/}" \
-			"USB: /dev/${MYSELECTION}"
+		yad --image=dialog-warning --title="$(gettext 'Write IMG to USB')" --window-icon=dialog-warning \
+			--button="$(gettext 'Write IMG to USB')"\!gtk-yes \
+			--button="$(gettext 'Cancel')"\!gtk-no \
+			--text="$(gettext 'Write IMG to USB')\nIMG: ${img_file##*/}\nUSB: /dev/${MYSELECTION}"
 		[ $? -ne 0 ] && exit
 		echo 'pdsk img2flash "'${img_file}'" /dev/'${USBDRV}'
 if [ $? -eq 0 ] ; then
-	/usr/lib/gtkdialog/box_ok Done info "Finished writing IMG file to /dev/'${USBDRV}'" "" "Hopefully no errors occurred.."
+	yad --title=Done --window-icon=dialog-information --image=dialog-information --text="Finished writing IMG file to /dev/${USBDRV}\nHopefully no errors occurred." --button=gtk-ok
 else
-	/usr/lib/gtkdialog/box_ok Error error "Error writing img file to drive"
+	yad --title=Error --window-icon=dialog-error --image=dialog-error --text="Error writing img file to drive"" --button=gtk-ok
 fi
 ' > /tmp/write_img_file_usb_drv_$$
 		xterm -title "Writing IMG to /dev/${USBDRV}" -e sh /tmp/write_img_file_usb_drv_$$
@@ -744,12 +745,12 @@ fi
 		#========================
 		#   DD ISO TO USB DRV
 		#========================
-		iso_file=$(/usr/lib/gtkdialog/file_chooser --last-path "Select ISO file")
+		iso_file=$(yad --title="Select ISO file" --file)
 		if [ ! "$iso_file" ] ; then
 			exit
 		fi
 		case $iso_file in *.[iI][sS][oO]) ok=1 ;;
-			*) exec /usr/lib/gtkdialog/box_ok "Error" error "$(gettext 'You did not select an ISO file..')" ;;
+			*) exec yad --title=Error --window-icon=dialog-error --image=dialog-error --text="$(gettext 'You did not select an ISO file..')" --button=gtk-ok ;;
 		esac
 		res=$(yad --title="Bootflash - $USBDRV" --window-icon="gtk-yes" \
 			--button=gtk-ok:0 --button="Don't recover empty space":1 \
@@ -759,16 +760,16 @@ fi
 		FS_TYPE=$(echo $res | cut -f 2 -d "|")
 		#---
 		MYSELECTION="`echo "$xSELECTIONS" | grep "^${USBDRV} " | tr '"' ' ' | tr -s ' '`" #'geany
-		/usr/lib/gtkdialog/box_yesno --warning --yes-label "$(gettext 'Write ISO to USB')" \
-			--no-label "$(gettext 'Cancel')" "$(gettext 'Write ISO to USB')" \
-			"ISO: ${iso_file##*/}" \
-			"USB: /dev/${MYSELECTION}"
+		yad --image=dialog-warning --title="$(gettext 'Write ISO to USB')" --window-icon=dialog-warning \
+			--button="$(gettext 'Write ISO to USB')"\!gtk-yes \
+			--button="$(gettext 'Cancel')"\!gtk-no \
+			--text="$(gettext 'Write ISO to USB')\nISO: ${iso_file##*/}\nUSB: /dev/${MYSELECTION}"
 		[ $? -ne 0 ] && exit
 		echo 'pdsk iso2flash "'${iso_file}'" /dev/'${USBDRV}' '${FS_TYPE}'
 if [ $? -eq 0 ] ; then
-	/usr/lib/gtkdialog/box_ok "Done" info "'$(gettext "Finished writing ISO file to")' /dev/'${USBDRV}'" "" "Hopefully no errors occurred.."
+	yad --title=Done --window-icon=dialog-information --image=dialog-information --text="$(gettext "Finished writing ISO file to") /dev/${USBDRV}\nHopefully no errors occurred.." --button=gtk-ok
 else
-	/usr/lib/gtkdialog/box_ok Error error "Error writing ISO file to drive"
+	yad --title=Error --window-icon=dialog-error --image=dialog-error --text="Error writing ISO file to drive" --button=gtk-ok
 fi
 ' > /tmp/write_iso_file_usb_drv_$$
 		xterm -title "Writing ISO to /dev/${USBDRV}" -e sh /tmp/write_iso_file_usb_drv_$$
@@ -784,19 +785,23 @@ ensure_unmounted /dev/${USBDRV}
 
 #reconfirm correct drv choice...
 MYSELECTION="`echo "$xSELECTIONS" | grep "^${USBDRV} " | tr '"' ' ' | tr -s ' '`" #'geany
-/usr/lib/gtkdialog/box_yesno --no-first --yes-label "$(gettext 'OK')" --no-label "$(gettext 'Cancel')" "BootFlash" \
-	"$(gettext 'Please reconfirm that this is the USB drive that you want to format:')" \
-	"<b>${MYSELECTION}</b>" \
-	"`gettext "Please also reconfirm that you want to use BootFlash to reformat the drive (and install Puppy)."`" \
-	"`gettext "Click 'OK' to continue, 'Cancel' to quit:"`"
+yad --image=dialog-question --title=BootFlash --window-icon=dialog-warning \
+	--button=gtk-ok \
+	--button=gtk-cancel \
+	--text="$(gettext 'Please reconfirm that this is the USB drive that you want to format:')
+<b>${MYSELECTION}</b>
+`gettext "Please also reconfirm that you want to use BootFlash to reformat the drive (and install Puppy)."`
+`gettext "Click 'OK' to continue, 'Cancel' to quit:"`"
 	[ $? -ne 0 ] && exit
 
 #make sure not mounted...
 while [ "`mount | grep "^/dev/$DRVSEL "`" != "" ];do
-	/usr/lib/gtkdialog/box_yesno --yes-first --yes-label "$(gettext 'OK')" --no-label "$(gettext 'Cancel')" "BootFlash" \
-	"$(printf "$(gettext '<b>Drive %s is still mounted. Please unmount it before continuing. If the drive has multiple partitions, are they all unmounted?</b>')" "${DRVSEL}")" \
-	"$(gettext 'Note: click on the appropriate mounted desktop drive icon, and you will receive an offer to unmount it.')" \
-	"$(gettext 'Click 'OK' to continue, 'Cancel' to quit:')"
+	yad --image=dialog-warning --title=BootFlash --window-icon=dialog-warning \
+	--button=gtk-ok \
+	--button=gtk-cancel \
+	--text="$(printf "$(gettext '<b>Drive %s is still mounted. Please unmount it before continuing. If the drive has multiple partitions, are they all unmounted?</b>')" "${DRVSEL}")
+$(gettext 'Note: click on the appropriate mounted desktop drive icon, and you will receive an offer to unmount it.')
+$(gettext 'Click 'OK' to continue, 'Cancel' to quit:')"
 	[ $? -ne 0 ] && exit
 	sleep 1
 done
@@ -806,7 +811,7 @@ done
 #            DRIVE PARTITIONING / INSTALLATION
 #======================================================================
 
-/usr/lib/gtkdialog/box_splash -close never -text "$(printf "$(gettext 'Please wait, formatting %s drive...')" "${USBDRV}")" &
+yad --image=system-run --layer=overlay --edge=top --text="$(printf "$(gettext 'Please wait, formatting %s drive...')" "${USBDRV}")" --no-buttons &
 X1PID=$!
 
 if [ "$BOOTLOADER" = "grub4dos" ] ; then
@@ -838,11 +843,11 @@ mkdir -p /mnt/${PBOOTPART}
 mount -t $FSTYPE /dev/${PBOOTPART} /mnt/${PBOOTPART}
 
 if [ "`mount | grep "/dev/${PBOOTPART}"`" = "" ];then
-	/usr/lib/gtkdialog/box_ok "Bootflash" error "$(gettext 'Error mounting USB drive')"
+	yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting USB drive')" --button=gtk-ok
 	exit
 fi
 
-/usr/lib/gtkdialog/box_splash -close never -text "$(gettext 'Please wait, copying files...')" &
+yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Please wait, copying files...')" --no-buttons &
 X1PID=$!
 
 if [ "`cat /sys/block/$USBDRV/removable`" = "1" ] ; then
@@ -882,7 +887,7 @@ if [ "${FSTYPE2}" ] ; then # fat32 + f2fs
 	mkdir -p /mnt/${PBOOTPART}/${DISTRO_FILE_PREFIX}save
 	mount -t $FSTYPE2 /dev/${PBOOTPART} /mnt/${PBOOTPART}
 	if [ "`mount | grep "/dev/${PBOOTPART}"`" = "" ];then
-		/usr/lib/gtkdialog/box_ok "Bootflash" error "$(gettext 'Error mounting USB drive')"
+		yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting USB drive')" --button=gtk-ok
 		exit
 	fi
 	#-
@@ -930,9 +935,9 @@ if [ "${FSTYPE2}" ] ; then
 fi
 kill $X1PID
 
-/usr/lib/gtkdialog/box_ok "$(gettext 'BootFlash: Puppy installed')" complete \
- "<b>$(gettext 'Puppy installed!')</b>" \
- "<b>$(gettext 'USB drive now (hopefully) bootable!')</b>" \
- "$(gettext 'The desktop drive icons should have been updated, so you can click on them to check that everything looks right. Then reboot and find out for sure...')"
+yad --title="$(gettext 'BootFlash: Puppy installed')" --window-icon=dialog-information --image=dialog-information --button=gtk-ok \
+--text="<b>$(gettext 'Puppy installed!')</b>
+<b>$(gettext 'USB drive now (hopefully) bootable!')</b>
+$(gettext 'The desktop drive icons should have been updated, so you can click on them to check that everything looks right. Then reboot and find out for sure...')"
 
 ### END ###

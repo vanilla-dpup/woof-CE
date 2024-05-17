@@ -5,13 +5,7 @@ download() {
 build() {
     tar -xzf yad-0.42.81.tar.gz
     cd yad-0.42.81
-    autoreconf -if
-    intltoolize --force
-    if [ $PETBUILD_GTK -eq 3 ]; then
-        ./configure --prefix=/usr --disable-pfd --disable-tools --disable-icon-browser --with-gtk=gtk3
-    else
-        ./configure --prefix=/usr --disable-pfd --disable-tools --disable-icon-browser
-    fi
-    make install
-    rm -rf /usr/share/locale /usr/share/aclocal
+    patch -p1 < ../layer-shell.patch
+    meson --buildtype=release --prefix=/usr build
+    ninja -C build install
 }
