@@ -37,9 +37,6 @@ export title='Pup Advert Blocker'
 export markerstart='# pup-advert-blocker IPs below'
 export markerend='# pup-advert-blocker IPs above'
 
-# create functions
-set -a
-
 # cleanup all leftover files
 cleanup () {
 	# remove all temp files
@@ -74,7 +71,7 @@ append_adlist () {
 
 success () {
 	# tell user 
-   yad --title="$title" --window-icon=dialog-information --image=dialog-information --button=gtk-ok \
+	yad --title="$title" --window-icon=dialog-information --image=dialog-information --button=gtk-ok \
 --text="$(gettext '<b>Success - your settings have been changed.</b>
 Your hosts file has been updated.
 Restart your browser to see the changes.')"
@@ -86,76 +83,45 @@ Blocking ad servers protects your privacy, saves you bandwidth, greatly improves
 
 yad --title="$title" --window-icon=dialog-information --text-info --filename=/tmp/box_help --wrap --button=gtk-ok &
 }
-export -f msg_help
-
-export PupAdvertBlocker='<window title="'$title' '$appver'" icon-name="gtk-execute" resizable="false">
-<vbox space-expand="true" space-fill="true">
-  '"`/usr/lib/gtkdialog/xml_info scale dialog_stop.svg 60 "<b>$title</b>" "$(gettext "Block online ads in all browsers with this simple tool")"`"'
-  <vbox>
-    <hbox border-width="7" space-expand="true" space-fill="true">
-      <text xalign="0" use-markup="true" space-expand="true" space-fill="true"><label>"'$(gettext "<b>Start blocker</b>
-Download and block the latest list of known advertising servers.")'"</label></text>
-      <vbox space-expand="false" space-fill="false">
-        <button>
-          '"`/usr/lib/gtkdialog/xml_button-icon execute.svg big`"'
-          <action>download_adlist</action>
-          <action>append_adlist</action>
-          <action>cleanup</action>
-          <action>success</action>
-        </button>
-      </vbox>
-    </hbox>
-    <hbox border-width="7" space-expand="true" space-fill="true">
-      <text xalign="0" use-markup="true" space-expand="true" space-fill="true"><label>"'$(gettext "<b>Stop blocker</b>
-Stop blocking known advertising servers.")'"</label></text>
-      <vbox space-expand="false" space-fill="false">
-        <button>
-          '"`/usr/lib/gtkdialog/xml_button-icon cancel.svg big`"'
-          <action>empty_adlist</action>
-          <action>append_adlist</action>
-          <action>cleanup</action>
-          <action>success</action>
-        </button>
-      </vbox>
-    </hbox>
-    <hbox border-width="7" space-expand="true" space-fill="true">
-      <text xalign="0" use-markup="true" space-expand="true" space-fill="true"><label>"'$(gettext "<b>Edit host list</b>
-Manually edit your hosts file in a text editor, adding or removing any entries you like.")'"</label></text>
-      <vbox space-expand="false" space-fill="false">
-        <button>
-          '"`/usr/lib/gtkdialog/xml_button-icon edit.svg big`"'
-          <action>defaulttexteditor /etc/hosts &</action>
-        </button>
-      </vbox>
-    </hbox>
-  </vbox>
-  <hbox space-expand="false" space-fill="false"> 
-    <hbox space-expand="false" space-fill="false"> 
-      <button>
-        <label>'$(gettext "Help")'</label>
-        '"`/usr/lib/gtkdialog/xml_button-icon help`"'
-        <action>msg_help</action>
-      </button>
-    </hbox>
-    <text space-expand="true" space-fill="true"><label>""</label></text>
-    <button space-expand="false" space-fill="false">
-      <label>'$(gettext "Quit")'</label>
-      '"`/usr/lib/gtkdialog/xml_button-icon quit`"'
-      <action type="exit">EXIT_NOW</action>
-    </button>
-  </hbox>
-</vbox>
-</window>'
 
 # cleanup before start
 cleanup
 
-if [ "$1" = "start" ]; then
-  download_adlist
-  append_adlist
-  cleanup
-else
-  # run the program
-  . /usr/lib/gtkdialog/xml_info gtk #build bg_pixmap for gtk-theme
-  gtkdialog -p PupAdvertBlocker --styles=/tmp/gtkrc_xml_info.css
-fi
+case "$1" in
+  start)
+    download_adlist
+    append_adlist
+    cleanup
+    success
+    ;;
+  stop)
+    empty_adlist
+    append_adlist
+    cleanup
+    success
+    ;;
+  *)
+    yad \
+      --title="$title $appver" \
+      --window-icon=gtk-execute \
+      --text="$(gettext "Block online ads in all browsers with this simple tool")" \
+      --form \
+      --columns=2 \
+      --field "$(gettext '<b>Start blocker</b>
+Download and block the latest list of known advertising servers.')":LBL "" \
+      --field "$(gettext '<b>Stop blocker</b>
+Stop blocking known advertising servers.')":LBL "" \
+      --field "$(gettext '<b>Edit host list</b>
+Manually edit your hosts file in a text editor, adding or removing any entries you like.')":LBL "" \
+      --field \!gtk-yes:FBTN "$0 start" \
+      --field \!gtk-no:FBTN "$0 stop" \
+      --field \!gtk-edit:FBTN "xdg-open /etc/hosts &" \
+      --button=gtk-help \
+      --button=gtk-quit \
+      --use-interp
+   if [ $? -eq 0 ]; then
+     msg_help
+     exec $0
+   fi
+   ;;
+esac
