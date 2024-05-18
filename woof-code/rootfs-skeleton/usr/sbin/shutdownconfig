@@ -560,7 +560,7 @@ If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
   yad --layer=overlay \
       --edge=top \
       --text="<b>${T_createtitle}</b>\n${altT_createsf}" \
-      --no-buttons
+      --no-buttons &
   w1PID=$!
  else
   ${DIALOGEXE} ${BACKGROUNDORANGE} ${TITLEPARAM} "$T_createtitle" --colors --yes-label "OK" --msgbox "$T_createsf" 0 0 &
