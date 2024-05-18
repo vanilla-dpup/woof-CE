@@ -92,16 +92,6 @@ fi
 DU_INITRD_PUP_RW=0
 [ "`mount | grep ' /initrd/pup_rw '`" != "" ] && DU_INITRD_PUP_RW=`du -B 1M -c /initrd/pup_rw |tail -n1 |awk '{print $1}'` #M=1024,MB=1000
 
-#130525 introduced 130522. moved up.
-ORANGEGTKRC="style \"windowstuff\"
-{
-    bg[NORMAL]      = \"#FFDC32\"
-    fg[NORMAL]      = \"#000000\"
-}
-class \"*\" style \"windowstuff\"
-"
-echo "$ORANGEGTKRC" > /tmp/orange_gtkrc${$}
-
 #================================================================
 
 get_DRV() {
@@ -567,13 +557,10 @@ If anything looks wrong, choose \Zb\\\${T_notsave}\ZB...\"`"
  altT_createsf="$(eval_gettext "Creating \${NAMEONLY} in \${SAVEPART}, please wait awhile...")"
  if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
   #create nice window looking like prior ones...
-  export SHUTDLG="<window decorated=\"false\">
-<vbox>
-<text use-markup=\"true\"><label>\"<big><b>${T_createtitle}</b></big>\"</label></text>
-<text use-markup=\"true\"><label>\"<big>${altT_createsf}</big>\"</label></text>
-</vbox>
-</window>"
-  GTK2_RC_FILES=/tmp/orange_gtkrc${$}:/root/.gtkrc-2.0 gtkdialog --center --class="splashwindow" --program=SHUTDLG & #130525 130712
+  yad --layer=overlay \
+      --edge=top \
+      --text="<b>${T_createtitle}</b>\n${altT_createsf}" \
+      --no-buttons
   w1PID=$!
  else
   ${DIALOGEXE} ${BACKGROUNDORANGE} ${TITLEPARAM} "$T_createtitle" --colors --yes-label "OK" --msgbox "$T_createsf" 0 0 &
@@ -759,37 +746,18 @@ T_ms="`eval_gettext \"You can save the session and all of the settings and perso
 If unsure, it is recommended that you do save the session, so all your personal settings and files will be automatically loaded at next boot.\"`"
 if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
   T_display="`eval_gettext \"Click the \Zb\\\${T_save}\ZB button to be provided with the available save options, or click \Zb\\\${T_no}\ZB to exit immediately without saving anything.\"`" #111012 fix.
-  STEP=6
-  export XY_DIALOG="<window title=\"$T_title\" icon-name=\"gtk-save\" resizable=\"false\"><vbox>
-    <text use-markup=\"true\"><label>\"$T_ms\"</label></text>
-    <text use-markup=\"true\"><label>\"$T_canceltitle\"</label></text>
-    <progressbar><input>for i in \$(seq 0 10 100); do echo \$i; sleep $STEP; done;echo 100</input>
-      <label>$(gettext 'Shutdown in 60 seconds.')</label>
-      <action type=\"exit\">20</action>
-    </progressbar>
-    <hbox>
-     <button>
-     <input file icon=\"gtk-yes\"></input>
-     <label>$T_save</label><action>EXIT:0</action>
-     </button>
-     <button>
-      <input file icon=\"gtk-no\"></input>
-     <label>$T_no</label><action>EXIT:20</action>
-     </button>
-    </hbox>
-    </vbox></window>"
-    
-  doagain=10
-  while [ $doagain -gt 0 ]
-  do
-   eval "$(gtkdialog -p XY_DIALOG --center)"
-   case "$EXIT" in
-     "")    doagain=$(( $doagain - 1 ))   ;; #progressbar crash
-     abort) SAVECHOICE=255; doagain=0     ;;
-     *)     SAVECHOICE="$EXIT"; doagain=0 ;;
-   esac
-  done
-
+  yad --title="$T_title" \
+      --window-icon=gtk-save \
+      --text="${T_ms}\n${T_canceltitle}\n\n$(gettext 'Shutdown in 60 seconds.')" \
+      --timeout=60 \
+      --timeout-indicator=bottom \
+      --button="$T_save"\!gtk-yes \
+      --button="$T_no"\!gtk-no:2
+  case $? in
+   0) SAVECHOICE=0   ;;
+   1) SAVECHOICE=255 ;;
+   2) SAVECHOICE=20  ;;
+  esac
 else
   T_display="`eval_gettext \"Select \Zb\\\${T_save}\ZB (just press ENTER key) to be provided with the available save options, or select \Zb\\\${T_no}\ZB (TAB then ENTER) to exit without saving.\"`"
   yesno="$T_ms \n\n$T_display \n\n$T_orwait240"
