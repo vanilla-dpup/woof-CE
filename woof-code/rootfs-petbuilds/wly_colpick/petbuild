@@ -1,0 +1,9 @@
+download() {
+    [ -f 5417a91aa0a4c978a12db6bf7b8b116650e59dc7.tar.gz ] || wget -t 3 -T 60 https://github.com/01micko/wly_colpick/archive/5417a91aa0a4c978a12db6bf7b8b116650e59dc7.tar.gz
+}
+
+build() {
+    tar -xzf 5417a91aa0a4c978a12db6bf7b8b116650e59dc7.tar.gz
+    cd wly_colpick-5417a91aa0a4c978a12db6bf7b8b116650e59dc7
+    make PREFIX=/usr install
+}
