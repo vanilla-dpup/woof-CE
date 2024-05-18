@@ -1,4 +1,4 @@
-#!/bin/ash
+#!/bin/bash
 # - this is cli/gui script
 # - run "pupswap" to create a swap file on a given partition
 # - it's called by shutdownconfig on shutdown if there are no swaps loaded
@@ -104,14 +104,16 @@ if [ "$SWAP_SIZE_LIMIT" ] ; then #MB - SWAP_SIZE_LIMIT can be exported
 	done
 	SWAP_SIZES=$SWAP_SIZES2
 fi
-X=0
+TOTAL_SWAP_SIZES=0
 for i in $SWAP_SIZES ; do
-	X=$(($X+1))
+	TOTAL_SWAP_SIZES=$(($TOTAL_SWAP_SIZES+1))
 	SIZE_LIST_CLI=''${SIZE_LIST_CLI}' "'${X}'" "'${i}'"'
-	SIZE_LIST_GUI="$SIZE_LIST_GUI<item>${i}MB</item>"
+	if [ -n "$SIZE_LIST_GUI" ] ; then
+		SIZE_LIST_GUI="${SIZE_LIST_GUI}!${i}MB"
+	else
+		SIZE_LIST_GUI="${i}MB"
+	fi
 done
-[ $X -lt 2 ] && DISABLE_SIZE_COMBO='<sensitive>"false"</sensitive>'
-TOTAL_SWAP_SIZES=$X
 
 if [ "$MOUNTED_PARTITIONS" = "" ] ; then #MOUNTED_PARTITIONS can be exported
 	MOUNTED_PARTITIONS="`mount | grep -E "/(s|h)d[a-z][0-9]" | awk '{print $3}' | sort -u`"
@@ -121,14 +123,16 @@ if [ $PUPMODE -eq 2 ] ; then #full install
 $MOUNTED_PARTITIONS"
 fi
 MOUNTED_PARTITIONS="$(echo "$MOUNTED_PARTITIONS" | sort -u)"
-X=0
+TOTAL_MOUNTED_PARTITIONS=0
 for drv in $MOUNTED_PARTITIONS ; do
-	X=$(($X+1))
+	TOTAL_MOUNTED_PARTITIONS=$(($TOTAL_MOUNTED_PARTITIONS+1))
 	DIR_LIST_CLI=''${DIR_LIST_CLI}' "'${X}'" "'${drv}'"'
-	DIR_LIST_GUI="$DIR_LIST_GUI<item>${drv}</item>"
+	if [ -n "$DIR_LIST_GUI" ] ; then
+		DIR_LIST_GUI="${DIR_LIST_GUI}!${drv}"
+	else
+		DIR_LIST_GUI="${drv}"
+	fi
 done
-[ $X -lt 2 ] && DISABLE_DRV_COMBO='<sensitive>"false"</sensitive>'
-TOTAL_MOUNTED_PARTITIONS=$X
 
 FREEE="$(free)"
 TOTALRAM=`echo "$FREEE" | grep -o 'Mem: .*' | tr -s ' ' | cut -f 2 -d ' '`
@@ -145,63 +149,26 @@ FST_DESC="$(gettext 'This tool allows you to create a swap file.')"
 MAIN_DESC="$FST_DESC $EXT_DESC"
 
 if [ $GUI ] ; then
-	WINDOW_MSG="$(/usr/lib/gtkdialog/xml_info 0 execute_add.svg 32 "$MAIN_DESC")"
-	export SWAPFILE_DIALOG='
-<window title="pupswap" image-name="/usr/share/pixmaps/puppy/preferences.svg" resizable="false">
-<vbox>
-  '${WINDOW_MSG}'
-  <frame '$(gettext 'Select partition and swap size')'>
-  <hbox>
-    <text space-expand="true" space-fill="false"><label>"Total RAM: '${TOTALRAM}'"</label></text>
-    <text space-expand="true" space-fill="true"><label>"Total SWAP: '${TOTALSWAP}'"</label></text>
-  </hbox>
-  <hbox>
-    <text><label>'$(gettext 'Destination:')'</label></text>
-    <comboboxtext>
-      <variable>SWAP_PART</variable>
-      '${DISABLE_DRV_COMBO}'
-      '${DIR_LIST_GUI}'
-    </comboboxtext>
-  </hbox>
-
-  <hbox>
-    <text><label>'$(gettext 'Swap size:')'</label></text>
-    <comboboxtext>
-      <variable>SWAP_SIZE_MB</variable>
-      '${DISABLE_SIZE_COMBO}'
-      '${SIZE_LIST_GUI}'
-    </comboboxtext>
-  </hbox>
-  </frame>
-  <hbox space-expand="false" space-fill="false">
-    <button space-expand="false" space-fill="false">
-      '"`/usr/lib/gtkdialog/xml_button-icon help`"'
-      <label>"'$(gettext 'Help')'"</label>
-      <action>'${0}' guihelp &</action>
-    </button>
-    <text space-expand="true" space-fill="false"><label>" "</label></text>
-   <button space-expand="false" space-fill="false">
-     <label>'$(gettext 'Create pupswap.swp')'</label>
-     '$(/usr/lib/gtkdialog/xml_button-icon dialog-complete.svg)'
-     <action>exit:OK</action>
-   </button>
-   <button space-expand="false" space-fill="false">
-      '$(/usr/lib/gtkdialog/xml_button-icon quit.svg)'
-      <label>Swap not required</label>
-      <action type="exit">Cancel</action>
-   </button>
-  </hbox>
-</vbox>
-</window>
-'
-	. /usr/lib/gtkdialog/xml_info gtk #build bg_pixmap for gtk-theme
-	retvals=$(gtkdialog --center --program=SWAPFILE_DIALOG --styles=/tmp/gtkrc_xml_info.css)
-	eval "$retvals"
-	[ "$EXIT" = "OK" ] || exit
+	retvals=$(yad \
+--title=pupswap \
+--window-icon=system-run \
+--text="${FST_DESC=}\n\nTotal RAM: ${TOTALRAM}\tTotal SWAP: ${TOTALSWAP}\n" \
+--form \
+--field="$(gettext 'Destination:')":CB ${DIR_LIST_GUI} \
+--field="$(gettext 'Swap size:')":CB ${SIZE_LIST_GUI}  \
+--button="Create pupswap.swp"\!gtk-yes \
+--button="Swap not required"\!gtk-no \
+--button="$(gettext 'Help')"\!gtk-help)
+	case $? in
+	2) exec $0 guihelp ;;
+	0) ;;
+	*) exit ;;
+	esac
+	IFS='|' read -r SWAP_PART SWAP_SIZE_MB <<< "$retvals"
 else
 	# -- cli --
-	DIR_LIST=$(echo "$DIR_LIST_GUI" | sed -e 's|<item>||g' -e 's|</item>|\n|g')
-	SIZE_LIST=$(echo "$SIZE_LIST_GUI" | sed -e 's|<item>||g' -e 's|</item>|\n|g')
+	DIR_LIST=$(echo "$DIR_LIST_GUI" | sed 's/!/\n/g'')
+	SIZE_LIST=$(echo "$SIZE_LIST_GUI" | sed 's/!/\n/g'')
 	for i in 1 2 ; do #1=partition 2=swap_size
 		if [ $i -eq 1 ] ; then
 			ITEMCOUNT=${TOTAL_MOUNTED_PARTITIONS}
