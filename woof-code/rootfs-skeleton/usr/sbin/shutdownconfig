@@ -611,7 +611,7 @@ If anything looks wrong, choose \\\${T_notsave}...\"`"
  if [ "$CRYPTO" = "" ];then
   mkfs.${SFFS} -q -m 0 -F ${SMNTPT}$SAVEFILE ${SFFSOPTS}
   #...default is f.s. auto checked every 26 mounts or 180 days. tune2fs to change.
-  pupkill $w1PID #130525 moved down.
+  kill $w1PID #130525 moved down.
  else
   #note: loop2 is kept available for scripts to use. but, find which is free...
   echo -e "Save this log somewhere and close this window to continue...\n" >/tmp/mk2fs.log
@@ -621,12 +621,12 @@ If anything looks wrong, choose \\\${T_notsave}...\"`"
   echo -n "$MYPASSWORD" | cryptsetup luksOpen -v $DEVLOOP savefile - &>>/tmp/mk2fs.log
   mkfs.${SFFS} -q -m 0 -F /dev/mapper/savefile ${SFFSOPTS} &>>/tmp/mk2fs.log
   if [ $? -ne 0 ] ; then
-    pupkill $w1PID
+    kill $w1PID
     yad --title=Error --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Unable to create filesystem')" --button=gtk-ok
     defaulttextviewer /tmp/mk2fs.log
   fi
   sync
-  pupkill $w1PID #130525 moved down.
+  kill $w1PID #130525 moved down.
   [ "$CRYPTO" = "luks" ] && cryptsetup luksClose savefile
   losetup -d $DEVLOOP
  fi
