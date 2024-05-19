@@ -802,9 +802,9 @@ if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
       --button="$T_save"\!gtk-yes \
       --button="$T_no"\!gtk-no:2
   case $? in
-   0) SAVECHOICE=0   ;;
-   1) SAVECHOICE=255 ;;
-   2) SAVECHOICE=20  ;;
+   0)   SAVECHOICE=0   ;;
+   252) SAVECHOICE=255 ;;
+   *)   SAVECHOICE=20  ;;
   esac
 else
   T_display="`eval_gettext \"Select \\\${T_save} (just press ENTER key) to be provided with the available save options, or select \\\${T_no} (TAB then ENTER) to exit without saving.\"`"
