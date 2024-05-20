@@ -38,7 +38,7 @@ if [ "$USBDRV" = "" ];then
 	done > /tmp/xselections$$
 	xSELECTIONS="`cat /tmp/xselections$$ | tr '\n' ' ' | tr -s ' '`"
 	rm -f /tmp/xselections$$
-	CHOOSEDLG="Xdialog --wmclass \"gtkdialog2\" --title \"$(gettext 'BootFlash: make USB drive bootable')\" --no-cancel --stdout --menubox \"$(gettext 'Choose which drive to format:')\" 10 60 0 ${xSELECTIONS}"
+	CHOOSEDLG="yad --title=\"$(gettext 'BootFlash: make USB drive bootable')\" --width=640 --height=240 --button=gtk-ok --text=\"$(gettext 'Choose which drive to format:')\" --list --no-headers --column=:TEXT --column=:TEXT --print-column=1 --separator= -- ${xSELECTIONS}"
 	DRVSEL="`eval "$CHOOSEDLG"`"
 	[ $? -ne 0 ] && exit
 	USBDRV="$DRVSEL"
@@ -95,49 +95,12 @@ create_gpt_drv() {
 	sleep 1
 	case "$XFSTYPE2" in
 		f2fs) mkfs.f2fs -f /dev/${XDEV}2 ;;
-		ext4) mkfs.ext4 /dev/${XDEV}2 ;;
+		ext4) mkfs.ext4 -F -O ^has_journal /dev/${XDEV}2 ;;
 	esac
 	sync
 
 	blockdev --rereadpt /dev/${XDEV}
 	sleep 4
-}
-
-# grub2 - make bootable
-# $1: targetdir 
-# $2: pmedia
-copy_grub2_uefi_boot() {
-	# includes some code from uefi-usb-installer (01micko)
-	local HOMEDIR="$1"
-	local PMEDIA="$2"
-	GRUBDIR="/usr/share/grub2-efi"
-	mkdir -p ${HOMEDIR}/EFI/boot
-	if [ -f ${GRUBDIR}/grubia32.efi ] ; then
-		cp ${GRUBDIR}/grubia32.efi ${HOMEDIR}/EFI/boot/bootia32.efi
-	fi
-	if [ -f ${GRUBDIR}/grubx64.efi ] ; then
-		cp ${GRUBDIR}/grubx64.efi ${HOMEDIR}/EFI/boot/bootx64.efi
-	elif [ -f $GRUBDIR/grubx64.efi.tar.xz ] ; then # old stuff
-		tar -xJvf $GRUBDIR/grubx64.efi.tar.xz -C ${HOMEDIR}/EFI/boot/
-		mv ${HOMEDIR}/EFI/boot/grubx64.efi ${HOMEDIR}/EFI/boot/bootx64.efi
-	fi
-	sync
-
-	# grub.cfg
-	[ "$PMEDIA" ] || PMEDIA=usbflash
-	BOOTLABEL='puppy'
-	sed -e "s/DISTRO_FILE_PREFIX/${DISTRO_FILE_PREFIX}/g" \
-		-e "s/DISTRO_DESC/${DISTRO_FILE_PREFIX} ${DISTRO_VERSION}/g" \
-		-e "s/#distrodesc#/${DISTRO_FILE_PREFIX} ${DISTRO_VERSION}/g" \
-		-e "s/BOOTLABEL/${BOOTLABEL}/g"  \
-		-e "s/pmedia=cd/pmedia=${PMEDIA}/g" \
-		/usr/share/boot-dialog/grub.cfg > ${HOMEDIR}/grub.cfg
-
-	if [ -f /usr/share/boot-dialog/puppy.png ] ; then
-		cp -fv /usr/share/boot-dialog/puppy.png ${HOMEDIR}/splash.png
-	else
-		sed -i '/background_image/d' ${HOMEDIR}/grub.cfg
-	fi
 }
 
 # efilinux - make bootable
@@ -166,64 +129,7 @@ copy_efilinux_uefi_boot() {
 	sync
 }
 
-# $1: directory
-# $2: distro
-# $3: pmedia
-copy_g4dos_cd() {
-	if [ ! -d "$1" ] ; then
-		return 1
-	fi
-
-	cp -fv /usr/share/g4dos/pcd/* "$1"/ # deleted dir - obsolete code - delete this
-	cp -fv /usr/share/boot-dialog/menu.lst "$1"/
-	cp -fv /usr/share/boot-dialog/menu_phelp.lst "$1"/
-	cp -fv /usr/share/boot-dialog/grldr "$1"/
-
-	if [ "$2" ] ; then #distro
-		if [ "$2" = "auto" ] ; then
-			. /etc/DISTRO_SPECS
-			sed -i "s%#distrodesc#%${DISTRO_NAME} ${DISTRO_VERSION}%" "$1"/menu.lst
-		else
-			sed -i "s%#distrodesc#%${2}%" "$1"/menu.lst
-		fi
-	fi
-	if [ "$3" ] ; then #pmedia
-		sed -i "s|pmedia=cd|pmedia=${3}|" "$1"/menu.lst
-	fi
-
-	# frugalpup
-	if [ -f /usr/local/frugalpup/grub4dos.tar.xz ] ; then
-		tar -C "$1"/ -xf /usr/local/frugalpup/grub4dos.tar.xz ./grldr
-	fi
-
-	if [ ! -f "$1"/grldr ] && [ -f /usr/lib/grub4dos/grldr ] ; then # grub4dosconfig
-		cp /usr/lib/grub4dos/grldr "$1"/
-	fi
-}
-
-# $1: drive
-write_wee_mbr() {
-	XDEV=${1##*/}
-	BLOCKDEV=$1
-	WEE_MBR='/usr/share/boot-dialog/wee.mbr'
-	[ -f /usr/share/g4dos/wee.mbr ] && WEE_MBR='/usr/share/g4dos/wee.mbr' # moved - delete this
-	if [ ! -f $WEE_MBR ] ; then
-		echo "file not found: $WEE_MBR"
-		exit 1
-	fi
-	cp ${WEE_MBR} /tmp/wee.mbr
-	## Read disk signature and partition table from MBR
-	## and write it to wee.mbr:
-	dd if=${BLOCKDEV} bs=1 skip=439 count=72 2>/dev/null | \
-		dd of=/tmp/wee.mbr bs=1 seek=439 conv=notrunc
-	## backup MBR
-	dd if=${BLOCKDEV} of=/tmp/${XDEV}.mbr bs=512 count=63
-	## Write wee MBR to $MBR_DEV
-	echo "Installing bootloader(Wee) on ${BLOCKDEV} ..."
-	dd if=/tmp/wee.mbr of=${BLOCKDEV}
-}
-
-# create msdos partition table and 1 partition, then install wee.mbr
+# create msdos partition table and 1 partition
 # $1 = drv
 # $2 = XFSTYPE (vfat, ntfs, ext3, ext4)
 # $3 = XFSTYPE2 (f2fs)  (optional - $2 becomes vfat)
@@ -275,7 +181,7 @@ create_bios_bootable_drv() {
 	sleep 1
 	case "$XFSTYPE2" in
 		f2fs) mkfs.f2fs -f /dev/${XDEV}2 ;;
-		ext4) mkfs.ext4 /dev/${XDEV}2 ;;
+		ext4) mkfs.ext4 -F -O ^has_journal /dev/${XDEV}2 ;;
 	esac
 
 	sync
@@ -324,57 +230,10 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	CDDRIVE=""
 	ASK=""
 	#-----
-	if [ $PUPMODE -eq 2 ] ; then #full install
-		ASK=1
+	PDEV1_MP=/initrd/mnt/dev_save
+	if [ -f ${PDEV1_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f ${PDEV1_MP}${PSUBDIR}/vmlinuz -a -f ${PDEV1_MP}${PSUBDIR}/initrd.zst ] ; then
+		SRCPATH=${PDEV1_MP}${PSUBDIR}
 	else
-		PDEV1_IS_CD=$(probedisk /dev/${PDEV1} 2>/dev/null | grep '|optical|')
-		PDEV1_MP=$(LANG=C mount | grep "^/dev/${PDEV1} " | awk '{print $3}')
-		PDEV1_FS=$(busybox blkid /dev/${PDEV1} | grep -o ' TYPE=.*' | cut -f 2 -d '"')
-		if [ "$PDEV1_MP" ] && [ ! "$PDEV1_FS" ] ; then # no fs?
-			# hmm mounted but media not present?... removable drive (probably)
-			umount $PDEV1_MP
-			PDEV1_MP=""
-		fi
-		#--
-		if [ ! "$PDEV1_FS" ] ; then
-			# no partition fs
-			PDEV1_FS="$DEV1FS" #DEV1FS is in /etc/rc.d/PUPSTATE
-		fi
-		if [ ! "$PDEV1_MP" ] ; then
-			# not mounted
-			mkdir -p /mnt/$PDEV1
-			mount -t $PDEV1_FS /dev/$PDEV1 /mnt/$PDEV1
-			if [ $? -eq 0 -a -f /mnt/${PDEV1}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f /mnt/${PDEV1}${PSUBDIR}/vmlinuz -a -f /mnt/${PDEV1}${PSUBDIR}/initrd.zst ] ; then
-				SRCPATH=/mnt/${PDEV1}${PSUBDIR}
-			else
-				umount /mnt/$PDEV1 2>/dev/null
-			fi
-		else
-			# already mounted
-			if [ -f ${PDEV1_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f ${PDEV1_MP}${PSUBDIR}/vmlinuz -a -f ${PDEV1_MP}${PSUBDIR}/initrd.zst ] ; then
-				SRCPATH=${PDEV1_MP}${PSUBDIR}
-			fi
-		fi
-		#--
-		if [ -z "$SRCPATH" -a -n "$PDEV1_IS_CD" ] ; then # not found yet..
-			# may need to insert CD..
-			CDDRIVE=${PDEV1}
-			CDDRVINFO=$(echo "$PDEV1_IS_CD" | cut -f 3 -d '|')
-			Xdialog --wmclass "gtkdialog2" --left --title "$L_PUPPY_INSTALLER" \
-			--msgbox "$(eval_gettext "Please insert the Puppy live-CD (if not already) \
-  into the drive.\nNote, in case your PC has two CD/DVD drives, \
-  Puppy is expecting\nthe live-CD to be inserted into $CDDRIVE, which is \
-  described as:\n $CDDRVINFO \n\nAfter inserting live-CD, \
-  click OK button...")" 0 0
-			mkdir /mnt/${CDDRIVE} 2> /dev/null
-			mount -t iso9660 /dev/${CDDRIVE} /mnt/${CDDRIVE} || umount /dev/${CDDRIVE}
-			if [ -f /mnt/${CDDRIVE}${PSUBDIR}/${DISTRO_PUPPYSFS} ] ; then
-				SRCPATH=/mnt/${CDDRIVE}${PSUBDIR}
-			fi
-		fi
-	fi
-	#-----
-	if [ ! "$SRCPATH" ] ; then
 		ASK=1 #last resort..
 	fi
 	#-----
@@ -393,11 +252,11 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 	#===============================
 	#sanity check...
 	if [ ! -f ${SRCPATH}/${DISTRO_PUPPYSFS} ];then #v3.01 v424 100913
-		Xdialog --wmclass "gtkdialog2" --left \
-			--title "$(gettext 'ERROR')" --msgbox "`eval_gettext \"Oh dear, a 'sanity check' has failed.\
- \nThis file: \\\$SRCPATH/\\\${DISTRO_PUPPYSFS}\ndoes not exist.\nThe above \
- is supposed to be path-to-where-puppy-files-are/\\\${DISTRO_PUPPYSFS}\
- \nClick OK button to quit...\"`" 0 0
+		yad \
+			--title="$(gettext 'ERROR')" --button=gtk-ok --text="`eval_gettext \"Oh dear, a 'sanity check' has failed.
+This file: \\\$SRCPATH/\\\${DISTRO_PUPPYSFS} does not exist.
+The above is supposed to be path-to-where-puppy-files-are/\\\${DISTRO_PUPPYSFS}.
+nClick OK button to quit...\"`"
 		exit
 	fi
 } #end locate_puppy_src_files function.
@@ -406,379 +265,24 @@ locate_puppy_src_files() { # set $SRCPATH $CDDRIVE
 #                     MAIN DIALOG
 #=================================================================
 
-create_dlg_item() { # title desc icon exit
-	echo '
-    <hbox space-expand="true" space-fill="true">
-      <text space-expand="false" space-fill="false"><label>""</label></text>
-      <text xalign="0" use-markup="true" space-expand="true" space-fill="true"><label>"'"${1}
-${2}"'"</label></text>
-      <vbox space-expand="false" space-fill="false">
-        <button>
-          '"`/usr/lib/gtkdialog/xml_button-icon ${3} big`"'
-          <action type="exit">'${4}'</action>
-        </button>
-      </vbox>
-    </hbox>
-    <hseparator></hseparator>'
-}
+#ITEMS="$ITEMS 3 \"$(gettext '<b>Write .img[.gz|.xz] file to USB drive</b>'\" 4 \"$(gettext '<b>Write Hybrid ISO file to USB drive</b>')\""
+RETVAL="`yad --title="Bootflash $USBDRV" --window-icon=gtk-preferences --button=gtk-ok --text="$(gettext 'This tool allows to quickly create a bootable usb drive ready to use. Be aware that ALL DATA ON THE USB DRIVE WILL BE LOST')" --width=640 --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Create UEFI bootable USB (efilinux + ext4)')" 2 "$(gettext 'Create UEFI bootable USB (efilinux + f2fs)')" 3 "$(gettext 'Create BIOS bootable USB (syslinux + ext4)')" 4 "$(gettext 'Create BIOS bootable USB (syslinux + f2fs)')"`"
 
-if [ "$(ls /usr/share/grub2-efi/grub*.efi* 2>/dev/null)" ] ; then
-	UEFI_USB_INSTALLER=$(
-		create_dlg_item "$(gettext '<b>Create UEFI USB (GPT / GRUB2)</b>')" \
-			"$(gettext 'For UEFI-enabled machines booting in UEFI mode. Installs the running system. Not compatible with old BIOS')" \
-			install_options.svg 1
-	)
-fi
-
-if [ -f /usr/lib/efilinux/efilinux.efi ] ; then
-	EFILINUX_USB_INSTALLER=$(
-		create_dlg_item "$(gettext '<b>Create UEFI USB (GPT / efilinux)</b>')" \
-			"$(gettext 'For UEFI-enabled machines booting in UEFI mode. Installs the running system. Not compatible with old BIOS')" \
-			install_options.svg 5
-	)
-fi
-
-if command -v syslinux > /dev/null && [ -f /usr/lib/SYSLINUX/mbr.bin ] ; then
-	SYSLINUX_USB_INSTALLER=$(
-		create_dlg_item "$(gettext '<b>Create syslinux USB (MBR - BIOS)</b>')" \
-			"$(gettext 'Does not support UEFI. Installs the running system. For computers booting with BIOS.')" \
-			install_options.svg 6
-	)
-fi
-
-if [ -d /usr/share/g4dos -o -f /usr/local/frugalpup/grub4dos.tar.xz -o -f /usr/lib/grub4dos/grldr ] ; then
-	GRUB4DOS_USB_INSTALLER=$(
-		create_dlg_item "$(gettext '<b>Create grub4dos USB (MBR - BIOS)</b>')" \
-			"$(gettext 'Does not support UEFI. Installs the running system. For computers booting with BIOS.')" \
-			install_options.svg 2
-	)
-fi
-
-export ASKDIALOG='
-<window title="'"Bootflash $USBDRV"'" icon-name="gtk-preferences">
-<vbox>
-  <frame Bootflash '$USBDRV'>
-    '"`/usr/lib/gtkdialog/xml_info 0 flashcard_usb.svg 48 "$(gettext "This tool allows to quickly create a bootable usb drive ready to use. Be aware that ALL DATA ON THE USB DRIVE WILL BE LOST")"`"'
-
-    '${UEFI_USB_INSTALLER}'
-
-    '${EFILINUX_USB_INSTALLER}'
-
-    '${GRUB4DOS_USB_INSTALLER}'
-
-    '${SYSLINUX_USB_INSTALLER}'
-
-    '$(create_dlg_item "$(gettext '<b>Write .img[.gz|.xz] file to USB drive</b>')" \
-		"$(gettext "IMG files meant to be written to usb sticks/SD cards...")" \
-		flashcard_usb_2.svg 3
-		)'
-
-    '$(create_dlg_item "$(gettext '<b>Write Hybrid ISO file to USB drive</b>')" \
-		"$(gettext "It's probably only useful if you want to try/install Linux distros that provide hybrid ISOs.")" \
-		cd_burn.svg 4
-		)'
-
-  </frame>
-  
-    <hbox space-expand="false" space-fill="false">
-     <button>
-       '"`/usr/lib/gtkdialog/xml_button-icon quit`"'
-       <label>'$(gettext 'Quit')'</label>
-       <action type="exit">EXIT</action>
-     </button>
-    </hbox>
-
-  </vbox>
-</window>'
-#echo "$ASKDIALOG" > /tmp/bootflash.main.xml #debug
-. /usr/lib/gtkdialog/xml_info gtk #build bg_pixmap for gtk-theme
-RETVAL="`gtkdialog --center -p ASKDIALOG 2>/dev/null`"
-eval "$RETVAL"
-
-# check f2fs support
-if [ "$(cat /proc/filesystems  | grep f2fs)" ] ; then
-	if type mkfs.f2fs >/dev/null 2>&1 ; then
-		F2FS_DLG=$(create_dlg_item "$(gettext '<b>FAT32 partition + F2FS partition</b>')" \
-		"$(gettext 'Enables use of F2FS partition')" \
-		install_options.svg 15)
-	fi
-fi
-
-case $EXIT in
+BOOTLOADER=efilinux
+FSTYPE='vfat'
+FSTYPE2='ext4'
+case "$RETVAL" in
 	1)
-		#========================
-		#    UEFI - GRUB2
-		#========================
-		BOOTLOADER=grub2
-		FSTYPE=vfat
-		export UEFI_DIALOG='<window title="'"BootFlash: $USBDRV"'" icon-name="gtk-preferences">
-<vbox>
-    '$(/usr/lib/gtkdialog/xml_info fixed execute_yes.svg 30 "$(gettext 'The intention of BootFlash is to make a USB memory stick (Flash drive) bootable.. then to install Puppy on it')")'
-
-	'$(create_dlg_item "$(gettext '<b>FAT32 GPT UEFI</b>')" \
-		"$(gettext 'Create FAT32 partition and install grub2')" \
-		install_options.svg 11
-		)'
-
-	'${F2FS_DLG}'
-
-    <hbox homogeneous="true" space-expand="true" space-fill="true">
-       <text use-markup="true" space-expand="true" space-fill="true">
-         <label>"<span fgcolor='"'#821811'"'><b>'$(gettext "THIS WILL DESTROY ALL DATA ON ${USBDRV}")'</b></span>"</label>
-       </text>
-    </hbox>
-    <hseparator></hseparator>
-
-    <hbox space-expand="false" space-fill="false">
-     <button>
-       '"`/usr/lib/gtkdialog/xml_button-icon quit`"'
-       <label>'$(gettext 'Quit')'</label>
-       <action type="exit">EXIT</action>
-     </button>
-    </hbox>
-
-  </vbox>
-</window>'
-		. /usr/lib/gtkdialog/xml_info gtk
-		#echo "$UEFI_DIALOG" > /tmp/bootflash.uefi.xml #debug
-		RETPARAMS="`gtkdialog --center --program=UEFI_DIALOG`"
-		eval "$RETPARAMS"
-		case $EXIT in
-			11) FSTYPE='vfat' ;;
-			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
-			*) exit ;;
-		esac
 		;;
-
-	5)
-		#========================
-		#    UEFI - efilinux
-		#========================
-		BOOTLOADER=efilinux
-		export UEFI_DIALOG='<window title="'"BootFlash: $USBDRV"'" icon-name="gtk-preferences">
-<vbox>
-    '$(/usr/lib/gtkdialog/xml_info fixed execute_yes.svg 30 "$(gettext 'The intention of BootFlash is to make a USB memory stick (Flash drive) bootable.. then to install Puppy on it')")'
-
-	'${F2FS_DLG}'
-
-	'$(create_dlg_item "$(gettext '<b>FAT32 partition + ext4 partition</b>')" \
-		"$(gettext 'Create ext4 partition and install efilinux')" \
-		install_options.svg 13
-		)'
-
-	'$(create_dlg_item "$(gettext '<b>FAT32 GPT UEFI</b>')" \
-		"$(gettext 'Create FAT32 partition and install efilinux')" \
-		install_options.svg 11
-		)'
-
-    <hbox homogeneous="true" space-expand="true" space-fill="true">
-       <text use-markup="true" space-expand="true" space-fill="true">
-         <label>"<span fgcolor='"'#821811'"'><b>'$(gettext "THIS WILL DESTROY ALL DATA ON ${USBDRV}")'</b></span>"</label>
-       </text>
-    </hbox>
-    <hseparator></hseparator>
-
-    <hbox space-expand="false" space-fill="false">
-     <button>
-       '"`/usr/lib/gtkdialog/xml_button-icon quit`"'
-       <label>'$(gettext 'Quit')'</label>
-       <action type="exit">EXIT</action>
-     </button>
-    </hbox>
-
-  </vbox>
-</window>'
-		. /usr/lib/gtkdialog/xml_info gtk
-		#echo "$UEFI_DIALOG" > /tmp/bootflash.uefi.xml #debug
-		RETPARAMS="`gtkdialog --center --program=UEFI_DIALOG`"
-		eval "$RETPARAMS"
-		case $EXIT in
-			11) FSTYPE='vfat' ;;
-			13) FSTYPE='vfat' ; FSTYPE2='ext4' ;;
-			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
-			*) exit ;;
-		esac
-		;;
-
 	2)
-		#========================
-		#        GRUB4DOS
-		#========================
-		export GRUB4DOS_DIALOG='<window title="'"BootFlash: $USBDRV"'" icon-name="gtk-preferences">
-<vbox>
-    '$(/usr/lib/gtkdialog/xml_info fixed execute_yes.svg 30 "$(gettext 'The intention of BootFlash is to make a USB memory stick (Flash drive) bootable.. then to install Puppy on it')")'
-
-	'${F2FS_DLG}'
-
-	'$(create_dlg_item "$(gettext '<b>FAT32 partition + grub4dos</b>')" \
-		"$(gettext 'Create FAT32 partition and install grub4dos')" \
-		install_options.svg 11
-		)'
-
-    '$(create_dlg_item "$(gettext '<b>EXT4 partition + grub4dos</b>')" \
-		"$(gettext 'Create ext4 partition and install grub4dos')" \
-		install_options.svg 13
-		)'
-
-    '$(create_dlg_item "$(gettext '<b>EXT3 partition + grub4dos</b>')" \
-		"$(gettext 'Create ext3 partition and install grub4dos')" \
-		install_options.svg 14
-		)'
-
-	'$(create_dlg_item "$(gettext '<b>NTFS partition + grub4dos</b>')" \
-		"$(gettext 'Create NTFS partition and install grub4dos')" \
-		install_options.svg 12
-		)'
-
-    <hbox homogeneous="true" space-expand="true" space-fill="true">
-       <text use-markup="true" space-expand="true" space-fill="true">
-         <label>"<span fgcolor='"'#821811'"'><b>'$(gettext "THIS WILL DESTROY ALL DATA ON ${USBDRV}")'</b></span>"</label>
-       </text>
-    </hbox>
-    <hseparator></hseparator>
-
-    <hbox space-expand="false" space-fill="false">
-     <button>
-       '"`/usr/lib/gtkdialog/xml_button-icon quit`"'
-       <label>'$(gettext 'Quit')'</label>
-       <action type="exit">EXIT</action>
-     </button>
-    </hbox>
-
-  </vbox>
-</window>'
-	. /usr/lib/gtkdialog/xml_info gtk
-		#echo "$GRUB4DOS_DIALOG" > /tmp/bootflash.grub4dos.xml #debug
-		RETPARAMS="`gtkdialog --center --program=GRUB4DOS_DIALOG`"
-		eval "$RETPARAMS"
-
-		BOOTLOADER='grub4dos'
-		case $EXIT in
-			13) FSTYPE='ext4' ;;
-			14) FSTYPE='ext3' ;;
-			12) FSTYPE='ntfs' ;;
-			11) FSTYPE='vfat' ;;
-			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
-			*) exit ;;
-		esac
-		;;
-
-	6)
-		#========================
-		#    SYSLINUX
-		#========================
-		BOOTLOADER=syslinux
-		export SYSLINUX_DIALOG='<window title="'"BootFlash: $USBDRV"'" icon-name="gtk-preferences">
-<vbox>
-    '$(/usr/lib/gtkdialog/xml_info fixed execute_yes.svg 30 "$(gettext 'The intention of BootFlash is to make a USB memory stick (Flash drive) bootable.. then to install Puppy on it')")'
-
-	'${F2FS_DLG}'
-
-	'$(create_dlg_item "$(gettext '<b>FAT32 partition + ext4 partition</b>')" \
-		"$(gettext 'Create ext4 partition and install syslinux')" \
-		install_options.svg 13
-		)'
-
-	'$(create_dlg_item "$(gettext '<b>FAT32 partition + syslinux</b>')" \
-		"$(gettext 'Create FAT32 partition and install syslinux')" \
-		install_options.svg 11
-		)'
-
-    <hbox homogeneous="true" space-expand="true" space-fill="true">
-       <text use-markup="true" space-expand="true" space-fill="true">
-         <label>"<span fgcolor='"'#821811'"'><b>'$(gettext "THIS WILL DESTROY ALL DATA ON ${USBDRV}")'</b></span>"</label>
-       </text>
-    </hbox>
-    <hseparator></hseparator>
-
-    <hbox space-expand="false" space-fill="false">
-     <button>
-       '"`/usr/lib/gtkdialog/xml_button-icon quit`"'
-       <label>'$(gettext 'Quit')'</label>
-       <action type="exit">EXIT</action>
-     </button>
-    </hbox>
-
-  </vbox>
-</window>'
-		. /usr/lib/gtkdialog/xml_info gtk
-		RETPARAMS="`gtkdialog --center --program=SYSLINUX_DIALOG`"
-		eval "$RETPARAMS"
-		case $EXIT in
-			15) FSTYPE='vfat' ; FSTYPE2='f2fs' ;;
-			13) FSTYPE='vfat' ; FSTYPE2='ext4' ;;
-			11) FSTYPE='vfat' ;;
-			*) exit ;;
-		esac
-		;;
-
+		FSTYPE2='f2fs' ;;
 	3)
-		#========================
-		#   DD IMG TO USB DRV
-		#========================
-		img_file=$(yad --title="Select file" --file --text="Select *.img / *.img.gz / *.img.xz file")
-		if [ ! "$img_file" ] ; then
-			exit
-		fi
-		case $img_file in *.img|*.img.gz|*.img.xz) ok=1 ;;
-			*) exec yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Only .img/.img.gz/img.xz are supported..')" --button=gtk-ok ;;
-		esac
-		MYSELECTION="`echo "$xSELECTIONS" | grep "^${USBDRV} " | tr '"' ' ' | tr -s ' '`" #'geany
-		yad --image=dialog-warning --title="$(gettext 'Write IMG to USB')" --window-icon=dialog-warning \
-			--button="$(gettext 'Write IMG to USB')"\!gtk-yes \
-			--button="$(gettext 'Cancel')"\!gtk-no \
-			--text="$(gettext 'Write IMG to USB')\nIMG: ${img_file##*/}\nUSB: /dev/${MYSELECTION}"
-		[ $? -ne 0 ] && exit
-		echo 'pdsk img2flash "'${img_file}'" /dev/'${USBDRV}'
-if [ $? -eq 0 ] ; then
-	yad --title=Done --window-icon=dialog-information --image=dialog-information --text="Finished writing IMG file to /dev/${USBDRV}\nHopefully no errors occurred." --button=gtk-ok
-else
-	yad --title=Error --window-icon=dialog-error --image=dialog-error --text="Error writing img file to drive"" --button=gtk-ok
-fi
-' > /tmp/write_img_file_usb_drv_$$
-		xterm -title "Writing IMG to /dev/${USBDRV}" -e sh /tmp/write_img_file_usb_drv_$$
-		rm -f /tmp/write_img_file_usb_drv_$$
-		exit
-		;;
-
+		BOOTLOADER=syslinux ;;
 	4)
-		#========================
-		#   DD ISO TO USB DRV
-		#========================
-		iso_file=$(yad --title="Select ISO file" --file)
-		if [ ! "$iso_file" ] ; then
-			exit
-		fi
-		case $iso_file in *.[iI][sS][oO]) ok=1 ;;
-			*) exec yad --title=Error --window-icon=dialog-error --image=dialog-error --text="$(gettext 'You did not select an ISO file..')" --button=gtk-ok ;;
-		esac
-		res=$(yad --title="Bootflash - $USBDRV" --window-icon="gtk-yes" \
-			--button=gtk-ok:0 --button="Don't recover empty space":1 \
-			--center --sticky --on-top --fixed --form \
-			--field="$(gettext 'We can also try to make the extra space usable again and create a new partition. This is not guaranteed to work. Select filesystem:'):LBL" "" \
-			--field="$(gettext 'Filesystem'):CB" "ext4!ntfs!fat")
-		FS_TYPE=$(echo $res | cut -f 2 -d "|")
-		#---
-		MYSELECTION="`echo "$xSELECTIONS" | grep "^${USBDRV} " | tr '"' ' ' | tr -s ' '`" #'geany
-		yad --image=dialog-warning --title="$(gettext 'Write ISO to USB')" --window-icon=dialog-warning \
-			--button="$(gettext 'Write ISO to USB')"\!gtk-yes \
-			--button="$(gettext 'Cancel')"\!gtk-no \
-			--text="$(gettext 'Write ISO to USB')\nISO: ${iso_file##*/}\nUSB: /dev/${MYSELECTION}"
-		[ $? -ne 0 ] && exit
-		echo 'pdsk iso2flash "'${iso_file}'" /dev/'${USBDRV}' '${FS_TYPE}'
-if [ $? -eq 0 ] ; then
-	yad --title=Done --window-icon=dialog-information --image=dialog-information --text="$(gettext "Finished writing ISO file to") /dev/${USBDRV}\nHopefully no errors occurred.." --button=gtk-ok
-else
-	yad --title=Error --window-icon=dialog-error --image=dialog-error --text="Error writing ISO file to drive" --button=gtk-ok
-fi
-' > /tmp/write_iso_file_usb_drv_$$
-		xterm -title "Writing ISO to /dev/${USBDRV}" -e sh /tmp/write_iso_file_usb_drv_$$
-		rm -f /tmp/write_iso_file_usb_drv_$$
-		exit
-		;;
-
+		BOOTLOADER=syslinux
+		FSTYPE2='f2fs' ;;
 	*)
-		exit ;;
+		exit 1 ;;
 esac
 
 ensure_unmounted /dev/${USBDRV}
@@ -814,13 +318,10 @@ done
 yad --image=system-run --layer=overlay --edge=top --text="$(printf "$(gettext 'Please wait, formatting %s drive...')" "${USBDRV}")" --no-buttons &
 X1PID=$!
 
-if [ "$BOOTLOADER" = "grub4dos" ] ; then
-	create_bios_bootable_drv ${USBDRV} ${FSTYPE} ${FSTYPE2}
-	write_wee_mbr /dev/${USBDRV##*/} #install wee.mbr
-elif [ "$BOOTLOADER" = "syslinux" ] ; then
+if [ "$BOOTLOADER" = "syslinux" ] ; then
 	create_bios_bootable_drv ${USBDRV} ${FSTYPE} ${FSTYPE2}
 	dd if=/usr/lib/SYSLINUX/mbr.bin of=/dev/${USBDRV##*/}
-elif [ "$BOOTLOADER" = "grub2" -o "$BOOTLOADER" = "efilinux" ] ; then
+elif [ "$BOOTLOADER" = "efilinux" ] ; then
 	create_gpt_drv ${USBDRV} ${FSTYPE2}
 else
 	exit 1
@@ -856,13 +357,9 @@ else
 	PMEDIA="usbhd"
 fi
 
-if [ "$BOOTLOADER" = "grub4dos" ] ; then
-	copy_g4dos_cd /mnt/${PBOOTPART} auto ${PMEDIA}
-elif [ "$BOOTLOADER" = "syslinux" ] ; then
+if [ "$BOOTLOADER" = "syslinux" ] ; then
 	syslinux /dev/${USBDRV}1
 	create_syslinux_conf /mnt/${PBOOTPART} /dev/${PBOOTPART} ${PMEDIA} ${FSTYPE2}
-elif [ "$BOOTLOADER" = "grub2" ] ; then
-	copy_grub2_uefi_boot /mnt/${PBOOTPART} ${PMEDIA}
 elif [ "$BOOTLOADER" = "efilinux" ] ; then
 	copy_efilinux_uefi_boot /mnt/${PBOOTPART} /dev/${PBOOTPART} ${PMEDIA}
 fi
@@ -898,12 +395,6 @@ if [ "${FSTYPE2}" ] ; then # fat32 + f2fs
 	UUID=$(busybox blkid /dev/${USBDRV}2 | grep -o ' UUID=".*' | cut -f2 -d '"')
 	if [ "$UUID" ] ; then
 		# need to alter bootmenu
-		if [ -f /mnt/${USBDRV}1/menu.lst ] ; then
-			SEDFILES="/mnt/${USBDRV}1/menu.lst"
-		fi
-		if [ -f /mnt/${USBDRV}1/grub.cfg ] ; then
-			SEDFILES="$SEDFILES /mnt/${USBDRV}1/grub.cfg"
-		fi
 		if [ -f /mnt/${USBDRV}1/EFI/boot/efilinux.cfg ] ; then
 			SEDFILES="$SEDFILES /mnt/${USBDRV}1/EFI/boot/efilinux.cfg"
 		fi
