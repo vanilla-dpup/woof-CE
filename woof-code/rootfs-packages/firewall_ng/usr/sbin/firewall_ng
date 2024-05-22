@@ -13,15 +13,6 @@ version=0.8
 export TEXTDOMAIN=firewall_ng
 export OUTPUT_CHARSET=UTF-8
 
-# firewall test
-wall_state() {
-	if [ `iptables -L -n |wc -l` -gt 10 ];then
-		return 1
-	else
-		return 0
-	fi
-}
-
 # error splash
 error_cond() {
 	if [ -z "$2" ]; then
@@ -31,7 +22,6 @@ error_cond() {
 	fi
 	exit
 }
-export -f error_cond
 
 # custom settings
 export FILE=/tmp/firewall_extras
@@ -47,7 +37,6 @@ mk_entry() {
 	echo -e "\$IPT -A $DIRECTION -p $PROTO -s $IPRANGE $DOPT $PORT -j ACCEPT" \
 		>> $FILE
 }
-export -f mk_entry
 
 # parse input from extras gui
 add_extras() {
@@ -105,7 +94,6 @@ add_extras() {
 		mk_entry $1 TCP tcp_inbound "0/0"
 	fi
 }
-export -f add_extras
 
 process_ports() {
 	read -a name <<< "$1"
@@ -115,85 +103,11 @@ process_ports() {
 	done
 
 }
-export -f process_ports
-
-# extra ports gui
-extras_gui() {
-	TEXT1="$(gettext "Place a space delimited array of ports and options in the 
-	box below. Up to 10 can be specified. You must comma 
-	delimit the options.
-	Specifying the port number only allows inbound TCP
-	and UDP traffic from any source.")"
-	TEXT2="$(gettext "Example:")"
-	TEXT3=51200,TCP
-	TEXT4="$(gettext "Or:")"
-	TEXT5=5100,TCP,UDP,192.168.1.0/16
-	TEXT6="$(gettext "Place extra ports here")"
-	if [ -f "$CONF" ];then
-		. "$CONF"
-		EXTRA_CONF="$CONFIG_EXTRAS"
-		[ -z "$EXTRA_CONF" ] && EXTRA_CONF="$TEXT6"
-	else
-		EXTRA_CONF="$TEXT6"
-	fi
-
-	export extras="<window title=\"$(gettext "Extra ports")\">
-	<vbox>
-		<hbox space-expand=\"true\" space-fill=\"true\" width-request=\"500\">
-			<vbox>
-				<text space-expand=\"true\" space-fill=\"true\">
-					<label>\"$TEXT1\"</label>
-				</text>
-				<text space-expand=\"true\" space-fill=\"true\" xalign=\"0\">
-					<label>\"$TEXT2\"</label>
-				</text>
-				<text space-expand=\"true\" space-fill=\"true\" use-markup=\"true\">
-					<label>\"<i>$TEXT3</i>\"</label>
-				</text>
-				<text space-expand=\"true\" space-fill=\"true\" xalign=\"0\">
-					<label>\"$TEXT4\"</label>
-				</text>
-				<text space-expand=\"true\" space-fill=\"true\" use-markup=\"true\">
-					<label>\"<i>$TEXT5</i>\"</label>
-				</text>
-			</vbox>
-		</hbox>
-		<hbox space-expand=\"true\" space-fill=\"true\" width-request=\"500\">
-			<entry>
-				<variable>extra_ports</variable>
-				<default>$EXTRA_CONF</default>
-			</entry>
-		</hbox>
-		<hbox><button ok></button></hbox>
-	</vbox>
-</window>"
-	eval $(gtkdialog -p extras)
-	[ "$EXIT" = "abort" ] && return
-	[ "$extra_ports" = "$TEXT6" ] && error_cond \
-		"Error: $(gettext "No rules set!")"
-	echo "$extra_ports" > /tmp/extra_ports.txt
-	process_ports "$extra_ports"
-	error_cond "$(gettext "Setting custom rules")" z
-}
-export -f extras_gui
 
 warning_func() {
 	title="$(gettext "Warning!")"
-	fr="$(gettext "Information")"
 	message="$(gettext "You don't seem to be connected to a network. You can configure your firewall but some features will not work correctly until you establish a connection and reconfigure the firewall.")"
-	echo "<window title=\"$title\">
-		<vbox>
-			<hbox space-expand=\"true\" space-fill=\"true\">
-				<text height-request=\"50\" use-markup=\"true\"><label>\"<span size='x-large' color='sienna'>$title</span>\"</label></text>
-			</hbox>
-			<frame $fr>
-			<hbox homogeneous=\"true\">
-				<text><label>$message</label></text>
-			</hbox>
-			</frame>
-			<hbox><button ok></button></hbox>
-		</vbox>
-	</window>"|gtkdialog -c -s
+	yad --title="$title" --image=dialog-warning --text="$message" --button=gtk-ok
 }
 
 # get the current network interface and subnet
@@ -226,183 +140,15 @@ SUBNET=${host}/${sub}
 [ -z "$IFACE" ] && warning_func
 
 # setup
-sens=false
 [ -d "$CONFDIR" ] || mkdir -p "$CONFDIR"
 if [ -f "$CONF" ];then
 	. "$CONF"
-	def_extra="$CONFIG_EXTRAS"
-	defgen=$GENERIC
-	loggen=$LOGGING
-	defmain=$MAIN
 	CB_MAINTXT="$(gettext "Your firewall is configured. Change it to open ports if you have added extra services.")"
-	CB_TTTXT="$(gettext "Your firewall is configured. Change it if you wish.")"
 else
-	def=false
-	defgen=true
-	loggen=false
-	defmain=true
 	CB_MAINTXT="$(gettext "The default setting is that all ports are blocked. Uncheck to allow you to check some ports.")"
-	CB_TTTXT="$(gettext "If you do not need to connect to any incoming services then the default setting is recommended")"
-fi
-[ "$MAIN" == 'false' ] && sens=true
-
-# gui
-wall_state
-state=$?
-if [ "$state" = '1' ];then
-	IMAGEFILE=/usr/share/pixmaps/puppy/shield_yes.svg
-	msg=$(gettext "Firewall On")
-	winicon=gtk-connect
-	ttmsg=$(gettext "Your firewall is configured and running. You can cancel or abort this program if you wish, or change the settings now.")
-	btn_label="$(gettext "Reload")"
-else
-	IMAGEFILE=/usr/share/pixmaps/puppy/shield_no.svg
-	msg=$(gettext "Firewall Off")
-	winicon=gtk-no
-	ttmsg=$(gettext "Your firewall is not running. You should configure it now!")
-	btn_label="$(gettext "Resume")"
-fi
-# resume/reload button
-if [ -x /etc/init.d/rc.firewall ];then
-	RESUME="<button tooltip-text=\"$(gettext "Restart Firewall with current settings")\">
-				<label>$btn_label</label>
-				<input file stock=\"gtk-refresh\"></input>
-				<action type=\"exit\">Redo</action>
-			</button>
-"
-fi
-export url="http://www.slackware.com/~alien/efg/" 
-TEXT='<b><u><span color='"'blue'"'>'"$(gettext "Alien Bob's Easy Firewall Generator for IPTables")"'</span></u></b>' 
-URL="<eventbox hover-selection=\"true\" homogeneous=\"true\" tooltip-text=\"$(gettext "This link opens in your default web browser")\"> 
-      <text justify=\"2\" use-markup=\"true\"><label>\"$TEXT\"</label></text> 
-<action signal=\"button-press-event\">defaultbrowser $url &</action> 
-</eventbox>"
-for i in SSH CUPS Samba Samba_client DLNA NTP ftp http DNS DHCP NFS ;do
-
-	case $i in 
-		Samba)var=CONFIG_SAMBA desc=$(gettext "Share files with Windows");[ -f "$CONF" ] &&  def=$CONFIG_SAMBA || def=false;;
-		Samba_client)var=CONFIG_SAMBA_CLIENT desc=$(gettext "Browse files on Windows");[ -f "$CONF" ] &&  def=$CONFIG_SAMBA_CLIENT || def=false;;
-		DLNA)var=CONFIG_DLNA  desc=$(gettext "Media Server");[ -f "$CONF" ] &&  def=$CONFIG_DLNA || def=false;;
-		ftp)var=CONFIG_FTP desc=$(gettext "File transfer protocol");[ -f "$CONF" ] &&  def=$CONFIG_FTP || def=false;;
-		http)var=CONFIG_HTTP desc=$(gettext "Web Server");[ -f "$CONF" ] &&  def=$CONFIG_HTTP || def=false;;
-		SSH)var=CONFIG_${i} desc=$(gettext "Remote secure shell access");[ -f "$CONF" ] &&  def=$CONFIG_SSH || def=false;;
-		CUPS)var=CONFIG_${i} desc=$(gettext "Printer server");[ -f "$CONF" ] &&  def=$CONFIG_CUPS || def=false;;
-		NTP)var=CONFIG_${i} desc=$(gettext "Time server");[ -f "$CONF" ] &&  def=$CONFIG_NTP || def=false;;
-		DHCP)var=CONFIG_${i} desc=$(gettext "DHCP Server");[ -f "$CONF" ] &&  def=$CONFIG_DHCP || def=false;;
-		DNS)var=CONFIG_${i} desc=$(gettext "Domain Name Services");[ -f "$CONF" ] &&  def=$CONFIG_DNS || def=false;;
-		NFS)var=CONFIG_${i} desc=$(gettext "Network File Sharing Protocol (UNIX)");[ -f "$CONF" ] &&  def=$CONFIG_NFS || def=false ;;
-	esac
-	name=$i
-	[ "$name" == 'Samba_client' ] && name="Samba Client"
-	CB="$CB""<hbox space-expand=\"true\" space-fill=\"true\">
-		<checkbox>
-			<label>$name - $desc</label>
-			<default>$def</default>
-			<variable>$var</variable>
-			<sensitive>$sens</sensitive>
-		</checkbox>
-	</hbox>"
-	case $var in 
-		CONFIG_FTP|CONFIG_HTTP|CONFIG_NTP|CONFIG_DHCP|CONFIG_DNS|CONFIG_NFS)
-		ACT="$ACT""<action>if true enable:$var</action>
-				<action>if false disable:$var</action>"
-		;;
-		*)DEF="$DEF""<action>if false enable:$var</action>
-				<action>if true disable:$var</action>"
-		;;
-	esac
-		
-done
-
-export GUI="<window title=\"Firewall Setup $version\" icon-name=\"$winicon\">
-	<vbox>
-		<hbox space-expand=\"true\" space-fill=\"true\">
-			<vbox>
-				<pixmap tooltip-text=\"$ttmsg\">
-					<height>64</height>
-					<input file>\"$IMAGEFILE\"</input>
-				</pixmap>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					<text use-markup=\"true\"><label>\"<small><tt>$msg</tt></small>\"</label></text>
-				</hbox>
-			</vbox>
-			<vbox>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					<text use-markup=\"true\"><label>\"<b>$(gettext "Choose which connections to allow through your firewall.")</b>\"</label></text>
-				</hbox>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					<text><label>$(gettext "Check your required remote connections or leave the default.")</label></text>
-				</hbox>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					<text><label>$(gettext "Advanced users may need a more granular Firewall. Please visit:")</label></text>
-				</hbox>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					$URL
-				</hbox>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					<checkbox>
-						<label>\"$(gettext "When this button is checked a generic firewall is generated on no specific interface.")\"</label>
-						<default>$defgen</default>
-						<variable>GENERIC</variable>
-					</checkbox>
-				</hbox>
-				<hbox space-expand=\"true\" space-fill=\"true\">
-					<checkbox>
-						<label>\"$(gettext "Check this box to enable logging.")\"</label>
-						<default>$loggen</default>
-						<variable>LOGGING</variable>
-					</checkbox>
-				</hbox>
-			</vbox>
-		</hbox>
-		<frame>
-			<hbox space-expand=\"true\" space-fill=\"true\">
-				<checkbox tooltip-text=\"$CB_TTTXT\">
-					<label>\"$CB_MAINTXT\"</label>
-					<default>$defmain</default>
-					<variable>MAIN</variable>
-					$DEF
-					<action>if false enable:EX</action>
-					<action>if true disable:EX</action>
-				</checkbox>
-			</hbox>
-		</frame>
-		<vbox scrollable=\"true\" width=\"480\" height=\"230\">
-			<hbox space-expand=\"true\" space-fill=\"true\">
-				<checkbox>
-					<label>$(gettext "Check this to allow higher level server settings (Experts only).")</label>
-					<variable>EX</variable>
-					<default>false</default>
-					$ACT
-					<sensitive>false</sensitive>
-				</checkbox>
-			</hbox>
-			<hseparator></hseparator>
-			$CB
-		</vbox>
-		<hbox>
-			<button cancel></button>
-			$RESUME
-			<button tooltip-text=\"$(gettext "Option to choose custom ports")\">
-				<label>$(gettext "Extras")</label>
-				<input file stock=\"gtk-add\"></input>
-				<action>extras_gui</action>
-			</button>
-			<button has-focus=\"true\">
-				<label>$(gettext "Apply")</label>
-				<input file stock=\"gtk-apply\"></input>
-				<action type=\"exit\">Doit</action>
-			</button>
-		</hbox>
-	</vbox>
-</window>"
-if [ "$1" = "enable" ]; then
-	echo "Enabling firewall"
-	EXIT=Doit
 	GENERIC=true
 	LOGGING=false
-	MAIN=true
-	EX=false
+	MAIN=false
 	CONFIG_SSH=false
 	CONFIG_CUPS=false
 	CONFIG_SAMBA=false
@@ -414,15 +160,52 @@ if [ "$1" = "enable" ]; then
 	CONFIG_DNS=false
 	CONFIG_DHCP=false
 	CONFIG_NFS=false
+	CONFIG_EXTRAS=""
+fi
+
+if [ "$1" = "enable" ]; then
+	echo "Enabling firewall"
+	RETVALS="true|true|false|||false|false|false|false|false|false|false|false|false|false|false||||"
+	EXIT=0
 else
-	eval $(gtkdialog -p GUI -c 2>/dev/null) 2>/dev/null
-	echo $EXIT
+	RETVALS="$(yad \
+		--title="Firewall Setup $version" \
+		--form \
+		--field="$CB_MAINTXT":CHK $MAIN \
+		--field="$(gettext 'When this button is checked a generic firewall is generated on no specific interface.')":CHK $GENERIC \
+		--field="$(gettext 'Check this box to enable logging.')":CHK $LOGGING \
+		--field=:LBL "" \
+		--field="<b>$(gettext 'Choose which connections to allow through your firewall.')</b>
+$(gettext 'Check your required remote connections or leave the default.')":LBL "" \
+		--field="SSH - $(gettext 'Remote secure shell access')":CHK $CONFIG_SSH \
+		--field="CUPS - $(gettext 'Printer server')":CHK $CONFIG_CUPS \
+		--field="Samba - $(gettext 'Share files with Windows')":CHK $CONFIG_SAMBA \
+		--field="Samba Client - $(gettext 'Browse files with Windows')":CHK $CONFIG_SAMBA_CLIENT \
+		--field="DLNA - $(gettext 'Media Server')":CHK $CONFIG_DLNA \
+		--field="NTP - $(gettext 'Time Server')":CHK $CONFIG_NTP \
+		--field="FTP - $(gettext 'File transfer protocol')":CHK $CONFIG_FTP \
+		--field="HTTP - $(gettext 'Web Server')":CHK $CONFIG_HTTP \
+		--field="DNS - $(gettext 'Domain Name Services')":CHK $CONFIG_DNS \
+		--field="DHCP - $(gettext 'DHCP Server')":CHK $CONFIG_DHCP \
+		--field="NFS - $(gettext 'Network File Sharing Protocol (UNIX)')":CHK $CONFIG_NFS \
+		--field=:LBL "" \
+		--field="$(gettext 'Place a space delimited array of ports and options in the box below. Up to 10 can be specified. You must comma delimit the options.
+Specifying the port number only allows inbound TCP and UDP traffic from any source.')
+$(gettext 'Example:')
+51200,TCP
+$(gettext 'Or:')
+5100,TCP,UDP,192.168.1.0/16":LBL "" \
+		--field=:CE "^$CONFIG_EXTRAS" \
+		--button=gtk-apply \
+		--button=gtk-cancel \
+		--bool-fmt=t)"
+	EXIT=$?
 fi
 case "$EXIT" in
-	Doit)echo "GENERIC=$GENERIC
+	0)IFS='|' read -r MAIN GENERIC LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_SAMBA_CLIENT CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS _ _ CONFIG_EXTRAS <<< "$RETVALS"
+	echo "GENERIC=$GENERIC
 LOGGING=$LOGGING
 MAIN=$MAIN
-EX=$EX
 CONFIG_SSH=$CONFIG_SSH
 CONFIG_CUPS=$CONFIG_CUPS
 CONFIG_SAMBA=$CONFIG_SAMBA
@@ -433,32 +216,9 @@ CONFIG_FTP=$CONFIG_FTP
 CONFIG_HTTP=$CONFIG_HTTP
 CONFIG_DNS=$CONFIG_DNS
 CONFIG_DHCP=$CONFIG_DHCP
-CONFIG_NFS=$CONFIG_NFS" > $CONF # (re)write config
-	if [ -f /tmp/extra_ports.txt ];then
-		XTRAS="`cat /tmp/extra_ports.txt`"
-		echo "CONFIG_EXTRAS=\"$XTRAS\"" >> $CONF # add a new custom setup
-		rm /tmp/extra_ports.txt
-	else
-		echo "CONFIG_EXTRAS=\"$def_extra\"" >> $CONF # save initial custom setup
-		process_ports "$def_extra"
-	fi
-	;;
-	Redo)
-	if [ -f "$CONF" ];then
-		if [ -x /etc/init.d/rc.firewall ];then
-			if [ $state -eq 0 ];then
-				/etc/init.d/rc.firewall start
-				echo 'starting firewall using previous config' && exit
-			else
-				/etc/init.d/rc.firewall restart
-				echo 'restarting firewall using previous config' && exit
-			fi
-		else
-			echo 'aborting' && exit
-		fi
-	else
-		echo 'aborting' && exit
-	fi
+CONFIG_NFS=$CONFIG_NFS
+CONFIG_EXTRAS=\"$CONFIG_EXTRAS\"" > $CONF # (re)write config
+	process_ports "$CONFIG_EXTRAS"
 	;;
 	*)echo 'aborting' && exit
 	;;
@@ -1440,7 +1200,7 @@ echo "Load rules for mangle table ..."
 EOF_REST
 
 if [ -f "$TMPFW" ];then
-	[ $state = 1 -a "$1" != "enable" ] && sh /etc/init.d/rc.firewall stop && sleep 1
+	[ "$1" != "enable" ] && sh /etc/init.d/rc.firewall stop && sleep 1
 	echo "copying firewall"
 	cp -af "$TMPFW" /etc/init.d/rc.firewall
 	[ "$MAIN" = "true" -o "$CONFIG_SSH" = "true" -o "$CONFIG_CUPS" = "true" -o "$CONFIG_SAMBA" = "true" -o "$CONFIG_SAMBA_CLIENT" = "true" -o "$CONFIG_DLNA" = "true" -o "$CONFIG_NTP" = "true" -o "$CONFIG_FTP" = "true" -o "$CONFIG_HTTP" = "true" -o "$CONFIG_DNS" = "true" -o "$CONFIG_DHCP" = "true" -o "$CONFIG_NFS" = "true" ] && chmod 755 /etc/init.d/rc.firewall || chmod 644 /etc/init.d/rc.firewall
