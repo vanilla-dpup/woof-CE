@@ -170,7 +170,10 @@ if [ "$1" = "enable" ]; then
 else
 	RETVALS="$(yad \
 		--title="Firewall Setup $version" \
+		--width=640 \
+		--height=320 \
 		--form \
+		--scroll \
 		--field="$CB_MAINTXT":CHK $MAIN \
 		--field="$(gettext 'When this button is checked a generic firewall is generated on no specific interface.')":CHK $GENERIC \
 		--field="$(gettext 'Check this box to enable logging.')":CHK $LOGGING \
