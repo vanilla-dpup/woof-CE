@@ -4,6 +4,7 @@ UEFI_IMG_BASE=${DISTRO_FILE_PREFIX}-${DISTRO_VERSION}-ext4-2gb-uefi.img
 set -e
 
 mount --bind /dev rootfs-complete/dev
+mount --bind /proc rootfs-complete/proc
 mkdir rootfs-complete/build
 mount --bind build rootfs-complete/build
 
@@ -26,8 +27,9 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 	mv -f ${UEFI_IMG_BASE} ../${WOOF_OUTPUT}/
 fi
 
-umount -l rootfs-complete/dev
 umount -l rootfs-complete/build
 rmdir rootfs-complete/build
+umount -l rootfs-complete/proc
+umount -l rootfs-complete/dev
 
 set +e
