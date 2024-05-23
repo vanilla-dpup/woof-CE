@@ -17,7 +17,8 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
 * Support for the devx SFS is gone and development packages can be installed individually, without having to download the entire devx.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
-* The bootable images produced by woof-CE contain an empty save folder and Bootflash creates an empty save folder if possible, to reduce the number of questions users need to answer.
+* Bootflash creates an empty save folder, to reduce the number of questions users need to answer.
+* The build output is produced by Bootflash, with a sparse image and a loop device as the installation destination.
 * `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`.
 * SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`.
 * Rarely-used boot codes like `pimod` and `pwireless` are gone.
