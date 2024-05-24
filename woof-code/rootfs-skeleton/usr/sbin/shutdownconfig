@@ -855,12 +855,6 @@ case $SAVECHOICE in
 esac
 
 #--------------------------------------------------
-if [ ! -f ${SMNTPT}/pupswap.swp ] ; then
-  if pupswap validate_drive ${SAVEPART} ; then
-    ONLY_IF_NO_SWAP=1 pupswap set_dir ${SMNTPT}
-  fi
-fi
-#--------------------------------------------------
 
 #record all variables to a file...
 #20140716 SFR: but first escape ' (if present) in MYPASSWORD
