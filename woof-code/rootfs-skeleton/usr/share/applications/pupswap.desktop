@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=pupswap
+Icon=system-run
+Comment=Create a swap file
+Exec=pupswap
+Terminal=false
+Type=Application
+Categories=X-System
