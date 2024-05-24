@@ -19,6 +19,7 @@ create_swapfile() {
 	if [ $? -eq 0 ];then
 		sync
 		mkswap ${outfile}
+		swapon ${outfile}
 	fi
 	if [ $? -ne 0 ];then
 		rm -f ${outfile} 2>/dev/null
