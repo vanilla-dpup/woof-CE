@@ -13,9 +13,6 @@ echo "add $DISPLAY . `mcookie`" | xauth -q -f ~/.Xauthority
 cp -f ~/.Xauthority /home/spot/.Xauthority
 chown spot:spot /home/spot/.Xauthority
 
-# desktop settings
-[ -e "$XDG_CONFIG_HOME/wmonitors/wmon_cmd" ] && . $XDG_CONFIG_HOME/wmonitors/wmon_cmd
-
 gsettings set org.gnome.desktop.interface enable-animations false
 run-as-spot gsettings set org.gnome.desktop.interface enable-animations false
 
