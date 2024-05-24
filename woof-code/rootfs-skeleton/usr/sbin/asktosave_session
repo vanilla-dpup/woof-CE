@@ -22,29 +22,29 @@ fi
    RETVAL=0
  else
   
+  MSG="$(gettext 'Save session?
+
+Press ENTER key to save session...
+Or, press TAB then ENTER to not save session...
+Or, wait 60 seconds to shutdown without saving session...')"
+
   if [ "$(pidof -s X Xorg $(cat /etc/windowmanager))" != "" ]; then
-   DLGEXE="Xdialog"
    [ "$DISPLAY" == "" ] && export DISPLAY=:0
    [ "$WAYLAND_DISPLAY" == "" ] && export WAYLAND_DISPLAY=wayland-0
    [ "$XDG_RUNTIME_DIR" == "" ] && export XDG_RUNTIME_DIR=/tmp/runtime-root
+   yad --timeout=60 --timeout-indicator=bottom --text="$MSG" --button=gtk-yes --button=gtk-no
   else
-   DLGEXE="dialog"
+   dialog --timeout 60 --yesno "$MSG" 0 0
   fi
- 
-  $DLGEXE --timeout 60 --yesno "$(gettext 'Save session?
+  RETVAL=$?
 
-Press ENTER key to save session... 
-Or, press TAB then ENTER to not save session... 
-Or, wait 60 seconds to shutdown without saving session...')" 0 0
-   
-   RETVAL=$?
- 
- fi
- 
  if [ "$xMAKE_ANSWER" != "" ]; then
   
   if [ $RETVAL -eq 0 ]; then
    echo "RAMDISK_SAVE_SESSION=y" > /tmp/session_ramdisk_result
+  elif [ $RETVAL -eq 252 ]; then
+   rm -f /tmp/session_ramdisk_result 2>/dev/null
+   exit 255
   else
    echo "RAMDISK_SAVE_SESSION=n" > /tmp/session_ramdisk_result
   fi

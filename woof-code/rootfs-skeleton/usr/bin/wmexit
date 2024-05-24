@@ -43,7 +43,10 @@ case $script in
          [ $? -eq 255 ] && exit #abort shutdown.
       elif [ $PUPMODE -eq 13 ] ; then
          . /etc/eventmanager
-         [ "$ASKTOSAVE" = "true" ] && asktosave_session --file
+         if [ "$ASKTOSAVE" = "true" ] ; then
+            asktosave_session --file
+            [ $? -eq 255 ] && exit #abort shutdown.
+         fi
          #...writes results to /tmp/session_ramdisk_result, which /etc/rc.d/rc.shutdown reads.
       fi
       [ "$script" = 'wmreboot' ] && EXITMODE="reboot"
