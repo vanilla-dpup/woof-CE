@@ -81,7 +81,7 @@ msg_help () {
 echo "$title $(gettext "adds stuff to your '/etc/hosts' file, so that many advertising servers and websites will not be able to connect to this PC.
 Blocking ad servers protects your privacy, saves you bandwidth, greatly improves web-browsing speeds and makes the internet much less annoying in general.")" > /tmp/box_help
 
-yad --title="$title" --window-icon=dialog-information --text-info --filename=/tmp/box_help --wrap --button=gtk-ok &
+yad --title="$title" --window-icon=dialog-information --width=640 --height=240 --text-info --filename=/tmp/box_help --wrap --button=gtk-ok &
 }
 
 # cleanup before start
