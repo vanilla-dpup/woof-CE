@@ -99,22 +99,9 @@ void show_help()
  */
 void process_directory(GMenuTreeDirectory *directory, GHashTable *history, int root)
 {
-    GMenuTreeIter *entryList = gmenu_tree_directory_iter (directory);
+    GMenuTreeIter *entryList;
     GMenuTreeItemType entryType;
 
-    while ((entryType = gmenu_tree_iter_next (entryList)) != GMENU_TREE_ITEM_INVALID)
-    {
-        if (entryType == GMENU_TREE_ITEM_ENTRY)
-        {
-            gmenu_tree_iter_unref (entryList);
-            goto start;
-        }
-    }
-
-    gmenu_tree_iter_unref (entryList);
-    return;
-
-start:
    if (root)
    {
       g_printf(
