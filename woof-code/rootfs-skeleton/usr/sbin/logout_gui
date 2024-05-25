@@ -15,11 +15,13 @@ exec yad \
     --form \
     --align=center \
     --columns=2 \
-    --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN "wmreboot; kill \$YAD_PID" \
-    --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN "wmpoweroff; kill \$YAD_PID" \
-    --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN "restartwm; kill \$YAD_PID" \
-    --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN "wmexit; kill \$YAD_PID" \
-    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "fixmenus; killall -HUP labwc; kill \$YAD_PID" \
-    --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN "puplock; kill \$YAD_PID" \
+    --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN "kill \$YAD_PID; wmreboot" \
+    --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN "kill \$YAD_PID; wmpoweroff" \
+    --field "$(gettext 'Save changes')"\!document-save-symbolic:FBTN "kill \$YAD_PID; save2flash" \
+    --field "$(gettext 'Install Puppy')"\!media-flash-symbolic:FBTN "kill \$YAD_PID; bootflash" \
+    --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN "kill \$YAD_PID; restartwm" \
+    --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN "kill \$YAD_PID; wmexit" \
+    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "kill \$YAD_PID; fixmenus; killall -HUP labwc" \
+    --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN "kill \$YAD_PID; puplock" \
     --no-buttons \
     --use-interp
