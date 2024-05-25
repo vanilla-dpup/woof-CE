@@ -107,10 +107,6 @@ choosepartfunc() {
  if [ "$PSAVEPART" != "" ];then #see /etc/rc.d/PUPSTATE
   SAVEPART="${PSAVEPART}"
  fi
- if [ "$PMEDIA" = "iso" ];then # first iso boot
-  SAVEPART=''
-  PCHOOSE='yes'
- fi
  if [ "$SAVEPART" != "" ];then
   SAVEFS="$(blkid /dev/$SAVEPART | grep -o ' TYPE=.*' | cut -f2 -d'"')"
   SAVEFILE="$PSUBDIR/${DISTRO_FILE_PREFIX}save.2fs"
@@ -536,28 +532,7 @@ pupsavefunc() {
   SAVEPATH=$(dirname "$SAVEFILE")
   [ "$SAVEPATH" = '/' ] && SAVEPATH=''
   NAMEONLY=$(basename "$SAVEFILE")
-  if [ "$PMEDIA" != "iso" -a "$PSAVEDIR" -o "$PMEDIA" = "cd" ]; then
-   T_sanitext="`eval_gettext \"FINAL SANITY CHECK:
-Partition you are saving to:      \\\${SAVEPART}
-The filesystem of \\\${SAVEPART} partition: \\\${SAVEFS}
-Name of the save file:            \\\${NAMEONLY}
-Path (folder) of the save file:   \\\${SAVEPATH}
-Size of save file:                \\\${SIZEPFILE}KB (\\\${AAAMB}MB)
-Encryption:                       \\\${CRYPTO}
-Filesystem inside save file:      \\\${SFFS}
-Filesystem options:               \\\${SFFSOPTS}
-
-If they definitely look right, choose \\\${T_saniyes} button...
-If anything looks wrong, choose \\\${T_notsave}...\"`"
-   if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
-    yad --title="$T_sanititle" --button="$T_saniyes"\!gtk-yes --button="$T_notsave"\!gtk-no --text="$T_sanitext"
-   else
-    dialog --title "$T_sanititle" --colors --no-collapse --yes-label "$T_saniyes" --no-label "$T_notsave" --yesno "$T_sanitext" 0 0 #110926
-   fi
-   [ $? -eq 0 ] || return 1
-   break
-  else
-   T_sanitext="`eval_gettext \"FINAL SANITY CHECK:
+  T_sanitext="`eval_gettext \"FINAL SANITY CHECK:
 Partition you are saving to:      \\\${SAVEPART}
 The filesystem of \\\${SAVEPART} partition: \\\${SAVEFS}
 Name of the save file:            \\\${NAMEONLY}
@@ -570,20 +545,19 @@ Filesystem options:               \\\${SFFSOPTS}
 If they definitely look right, choose \\\${T_saniyes} button...
 Looks ok, but you want to change the folder, choose \\\${T_sanichange}...
 If anything looks wrong, choose \\\${T_notsave}...\"`"
-   if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
-    yad --title="$T_sanititle" --button="$T_saniyes"\!gtk-yes --button="$T_sanichange":3 --button="$T_notsave"\!gtk-no --text="$T_sanitext"
-   else
-    dialog --title "$T_sanititle" --colors --no-collapse --extra-button --yes-label "$T_saniyes"  --extra-label "$T_sanichange" --no-label "$T_notsave" --yesno "$T_sanitext" 0 0 #110926
-   fi
-   SANITYRET=$?
-   [ $SANITYRET -ne 0 -a $SANITYRET -ne 3 ] && return 1
-   [ $SANITYRET -eq 0 ] && break
-   if [ $SANITYRET -eq 3 ];then #change folder.
-    changefolder
-   else
-    SAVEFILE="${SAVEPATH}${NAMEONLY}"
-    PUPSAVE="$SAVEPART,$SAVEFS,$SAVEFILE"
-   fi
+  if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
+   yad --title="$T_sanititle" --button="$T_saniyes"\!gtk-yes --button="$T_sanichange":3 --button="$T_notsave"\!gtk-no --text="$T_sanitext"
+  else
+   dialog --title "$T_sanititle" --colors --no-collapse --extra-button --yes-label "$T_saniyes"  --extra-label "$T_sanichange" --no-label "$T_notsave" --yesno "$T_sanitext" 0 0 #110926
+  fi
+  SANITYRET=$?
+  [ $SANITYRET -ne 0 -a $SANITYRET -ne 3 ] && return 1
+  [ $SANITYRET -eq 0 ] && break
+  if [ $SANITYRET -eq 3 ];then #change folder.
+   changefolder
+  else
+   SAVEFILE="${SAVEPATH}${NAMEONLY}"
+   PUPSAVE="$SAVEPART,$SAVEFS,$SAVEFILE"
   fi
  done
  [ -f ${SMNTPT}${SAVEPATH} ] && return 1 #abort. must be a directory.
@@ -644,23 +618,7 @@ save_directory() {
   SAVEPATH=$(dirname "$SAVEFILE")
   [ "$SAVEPATH" = '/' ] && SAVEPATH=''
   NAMEONLY=$(basename "$SAVEFILE")
-  if [ "$PMEDIA" != "iso" -a "$PSAVEDIR" -o "$PMEDIA" = "cd" ]; then
-   T_sanitext="`eval_gettext \"FINAL SANITY CHECK:
-Partition you are saving to:      \\\${SAVEPART}
-The filesystem of \\\${SAVEPART} partition: \\\${SAVEFS}
-Path (folder) of the pupsave:   \\\${SAVEPATH}/${NAMEONLY}
-
-If they definitely look right, choose \\\${T_saniyes} button...
-If anything looks wrong, choose \\\${T_notsave}...\"`"
-   if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
-    yad --title="$T_sanititle" --button="$T_saniyes"\!gtk-yes --button="$T_notsave"\!gtk-no --text="$T_sanitext"
-   else
-    dialog --title "$T_sanititle" --colors --no-collapse --yes-label "$T_saniyes" --no-label "$T_notsave" --yesno "$T_sanitext" 0 0 #110926
-   fi
-   [ $? -eq 0 ] || return 1
-   break
-  else
-   T_sanitext="`eval_gettext \"FINAL SANITY CHECK:
+  T_sanitext="`eval_gettext \"FINAL SANITY CHECK:
 Partition you are saving to:      \\\${SAVEPART}
 The filesystem of \\\${SAVEPART} partition: \\\${SAVEFS}
 Path (folder) of the pupsave:   \\\${SAVEPATH}/${NAMEONLY}
@@ -668,20 +626,19 @@ Path (folder) of the pupsave:   \\\${SAVEPATH}/${NAMEONLY}
 If they definitely look right, choose \\\${T_saniyes} button...
 Looks ok, but you want to change the folder, choose \\\${T_sanichange}...
 If anything looks wrong, choose \\\${T_notsave}...\"`"
-   if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
-    yad --title="$T_sanititle" --button="$T_saniyes"\!gtk-yes --button="$T_sanichange":3 --button="$T_notsave"\!gtk-no --text="$T_sanitext"
-   else
-    dialog --title "$T_sanititle" --colors --no-collapse --extra-button --yes-label "$T_saniyes"  --extra-label "$T_sanichange" --no-label "$T_notsave" --yesno "$T_sanitext" 0 0 #110926
-   fi
-   SANITYRET=$?
-   [ $SANITYRET -ne 0 -a $SANITYRET -ne 3 ] && return 1
-   [ $SANITYRET -eq 0 ] && break
-   if [ $SANITYRET -eq 3 ];then #change folder.
-    changefolder
-   else
-    SAVEFILE="${SAVEPATH}${NAMEONLY}"
-    PUPSAVE="$SAVEPART,$SAVEFS,$SAVEFILE"
-   fi
+  if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ];then
+   yad --title="$T_sanititle" --button="$T_saniyes"\!gtk-yes --button="$T_sanichange":3 --button="$T_notsave"\!gtk-no --text="$T_sanitext"
+  else
+   dialog --title "$T_sanititle" --colors --no-collapse --extra-button --yes-label "$T_saniyes"  --extra-label "$T_sanichange" --no-label "$T_notsave" --yesno "$T_sanitext" 0 0 #110926
+  fi
+  SANITYRET=$?
+  [ $SANITYRET -ne 0 -a $SANITYRET -ne 3 ] && return 1
+  [ $SANITYRET -eq 0 ] && break
+  if [ $SANITYRET -eq 3 ];then #change folder.
+   changefolder
+  else
+   SAVEFILE="${SAVEPATH}${NAMEONLY}"
+   PUPSAVE="$SAVEPART,$SAVEFS,$SAVEFILE"
   fi
  done
 
@@ -714,25 +671,14 @@ autosavefunc() {
    fi
  fi
  if [ "$SAVEPART" != "" ];then
-   if [ "$PSAVEDIR" ];then
-     aSAVEDIR="${PSAVEDIR%/}"
-   else
-     aSAVEDIR="$PSUBDIR"
-   fi
    SAVEFS="$(blkid /dev/$SAVEPART | grep -o ' TYPE=.*' | cut -f2 -d'"')"
    enmount
-   if [ ! -e "${SMNTPT}${aSAVEDIR}/AUTOSAVE" ];then
-     umount ${SMNTPT} 2>/dev/null
-     SMNTPT=''
-     SAVEPART=''
-     return 1
-   fi
    case $SAVEFS in
      ext?|xfs|btrfs|f2fs) SAVEFS_IS_LINUX="y";;
      *) SAVEFS_IS_LINUX="";;
    esac
    if [ "$SAVEFS_IS_LINUX" = "y" ];then
-     SAVEFILE="${aSAVEDIR}/${DISTRO_FILE_PREFIX}save"
+     SAVEFILE="${PSUBDIR}/${DISTRO_FILE_PREFIX}save"
      if [ -e "${SMNTPT}${SAVEFILE}" ];then
        umount ${SMNTPT} 2>/dev/null
        SMNTPT=''
@@ -758,18 +704,10 @@ xPDEV="$PDEV1"
 [ ! "$DEV1FS" ] && xDEVFS='xxx' #this will enable choice of create a save-file.
 
 if [ "$PSAVEPART" ]; then
-    DSAVEPART="$PSAVEPART"
-    if [ "$(blkid /dev/$DSAVEPART)" = "" ];then #specified drive not present
+    if [ "$(blkid /dev/$PSAVEPART)" = "" ];then #specified drive not present
         echo "PUPMODE=5" > /tmp/shutdownconfig_results
         exit
     fi
-else
-    DSAVEPART="$xPDEV"
-fi
-if [ "$PSAVEDIR" ]; then
-    DSAVEDIR="${PSAVEDIR%/}"
-else
-    DSAVEDIR="$PSUBDIR"
 fi
 
 SAVECHOICE=255
@@ -836,11 +774,7 @@ case $SAVECHOICE in
     choosename
     NAMEROOT="$NAMEONLY"
     [ "${SFEXT}" ] && NAMEONLY="$NAMEROOT.${SFEXT}"
-    if [ "$PSAVEDIR" ];then
-      SAVEFILE="${PSAVEDIR}${NAMEONLY}"
-    else
-      SAVEFILE="$PSUBDIR/$NAMEONLY"
-    fi
+    SAVEFILE="$PSUBDIR/$NAMEONLY"
     #nameclash || exit	###FIXME###
     PUPSAVE="$SAVEPART,$SAVEFS,$SAVEFILE"
     case "$SAVESTYLE" in
