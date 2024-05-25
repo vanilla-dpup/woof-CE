@@ -220,7 +220,7 @@ fi
 if [ -z "$PUPMODE" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 
-	RETVAL="`yad --title=BootFlash  --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'When should Puppy save changes?')" --list --no-headers --column=:TEXT --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 13 "$(gettext 'On user request')" 12 "$(gettext Continuously)" 5 "$(gettext Never)"`"
+	RETVAL="`yad --title=BootFlash  --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'When should Puppy save changes?')" --list --no-headers --column=:TEXT --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 13 "$(gettext 'On user request')" 12 "$(gettext Continuously)" 5 "$(gettext 'Decide on first shutdown')"`"
 
 	case "$RETVAL" in
 		13|12|5)
