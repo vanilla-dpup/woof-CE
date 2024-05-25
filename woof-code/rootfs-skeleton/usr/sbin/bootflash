@@ -17,7 +17,8 @@ fi
 USBDRV="$1"
 BOOTLOADER="$2"
 FSTYPE2="$3"
-SRCPATH="$4"
+PUPMODE="$4"
+SRCPATH="$5"
 
 if [ "$USBDRV" = "" ];then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
@@ -92,9 +93,11 @@ create_drv() {
 # efilinux - make bootable
 # $1: targetdir 
 # $2: pdrv
+# $3: PUPMODE
 copy_efilinux_uefi_boot() {
 	local HOMEDIR="$1"
 	local PDRV="$2"
+	local PUPMODE="$3"
 
 	mkdir -p ${HOMEDIR}/EFI/boot
 	cp -f /usr/lib/efilinux/efilinux.efi ${HOMEDIR}/EFI/boot/bootx64.efi
@@ -103,6 +106,11 @@ copy_efilinux_uefi_boot() {
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="initrd=\ucode.cpio ${INITRD}"
 
 	APPEND="pfix=fsck pmedia=usbflash"
+	case ${PUPMODE} in
+		12)	APPEND="pfix=fsck pmedia=atahd" ;;
+		5)	APPEND="pfix=fsck pmedia=atahd pfix=ram" ;;
+	esac
+
 	UUID=$(blkid -o export ${PDRV} | grep ^UUID= | cut -f 2 -d =)
 	[ "$UUID" ] && APPEND="${APPEND} pupsfs=${UUID} psave=${UUID}"
 
@@ -114,14 +122,21 @@ copy_efilinux_uefi_boot() {
 # syslinux - make bootable
 # $1: targetdir 
 # $2: pdrv
+# $3: PUPMODE
 create_syslinux_conf() {
 	local HOMEDIR="$1"
 	local PDRV="$2"
+	local PUPMODE="$3"
 
 	INITRD="initrd.zst"
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="ucode.cpio,${INITRD}"
 
 	APPEND="pfix=fsck pmedia=usbflash"
+	case ${PUPMODE} in
+		12)	APPEND="pfix=fsck pmedia=atahd" ;;
+		5)	APPEND="pfix=fsck pmedia=atahd pfix=ram" ;;
+	esac
+
 	UUID=$(blkid -o export ${PDRV} | grep ^UUID= | cut -f 2 -d =)
 	[ "$UUID" ] && APPEND="${APPEND} pupsfs=${UUID} psave=${UUID}"
 
@@ -183,7 +198,7 @@ nClick OK button to quit...\"`"
 if [ -z "$BOOTLOADER" -o -z "$FSTYPE2" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 
-	RETVAL="`yad --title="Bootflash $USBDRV" --window-icon=gtk-preferences --button=gtk-ok --text="$(gettext 'This tool allows to quickly create a bootable usb drive ready to use. Be aware that ALL DATA ON THE USB DRIVE WILL BE LOST')" --width=640 --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Create UEFI bootable USB (efilinux + ext4)')" 2 "$(gettext 'Create UEFI bootable USB (efilinux + f2fs)')" 3 "$(gettext 'Create BIOS bootable USB (syslinux + ext4)')" 4 "$(gettext 'Create BIOS bootable USB (syslinux + f2fs)')"`"
+	RETVAL="`yad --title="Bootflash $USBDRV" --window-icon=gtk-preferences --button=gtk-ok --text="$(gettext 'This tool allows to quickly create a bootable usb drive ready to use. Be aware that ALL DATA ON THE USB DRIVE WILL BE LOST')" --width=640 --height=240 --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Create UEFI bootable USB (efilinux + ext4)')" 2 "$(gettext 'Create UEFI bootable USB (efilinux + f2fs)')" 3 "$(gettext 'Create BIOS bootable USB (syslinux + ext4)')" 4 "$(gettext 'Create BIOS bootable USB (syslinux + f2fs)')"`"
 
 	BOOTLOADER=efilinux
 	FSTYPE2=ext4
@@ -202,15 +217,27 @@ if [ -z "$BOOTLOADER" -o -z "$FSTYPE2" ] ; then
 	esac
 fi
 
-#reconfirm correct drv choice...
-if [ -z "$1" -o -z "$2" -o -z "$3" ]; then
+if [ -z "$PUPMODE" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
-	MYSELECTION="`echo "$xSELECTIONS" | grep "^${USBDRV} " | tr '"' ' ' | tr -s ' '`" #'geany
+
+	RETVAL="`yad --title=BootFlash  --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'When should Puppy save changes?')" --list --no-headers --column=:TEXT --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 13 "$(gettext 'On user request')" 12 "$(gettext Continuously)" 5 "$(gettext Never)"`"
+
+	case "$RETVAL" in
+		13|12|5)
+			PUPMODE="$RETVAL" ;;
+		*)
+			exit 1 ;;
+	esac
+fi
+
+#reconfirm correct drv choice...
+if [ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ]; then
+	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 	yad --image=dialog-question --title=BootFlash --window-icon=dialog-warning \
 		--button=gtk-ok \
 		--button=gtk-cancel \
 		--text="$(gettext 'Please reconfirm that this is the USB drive that you want to format:')
-	<b>${MYSELECTION}</b>
+<b>${USBDRV}</b>
 `gettext "Please also reconfirm that you want to use BootFlash to reformat the drive (and install Puppy)."`
 `gettext "Click 'OK' to continue, 'Cancel' to quit:"`"
 		[ $? -ne 0 ] && exit 1
@@ -266,9 +293,9 @@ fi
 
 if [ "$BOOTLOADER" = "syslinux" ] ; then
 	syslinux /dev/${PBOOTPART}
-	create_syslinux_conf /mnt/${PBOOTPART} /dev/${PSAVEPART}
+	create_syslinux_conf /mnt/${PBOOTPART} /dev/${PSAVEPART} ${PUPMODE}
 elif [ "$BOOTLOADER" = "efilinux" ] ; then
-	copy_efilinux_uefi_boot /mnt/${PBOOTPART} /dev/${PSAVEPART}
+	copy_efilinux_uefi_boot /mnt/${PBOOTPART} /dev/${PSAVEPART} ${PUPMODE}
 fi
 
 FILES2COPY="vmlinuz
@@ -291,7 +318,7 @@ if [ $? -ne 0 ];then
 	[ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] && yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting USB drive')" --button=gtk-ok
 	exit 1
 fi
-mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save
+[ $PUPMODE -eq 5 ] || mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save
 #-
 cp -fv ${SRCPATH}/vmlinuz /mnt/${PBOOTPART}/
 cp -fv ${SRCPATH}/initrd.zst /mnt/${PBOOTPART}/

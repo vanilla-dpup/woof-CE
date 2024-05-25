@@ -17,7 +17,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
 * Support for the devx SFS is gone and development packages can be installed individually, without having to download the entire devx.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
-* Bootflash creates an empty save folder, to reduce the number of questions users need to answer.
+* Bootflash lets the user select what PUPMODE to use: if it's 12 or 13, an empty save folder is created and the "first shutdown" prompt is skipped.
 * The build output is produced by Bootflash, with a sparse image and a loop device as the installation destination.
 * `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`.
 * SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`.
@@ -64,7 +64,8 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * kernel-kit's firmware picker is gone: fdrv is built by moving /usr/lib/firmware out of the main SFS.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
-* ext2 and ext3 save files are gone: all save files (including encrypted ones) use ext4, with or without journaling, and Bootflash supports ext4.
+* ext2 and ext3 save files are gone: all save files (including encrypted ones) use ext4, with or without journaling.
+* Bootflash supports only syslinux and efilinux, with one partition layout: a small FAT32 boot partition and a big ext4 (without journaling) or F2FS partition for SFSs and persistency.
 * initrd is zstd-compressed and built from rootfs binaries instead of a prebuilt, outdated and unmaintained set of static executables.
 
 ## Directory Structure
