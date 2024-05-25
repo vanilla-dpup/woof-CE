@@ -1,6 +1,6 @@
 # Persistency
 
-[Since the Puppy Linux 2.x days](https://bkhome.org/archive/puppylinux/development/howpuppyworks.html), Puppy Linux supports various kinds of persistent and non-persistent sessions, also known as "PUPMODEs".
+[Since the Puppy Linux 2.x days](https://bkhome.org/archive/puppylinux/development/howpuppyworks.html), Puppy Linux supports various kinds of persistent and non-persistent sessions, also known as "PUPMODEs". Bootflash, the DISTRO_NAME installer, allows one to select the desired persistency mode at installation time, but the persistency mode can be changed later by changing the [Boot Codes](boot-codes.md) set by Bootflash.
 
 In non-persistent sessions, there is a writeable, non-persistent, [tmpfs](https://www.kernel.org/doc/html/latest/filesystems/tmpfs.html) layer on top of the stack of loaded SFSs (see [SFS Modules](sfs_load.md)). The changes saved to this layer are lost on shutdown. Persistency is achieved by replacing this layer with DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs, or by synchronizing DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs with the contents of this layer.
 
@@ -8,13 +8,13 @@ In non-persistent sessions, there is a writeable, non-persistent, [tmpfs](https:
 
 Changes to the layered file system at / reside in RAM and a shutdown prompt offers the user to create DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs and save the changes to it.
 
-DISTRO_NAME boots with PUPMODE 5 when `pfix=ram` (see [Boot Codes](boot-codes.md)) is specified or when neither DISTRO_FILE_PREFIXsave/ nor DISTRO_FILE_PREFIXsave.4fs are found.
+DISTRO_NAME boots with PUPMODE 5 when `pfix=ram` is specified or when neither DISTRO_FILE_PREFIXsave/ nor DISTRO_FILE_PREFIXsave.4fs are found. Therefore, to switch to PUPMODE 5 to 12 or 13, remove `pfix=ram` or delete DISTRO_FILE_PREFIXsave/ and DISTRO_FILE_PREFIXsave.4fs.
 
 ## PUMODE 13: On-Demand Persistency
 
 Changes to the layered file system at / reside in RAM and can be copied to DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs using `save2flash` and during shutdown.
 
-DISTRO_NAME boots with PUPMODE 13 when DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs is found and `pmedia=usbflash` or the save partition is a removable drive but `pmedia` is unspecified or `pmedia=cd`.
+DISTRO_NAME boots with PUPMODE 13 when DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs is found and `pmedia=usbflash` or the save partition is a removable drive but `pmedia` is unspecified or `pmedia=cd`. Therefore, to switch from PUPMODE 13 to 12, replace `pmedia=usbflash` with `pmedia=atahd`.
 
 By default, DISTRO_NAME images contain DISTRO_FILE_PREFIXsave/, making PUPMODE 13 the default when booting from a flash drive.
 
@@ -24,7 +24,7 @@ PUPMODE 13 can increase the lifespan of flash drives by reducing the number of w
 
 Changes are saved directly to DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs, which is used as the upper, writable layer of the layered file system at /.
 
-DISTRO_NAME boots with PUPMODE 12 when DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs is found but the other criteria for PUPMODE 13 are not met.
+DISTRO_NAME boots with PUPMODE 12 when DISTRO_FILE_PREFIXsave/ or DISTRO_FILE_PREFIXsave.4fs is found but the other criteria for PUPMODE 13 are not met. Therefore, to switch from PUPMODE 12 to 13, replace `pmedia=atahd` with `pmedia=usbflash`.
 
 ## Implementation Details
 
