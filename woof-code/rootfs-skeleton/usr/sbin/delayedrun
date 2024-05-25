@@ -2,10 +2,6 @@
 #(c) copyright 2007 Barry Kauler LGPL v2
 #launched from ~/.xinitrc, so X is running.
 
-# see also /etc/sudoers -- set delayedrun does not require password,
-# probably a security hole, need to look at it again later.
-[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
-
 . /etc/DISTRO_SPECS
 . /etc/rc.d/BOOTCONSTRAINED
 

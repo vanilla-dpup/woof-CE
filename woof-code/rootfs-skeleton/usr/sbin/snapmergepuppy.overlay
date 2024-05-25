@@ -50,8 +50,6 @@ export LANG=C
 . /etc/rc.d/PUPSTATE
 . /etc/DISTRO_SPECS
 
-[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
-
 touch /tmp/snapmergepuppy.lock
 
 if [ $PUPMODE -ne 13 ] ; then

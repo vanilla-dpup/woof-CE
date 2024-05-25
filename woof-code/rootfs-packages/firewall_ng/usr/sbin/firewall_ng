@@ -4,7 +4,6 @@
 
 # A very simple firewall based on Alienbob's script
 # at http://www.slackware.com/~alien/efg/
-[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@}
 CONFDIR="$HOME/.config/firewall"
 export CONF="$CONFDIR/fw.conf"
 version=0.8

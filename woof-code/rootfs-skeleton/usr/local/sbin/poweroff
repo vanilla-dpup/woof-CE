@@ -36,8 +36,6 @@ if [ "$PUPMODE" = "5" ] && [ $PPID -eq 1 ] ; then
 	touch /tmp/shutdownconfig_results ; sync  #skip shutdownconfig
 fi
 
-[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@} #110505
-
 if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
 	case $script in
 		poweroff)  exec wmpoweroff ;; #avoid freeze on a virtual terminal

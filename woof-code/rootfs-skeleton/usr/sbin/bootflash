@@ -4,8 +4,6 @@
 export TEXTDOMAIN=bootflash
 export OUTPUT_CHARSET=UTF-8
 
-[ "`whoami`" != "root" ] && exec sudo -A ${0} ${@} #110505
-
 if [ "$1" = "debug" ] ; then
 	exec &>/tmp/${0##*/}.log ; set -x ; env #debug
 	shift
