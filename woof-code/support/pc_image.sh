@@ -7,6 +7,12 @@ mount --bind /dev rootfs-complete/dev
 mount --bind /proc rootfs-complete/proc
 mkdir rootfs-complete/build
 mount --bind build rootfs-complete/build
+cat << EOF > rootfs-complete/usr/local/bin/uname
+#!/bin/sh
+
+/bin/uname \"\$@\" | sed s/`uname -r`/`basename build/kbuild-*.sfs .sfs | cut -f 2 -d -`/g
+EOF
+chmod 755 rootfs-complete/usr/local/bin/uname
 
 echo "Building ${BIOS_IMG_BASE}"
 
@@ -27,6 +33,7 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 	mv -f ${UEFI_IMG_BASE} ../${WOOF_OUTPUT}/
 fi
 
+rm -f rootfs-complete/usr/local/bin/uname
 umount -l rootfs-complete/build
 rmdir rootfs-complete/build
 umount -l rootfs-complete/proc
