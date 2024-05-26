@@ -114,13 +114,13 @@ killall udevd >/dev/null 2>&1
 if [ $PUPMODE -eq 5 ];then
  # shutdownconfig creates /tmp/shutdownconfig_results
  # which contains variables to be used further in the script
- unset PUPSAVE SAVEFS SAVEPART SAVEFILE NAMEONLY SAVEPATH MYPASSWORD SFEXT xPDEV xDEVFS
+ unset PUPSAVE MYPASSWORD
  if [ ! -f /tmp/shutdownconfig_results ];then
    #note, shutdownconfig normally called via /usr/bin/wmreboot or wmpoweroff when want shutdown from X.
    shutdownconfig > /dev/console
  fi
  if [ -s /tmp/shutdownconfig_results ];then
-   . /tmp/shutdownconfig_results #supplies variables PUPMODE SAVEFS PUPSAVE SAVEPART SAVEFILE NAMEONLY SAVEPATH MYPASSWORD SFEXT
+   . /tmp/shutdownconfig_results #supplies variables PUPMODE PUPSAVE MYPASSWORD
    cp /tmp/shutdownconfig_results /tmp/rc.shutdown_config # read by /usr/sbin/savesession-dvd
    rm -f /tmp/shutdownconfig_results #precaution.
  fi
@@ -226,9 +226,6 @@ case $PUPMODE in
     esac
    done < <(find /tmp/save1stpup${PFIX} -type L)
   fi
-  #copy initmodules config file from /tmp if it exists
-  [ -f /tmp/${DISTRO_FILE_PREFIX}initmodules.txt ] && cp -f /tmp/${DISTRO_FILE_PREFIX}initmodules.txt ${SMNTPT}${SAVEPATH}/${DISTRO_FILE_PREFIX}initmodules.txt
-  sync
   if [ ! -L /tmp/save1stpup ] ; then
     sync
     umount /tmp/save1stpup

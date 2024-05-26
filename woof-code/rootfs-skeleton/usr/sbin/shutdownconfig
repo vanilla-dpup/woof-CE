@@ -74,18 +74,6 @@ DU_INITRD_PUP_RW=0
 
 #================================================================
 
-get_DRV() {
-  # "$1" - partition - ex: sda3
-  ret_DRV=''
-  [ "$1" ] || return 1
-  local xPART="$1"
-  while [ ${#xPART} -gt 2 ]; do
-    [ -e /sys/block/$xPART ] && { ret_DRV="$xPART"; break; }
-    xPART=${xPART%?}
-  done
-  return 0
-}
-
 choosepartfunc() {
  #dialog to choose what partition to create ${DISTRO_FILE_PREFIX}save.2fs on...
  case "$PMEDIA" in ""|cd|scsicd|satacd|idecd|atacd|usbcd) PCHOOSE="yes" ;; esac
@@ -752,20 +740,10 @@ esac
 #20140716 SFR: but first escape ' (if present) in MYPASSWORD
 MYPASSWORD="`echo "$MYPASSWORD" | sed -e "s#'#'\\"'\\"'#g"`"
 echo "PUPMODE=${PUPMODE}
-SAVEPART='${SAVEPART}'
-SAVEFS='${SAVEFS}'
-SAVEFILE='${SAVEFILE}'
 PUPSAVE='${SAVEPART},${SAVEFS},${SAVEFILE}'
-NAMEONLY='${NAMEONLY}'
-SAVEPATH='${SAVEPATH}'
 MYPASSWORD='${MYPASSWORD}'
-SFEXT='${SFEXT}'
-xPDEV='${xPDEV}'
-xDEVFS='${xDEVFS}'
-xPSUBDIR='${xPSUBDIR}'
 SMNTPT='${SMNTPT}'
-CRYPTO='${CRYPTO}'
-expBOOTDRV='${expBOOTDRV}'" > /tmp/shutdownconfig_results
+CRYPTO='${CRYPTO}'" > /tmp/shutdownconfig_results
 
 exit 0
 #the end#
