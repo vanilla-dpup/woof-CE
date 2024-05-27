@@ -115,7 +115,6 @@ loadswap_func() { #w481 made into a function.
 . /etc/rc.d/PUPSTATE
 
 . /etc/DISTRO_SPECS
-. /etc/rc.d/BOOTCONSTRAINED # has BOOT_DISABLESWAP, BOOT_ATIME, BOOT_DIRTYWRITE.
 [ $loglevel ] && LOGLEVEL=$loglevel #boot param.
 
 #if have just done a switch_root, output a 'done' message...
@@ -144,11 +143,6 @@ FREERAM=`free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 4 -d ' '` #w481 110405
 QTRFREERAM=`expr $FREERAM \/ 4`
 
 #===============
-
-if [ "$BOOT_DIRTYWRITE" ];then #120704 see /etc/rc.d/BOOTCONSTRAINED, variable set in 3builddistro.
- #i have set this as 1500 which is 15 seconds (default is 5 seconds).
- echo $BOOT_DIRTYWRITE > /proc/sys/vm/dirty_writeback_centisecs #refer: http://www.lesswatts.org/tips/disks.php
-fi
 
 #redirect all output to a log file (must do after remount rw)...
 if [ ! "$LOGLEVEL" ] ; then
@@ -272,9 +266,8 @@ fi
 ######################LOAD SWAP#####################
 # we prefer not to use swap unless we have to; this should improve responsiveness if we don't have much RAM
 echo 5 > /proc/sys/vm/swappiness
-[ "$BOOT_DISABLESWAP" ] && SWAPON="$BOOT_DISABLESWAP" #120704 now ask in 3builddistro if want use swap file/partition. anything not "yes" means no.
 EXTRAALLOCK=0
-[ "$SWAPON" != "yes" ] && loadswap_func
+loadswap_func
 if [ "$SWAPON" = "yes" ];then
  # resize tmpfs
  # this code is meant to increase the size of the tmpfs
