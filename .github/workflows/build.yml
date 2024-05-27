@@ -73,6 +73,7 @@ jobs:
       run: |
         yes "" | sudo -E ./merge2out woof-distro/${{ inputs.arch }}/${{ inputs.compat-distro }}/${{ inputs.compat-distro-version }}
         sudo chown -R root:root ../woof-out_*
+        sudo tar -c -I "gzip -9" -f woof-CE.tar.gz ../woof-out_*
     - name: Set name
       if: ${{ inputs.name != '' }}
       run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' ../woof-out_*/DISTRO_SPECS
@@ -164,4 +165,5 @@ jobs:
         path: |
           *.img.gz
           *.sfs
+          woof-CE.tar.gz
         retention-days: ${{ inputs.retention }}
