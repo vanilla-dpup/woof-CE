@@ -233,4 +233,4 @@ if [ $# -ne 0 ]; then
 	exit 0
 fi
 
-exec yad --title SFS-Load --window-icon=gtk-preferences --height=300 --list --no-headers --column=name --button=gtk-close -- $LASTUNIONRECORD
+exec yad --title SFS-Load --window-icon=gtk-preferences --height=300 --width=300 --list --no-headers --column=name --button=gtk-close -- $LASTUNIONRECORD
