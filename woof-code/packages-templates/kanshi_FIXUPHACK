@@ -19,6 +19,7 @@ echo "profile {" > /tmp/kanshi-profile
 
 OUTPUT=
 OUTPUTS=
+VALID=0
 while IFS= read LINE; do
 	case "\$LINE" in
 		"  Enabled:"*)
@@ -58,6 +59,7 @@ while IFS= read LINE; do
 						echo -n " adaptive_sync off"
 					fi
 					echo
+					VALID=1
 				fi
 			fi
 
@@ -78,6 +80,11 @@ while IFS= read LINE; do
 			;;
 	esac
 done < <(wlr-randr; echo EOF) >> /tmp/kanshi-profile
+
+if [ $VALID -eq 0 ]; then
+	rm -f /tmp/kanshi-profile
+	exit
+fi
 
 echo "}" >> /tmp/kanshi-profile
 
