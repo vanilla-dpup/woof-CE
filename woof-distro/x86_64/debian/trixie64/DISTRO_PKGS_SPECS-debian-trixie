@@ -203,6 +203,7 @@ fi
 
 PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|grim|grim|exe,dev,doc,nls||deps:yes
+yes|kanshi|kanshi|exe,dev,doc,nls||deps:yes
 yes|scdoc|scdoc|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|seatd|seatd|exe,dev,doc,nls||deps:yes
 yes|slurp|slurp|exe,dev,doc,nls||deps:yes

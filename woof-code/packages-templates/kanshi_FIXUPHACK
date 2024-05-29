@@ -1,0 +1,104 @@
+cat << EOF > etc/xdg/autostart/kanshi.desktop
+[Desktop Entry]
+Version=1.0
+Name=kanshi
+Comment=kanshi
+Exec=sh -c "kanshi-gen; exec kanshi"
+Terminal=false
+EOF
+chmod 644 etc/xdg/autostart/kanshi.desktop
+
+mkdir -p root/.config/kanshi
+echo 'include ~/.config/kanshi/*.profile' > root/.config/kanshi/config
+chmod 644 root/.config/kanshi/config
+
+cat << EOF > usr/bin/kanshi-gen
+#!/bin/bash
+
+echo "profile {" > /tmp/kanshi-profile
+
+OUTPUT=
+OUTPUTS=
+while IFS= read LINE; do
+	case "\$LINE" in
+		"  Enabled:"*)
+			read -r _ ENABLED <<< "\$LINE"
+			;;
+		"    "*x*" px, "*" Hz ("*"current)")
+			read -r RES _ HZ _ <<< "\$LINE"
+			MODE="\${RES}@\${HZ}"
+			;;
+		"  Position:"*)
+			read -r _ POS <<< "\$LINE"
+			;;
+		"  Transform:"*)
+			read -r _ TRANS <<< "\$LINE"
+			;;
+		"  Scale:"*)
+			read -r _ SCALE <<< "\$LINE"
+			;;
+		"  Adaptive Sync:"*)
+			read -r _ _ ASYNC <<< "\$LINE"
+			;;
+		" "*)
+			;;
+		*)
+			if [ -n "\$OUTPUT" ]; then
+				if [ "\$ENABLED" = no ]; then
+					echo "	output \${OUTPUT} disable"
+				else
+					echo -n "	output \${OUTPUT}"
+					[ -n "\$MODE" ] && echo -n " mode --custom \${MODE}"
+					[ -n "\$POS" ] && echo -n " position \${POS}"
+					[ -n "\$TRANS" ] && echo -n " transform \${TRANS}"
+					[ -n "\$SCALE" ] && echo -n " scale \${SCALE}"
+					if [ "\$ASYNC" = enabled ]; then
+						echo -n " adaptive_sync on"
+					else
+						echo -n " adaptive_sync off"
+					fi
+					echo
+				fi
+			fi
+
+			OUTPUT="\${LINE%% *}"
+			[ "\$OUTPUT" = EOF ] && break
+
+			if [ -z "\$OUTPUTS" ]; then
+				OUTPUTS="\${OUTPUT}"
+			else
+				OUTPUTS="\${OUTPUTS} \${OUTPUT}"
+			fi
+			ENABLED=
+			MODE=
+			POS=
+			TRANS=
+			SCALE=
+			ASYNC=
+			;;
+	esac
+done < <(wlr-randr; echo EOF) >> /tmp/kanshi-profile
+
+echo "}" >> /tmp/kanshi-profile
+
+HASH=\`echo "\$OUTPUTS" | tr ' ' '\n' | sort | sum | awk '{print \$1}'\`
+
+if ! cmp -s \${XDG_CONFIG_HOME}/kanshi/\${HASH}.profile /tmp/kanshi-profile; then
+	mkdir -p \${XDG_CONFIG_HOME}/kanshi
+	mv -f /tmp/kanshi-profile \${XDG_CONFIG_HOME}/kanshi/\${HASH}.profile
+else
+	rm -f /tmp/kanshi-profile
+fi
+EOF
+chmod 755 usr/bin/kanshi-gen
+
+cat << EOF > pinstall.sh
+if [ -e usr/bin/wdisplays ]; then
+	cat << _EOF > usr/local/bin/wdisplays
+#!/bin/sh
+/usr/bin/wdisplays
+kanshi-gen
+_EOF
+	chmod 755 usr/local/bin/wdisplays
+fi
+EOF
