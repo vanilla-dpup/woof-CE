@@ -11,6 +11,13 @@
     <policy>automatic</policy>
   </placement>
 
+  <!-- set by ptheme-labwc -->
+  <theme><name>Gradient-grey</name></theme>
+
+  <theme>
+    <dropShadows>yes</dropShadows>
+  </theme>
+
   <keyboard>
     <default />
 
