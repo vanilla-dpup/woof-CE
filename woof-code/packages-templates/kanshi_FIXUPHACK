@@ -86,6 +86,7 @@ HASH=\`echo "\$OUTPUTS" | tr ' ' '\n' | sort | sum | awk '{print \$1}'\`
 if ! cmp -s \${XDG_CONFIG_HOME}/kanshi/\${HASH}.profile /tmp/kanshi-profile; then
 	mkdir -p \${XDG_CONFIG_HOME}/kanshi
 	mv -f /tmp/kanshi-profile \${XDG_CONFIG_HOME}/kanshi/\${HASH}.profile
+	killall -HUP kanshi
 else
 	rm -f /tmp/kanshi-profile
 fi
