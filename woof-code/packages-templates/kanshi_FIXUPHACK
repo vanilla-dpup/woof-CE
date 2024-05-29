@@ -3,7 +3,7 @@ cat << EOF > etc/xdg/autostart/kanshi.desktop
 Version=1.0
 Name=kanshi
 Comment=kanshi
-Exec=sh -c "kanshi-gen; exec kanshi"
+Exec=sh -c "ls ~/.config/kanshi/*.profile || kanshi-gen; exec kanshi"
 Terminal=false
 EOF
 chmod 644 etc/xdg/autostart/kanshi.desktop
