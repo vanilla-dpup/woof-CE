@@ -1,4 +1,5 @@
 border.width: 3
+titlebar.height: 19
 padding.height: 0
 window.active.border.color: #CACACA
 window.inactive.border.color: #E2E2E2

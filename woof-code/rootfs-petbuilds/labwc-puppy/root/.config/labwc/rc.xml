@@ -15,7 +15,7 @@
   <theme><name>Gradient-grey</name></theme>
 
   <theme>
-    <dropShadows>yes</dropShadows>
+    <cornerRadius>0</cornerRadius>
   </theme>
 
   <keyboard>
