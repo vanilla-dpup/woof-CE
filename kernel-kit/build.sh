@@ -30,8 +30,6 @@ for i in $@ ; do
 	case $i in
 		clean) DO_CLEAN=1 ; break ;;
 		auto) AUTO=yes ; shift ;;
-		nopae) x86_disable_pae=yes ; shift ;; #funcs.sh
-		pae)   x86_enable_pae=yes  ; shift ;; #funcs.sh
 	esac
 	# if a filename is specified on the command line it is assumed to be
 	# an extra build config that will be used in addition to build.conf
@@ -72,7 +70,7 @@ log_ver #funcs.sh
 which cc >/dev/null 2>&1 || ln -sv $(which gcc) /usr/bin/cc
 
 if [ "$AUTO" = "yes" ] ; then
-	[ ! "$DOTconfig_file" -a ! "$USE_GIT_KERNEL_CONFIG" ] && exit_error "Must specify DOTconfig_file=<file> in build.conf"
+	[ ! "$DOTconfig_file" ] && exit_error "Must specify DOTconfig_file=<file> in build.conf"
 fi
 
 case $(uname -m) in
@@ -98,8 +96,6 @@ if [ -f "$DOTconfig_file" ] ; then
 	CONFIGS_DIR=${DOTconfig_file%/*} #dirname  $DOTconfig_file
 	Choice=${DOTconfig_file##*/}     #basename $DOTconfig_file
 	[ "$CONFIGS_DIR" = "$Choice" ] && CONFIGS_DIR=.
-elif [ "$USE_GIT_KERNEL_CONFIG" ]; then
-	Choice=USE_GIT_KERNEL_CONFIG
 else
 	[ "$AUTO" = "yes" ] && exit_error "Must specify DOTconfig_file=<file> in build.conf"
 	## .configs
@@ -153,9 +149,6 @@ case $Choice in
 		echo -n "Enter kernel version (ex: 3.14.73) : "
 		read kernel_version
 		;;
-	USE_GIT_KERNEL_CONFIG)
-		# do nothing
-		;;
 	*)
 		case "$Choice" in DOTconfig-*)
 			IFS="-" read dconf kernel_version kernel_version_info <<< "$Choice" ;;
@@ -180,21 +173,6 @@ case $Choice in
 		;;
 esac
 
-if [ "$USE_GIT_KERNEL" ] ; then
-	kernel_git_dir="`expr match "$USE_GIT_KERNEL" '.*/\([^/]*/[^/]*\)' | sed 's\/\_\'`"_git
-	get_git_kernel # from funcs.sh
-	kernel_version="`print_git_kernel_version`" # from funcs.sh
-
-	if [ "$USE_GIT_KERNEL_CONFIG" ]; then
-		configure_git_kernel # from funcs.sh
-	fi
-elif [ "$USE_STABLE_KERNEL" ]; then
-	get_stable_kernel # from funcs.sh
-	kernel_version="`print_git_kernel_version $STABLE_KERNEL_DIR`" # from funcs.sh
-	if [ "$USE_GIT_KERNEL_CONFIG" ]; then
-		configure_git_kernel $STABLE_KERNEL_DIR # from funcs.sh
-	fi
-fi
 log_msg "kernel_version=${kernel_version}"
 log_msg "kernel_version_info=${kernel_version_info}"
 case "$kernel_version" in
@@ -209,7 +187,7 @@ fi
 export kernel_version
 #------------------------------------------------------------------
 
-# $package_name_suffix $custom_suffix $kernel_ver
+# $package_name_suffix $kernel_ver
 [ ! "$kernel_mirrors" ] && kernel_mirrors="https://www.kernel.org/pub/linux/kernel"
 ksubdir_3=v3.x #http://www.kernel.org/pub/linux/kernel/v3.x
 ksubdir_4=v4.x
@@ -225,11 +203,6 @@ for i in $kernel_mirrors ; do
 done
 kernel_mirrors="$first $km"
 #--
-
-if [ -f /etc/DISTRO_SPECS ] ; then
-	. /etc/DISTRO_SPECS
-	[ ! "$package_name_suffix" ] && package_name_suffix=${DISTRO_FILE_PREFIX}
-fi
 
 if [ -f DOTconfig ] ; then
 	echo ; tail -n10 README ; echo
@@ -324,13 +297,6 @@ if [ -f sources/kernels/linux-${kernel_tarball_version}.tar.xz.md5.txt ] ; then
 		DOWNLOAD_KERNEL=1
 	fi
 	cd $MWD
-elif [ "$USE_MAINLINE_KERNEL_PLUS_PATCH" = "yes" ] ; then
-	download_mainline_kernel_plus_patch # from funcs.sh
-	DOWNLOAD_KERNEL=0
-elif [ "$USE_GIT_KERNEL" ] ; then
-	DOWNLOAD_KERNEL=0
-elif [ "$USE_STABLE_KERNEL" ] ; then
-	DOWNLOAD_KERNEL=0
 else
 	DOWNLOAD_KERNEL=1
 fi
@@ -355,53 +321,13 @@ if [ $DOWNLOAD_KERNEL -eq 1 ] ; then
 	cd $MWD
 fi
 
-## check if kernel supports gcc version
-if [ -f linux-${kernel_version}/include/linux/compiler-gcc4.h ] ; then
-	# it's one of the releases that provide gcc support through
-	#    compiler-gcc3.h / compiler-gcc4.h / compiler-gcc5.h / etc
-	# some patched versions or kernels 4.2+ only have this file: compiler-gcc.h
-	gccver=$(gcc -dumpversion)
-	gccver=${gccver%%.*}
-	if [ "$gccver" -a ! -f linux-${kernel_version}/include/linux/compiler-gcc${gccver}.h ] ; then
-		exit_error "Sorry, linux-${kernel_version} does not support gcc $gccver"
-	fi
-fi
-
-#echo "HOST_ARCH = $HOST_ARCH"
-if [ "$HOST_ARCH" = "x86" -a "$USE_GIT_X86_TOOLS" ]; then
-	tools_git_dir="`expr match "$USE_GIT_X86_TOOLS" '.*/\([^/]*/[^/]*\)' | sed 's\/\_\'`"_git
-	get_git_cross_compiler "$USE_GIT_X86_TOOLS" # from funcs.sh
-	export PATH="${MWD}/tools/${tools_git_dir}/bin:$PATH"
-elif [ "$HOST_ARCH" = "x86_64" -a "$USE_GIT_X86_64_TOOLS" ]; then
-	tools_git_dir="`expr match "$USE_GIT_X86_64_TOOLS" '.*/\([^/]*/[^/]*\)' | sed 's\/\_\'`"_git
-	get_git_cross_compiler "$USE_GIT_X86_64_TOOLS" # from funcs.sh
-	export PATH="${MWD}/tools/${tools_git_dir}/bin:$PATH"
-fi
-
 #==============================================================
 #                    compile the kernel
 #==============================================================
 
 ## extract the kernel
 log_msg "Extracting the kernel sources"
-if [ "$USE_GIT_KERNEL" ] ; then
-	rm -rf linux-${kernel_version}
-	cp -a sources/${kernel_git_dir} linux-${kernel_version}
-elif [ "$USE_STABLE_KERNEL" ] ; then
-	rm -rf linux-${kernel_version}
-	cp -a sources/${STABLE_KERNEL_DIR} linux-${kernel_version}
-elif [ "$USE_MAINLINE_KERNEL_PLUS_PATCH" = "yes" ] ; then
-	rm -rf linux-${kernel_version}
-	mkdir linux-${kernel_version}
-	cd linux-${kernel_version}
-	tar --strip-components=1 -xf ../sources/kernels/linux-${kernel_major_version}.tar.xz >> ${BUILD_LOG} 2>&1
-	[ $? -ne 0 ] && exit_error "ERROR extracting kernel sources."
-	unxz -dc ../sources/kernels/patch-${kernel_tarball_version}.xz | patch -s -p1
-	[ $? -ne 0 ] && exit_error "ERROR patching kernel sources."
-	cd ..
-else
-	tar -xf sources/kernels/linux-${kernel_tarball_version}.tar.xz >> ${BUILD_LOG} 2>&1
-fi
+tar -xf sources/kernels/linux-${kernel_tarball_version}.tar.xz >> ${BUILD_LOG} 2>&1
 if [ $? -ne 0 ] ; then
 	rm -f sources/kernels/linux-${kernel_tarball_version}.tar.xz
 	exit_error "ERROR extracting kernel sources. file was deleted..."
@@ -417,21 +343,6 @@ cd linux-${kernel_version}
 #-------------------------
 
 cp Makefile Makefile-orig
-## custom suffix
-if [ -n "${custom_suffix}" ] ; then
-	sed -i "s/^EXTRAVERSION =.*/EXTRAVERSION = ${custom_suffix}/" Makefile
-elif [ "$kernel_is_plus_version" = "yes" ]; then
-	CONFIG_LOCALVERSION="`grep -F 'CONFIG_LOCALVERSION=' ../DOTconfig`"
-	if [ "$CONFIG_LOCALVERSION" != "" ]; then
-		local_version=${CONFIG_LOCALVERSION#CONFIG_LOCALVERSION=}
-		local_version="${local_version//\"/}"
-	fi
-	# add the '+' to the suffix - 3, 4 versions
-	case $kernel_series in
-		3|4)custom_suffix="${local_version}+" ;;
-		5)custom_suffix="${local_version}"    ;;
-	esac
-fi
 diff -up Makefile-orig Makefile || diff -up Makefile-orig Makefile > ../output/patches-${kernel_version}-${HOST_ARCH}/version.patch
 rm Makefile-orig
 
@@ -466,24 +377,13 @@ if [ -f ../DOTconfig ] ; then
 	sed -i '/^kernel_version/d' .config
 fi
 
-#----
-i386_specific_stuff #pae/nopae- funcs.sh
-#----
-
 [ -f .config -a ! -f ../DOTconfig ] && cp .config ../DOTconfig
-
-# SET_MAKE_COMMAND is used for cross compiling ARM kernels
-if [ "$SET_MAKE_COMMAND" ]; then
-	export MAKE="$SET_MAKE_COMMAND"
-else
-	export MAKE='make'
-fi
 
 #####################
 # pause to configure
 function do_kernel_config() {
-	log_msg "$MAKE $1"
-	$MAKE $1 ##
+	log_msg "make $1"
+	make $1 ##
 	if [ $? -eq 0 ] ; then
 		if [ -f .config -a "$AUTO" != "yes" ] ; then
 			log_msg "\nOk, kernel is configured. hit ENTER to continue, CTRL+C to quit"
@@ -495,8 +395,8 @@ function do_kernel_config() {
 }
 
 if [ "$AUTO" = "yes" ] ; then
-	log_msg "$MAKE olddefconfig"
-	$MAKE olddefconfig
+	log_msg "make olddefconfig"
+	make olddefconfig
 	if [ "$?" != "0" ] ; then
 		do_kernel_config oldconfig
 	fi
@@ -558,51 +458,27 @@ else
 fi
 
 #.....................................................................
-if [ "$kit_kernel" = "yes" ]; then
-	linux_kernel_dir=linux_kernel-${kernel_version}${custom_suffix}-${package_name_suffix}
-else
-	linux_kernel_dir=linux_kernel-${kernel_version}-${package_name_suffix}
-fi
+linux_kernel_dir=linux_kernel-${kernel_version}-${package_name_suffix}
 export linux_kernel_dir
 #.....................................................................
 
 ## kernel headers
-if [ "$kit_kernel" = "yes" ]; then
-	kheaders_dir="kernel_headers-${kernel_version}${custom_suffix}-${package_name_suffix}-$arch"
-else
-	kheaders_dir="kernel_headers-${kernel_version}-${package_name_suffix}-$arch"
-fi
+kheaders_dir="kernel_headers-${kernel_version}-${package_name_suffix}-$arch"
 rm -rf ../output/${kheaders_dir}
 log_msg "Creating the kernel headers package"
-$MAKE headers_check >> ${BUILD_LOG} 2>&1
-$MAKE INSTALL_HDR_PATH=${kheaders_dir}/usr headers_install >> ${BUILD_LOG} 2>&1
+make headers_check >> ${BUILD_LOG} 2>&1
+make INSTALL_HDR_PATH=${kheaders_dir}/usr headers_install >> ${BUILD_LOG} 2>&1
 find ${kheaders_dir}/usr/include \( -name .install -o -name ..install.cmd \) -delete
 mv ${kheaders_dir} ../output
 
 #------------------------------------------------------
 
-# SET_MAKE_COMMAND is used for cross compiling ARM kernels
-if [ "$SET_MAKE_COMMAND" ]; then
-	export MAKE="$SET_MAKE_COMMAND"
-else
-	export MAKE='make'
-fi
-# SET_MAKE_TARGETS is used for compiling ARM kernels and dtbs
-if [ "$SET_MAKE_TARGETS" ]; then
-	export MAKE_TARGETS="$SET_MAKE_TARGETS"
-else
-	export MAKE_TARGETS="bzImage modules"
-fi
-echo "$MAKE ${JOBS} ${MAKE_TARGETS}
-$MAKE INSTALL_MOD_PATH=${linux_kernel_dir}/usr INSTALL_MOD_STRIP=1 modules_install" > compile ## debug
+echo "make ${JOBS} bzImage modules
+make INSTALL_MOD_PATH=${linux_kernel_dir}/usr INSTALL_MOD_STRIP=1 modules_install" > compile ## debug
 
 log_msg "Compiling the kernel"
-$MAKE ${JOBS} ${MAKE_TARGETS} >> ${BUILD_LOG} 2>&1
-if [ "$kit_kernel" = "yes" ]; then
-	KCONFIG="output/DOTconfig-${kernel_version}${custom_suffix}-${HOST_ARCH}-${today}"
-else
-	KCONFIG="output/DOTconfig-${kernel_version}-${HOST_ARCH}-${today}"
-fi
+make ${JOBS} bzImage modules >> ${BUILD_LOG} 2>&1
+KCONFIG="output/DOTconfig-${kernel_version}-${HOST_ARCH}-${today}"
 cp .config ../${KCONFIG}
 
 if [ "$karch" = "x86" ] ; then
@@ -618,23 +494,19 @@ fi
 #---------------------------------------------------------------------
 
 log_msg "Creating the kernel package"
-$MAKE INSTALL_MOD_PATH=${linux_kernel_dir}/usr INSTALL_MOD_STRIP=1 modules_install >> ${BUILD_LOG} 2>&1
-rm -f ${linux_kernel_dir}/usr/lib/modules/${kernel_version}${custom_suffix}/{build,source}
+make INSTALL_MOD_PATH=${linux_kernel_dir}/usr INSTALL_MOD_STRIP=1 modules_install >> ${BUILD_LOG} 2>&1
+rm -f ${linux_kernel_dir}/usr/lib/modules/${kernel_version}/{build,source}
 mkdir -p ${linux_kernel_dir}/boot
 mkdir -p ${linux_kernel_dir}/etc/modules
 ## /boot/config-$(uname -m)     ## http://www.h-online.com/open/features/Good-and-quick-kernel-configuration-creation-1403046.html
-cp .config ${linux_kernel_dir}/boot/config-${kernel_version}${custom_suffix}
+cp .config ${linux_kernel_dir}/boot/config-${kernel_version}
 ## /boot/Sytem.map-$(uname -r)  ## https://en.wikipedia.org/wiki/System.map
-cp System.map ${linux_kernel_dir}/boot/System.map-${kernel_version}${custom_suffix}
+cp System.map ${linux_kernel_dir}/boot/System.map-${kernel_version}
 ## /etc/moodules/..
-if [ "$kit_kernel" = "yes" ]; then
-	cp .config ${linux_kernel_dir}/etc/modules/DOTconfig-${kernel_version}${custom_suffix}-${today}
-else
-	cp .config ${linux_kernel_dir}/etc/modules/DOTconfig-${kernel_version}-${today}
-fi
+cp .config ${linux_kernel_dir}/etc/modules/DOTconfig-${kernel_version}-${today}
 for i in `find ${linux_kernel_dir}/usr/lib/modules -type f -name "modules.*"| grep -E 'order$|builtin$'`;do 
-	cp $i ${linux_kernel_dir}/etc/modules/${i##*/}-${kernel_version}${custom_suffix}
-	log_msg "copied ${i##*/} to ${linux_kernel_dir}/etc/modules/${i##*/}-${kernel_version}${custom_suffix}"
+	cp $i ${linux_kernel_dir}/etc/modules/${i##*/}-${kernel_version}
+	log_msg "copied ${i##*/} to ${linux_kernel_dir}/etc/modules/${i##*/}-${kernel_version}"
 done
 
 #cp arch/x86/boot/bzImage ${linux_kernel_dir}/boot/vmlinuz
@@ -647,7 +519,7 @@ cp ${IMAGE} ${linux_kernel_dir}/boot
 cp ${IMAGE} ${linux_kernel_dir}/boot/vmlinuz
 
 if [ "$karch" = "arm" ]; then
-	BOOT_DIR="boot-${kernel_version}${custom_suffix}"
+	BOOT_DIR="boot-${kernel_version}"
 	mkdir -p ../output/${BOOT_DIR}/
 	cp arch/arm/boot/dts/*.dtb ../output/${BOOT_DIR}/
 	mkdir -p ../output/${BOOT_DIR}/overlays/
@@ -660,11 +532,7 @@ fi
 mv ${linux_kernel_dir} ../output ## ../output/${linux_kernel_dir}
 
 ## make fatdog kernel module package
-if [ "$kit_kernel" = "yes" ]; then
-	OUTPUT_VERSION="${package_version}${custom_suffix}-${package_name_suffix}"
-else
-	OUTPUT_VERSION="${package_version}-${package_name_suffix}"
-fi
+OUTPUT_VERSION="${package_version}-${package_name_suffix}"
 mv ../output/${linux_kernel_dir}/boot/vmlinuz \
 	../output/vmlinuz-${OUTPUT_VERSION}
 [ -f ../output/${linux_kernel_dir}/boot/bzImage ] && \
@@ -675,23 +543,19 @@ log_msg "${linux_kernel_dir} is ready in output"
 
 log_msg "Cleaning the kernel sources"
 make clean >> ${BUILD_LOG} 2>&1
-$MAKE prepare >> ${BUILD_LOG} 2>&1
+make prepare >> ${BUILD_LOG} 2>&1
 
 #----
 cd ..
 #----
 
-if [ "$kit_kernel" = "yes" ]; then
-	KERNEL_SOURCES_DIR="kernel_sources-${package_version}${custom_suffix}-${package_name_suffix}"
-else
-	KERNEL_SOURCES_DIR="kernel_sources-${package_version}-${package_name_suffix}"
-fi
-KBUILD_DIR="kbuild-${package_version}${custom_suffix}"
+KERNEL_SOURCES_DIR="kernel_sources-${package_version}-${package_name_suffix}"
+KBUILD_DIR="kbuild-${package_version}"
 if [ "$CREATE_SOURCES_SFS" != "no" ]; then
 	log_msg "Creating a kernel sources SFS"
 	mkdir -p ${KERNEL_SOURCES_DIR}/usr/src
 	mv linux-${kernel_version} ${KERNEL_SOURCES_DIR}/usr/src/linux
-	KERNEL_MODULES_DIR=${KERNEL_SOURCES_DIR}/usr/lib/modules/${kernel_version}${custom_suffix}
+	KERNEL_MODULES_DIR=${KERNEL_SOURCES_DIR}/usr/lib/modules/${kernel_version}
 	mkdir -p ${KERNEL_MODULES_DIR}
 	ln -s ../../../src/linux ${KERNEL_MODULES_DIR}/build
 	ln -s ../../../src/linux ${KERNEL_MODULES_DIR}/source
@@ -707,9 +571,9 @@ if [ "$CREATE_SOURCES_SFS" != "no" ]; then
 	if [ "$CREATE_KBUILD_SFS" = "yes" ]; then
 		mkdir -p ${KBUILD_DIR}/usr/src/${KBUILD_DIR}
 		./kbuild.sh ${KERNEL_SOURCES_DIR}/usr/src/linux ${KBUILD_DIR}/usr/src/${KBUILD_DIR} ${karch} || exit 1
-		mkdir -p ${KBUILD_DIR}/usr/lib/modules/${kernel_version}${custom_suffix}
-		ln -s ../../../src/${KBUILD_DIR} ${KBUILD_DIR}/usr/lib/modules/${kernel_version}${custom_suffix}/build
-		ln -s ../../../src/${KBUILD_DIR} ${KBUILD_DIR}/usr/lib/modules/${kernel_version}${custom_suffix}/source
+		mkdir -p ${KBUILD_DIR}/usr/lib/modules/${kernel_version}
+		ln -s ../../../src/${KBUILD_DIR} ${KBUILD_DIR}/usr/lib/modules/${kernel_version}/build
+		ln -s ../../../src/${KBUILD_DIR} ${KBUILD_DIR}/usr/lib/modules/${kernel_version}/source
 		[ -n "$GITHUB_ACTIONS" ] && rm -rf ${KERNEL_SOURCES_DIR}
 		mksquashfs ${KBUILD_DIR} output/${KBUILD_DIR}.sfs $COMP
 		md5sum output/${KBUILD_DIR}.sfs > output/${KBUILD_DIR}.sfs.md5.txt
@@ -722,53 +586,25 @@ fi
 #==============================================================
 
 
-if [ "$kit_kernel" = "yes" ]; then
-	KERNEL_MODULES_SFS_NAME="kernel-modules-${package_version}${custom_suffix}-${package_name_suffix}.sfs"
-else
-	KERNEL_MODULES_SFS_NAME="kernel-modules-${package_version}-${package_name_suffix}.sfs"
-fi
+KERNEL_MODULES_SFS_NAME="kernel-modules-${package_version}-${package_name_suffix}.sfs"
 
-if [ "$STRIP_KMODULES" = "yes" ] ; then
- [ -z "$STRIP" ] && STRIP=strip
- if [ "$(which $STRIP)" != "" -a "$($STRIP --help | grep "\--strip-unneeded")" != "" ]; then
-	for mods1 in $(find "$(pwd)/output/${linux_kernel_dir}" -type f -name "*.ko")
-	do
-		file "$mods1" | grep -q "unstripped" || $STRIP --strip-unneeded "$mods1"
-	done
- fi
-fi
 # copy in build.conf
-if [ "$kit_kernel" = "yes" ]; then
-	cp build.conf output/${linux_kernel_dir}/etc/modules/build.conf-${kernel_version}${custom_suffix}-${today}
-else
-	cp build.conf output/${linux_kernel_dir}/etc/modules/build.conf-${kernel_version}-${today}
-fi
+cp build.conf output/${linux_kernel_dir}/etc/modules/build.conf-${kernel_version}-${today}
 
 mksquashfs output/${linux_kernel_dir} output/${KERNEL_MODULES_SFS_NAME} $COMP
 [ $? = 0 ] || exit 1
 [ -n "$GITHUB_ACTIONS" ] && rm -rf output/${linux_kernel_dir}
 
 cd output/
-if [ "$kit_kernel" = "yes" ]; then
-	log_msg "Kit_Kernel compatible kernel package is ready to package./"
-	log_msg "Packaging kit-kernel-${OUTPUT_VERSION} kernel"
-	tar -cJvf kit-kernel-${OUTPUT_VERSION}.tar.xz \
-	vmlinuz-${OUTPUT_VERSION} ${BOOT_DIR} \
-	${KERNEL_MODULES_SFS_NAME} || exit 1
-	echo "kit-kernel-${OUTPUT_VERSION}.tar.xz is in output"
-	md5sum kit-kernel-${OUTPUT_VERSION}.tar.xz > kit-kernel-${OUTPUT_VERSION}.tar.xz.md5.txt
-	sha256sum kit-kernel-${OUTPUT_VERSION}.tar.xz > kit-kernel-${OUTPUT_VERSION}.tar.xz.sha256.txt
-else
-	log_msg "Huge compatible kernel packages are ready to package."
-	log_msg "Packaging huge-${OUTPUT_VERSION} kernel"
-	tar -cjvf huge-${OUTPUT_VERSION}.tar.bz2 \
+log_msg "Huge compatible kernel packages are ready to package."
+log_msg "Packaging huge-${OUTPUT_VERSION} kernel"
+tar -cjvf huge-${OUTPUT_VERSION}.tar.bz2 \
 	vmlinuz-${OUTPUT_VERSION} \
-	${KERNEL_MODULES_SFS_NAME} || exit 1	
-	[ -n "$GITHUB_ACTIONS" ] && rm -f vmlinuz-${OUTPUT_VERSION} ${KERNEL_MODULES_SFS_NAME}
-	echo "huge-${OUTPUT_VERSION}.tar.bz2 is in output"
-	md5sum huge-${OUTPUT_VERSION}.tar.bz2 > huge-${OUTPUT_VERSION}.tar.bz2.md5.txt
-	sha256sum huge-${OUTPUT_VERSION}.tar.bz2 > huge-${OUTPUT_VERSION}.tar.bz2.sha256.txt
-fi
+	${KERNEL_MODULES_SFS_NAME} || exit 1
+[ -n "$GITHUB_ACTIONS" ] && rm -f vmlinuz-${OUTPUT_VERSION} ${KERNEL_MODULES_SFS_NAME}
+echo "huge-${OUTPUT_VERSION}.tar.bz2 is in output"
+md5sum huge-${OUTPUT_VERSION}.tar.bz2 > huge-${OUTPUT_VERSION}.tar.bz2.md5.txt
+sha256sum huge-${OUTPUT_VERSION}.tar.bz2 > huge-${OUTPUT_VERSION}.tar.bz2.sha256.txt
 echo
 cd -
 
@@ -776,16 +612,6 @@ log_msg "Compressing the log"
 bzip2 -9 build.log
 cp build.log.bz2 output
 
-if [ "$kit_kernel" = "yes" ]; then
-log_msg "------------------
-Output files:
-- kit-kernel-${OUTPUT_VERSION}.tar.xz
-  (kernel tarball: vmlinuz, kernel modules sfs - used in the woof process)
-
-- output/${KERNEL_SOURCES_DIR}.sfs
-  (you can use this to compile new kernel modules - load or install first..)
-------------------"
-else
 log_msg "------------------
 Output files:
 - output/huge-${OUTPUT_VERSION}.tar.bz2
@@ -795,7 +621,6 @@ Output files:
 - output/${KERNEL_SOURCES_DIR}.sfs
   (you can use this to compile new kernel modules - load or install first..)
 ------------------"
-fi
 
 echo "Done!"
 [ -n "$GITHUB_ACTIONS" -o ! -f /usr/share/sounds/2barks.au ] || aplay /usr/share/sounds/2barks.au
