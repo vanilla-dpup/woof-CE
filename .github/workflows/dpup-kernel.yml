@@ -65,7 +65,7 @@ jobs:
           CREATE_KBUILD_SFS=yes ./build.sh
           rm -rf kernel_sources-*
           mkdir small-output
-          mv `ls sources/kernels/linux-$ver.tar.xz DOTconfig-$ver-${{ matrix.arch }} build.conf output/kernel_sources-*.sfs* output/kbuild-*.sfs* output/*.tar* 2>/dev/null` small-output
+          mv `ls sources/kernels/linux-$ver.tar.xz DOTconfig-$ver-${{ matrix.arch }} build.conf output/kbuild-*.sfs* output/*.tar* 2>/dev/null` small-output
           rm -rf output
       - name: Upload kernel
         uses: actions/upload-artifact@v3

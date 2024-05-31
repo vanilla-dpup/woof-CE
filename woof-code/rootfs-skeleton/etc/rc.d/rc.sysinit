@@ -37,7 +37,7 @@
 #130504 moved up, i think fbcon needs to be loaded before intel, nouveau modules load.
 #160609 rerwin: Add wait for USB3 driver.
 
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
 . /etc/rc.d/functions_x
 
 #================================================================

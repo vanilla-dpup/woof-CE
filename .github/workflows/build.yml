@@ -73,7 +73,8 @@ jobs:
       run: |
         yes "" | sudo -E ./merge2out woof-distro/${{ inputs.arch }}/${{ inputs.compat-distro }}/${{ inputs.compat-distro-version }}
         sudo chown -R root:root ../woof-out_*
-        sudo tar -c -I "gzip -9" -f woof-CE.tar.gz ../woof-out_*
+        sudo mkdir ../buildenv
+        sudo cp -a ../woof-out_* ../buildenv/
     - name: Set name
       if: ${{ inputs.name != '' }}
       run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' ../woof-out_*/DISTRO_SPECS
@@ -151,19 +152,31 @@ jobs:
         sudo mv petbuild-{sources,cache,output} ../woof-out_*/
         cd ../woof-out_*
         sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config ./3builddistro release
-        sudo chown -R --reference ~ petbuild-{sources,cache,output}
-        sudo mv petbuild-{sources,cache,output} $GITHUB_WORKSPACE/
+    - name: Build woof-CE.tar.gz
+      run: |
+        cd ../buildenv
+        cd woof-out_*
+        sudo mkdir -p kernel-kit/sources
+        sudo mv -f ../../woof-out_*/kernel-kit/output/linux-*.tar.xz kernel-kit/sources/
+        sudo mv -f ../../woof-out_*/kernel-kit/output/DOTconfig-* kernel-kit/
+        sudo mv -f ../../woof-out_*/kernel-kit/output/build.conf kernel-kit/
+        sudo mv ../../woof-out_*/petbuild-sources .
+        cd ..
+        sudo tar -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-out_*
+        sudo mv woof-out_*/petbuild-sources $GITHUB_WORKSPACE/
     - name: Move build output
       run: |
         for i in `ls ../woof-out_*/woof-output-*/*.img 2>/dev/null`; do sudo gzip -1 $i; done
         for i in `ls ../woof-out_*/woof-output-*/*.{img.gz,iso} 2>/dev/null`; do sudo mv -f $i .; done
-        sudo mv -f ../woof-out_*/kernel-kit/output/kernel_sources-*.sfs .
+    - name: Move cache
+      run: |
+        sudo mv ../woof-out_*/petbuild-{cache,output} $GITHUB_WORKSPACE/
+        sudo chown -R --reference ~ petbuild-{sources,cache,output}
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.artifact }}
         path: |
           *.img.gz
-          *.sfs
           woof-CE.tar.gz
         retention-days: ${{ inputs.retention }}

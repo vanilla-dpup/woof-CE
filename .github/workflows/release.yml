@@ -83,7 +83,6 @@ jobs:
           fail_on_unmatched_files: true
           files: |
             *.img.gz
-            *.sfs
             woof-CE.tar.gz
           draft: true
           prerelease: false

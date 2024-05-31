@@ -6,6 +6,27 @@ if [ "`whoami`" != "root" ] ; then
 	exit 1
 fi
 
+function clearenv() {
+	if [ -z "$RUNNING_IN_WOOFCE" ]; then
+		exec env -i RUNNING_IN_WOOFCE=1 DISTRO_VARIANT=$DISTRO_VARIANT $0
+	else
+		export SHELL=/bin/bash
+		export XDG_CONFIG_DIRS=/etc/xdg
+		export XDG_DATA_HOME=/root/.local/share
+		export XDG_CONFIG_HOME=/root/.config
+		export HOME=/root
+		export WAYLAND_DISPLAY=
+		export XDG_CACHE_HOME=/root/.cache
+		export DISPLAY=
+		export XDG_STATE_HOME=/root/.local/state
+		export XDG_RUNTIME_DIR=/tmp/runtime-root
+		export LC_ALL=en_US.UTF-8
+		export XDG_DATA_DIRS=/usr/share:/usr/local/share
+		export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+		export DEBIAN_FRONTEND=noninteractive
+	fi
+}
+
 function merge_to_woof_out() {
 	if [ -d "$1" ];then
 	MERGE_DIRECTORY_NAME=${1##*/}

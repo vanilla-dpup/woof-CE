@@ -1,4 +1,7 @@
-#!/bin/sh -e
+#!/bin/bash -e
+
+. ./_00func
+clearenv
 
 . ./DISTRO_SPECS
 . ./_00build.conf
@@ -18,8 +21,6 @@ devuan) MIRROR=http://deb.devuan.org/merged ;;
 ubuntu) MIRROR=http://archive.ubuntu.com/ubuntu ;;
 *) exit 1 ;;
 esac
-
-export DEBIAN_FRONTEND=noninteractive
 
 mkdir -p sandbox3
 cd sandbox3

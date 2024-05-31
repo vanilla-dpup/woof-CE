@@ -3,8 +3,6 @@
 #This script is called by /etc/rc.d/rc.sysinit. the purpose is to perform
 #any required updates to files when a new version of Puppy is booted.
 
-[ -z "$PATH" ] && export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
-
 status_func() {
 	if [ $1 -eq 0 ];then
 		echo -e "\\033[74G\\033[1;32mdone\\033[0;39m" >/dev/console
