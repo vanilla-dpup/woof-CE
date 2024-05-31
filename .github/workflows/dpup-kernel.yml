@@ -49,7 +49,7 @@ jobs:
           ver=`grep -Fm1 "Kernel Configuration" /tmp/base | cut -f 3 -d ' '`
           mv -f linux-source-* linux-$ver
           mkdir -p sources/kernels
-          tar -c linux-$ver | xz -1 > sources/kernels/linux-$ver.tar.xz
+          tar -c linux-$ver | xz -9 > sources/kernels/linux-$ver.tar.xz
           cd linux-$ver
           ./scripts/kconfig/merge_config.sh /tmp/base ../debian-diffconfigs/${{ matrix.release }}
           mv -f .config ../DOTconfig-$ver-${{ matrix.arch }}
@@ -65,7 +65,7 @@ jobs:
           CREATE_KBUILD_SFS=yes ./build.sh
           rm -rf kernel_sources-*
           mkdir small-output
-          mv `ls output/kernel_sources-*.sfs* output/kbuild-*.sfs* output/*.tar* 2>/dev/null` small-output
+          mv `ls sources/kernels/linux-$ver.tar.xz DOTconfig-$ver-${{ matrix.arch }} build.conf output/kernel_sources-*.sfs* output/kbuild-*.sfs* output/*.tar* 2>/dev/null` small-output
           rm -rf output
       - name: Upload kernel
         uses: actions/upload-artifact@v3
