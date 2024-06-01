@@ -25,9 +25,9 @@ esac
 mkdir -p sandbox3
 cd sandbox3
 
-CACHE_DIR=`pwd`/../../local-repositories/debootstrap/${DISTRO_TARGETARCH}
+CACHE_DIR=`pwd`/../local-repositories
 mkdir -p "$CACHE_DIR"
-TARBALL="${CACHE_DIR}/debootstrap-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}-usrmerge.tar.gz"
+TARBALL="${CACHE_DIR}/debootstrap.tar.gz"
 
 rm -rf rootfs
 
@@ -39,7 +39,7 @@ debootstrap --arch=$ARCH --variant=minbase --unpack-tarball=${TARBALL} ${DISTRO_
 rm -f rootfs/etc/resolv.conf
 cat /etc/resolv.conf > rootfs/etc/resolv.conf
 
-[ ! -e ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz ] || tar -C rootfs -xzf ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz
+[ ! -d ${CACHE_DIR}/archives ] || cp -r ${CACHE_DIR}/archives/* rootfs/var/cache/apt/archives/
 
 # configure the package manager
 case "$DISTRO_BINARY_COMPAT" in
@@ -117,7 +117,7 @@ PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 -d \| 
 chroot devx apt-get install -y $PKGS
 
 # create an archive of downloaded packages
-tar -C devx -c var/cache/apt/archives | gzip -1 > ${CACHE_DIR}/archives-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}.tar.gz
+cp -r devx/var/cache/apt/archives ${CACHE_DIR}/
 
 # remove any unneeded packages
 chroot rootfs apt-get autoremove -y --purge

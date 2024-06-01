@@ -43,7 +43,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 * The init script (/etc/rc.d/rc.sysinit) is shorter and much faster.
 * Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
-* Most of 0setup, 1download, 2createpackages and 3builddistro is reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap). Build times are much shorter than upstream's.
+* 0setup, 1download, 2createpackages and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
 
 ### Security
 
@@ -60,7 +60,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported: support for aufs is gone.
 * PPM is gone: packages in the build come from the upstream distro, rootfs-packages or rootfs-petbuilds (built from source).
 * Most old tools that use [gtkdialog](https://github.com/puppylinux-woof-CE/gtkdialog) are ported to [yad](https://github.com/step-/yad).
-* Support for kernel package types other than the "huge" one is gone.
+* kernel-kit builds the [Debian](https://www.debian.org/) kernel source and support for other types of kernels is gone.
 * kernel-kit's firmware picker is gone: fdrv is built by moving /usr/lib/firmware out of the main SFS.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
@@ -72,7 +72,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 * initrd-progs/ contains the initramfs skeleton
   * initrd-progs/0initrd/init is the early init script, which searches for Puppy files, sets up an overlay file system and `switch_root`s into it
-* kernel-kit/ contains a tool that builds Puppy-compatible kernels
+* kernel-kit/ contains a tool that builds Puppy-compatible kernels from the [Debian](https://www.debian.org/) kernel
 * woof-distro/ contains configuration files
   * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail) and [yambar](https://codeberg.org/dnkl/yambar), or [labwc](https://labwc.github.io/) with [sfwbar](https://github.com/LBCrion/sfwbar)
     * woof-distro/x86_64/debian/trixie64/DISTRO_SPECS contains the distro name and version
@@ -95,11 +95,12 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
   * woof-code/1download builds:
     * sandbox3/rootfs, a basic root file system template
     * sandbox3/devx, a copy of rootfs with development packages on top
+  * woof-code/2buildkernel builds the kernel
   * woof-code/3builddistro builds the packages specified in `$PETBUILDS` inside sandbox3/devx, then adds them and packages under rootfs-packages/ to sandbox3/rootfs, then builds bootable distro images
 
 ## Usage
 
-	sudo apt-get install -y --no-install-recommends dc debootstrap librsvg2-bin zstd xml2 syslinux-utils extlinux
+	sudo apt-get install -y --no-install-recommends debootstrap squashfs-tools
 
 Then:
 
@@ -114,4 +115,5 @@ Then:
 	./merge2out woof-distro/x86_64/debian/trixie64
 	cd ../woof-out_*
 	./1download
+	./2buildkernel
 	./3builddistro

@@ -51,7 +51,6 @@ jobs:
     - name: Create cache directories
       run: |
         mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
-        ln -s `pwd`/local-repositories ../local-repositories
     - name: Get cached local-repositories
       uses: actions/cache@v3
       with:
@@ -60,14 +59,6 @@ jobs:
         restore-keys: |
           local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
           local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: Prepare build environment
-      run: |
-        [ -f local-repositories/vercmp ] || (curl https://raw.githubusercontent.com/puppylinux-woof-CE/initrd_progs/master/pkg/w_apps_static/w_apps/vercmp.c | gcc -x c -o ../local-repositories/vercmp -)
-        sudo install -m 755 local-repositories/vercmp /usr/local/bin/vercmp
-        echo "dash dash/sh boolean false" | sudo debconf-set-selections
-        sudo DEBIAN_FRONTEND=noninteractive dpkg-reconfigure dash
-        sudo ln -s bash /bin/ash
-        [ "${{ inputs.compat-distro }}" != void ] || echo "LD_LIBRARY_PATH=/lib:/usr/lib:/lib64:/usr/lib64" >> $GITHUB_ENV
     - name: merge2out
       timeout-minutes: 5
       run: |
@@ -90,7 +81,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends dc debootstrap librsvg2-bin zstd xml2 syslinux-utils extlinux
+        sudo apt-get install -y --no-install-recommends debootstrap
         [ ${{ inputs.compat-distro }} != devuan ] || curl https://git.devuan.org/devuan/debootstrap/raw/branch/master/scripts/ceres | sudo tee /usr/share/debootstrap/scripts/`echo ${{ inputs.compat-distro-version }} | sed s/64$//`
     - name: 0setup
       timeout-minutes: 10
@@ -100,6 +91,8 @@ jobs:
     - name: 1download
       timeout-minutes: 120
       run: |
+        sudo chown -R root:root local-repositories
+        sudo mv local-repositories ../woof-out_*/
         cd ../woof-out_*
         sudo -E ./1download
     - name: 2createpackages
@@ -151,19 +144,13 @@ jobs:
         sudo chown -R root:root petbuild-{sources,cache,output}
         sudo mv petbuild-{sources,cache,output} ../woof-out_*/
         cd ../woof-out_*
-        sudo -E HOME=/root XDG_CONFIG_HOME=/root/.config ./3builddistro release
+        sudo -E ./3builddistro release
     - name: Build woof-CE.tar.gz
       run: |
         cd ../buildenv
-        cd woof-out_*
-        sudo mkdir -p kernel-kit/sources
-        sudo mv -f ../../woof-out_*/kernel-kit/output/linux-*.tar.xz kernel-kit/sources/
-        sudo mv -f ../../woof-out_*/kernel-kit/output/DOTconfig-* kernel-kit/
-        sudo mv -f ../../woof-out_*/kernel-kit/output/build.conf kernel-kit/
-        sudo mv ../../woof-out_*/petbuild-sources .
-        cd ..
+        sudo mv ../woof-out_*/petbuild-sources ../woof-out_*/local-repositories woof-out_*/
         sudo tar -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-out_*
-        sudo mv woof-out_*/petbuild-sources $GITHUB_WORKSPACE/
+        sudo mv woof-out_*/petbuild-sources woof-out_*/local-repositories $GITHUB_WORKSPACE/
     - name: Move build output
       run: |
         for i in `ls ../woof-out_*/woof-output-*/*.img 2>/dev/null`; do sudo gzip -1 $i; done
@@ -171,7 +158,7 @@ jobs:
     - name: Move cache
       run: |
         sudo mv ../woof-out_*/petbuild-{cache,output} $GITHUB_WORKSPACE/
-        sudo chown -R --reference ~ petbuild-{sources,cache,output}
+        sudo chown -R --reference ~ local-repositories petbuild-{sources,cache,output}
     - name: Upload build artifacts
       uses: actions/upload-artifact@v3
       with:

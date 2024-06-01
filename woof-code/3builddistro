@@ -222,14 +222,11 @@ EOF
 cd ../initrd-progs
 cp -f ../sandbox3/rootfs-complete/etc/DISTRO_SPECS .
 ./build.sh || exit 1
+cd ../sandbox3
 
-cd ../kernel-kit/output
-tar -xjf huge-*-kernel-kit.tar.bz2
-cd ../../sandbox3
-
-cp -f ../kernel-kit/output/vmlinuz-*-kernel-kit build/vmlinuz
+cp -f ../kernel-kit/output/vmlinuz-* build/vmlinuz
 cp -f ../kernel-kit/output/kbuild-*.sfs build/
-cp -f ../kernel-kit/output/kernel-modules-*-kernel-kit.sfs build/${ZDRVSFS}
+cp -f ../kernel-kit/output/kernel-modules-*.sfs build/${ZDRVSFS}
 
 mv -f ../initrd-progs/initrd.zst build/
 

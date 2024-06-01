@@ -1,0 +1,16 @@
+#!/bin/bash
+
+. ./_00func
+clearenv
+
+mkdir -p sandbox3/rootfs-kernel sandbox3/rootfs-kernel-work sandbox3/rootfs-kernel-upper
+mount -t overlay -o upperdir=sandbox3/rootfs-kernel-upper,lowerdir=sandbox3/devx,workdir=sandbox3/rootfs-kernel-work rootfs-kernel sandbox3/rootfs-kernel || exit 1
+
+mkdir sandbox3/rootfs-kernel/woof-out
+mount --bind . sandbox3/rootfs-kernel/woof-out
+
+chroot sandbox3/rootfs-kernel sh -c 'cd /woof-out/kernel-kit && ./build.sh'
+RET=$?
+umount -l sandbox3/rootfs-kernel/woof-out
+umount -l sandbox3/rootfs-kernel
+exit $RET
