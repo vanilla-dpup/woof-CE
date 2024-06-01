@@ -152,25 +152,25 @@ void process_directory(GMenuTreeDirectory *directory, GHashTable *history, int r
 void process_entry(GMenuTreeEntry *entry)
 {
     GDesktopAppInfo *app = gmenu_tree_entry_get_app_info(entry);
-    char *name = g_strdup (g_app_info_get_name(G_APP_INFO(app)));
-    char *exec = g_strdup (g_app_info_get_executable(G_APP_INFO(app)));
-    char *icon = g_icon_to_string(g_app_info_get_icon(G_APP_INFO(app)));
-    char *cmd = exec;
-    char *iconmod = icon;
+    gchar *name = g_strdup (g_app_info_get_name(G_APP_INFO(app)));
+    gchar *cmd = g_strdup (g_app_info_get_commandline(G_APP_INFO(app)));
+    gchar *icon = g_icon_to_string(g_app_info_get_icon(G_APP_INFO(app)));
+    gchar *tmp;
+    gchar *iconmod = icon;
     int i;
     size_t len;
 
-    for (i = 0; i < strlen(exec) - 1; i++) {
-        if (exec[i] == '%')
+    for (i = 0; i < strlen(cmd) - 1; i++) {
+        if (cmd[i] == '%')
         {
-            switch (exec[i+1]) {
+            switch (cmd[i+1]) {
                 case 'f': case 'F':
                 case 'u': case 'U':
                 case 'd': case 'D':
                 case 'n': case 'N':
                 case 'i': case 'c': case 'k': case 'v': case 'm':
-                    exec[i] = ' ';
-                    exec[i+1] = ' ';
+                    cmd[i] = ' ';
+                    cmd[i+1] = ' ';
                     i++;
                     break;
             }
@@ -179,7 +179,13 @@ void process_entry(GMenuTreeEntry *entry)
 
     if (g_desktop_app_info_get_boolean(app, G_KEY_FILE_DESKTOP_KEY_TERMINAL))
     {
-        cmd = g_strdup_printf("defaultterminal -e sh -c '%s'", exec);
+        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", g_strchomp(cmd));
+        g_free(cmd);
+        cmd = tmp;
+    }
+    else
+    {
+        cmd = g_strchomp(cmd);
     }
 
     if (icon[0] != '/' && (len = strlen(icon)) > 4)
@@ -193,12 +199,8 @@ void process_entry(GMenuTreeEntry *entry)
     g_printf("\t\titem(\" %s%%%s\",Exec \"%s\")\n", g_strjoinv("&amp;", g_strsplit(name, "&" ,0)), iconmod, cmd);
 
     g_free(name);
-    g_free(exec);
+    g_free(cmd);
     g_free(icon);
-    if (cmd != exec)
-    {
-        free(cmd);
-    }
     if (iconmod != icon)
     {
         free(iconmod);
