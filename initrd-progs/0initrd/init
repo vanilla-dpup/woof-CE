@@ -346,9 +346,20 @@ setup_psave(){ # setup savefile or savefolder
   fi
  elif [ -d "$SAVE_FN" ];then #savefolder
   echo "--SAVEFOLDER-- $SAVE_FN" #debug
-  mkdir -p "$SAVE_FN/upper" "$SAVE_FN/work"
-  ln -sv "$SAVE_FN/upper" "$SAVE_LAYER"
-  ln -sv "$SAVE_FN/work" "$WORKDIR"
+  if [ -s "$SAVE_FN/.pfscrypt" ]; then
+   echo -e "\n----" > /dev/console
+   PFSCRYPT_DIRS=""
+   while read PFSCRYPT_DIR; do
+    PFSCRYPT_DIRS="${PFSCRYPT_DIRS} ${SAVE_REL_FN#/}/${PFSCRYPT_DIR}"
+   done < "$SAVE_FN/.pfscrypt"
+   pfscrypt "$SAVE_MP" "" $PFSCRYPT_DIRS > /dev/console 2>&1 || PUPSAVE=""
+   echo -n "----" > /dev/console
+  fi
+  if [ "$PUPSAVE" ];then
+   mkdir -p "$SAVE_FN/upper" "$SAVE_FN/work"
+   ln -sv "$SAVE_FN/upper" "$SAVE_LAYER"
+   ln -sv "$SAVE_FN/work" "$WORKDIR"
+  fi
  else
   PUPSAVE=""
  fi

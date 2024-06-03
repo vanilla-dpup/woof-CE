@@ -17,6 +17,8 @@ BOOTLOADER="$2"
 FSTYPE2="$3"
 PUPMODE="$4"
 SRCPATH="$5"
+CRYPT="$6"
+PASSPHRASE="$7"
 
 if [ "$USBDRV" = "" ];then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
@@ -81,7 +83,7 @@ create_drv() {
 
 	case "$XFSTYPE2" in
 		f2fs) mkfs.f2fs -f /dev/${PSAVEPART} ;;
-		ext4) mkfs.ext4 -F -m 0 -O ^has_journal /dev/${PSAVEPART} ;;
+		ext4) mkfs.ext4 -F -m 0 -O ^has_journal,encrypt /dev/${PSAVEPART} ;;
 	esac
 	sync
 
@@ -228,6 +230,29 @@ if [ -z "$PUPMODE" ] ; then
 	esac
 fi
 
+if [ $PUPMODE -eq 5 ] ; then
+	CRYPT=0
+elif [ -z "$CRYPT" ] ; then
+	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
+
+	RETVAL="`yad --title=BootFlash --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Encrypt the save folder?')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Yes')" 2 "$(gettext 'Only the home directory')" 3 "$(gettext 'No')" 3`"
+
+	case "$RETVAL" in
+		1|2|3)
+			CRYPT=$RETVAL ;;
+		*)
+			exit 1 ;;
+	esac
+fi
+
+if [ $CRYPT -ne 3 -a -z "$PASSPHRASE" ] ; then
+	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
+
+	while [ -z "$PASSPHRASE" ] ; do
+		PASSPHRASE="`yad --title=BootFlash --icon=dialog-question --text="$(gettext 'Save folder passphrase')" --entry --hide-text --button=gtk-ok`"
+	done
+fi
+
 #reconfirm correct drv choice...
 if [ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ]; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
@@ -316,7 +341,33 @@ if [ $? -ne 0 ];then
 	[ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] && yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting USB drive')" --button=gtk-ok
 	exit 1
 fi
-[ $PUPMODE -eq 5 ] || mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save
+case $CRYPT in
+	1)
+		mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/{upper,work}
+		cat << EOF > /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/.pfscrypt
+upper
+work
+EOF
+		pfscrypt /mnt/${PSAVEPART} "${PASSPHRASE}" ${DISTRO_FILE_PREFIX}save/{upper,work}
+		;;
+
+	2)
+		mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/work
+		echo work > /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/.pfscrypt
+		for DIR in root home/spot ; do
+			mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
+			chmod --reference=/initrd/pup_ro2/${DIR} /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
+			chown --reference=/initrd/pup_ro2/${DIR} /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
+			touch --reference=/initrd/pup_ro2/${DIR} /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
+			echo "upper/${DIR}" >> /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/.pfscrypt
+		done
+		pfscrypt /mnt/${PSAVEPART} "${PASSPHRASE}" ${DISTRO_FILE_PREFIX}save/upper/{root,home/spot} ${DISTRO_FILE_PREFIX}save/work
+		;;
+
+	3)
+		mkdir /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save
+		;;
+esac
 #-
 cp -fv ${SRCPATH}/vmlinuz /mnt/${PBOOTPART}/
 cp -fv ${SRCPATH}/initrd.zst /mnt/${PBOOTPART}/

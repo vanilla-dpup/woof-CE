@@ -7,6 +7,8 @@ mount --bind /dev rootfs-complete/dev
 mount --bind /proc rootfs-complete/proc
 mkdir rootfs-complete/build
 mount --bind build rootfs-complete/build
+mkdir rootfs-complete/initrd
+ln -s / rootfs-complete/initrd/pup_ro2
 cat << EOF > rootfs-complete/usr/local/bin/uname
 #!/bin/sh
 
@@ -18,7 +20,7 @@ echo "Building ${BIOS_IMG_BASE}"
 
 dd if=/dev/zero of=${BIOS_IMG_BASE} bs=50M count=40 conv=sparse
 LOOP=`losetup -f --show ${BIOS_IMG_BASE}`
-chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build
+chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build 2 woofwoof
 losetup -d ${LOOP}
 mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
 
@@ -27,13 +29,15 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 
 	dd if=/dev/zero of=${UEFI_IMG_BASE} bs=50M count=40 conv=sparse
 	LOOP=`losetup -f --show ${UEFI_IMG_BASE}`
-	chroot rootfs-complete bootflash ${LOOP#/dev/} efilinux ext4 13 /build
+	chroot rootfs-complete bootflash ${LOOP#/dev/} efilinux ext4 13 /build 2 woofwoof
 	losetup -d ${LOOP}
 
 	mv -f ${UEFI_IMG_BASE} ../${WOOF_OUTPUT}/
 fi
 
 rm -f rootfs-complete/usr/local/bin/uname
+rm rootfs-complete/initrd/pup_ro2
+rmdir rootfs-complete/initrd
 umount -l rootfs-complete/build
 rmdir rootfs-complete/build
 umount -l rootfs-complete/proc

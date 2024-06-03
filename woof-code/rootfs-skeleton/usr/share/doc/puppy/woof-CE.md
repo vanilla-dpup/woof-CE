@@ -38,6 +38,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * The RAM occupied by cached SFSs is freed automatically (using OOM score adjustment) if needed.
 * SFSs are prioritized and lower priority SFSs are not cached when cached SFSs occupy half of available RAM.
 * If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
+* Encrypted save files are implemented using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html) instead of LUKS, allowing encryption of specific directories (like the user's home directory) rather than the entire save file.
 
 ### Speed
 
@@ -47,6 +48,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 ### Security
 
+* Save folders support encryption, using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html).
 * The [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox that restricts file system access for applications running as spot is stricter and also prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777, but without this new restriction, spot can access /initrd/mnt/dev_save/*save/upper/root instead, to bypass the sandbox. This breaks compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
 * Most legacy X11 applications work thanks to [Xwayland](https://wayland.freedesktop.org/xserver.html), which is unprivileged and sandboxed.
 

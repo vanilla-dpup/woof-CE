@@ -1,0 +1,7 @@
+download() {
+    :
+}
+
+build() {
+    $CC $CFLAGS `pkg-config --cflags libargon2` pfscrypt.c $LDFLAGS `pkg-config --libs libargon2` -o /usr/sbin/pfscrypt
+}

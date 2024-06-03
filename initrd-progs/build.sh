@@ -6,7 +6,7 @@ generate_initrd() {
 	cp -rf 0initrd/* ZZ_initrd-expanded
 	cd ZZ_initrd-expanded
 	cp -aLf ../../sandbox3/rootfs-complete/lib*/*-linux-*/ld-linux-*.so.2 lib/
-	for BIN in usr/bin/busybox sbin/cryptsetup sbin/e2fsck sbin/fsck.f2fs sbin/fsck.fat sbin/resize2fs; do
+	for BIN in usr/bin/busybox usr/sbin/pfscrypt sbin/cryptsetup sbin/e2fsck sbin/fsck.f2fs sbin/fsck.fat sbin/resize2fs; do
 		cp -af ../../sandbox3/rootfs-complete/${BIN} bin/
 		for LIB in `chroot  ../../sandbox3/rootfs-complete ldd /${BIN} | awk '{print $3}'`; do
 			cp -anLf ../../sandbox3/rootfs-complete${LIB} lib/
