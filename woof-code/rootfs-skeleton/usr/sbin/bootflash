@@ -17,8 +17,10 @@ BOOTLOADER="$2"
 FSTYPE2="$3"
 PUPMODE="$4"
 SRCPATH="$5"
-CRYPT="$6"
-PASSPHRASE="$7"
+STYLE="$6"
+SAVESIZE="$7"
+CRYPT="$8"
+PASSPHRASE="$9"
 
 if [ "$USBDRV" = "" ];then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
@@ -231,6 +233,55 @@ if [ -z "$PUPMODE" ] ; then
 fi
 
 if [ $PUPMODE -eq 5 ] ; then
+	STYLE="none"
+	SAVESIZE=0
+elif [ -z "$STYLE" ] ; then
+	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
+
+	RETVAL="`yad --title=BootFlash --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'How to save?')" --list --no-headers --column=:TEXT --column=:TEXT --hide-column=1 --print-column=1 --separator= -- folder "$(gettext 'Folder')" file "$(gettext 'File')"`"
+
+	case "$RETVAL" in
+		folder)
+			STYLE="folder"
+			SAVESIZE=0
+			;;
+		file)
+			STYLE="file"
+			;;
+		*)
+			exit 1
+			;;
+	esac
+fi
+
+if [ -z "$SAVESIZE" ] ; then
+	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
+
+	HAVE="`lsblk -ndbr -o SIZE /dev/${USBDRV}`"
+	HAVE=$(($HAVE - 1073741824)) # leave 1 GB aside
+	MBS=128
+	SIZES=""
+	while : ; do
+		MBS=$(($MBS*2))
+		[ $(($MBS*1024*1024)) -ge $HAVE ] && break
+		if [ $MBS -ge 1024 ] ; then
+			SIZES="${SIZES} ${MBS} $(($MBS/1024))GB"
+		else
+			SIZES="${SIZES} ${MBS} ${MBS}MB"
+		fi
+	done
+
+	if [ -z "$SIZES" ] ; then
+		[ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] && yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'USB drive is too small')" --button=gtk-ok
+		exit 1
+	fi
+
+	while [ -z "$SAVESIZE" ] ; do
+		SAVESIZE="`yad --title=BootFlash --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Save file size limit')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- ${SIZES}`"
+	done
+fi
+
+if [ $PUPMODE -eq 5 ] ; then
 	CRYPT=0
 elif [ -z "$CRYPT" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
@@ -245,7 +296,7 @@ elif [ -z "$CRYPT" ] ; then
 	esac
 fi
 
-if [ $CRYPT -ne 3 -a -z "$PASSPHRASE" ] ; then
+if [ $CRYPT -ne 0 -a $CRYPT -ne 3 -a -z "$PASSPHRASE" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 
 	while [ -z "$PASSPHRASE" ] ; do
@@ -301,10 +352,11 @@ locate_puppy_src_files
 
 #-----------------------------------------------------------------------
 
-mkdir -p /mnt/${PBOOTPART} /mnt/${PSAVEPART}
+mkdir -p /mnt/${PBOOTPART}
 mount -t vfat /dev/${PBOOTPART} /mnt/${PBOOTPART}
 
 if [ $? -ne 0 ];then
+	rmdir /mnt/${PBOOTPART}
 	[ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] && yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting USB drive')" --button=gtk-ok
 	exit 1
 fi
@@ -336,36 +388,61 @@ docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs
 nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 
 #-------------------------
+mkdir -p /mnt/${PSAVEPART}
 mount -t $FSTYPE2 /dev/${PSAVEPART} /mnt/${PSAVEPART}
 if [ $? -ne 0 ];then
+	umount -l /mnt/${PBOOTPART}
+	rmdir /mnt/${PBOOTPART}
+	[ $X1PID -gt 0 ] && kill $X1PID
 	[ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] && yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting USB drive')" --button=gtk-ok
 	exit 1
 fi
+
+SAVEMNT=/mnt/${PSAVEPART}
+SAVEPFIX=${DISTRO_FILE_PREFIX}save/
+if [ "$STYLE" = "file" ];then
+	dd if=/dev/zero of=/mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save.4fs bs=1MiB count=${SAVESIZE} conv=sparse
+	mkfs.ext4 -F -m 0 -O ^has_journal,encrypt /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save.4fs
+	SAVEMNT=/mnt/${PSAVEPART}save
+	SAVEPFIX=
+	mkdir -p ${SAVEMNT}
+	mount -t ext4 -o loop /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save.4fs /mnt/${PSAVEPART}save
+	if [ $? -ne 0 ];then
+		rmdir ${SAVEMNT}
+		umount -l /mnt/${PSAVEPART}
+		umount -l /mnt/${PBOOTPART}
+		rmdir /mnt/${PSAVEPART} /mnt/${PBOOTPART}
+		[ $X1PID -gt 0 ] && kill $X1PID
+		[ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] && yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting save file')" --button=gtk-ok
+		exit 1
+	fi
+fi
+
 case $CRYPT in
 	1)
-		mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/{upper,work}
-		cat << EOF > /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/.pfscrypt
+		mkdir -p ${SAVEMNT}${SAVEPFIX}/{upper,work}
+		cat << EOF > ${SAVEMNT}${SAVEPFIX}/.pfscrypt
 upper
 work
 EOF
-		pfscrypt /mnt/${PSAVEPART} "${PASSPHRASE}" ${DISTRO_FILE_PREFIX}save/{upper,work}
+		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}{upper,work}
 		;;
 
 	2)
-		mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/work
-		echo work > /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/.pfscrypt
+		mkdir -p ${SAVEMNT}${SAVEPFIX}/work
+		echo work > ${SAVEMNT}${SAVEPFIX}/.pfscrypt
 		for DIR in root home/spot ; do
-			mkdir -p /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
-			chmod --reference=/initrd/pup_ro2/${DIR} /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
-			chown --reference=/initrd/pup_ro2/${DIR} /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
-			touch --reference=/initrd/pup_ro2/${DIR} /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/upper/${DIR}
-			echo "upper/${DIR}" >> /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save/.pfscrypt
+			mkdir -p ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+			chmod --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+			chown --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+			touch --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+			echo "upper/${DIR}" >> ${SAVEMNT}${SAVEPFIX}/.pfscrypt
 		done
-		pfscrypt /mnt/${PSAVEPART} "${PASSPHRASE}" ${DISTRO_FILE_PREFIX}save/upper/{root,home/spot} ${DISTRO_FILE_PREFIX}save/work
+		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}upper/{root,home/spot} ${SAVEPFIX}work
 		;;
 
 	3)
-		mkdir /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save
+		mkdir -p ${SAVEMNT}${SAVEPFIX}
 		;;
 esac
 #-
@@ -382,8 +459,13 @@ done
 
 sync
 
+if [ "$STYLE" = "file" ] ; then
+	umount -l ${SAVEMNT}
+	rmdir ${SAVEMNT}
+fi
 umount -l /mnt/${PBOOTPART}
 umount -l /mnt/${PSAVEPART}
+rmdir /mnt/${PBOOTPART} /mnt/${PSAVEPART}
 [ $X1PID -gt 0 ] && kill $X1PID
 
 [ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 0

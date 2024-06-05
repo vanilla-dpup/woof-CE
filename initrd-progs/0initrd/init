@@ -336,9 +336,20 @@ setup_psave(){ # setup savefile or savefolder
     if [ $? -ne 0 ]; then
       PUPSAVE=""
     else
-      mkdir -p "/pup_loop/upper" "/pup_loop/work"
-      ln -sv "/pup_loop/upper" "$SAVE_LAYER"
-      ln -sv "/pup_loop/work" "$WORKDIR"
+      if [ -s /pup_loop/.pfscrypt ]; then
+        echo -e "\n----" > /dev/console
+        PFSCRYPT_DIRS=""
+        while read PFSCRYPT_DIR; do
+          PFSCRYPT_DIRS="${PFSCRYPT_DIRS} /pup_loop/${PFSCRYPT_DIR}"
+        done < /pup_loop/.pfscrypt
+        pfscrypt /pup_loop "" $PFSCRYPT_DIRS > /dev/console 2>&1 || PUPSAVE=""
+        echo -n "----" > /dev/console
+      fi
+      if [ "$PUPSAVE" ];then
+        mkdir -p "/pup_loop/upper" "/pup_loop/work"
+        ln -sv "/pup_loop/upper" "$SAVE_LAYER"
+        ln -sv "/pup_loop/work" "$WORKDIR"
+      fi
     fi
   else # load_ext_file failed
     FLAG_NO_TIMEOUT=1

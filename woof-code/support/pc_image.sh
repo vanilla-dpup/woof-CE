@@ -20,7 +20,7 @@ echo "Building ${BIOS_IMG_BASE}"
 
 dd if=/dev/zero of=${BIOS_IMG_BASE} bs=50M count=40 conv=sparse
 LOOP=`losetup -f --show ${BIOS_IMG_BASE}`
-chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build 2 woofwoof
+chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build folder 0 2 woofwoof
 losetup -d ${LOOP}
 mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
 
@@ -29,7 +29,7 @@ if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
 
 	dd if=/dev/zero of=${UEFI_IMG_BASE} bs=50M count=40 conv=sparse
 	LOOP=`losetup -f --show ${UEFI_IMG_BASE}`
-	chroot rootfs-complete bootflash ${LOOP#/dev/} efilinux ext4 13 /build 2 woofwoof
+	chroot rootfs-complete bootflash ${LOOP#/dev/} efilinux ext4 13 /build folder 0 2 woofwoof
 	losetup -d ${LOOP}
 
 	mv -f ${UEFI_IMG_BASE} ../${WOOF_OUTPUT}/
