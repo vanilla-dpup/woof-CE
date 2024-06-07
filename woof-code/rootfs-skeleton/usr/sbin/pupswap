@@ -285,8 +285,6 @@ else
 	fi
 fi
 
-[ $SHUTDOWNCONFIG ] && exit #exported in /usr/sbin/shutdownconfig
-
 #------------------
 
 TOTALSWAP=`free | grep -o 'Swap: .*' | tr -s ' ' | cut -f 2 -d ' '`

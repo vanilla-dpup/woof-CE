@@ -107,14 +107,12 @@ copy_efilinux_uefi_boot() {
 	INITRD="initrd=\initrd.zst"
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="initrd=\ucode.cpio ${INITRD}"
 
-	APPEND="pfix=fsck pmedia=usbflash"
-	case ${PUPMODE} in
-		12)	APPEND="pfix=fsck pmedia=atahd" ;;
-		5)	APPEND="pfix=fsck pmedia=atahd pfix=ram" ;;
-	esac
-
 	UUID=$(blkid -o export ${PDRV} | grep ^UUID= | cut -f 2 -d =)
-	[ "$UUID" ] && APPEND="${APPEND} pupsfs=${UUID} psave=${UUID}"
+	case ${PUPMODE} in
+		5)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID}" ;;
+		12)	APPEND="pfix=fsck pmedia=atahd pupsfs=${UUID} psave=${UUID}" ;;
+		13)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID} psave=${UUID}" ;;
+	esac
 
 	echo "-f \vmlinuz ${INITRD} ${APPEND}" > ${HOMEDIR}/EFI/boot/efilinux.cfg
 
@@ -133,14 +131,12 @@ create_syslinux_conf() {
 	INITRD="initrd.zst"
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="ucode.cpio,${INITRD}"
 
-	APPEND="pfix=fsck pmedia=usbflash"
-	case ${PUPMODE} in
-		12)	APPEND="pfix=fsck pmedia=atahd" ;;
-		5)	APPEND="pfix=fsck pmedia=atahd pfix=ram" ;;
-	esac
-
 	UUID=$(blkid -o export ${PDRV} | grep ^UUID= | cut -f 2 -d =)
-	[ "$UUID" ] && APPEND="${APPEND} pupsfs=${UUID} psave=${UUID}"
+	case ${PUPMODE} in
+		5)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID}" ;;
+		12)	APPEND="pfix=fsck pmedia=atahd pupsfs=${UUID} psave=${UUID}" ;;
+		13)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID} psave=${UUID}" ;;
+	esac
 
 	cat << EOF > ${HOMEDIR}/syslinux.cfg
 DEFAULT puppy
@@ -300,7 +296,7 @@ if [ $CRYPT -ne 0 -a $CRYPT -ne 3 -a -z "$PASSPHRASE" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 
 	while [ -z "$PASSPHRASE" ] ; do
-		PASSPHRASE="`yad --title=BootFlash --icon=dialog-question --text="$(gettext 'Save folder passphrase')" --entry --hide-text --button=gtk-ok`"
+		PASSPHRASE="`yad --title=BootFlash --icon=dialog-question --text="$(gettext 'Unlocking passphrase')" --entry --hide-text --button=gtk-ok`"
 	done
 fi
 

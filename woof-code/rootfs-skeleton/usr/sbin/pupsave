@@ -1,0 +1,185 @@
+#!/bin/bash
+
+export TEXTDOMAIN=pupsave
+
+. /etc/DISTRO_SPECS
+
+PSAVEPARTUUID=
+PSUBDIR=
+for ARG in `cat /proc/cmdline`; do
+	case "$ARG" in
+		psave=*)
+			PSAVEPARTUUID="${ARG#psave=}"
+			;;
+		psubdir=*)
+			PSUBDIR="/${ARG#psubdir=}"
+			;;
+	esac
+done
+
+if [ -n "$PSAVEPARTUUID" ]; then
+	PSAVEPART="`lsblk -rn -o uuid,name | grep "^${PSAVEPARTUUID}" | awk '{print $2}'`"
+	if [ -z "$PSAVEPART" ]; then
+		yad --title=pupsave --window-icon=dialog-error --image=dialog-error --text="$(gettext 'psave partition was not found')" --button=gtk-ok
+		exit 1
+	fi
+else
+	PARTS=""
+	while read LINE; do
+		read TYPE NAME FSTYPE SIZE <<< "$LINE"
+		PARTS="${PARTS} ${NAME} ${FSTYPE} ${SIZE}"
+	done < <(lsblk -r -o type,name,fstype,size | grep ^part)
+
+	PSAVEPART="`yad --title=pupsave --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Choose where to save:')" --list --column="$(gettext Name):TEXT" --column="$(gettext Type):TEXT" --column="$(gettext Size):TEXT" --print-column=1 --separator= -- ${PARTS}`"
+
+	[ -z "$PSAVEPART" ] && exit 1
+fi
+
+FSTYPE="`lsblk -nr -o FSTYPE /dev/${PSAVEPART}`"
+
+case "$FSTYPE" in
+ntfs|*fat|fat*)
+	STYLE="file"
+	;;
+*)
+	RETVAL="`yad --title=pupsave --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'How to save?')" --list --no-headers --column=:TEXT --column=:TEXT --hide-column=1 --print-column=1 --separator= -- folder "$(gettext 'Folder')" file "$(gettext 'File')"`"
+
+	case "$RETVAL" in
+	folder)
+		STYLE="folder"
+		SAVESIZE=0
+		;;
+	file)
+		STYLE="file"
+		;;
+	*)
+		exit 1
+		;;
+	esac
+	;;
+esac
+
+if [ -z "$SAVESIZE" ]; then
+	HAVE="`lsblk -nbr -o SIZE /dev/${PSAVEPART}`"
+	HAVE=$(($HAVE - 1073741824)) # leave 1 GB aside
+	MBS=128
+	SIZES=""
+	while :; do
+		MBS=$(($MBS*2))
+		[ $(($MBS*1024*1024)) -ge $HAVE ] && break
+		if [ $MBS -ge 1024 ]; then
+			SIZES="${SIZES} ${MBS} $(($MBS/1024))GB"
+		else
+			SIZES="${SIZES} ${MBS} ${MBS}MB"
+		fi
+	done
+
+	if [ -z "$SIZES" ]; then
+		yad --title=pupsave --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Partition is too small')" --button=gtk-ok
+		exit 1
+	fi
+
+	while [ -z "$SAVESIZE" ]; do
+		SAVESIZE="`yad --title=pupsave --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Save file size limit')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- ${SIZES}`"
+	done
+fi
+
+if [ "$FSTYPE" = "ext4" -o "$FSTYPE" = "f2fs" ]; then
+	RETVAL="`yad --title=pupsave --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Encrypt the save folder?')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Yes')" 2 "$(gettext 'Only the home directory')" 3 "$(gettext 'No')" 3`"
+
+	case "$RETVAL" in
+	1|2|3)
+		CRYPT=$RETVAL
+		;;
+	*)
+		exit 1
+		;;
+	esac
+else
+	CRYPT=3
+fi
+
+if [ $CRYPT -ne 3 ]; then
+	while [ -z "$PASSPHRASE" ]; do
+		PASSPHRASE="`yad --title=pupsave --icon=dialog-question --text="$(gettext 'Unlocking passphrase')" --entry --hide-text --button=gtk-ok`"
+	done
+fi
+
+mkdir -p /mnt/${PSAVEPART}
+mount /dev/${PSAVEPART} /mnt/${PSAVEPART}
+if [ $? -ne 0 ]; then
+	yad --title=pupsave --window-icon=dialog-error --image=dialog-error --text="$(gettext 'Error mounting partition')" --button=gtk-ok
+	exit 1
+fi
+
+SAVEPATH=
+while [ -z "$SAVEPATH" -o -e /mnt/${PSAVEPART}${SAVEPATH} ]; do
+	SUFFIX="`yad --title=pupsave --icon=dialog-question --text="$(gettext 'Name suffix')" --entry --button=gtk-ok`"
+	case "$SUFFIX" in
+	""|-*) ;;
+	*) SUFFIX="-${SUFFIX}" ;;
+	esac
+	if [ "$STYLE" = "file" ]; then
+		SAVEPATH="${PSUBDIR}/${DISTRO_FILE_PREFIX}save${SUFFIX}.4fs"
+	else
+		SAVEPATH="${PSUBDIR}/${DISTRO_FILE_PREFIX}save${SUFFIX}"
+	fi
+done
+
+if [ "$STYLE" = "file" ]; then
+	SAVEMNT=/mnt/${PSAVEPART}save
+	SAVEPFIX=
+
+	yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Creating save file')" --no-buttons &
+        YPID=$?
+	dd if=/dev/zero of=/mnt/${PSAVEPART}/${SAVEPATH} bs=1MiB count=${SAVESIZE} conv=sparse
+	mkfs.ext4 -F -m 0 -O ^has_journal,encrypt /mnt/${PSAVEPART}${SAVEPATH}
+	kill $YPID
+	mkdir -p ${SAVEMNT}
+	mount -t ext4 -o loop /mnt/${PSAVEPART}${SAVEPATH} /mnt/${PSAVEPART}save
+	if [ $? -ne 0 ]; then
+		rmdir ${SAVEMNT}
+		umount -l /mnt/${PSAVEPART}
+		rm -f /mnt/${PSAVEPART}${SAVEPATH}
+		rmdir /mnt/${PSAVEPART}
+		exit 1
+	fi
+else
+	SAVEMNT=/mnt/${PSAVEPART}
+	SAVEPFIX="$SAVEPATH"
+fi
+
+case $CRYPT in
+1)
+	mkdir -p ${SAVEMNT}${SAVEPFIX}/{upper,work}
+	cat << EOF > ${SAVEMNT}${SAVEPFIX}/.pfscrypt
+upper
+work
+EOF
+	pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}{upper,work}
+	;;
+
+2)
+	mkdir -p ${SAVEMNT}${SAVEPFIX}/work
+	echo work > ${SAVEMNT}${SAVEPFIX}/.pfscrypt
+	for DIR in root home/spot; do
+		mkdir -p ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+		chmod --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+		chown --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+		touch --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
+		echo "upper/${DIR}" >> ${SAVEMNT}${SAVEPFIX}/.pfscrypt
+	done
+	pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}upper/{root,home/spot} ${SAVEPFIX}work
+	;;
+
+3)
+	mkdir -p ${SAVEMNT}${SAVEPFIX}
+	;;
+esac
+
+if [ "$STYLE" = "file" ]; then
+	umount -l ${SAVEMNT}
+	rmdir ${SAVEMNT}
+fi
+umount -l /mnt/${PSAVEPART}
+rmdir /mnt/${PSAVEPART}

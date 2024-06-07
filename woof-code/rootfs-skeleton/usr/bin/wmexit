@@ -37,11 +37,7 @@ case $script in
    wmreboot|wmpoweroff)
       ## reboot/shutdown ##
       . /etc/rc.d/PUPSTATE
-      if [ $PUPMODE -eq 5 ] && [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then #first shutdown.
-         shutdownconfig #dlgs for creating save-file.
-         #...writes results to /tmp/shutdownconfig_results, which /etc/rc.d/rc.shutdown reads.
-         [ $? -eq 255 ] && exit #abort shutdown.
-      elif [ $PUPMODE -eq 13 ] ; then
+      if [ $PUPMODE -eq 13 ] ; then
          . /etc/eventmanager
          if [ "$ASKTOSAVE" = "true" ] ; then
             asktosave_session --file

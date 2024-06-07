@@ -25,13 +25,6 @@ fi
 . /etc/rc.d/PUPSTATE #variables created at bootup by init script in initrd...
 . /etc/DISTRO_SPECS
 
-PUPSFSFILE="`echo "$PUPSFS" | cut -f 3 -d ','`" #/etc/rc.d/PUPSTATE
-PSUBDIR="`dirname "$PUPSFSFILE"`"
-[ "$PSUBDIR" = "/" ] && PSUBDIR=""
-[ $PUPMODE -eq 5 ] && [ "$DEV1FS" = "iso9660" ] && PSUBDIR="" #100920 booting off cd, always default have savefile at /.
-[ $PUPMODE -eq 5 ] && [ "$DEV1FS" = "udf" ] && PSUBDIR=""     #ditto, for udf f.s.
-[ "$DEV1FS" = "msdos" ] && DEV1FS="vfat" #110919
-
 killzombies() {
 	# the zombie is already dead so can't be killed
 	# kill the parent process (PPID)
@@ -110,22 +103,6 @@ killall udevd >/dev/null 2>&1
 
 #=======================================================================
 
-#first time booted puppy, there may not have been any persistent storage...
-if [ $PUPMODE -eq 5 ];then
- # shutdownconfig creates /tmp/shutdownconfig_results
- # which contains variables to be used further in the script
- unset PUPSAVE MYPASSWORD
- if [ ! -f /tmp/shutdownconfig_results ];then
-   #note, shutdownconfig normally called via /usr/bin/wmreboot or wmpoweroff when want shutdown from X.
-   shutdownconfig > /dev/console
- fi
- if [ -s /tmp/shutdownconfig_results ];then
-   . /tmp/shutdownconfig_results #supplies variables PUPMODE PUPSAVE MYPASSWORD
-   cp /tmp/shutdownconfig_results /tmp/rc.shutdown_config # read by /usr/sbin/savesession-dvd
-   rm -f /tmp/shutdownconfig_results #precaution.
- fi
-fi #end ifpupmode5
-
 if [ $PUPMODE -eq 13 ]; then
  #read a file named /tmp/session_ramdisk_result, the answer file whether save the ramdisk session to savefile or not
  #It contains variable RAMDISK_SAVE_SESSION where the values are 'y' or 'n'
@@ -171,69 +148,6 @@ case $PUPMODE in
   [ ! "$SMNTPT" = "" ] && umount $SMNTPT 2>/dev/null
   #...well, fixed it, changed mntpt so not in /tmp. Leave above line here.
   ;;
- 128) #1st shutdown, save to ${DISTRO_FILE_PREFIX}save.2fs.
-  #partition already mounted on $SMNTPT.
-  echo "$(printf "$(gettext 'Saving session to %s file on %s partition...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
-  mkdir /tmp/save1stpup
-  echo -n "Mounting ${SAVEFILE}..."
-  FILEFS="ext3"
-  echo -n "$SAVEFILE" | grep -q "2fs" && FILEFS="ext2"
-  echo -n "$SAVEFILE" | grep -q "4fs" && FILEFS="ext4" # 01micko
-  if [ -d $SMNTPT$SAVEFILE ]; then
-   rm -r -f  /tmp/save1stpup
-   ln -s $SMNTPT$SAVEFILE /tmp/save1stpup
-  elif [ "$CRYPTO" = "" ];then
-   mount -t $FILEFS -o noatime,rw,loop $SMNTPT$SAVEFILE /tmp/save1stpup
-  else
-   DEVLOOP="`losetup -f`"
-   losetup $DEVLOOP ${SMNTPT}$SAVEFILE
-   echo -n "$MYPASSWORD" | cryptsetup luksOpen $DEVLOOP savefile -
-   [ ! $? -eq 0 ] && exit 1
-   mount -t $FILEFS -o noatime,rw /dev/mapper/savefile /tmp/save1stpup
-  fi
-  #120522 testing precise puppy with aufs, have two dirs here .wh..wh.orph, .wh..wh.plnk, filter out...
-  if [ "$PUNIONFS" = 'overlay' ]; then
-   mkdir -p /tmp/save1stpup/upper
-   PFIX="/upper"
-   RDIRS="`find /initrd/pup_rw/ -mindepth 1 -maxdepth 1 -mount -type d | grep -v -E '/$|^/initrd/pup_rw/initrd|/mnt|/media|/tmp|/proc|/sys|/dev|/lost' | tr '\n' ' '`"
-  else
-   PFIX=""
-   RDIRS="`find /initrd/pup_rw/ -mindepth 1 -maxdepth 1 -mount -type d | grep -v '/\.wh\.' | grep -v -E '/$|/mnt|/media|/tmp|/proc|/sys|/dev|/lost' | tr '\n' ' '`"
-  fi
-  for ONEDIR in $RDIRS
-  do
-   BASENAME="`basename $ONEDIR`"
-   # set owner/permission of dirs when 1st save. this is important when choose to run as finn on 1st shutdown.
-   if [ ! -d /tmp/save1stpup${PFIX}/${BASENAME} ];then
-    mkdir -p /tmp/save1stpup${PFIX}/${BASENAME}
-    #110503 got this from /usr/sbin/snapmergepuppy...
-    chmod "/tmp/save1stpup${PFIX}/${BASENAME}" --reference="$ONEDIR"
-    OWNER="`stat -c %U "$ONEDIR"`"
-    chown $OWNER "/tmp/save1stpup${PFIX}/${BASENAME}"
-    GRP="`stat -c %G "$ONEDIR"`"
-    chgrp $GRP "/tmp/save1stpup${PFIX}/${BASENAME}"
-    touch "/tmp/save1stpup${PFIX}/${BASENAME}" --reference="$ONEDIR"
-   fi
-   cp -a $ONEDIR/ /tmp/save1stpup${PFIX}/
-  done
-  if [ "$PUNIONFS" = 'overlay' ];then
-   find /tmp/save1stpup${PFIX} -type c -delete
-   while read ONELINK; do
-    ONEDST="`readlink "$ONELINK" 2>/dev/null`"
-    case "$ONEDST" in
-    /initrd/pup_ro1|/initrd/pup_ro1/*|/initrd/pup_ro2|/initrd/pup_ro2/*) ;;
-    /initrd/pup_ro[0-9]*) rm -f "$ONELINK" ;; # do not keep symlinks to files from dynamically loaded SFSs
-    esac
-   done < <(find /tmp/save1stpup${PFIX} -type L)
-  fi
-  if [ ! -L /tmp/save1stpup ] ; then
-    sync
-    umount /tmp/save1stpup
-    [ "$CRYPTO" = "luks" ] && cryptsetup luksClose savefile
-  fi
-  sync
-  umount $SMNTPT 2> /dev/null
- ;;
 
  2)  echo -n ;; #echo "$(printf "$(gettext '%s mounted directly, session already saved.')" "$PDEV1")" >/dev/console
  12) echo "$(printf "$(gettext '%s mounted directly top layer, session already saved.')" "${SAVEFILE##*/}")" >/dev/console ;;
@@ -378,7 +292,6 @@ if [ "$SAVE_LAYER" ];then
  	fi
 fi
 
-umount.crypto_LUKS all
 umount-FULL -in -a -r -d >/dev/null 2>&1
 sync
 

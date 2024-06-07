@@ -17,7 +17,8 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
 * Support for the devx SFS is gone and development packages can be installed individually, without having to download the entire devx.
 * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a simple init implementation (see woof-code/rootfs-petbuilds/init).
-* Bootflash lets the user select what PUPMODE to use: if it's 12 or 13, an empty save folder is created and the "first shutdown" prompt is skipped.
+* Bootflash lets the user select what PUPMODE to use: if it's 12 or 13, an empty save file or folder is created.
+* The "first shutdown" prompt that offers the user to save is gone, to make non-persistent installations less annoying to use without hacks to bypass this prompt: instead, users that want persistency can use the pupsave tool to create a save file/folder.
 * The build output is produced by Bootflash, with a sparse image and a loop device as the installation destination.
 * `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`.
 * SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`.
@@ -83,7 +84,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * woof-code/ contains most of woof-CE itself and the Puppy skeleton (minus initramfs)
   * woof-code/rootfs-skeleton contains the Puppy root file system skeleton
     * rootfs-skeleton/etc/rc.d/rc.sysinit is the init script
-    * rootfs-skeleton/usr/sbin/shutdownconfig implements the save/no save prompt shown when shutting down under PUPMODE 5
+    * rootfs-skeleton/usr/sbin/pupsave creates save folders and files, with optional encryption
     * rootfs-skeleton/usr/sbin/{save2flash,snapmergepuppy.overlay} implement saving under PUPMODE 13
     * rootfs-skeleton/etc/rc.d/rc.shutdown takes care of saving on shutdown
     * rootfs-skeleton/usr/local/sbin/{reboot,poweroff} run /etc/rc.d/rc.shutdown, then pass control to `/sbin/$0`

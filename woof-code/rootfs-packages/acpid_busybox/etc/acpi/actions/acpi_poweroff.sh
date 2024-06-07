@@ -169,8 +169,6 @@ TIMEOUT_ACTION='$TIMEOUT_ACTION'	# 'poweroff'/'suspend'" > $ACPI_CONFIG
  fi
  P=wmpoweroff
 else
- #20140621 shinobar: skip shutdownconfig when power button pressed before quicksetup done
- touch /tmp/shutdownconfig_results	# skip shutdownconfig
  if [ ! -s /etc/rc.d/pupsave.conf ]; then # compatible with pupsaveconfig
    echo 'PRECHOICE=no
 POPUP=no' > /etc/rc.d/pupsave.conf

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=pupsave
+Icon=document-save-as-symbolic
+Comment=Create save folder/file
+Exec=pupsave
+Terminal=false
+Type=Application
+Categories=X-SetupUtility
+GenericName=pupsave
