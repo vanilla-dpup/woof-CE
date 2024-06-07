@@ -395,12 +395,12 @@ if [ $? -ne 0 ];then
 fi
 
 SAVEMNT=/mnt/${PSAVEPART}
-SAVEPFIX=${DISTRO_FILE_PREFIX}save/
+SAVEPFIX=/${DISTRO_FILE_PREFIX}save
 if [ "$STYLE" = "file" ];then
 	dd if=/dev/zero of=/mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save.4fs bs=1MiB count=${SAVESIZE} conv=sparse
 	mkfs.ext4 -F -m 0 -O ^has_journal,encrypt /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save.4fs
 	SAVEMNT=/mnt/${PSAVEPART}save
-	SAVEPFIX=
+	SAVEPFIX=/
 	mkdir -p ${SAVEMNT}
 	mount -t ext4 -o loop /mnt/${PSAVEPART}/${DISTRO_FILE_PREFIX}save.4fs /mnt/${PSAVEPART}save
 	if [ $? -ne 0 ];then
