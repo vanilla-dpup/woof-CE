@@ -22,6 +22,16 @@ OUTPUTS=
 VALID=0
 while IFS= read LINE; do
 	case "\$LINE" in
+		"  Make:"*)
+			read -r _ MAKE <<< "\$LINE"
+			;;
+		"  Model:"*)
+			read -r _ MODEL <<< "\$LINE"
+			;;
+		"  Serial:"*)
+			read -r _ SERIAL <<< "\$LINE"
+			[ "\$SERIAL" = "(null)" ] && SERIAL="Unknown"
+			;;
 		"  Enabled:"*)
 			read -r _ ENABLED <<< "\$LINE"
 			;;
@@ -45,6 +55,10 @@ while IFS= read LINE; do
 			;;
 		*)
 			if [ -n "\$OUTPUT" ]; then
+				if [ -n "\$MAKE" -a -n "\$MODEL" ]; then
+					OUTPUT="\"\${MAKE} \${MODEL} \${SERIAL}\""
+				fi
+
 				if [ "\$ENABLED" = no ]; then
 					echo "	output \${OUTPUT} disable"
 				else
@@ -61,16 +75,20 @@ while IFS= read LINE; do
 					echo
 					VALID=1
 				fi
+
+				if [ -z "\$OUTPUTS" ]; then
+					OUTPUTS="\${OUTPUT}"
+				else
+					OUTPUTS="\${OUTPUTS}|\${OUTPUT}"
+				fi
 			fi
 
 			OUTPUT="\${LINE%% *}"
 			[ "\$OUTPUT" = EOF ] && break
 
-			if [ -z "\$OUTPUTS" ]; then
-				OUTPUTS="\${OUTPUT}"
-			else
-				OUTPUTS="\${OUTPUTS} \${OUTPUT}"
-			fi
+			MAKE=
+			MODEL=
+			SERIAL=
 			ENABLED=
 			MODE=
 			POS=
@@ -81,14 +99,14 @@ while IFS= read LINE; do
 	esac
 done < <(wlr-randr; echo EOF) >> /tmp/kanshi-profile
 
-if [ $VALID -eq 0 ]; then
+if [ \$VALID -eq 0 ]; then
 	rm -f /tmp/kanshi-profile
 	exit
 fi
 
 echo "}" >> /tmp/kanshi-profile
 
-HASH=\`echo "\$OUTPUTS" | tr ' ' '\n' | sort | sum | awk '{print \$1}'\`
+HASH=\`echo "\$OUTPUTS" | tr '|' '\n' | sort | sum | awk '{print \$1}'\`
 
 if ! cmp -s \${XDG_CONFIG_HOME}/kanshi/\${HASH}.profile /tmp/kanshi-profile; then
 	mkdir -p \${XDG_CONFIG_HOME}/kanshi
