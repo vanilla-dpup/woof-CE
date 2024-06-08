@@ -131,7 +131,7 @@ if [ "$STYLE" = "file" ]; then
 	SAVEPFIX=
 
 	yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Creating save file')" --no-buttons &
-        YPID=$?
+	YPID=$!
 	dd if=/dev/zero of=/mnt/${PSAVEPART}/${SAVEPATH} bs=1MiB count=${SAVESIZE} conv=sparse
 	mkfs.ext4 -F -m 0 -O ^has_journal,encrypt /mnt/${PSAVEPART}${SAVEPATH}
 	kill $YPID
