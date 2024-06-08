@@ -69,18 +69,15 @@ create_zram_swap() {
 loadswap_func() { #w481 made into a function.
  echo "LOAD SWAP"
  #load a swap partition...
- for i in `probepart -no-optical | grep '|swap|'`
+ while read _ ONESWAP SWAPSIZEBYTES
  do
-  ONESWAP=`echo "$i" | cut -f 1 -d '|'`
-  SWAPSIZEBYTES=`echo "$i" | cut -f 3 -d '|'`
-  SWAPSIZEBYTES=$((SWAPSIZEBYTES * 512 )) #bytes
-  [ $SWAPSIZEBYTES ] && EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
+  EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
   echo -n "Loading swap partition $ONESWAP ("$(fx_format_bytes $SWAPSIZEBYTES)")..." >/dev/console #loading swap partition
   chmod 0660 $ONESWAP
   swapon $ONESWAP
   status_func $?
   [ $? -eq 0 ] && SWAPON="yes"
- done
+ done < <(lsblk -bnro fstype,name,size | grep ^swap)
  [ "$SWAPON" = "yes" ] && return
  #if no go, try for a swap file...
  if [ -f /initrd${PUP_HOME}/pupswap.swp ] ; then

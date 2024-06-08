@@ -25,21 +25,15 @@ PASSPHRASE="$9"
 if [ "$USBDRV" = "" ];then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 
-	FDS=$(probedisk -extended-usb -card-as-usbflash -plus-size -hr | grep usbflash)
-	if [ -z "$FDS" ] ; then
+	while read _ _ ONEUSB SIZE VENDOR MODEL
+	do
+		echo "$ONEUSB \"${VENDOR} ${MODEL}, ${SIZE}\""
+	done < <(lsblk -dno type,rm,name,size,vendor,model | grep '^disk 1') > /tmp/xselections$$
+	xSELECTIONS="`cat /tmp/xselections$$ | tr '\n' ' ' | tr -s ' '`"
+	if [ -z "$xSELECTIONS" ] ; then
 		yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'No USB drive plugged in')" --button=gtk-ok
 		exit 1
 	fi
-	echo "$FDS" | sed 's|/dev/||' | \
-	while read USBINFO
-	do
-		IFS="|" read -r ONEUSB USBTYPE USBINFO USBSIZE <<< "$USBINFO"
-		if [ "$USBSIZE" = "0" -o "$USBSIZE" = "0B" ] ; then
-			continue # /dev/sdd|usbdrv|Multi Flash Reader|0
-		fi
-		echo "$ONEUSB \"Flash memory, ${USBINFO}, ${USBSIZE}\""
-	done > /tmp/xselections$$
-	xSELECTIONS="`cat /tmp/xselections$$ | tr '\n' ' ' | tr -s ' '`"
 	rm -f /tmp/xselections$$
 	CHOOSEDLG="yad --title=\"$(gettext 'BootFlash: make USB drive bootable')\" --width=640 --height=240 --button=gtk-ok --text=\"$(gettext 'Choose which drive to format:')\" --list --no-headers --column=:TEXT --column=:TEXT --print-column=1 --separator= -- ${xSELECTIONS}"
 	DRVSEL="`eval "$CHOOSEDLG"`"
