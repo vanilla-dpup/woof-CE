@@ -1,0 +1,17 @@
+.TH pfscrypt 8
+.SH NAME
+pfscrypt - directory encryption tool
+.SH SYNOPSIS
+.B pfscrypt
+MOUNT PASSPHRASE DIR...
+.SH DESCRIPTION
+.PP
+.B pfscrypt
+enables fscrypt-based encryption on empty directories, or unlocks encrypted directories.
+.PP
+DIR is relative to MOUNT, and up to 32 directories can be specified.
+.PP
+.B pfscrypt
+repeatedly prompts for a passphrase if PASSPHRASE is empty or wrong, until all specified directories are unlocked.
+.PP
+File contents are encrypted using AES-256-XTS and file names using AES-256-CBC-CTS. The encryption key is derived from the passphrase using Argon2.

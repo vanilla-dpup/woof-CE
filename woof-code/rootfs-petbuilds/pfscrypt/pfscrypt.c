@@ -5,6 +5,7 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <errno.h>
+#include <stdint.h>
 
 #include <linux/fscrypt.h>
 
@@ -13,7 +14,7 @@
 #define T_COST 15
 #define M_COST 128*1024
 #define THREADS 1
-#define SALT "woofwoof"
+#define SALT "\x5d\x32\x57\x7c\x9c\x18\x7f\xcf\x3f\xc9\xe0\xe2\x2c\x34\x83\xb8"
 #define KEY_SIZE 32
 
 #define HIDE_KEY "\e[33m\e[43m"
@@ -104,10 +105,13 @@ int main(int argc, char *argv[])
         .filenames_encryption_mode = FSCRYPT_MODE_AES_256_CTS,
         .flags = FSCRYPT_POLICY_FLAGS_PAD_32,
     };
-    int root, i, res;
+    uint32_t unlocked = 0;
+    int root, i, res, more;
 
-    if (argc < 4)
+    if (argc < 4 || argc > 35) {
+        fprintf(stderr, "%s MOUNT PASSPHRASE DIR...\n", argv[0]);
         return EXIT_FAILURE;
+    }
 
     root = open(argv[1], O_RDONLY);
     if (root < 0) {
@@ -116,7 +120,6 @@ int main(int argc, char *argv[])
     }
 
     do {
-wrong:
         res = add_key(argv[2], root, &policy);
         if (res != 0) {
             fprintf(stderr, "Failed to add key: %s\n", strerror(res));
@@ -124,11 +127,16 @@ wrong:
             return EXIT_FAILURE;
         }
 
+        more = 0;
         for (i = 3; i < argc; ++i) {
+            if (unlocked & (1 << (i - 3)))
+		continue;
+
             res = set_policy(root, argv[i], &policy);
             if (res == EEXIST) {
                 fprintf(stderr, "Wrong password for %s\n", argv[i]);
-                goto wrong;
+                more = 1;
+                continue;
             }
 
             if (res != 0) {
@@ -138,8 +146,9 @@ wrong:
             }
 
             fprintf(stderr, "Unlocked %s\n", argv[i]);
+            unlocked |= (1 << (i - 3));
         }
-    } while (0);
+    } while (more);
 
     close(root);
     return EXIT_SUCCESS;
