@@ -198,6 +198,10 @@ do
 				else
 					cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 				fi
+			elif [ $NSIZE -gt $SIZE ] && cmp -s -n $SIZE "$N" "$BASE/$N" ; then
+				tail -c $(($NSIZE - $SIZE)) "$N" >> "$BASE/$N"
+			elif [ $NSIZE -lt $SIZE ] && cmp -s -n $NSIZE "$N" "$BASE/$N" ; then
+				truncate -c -s $NSIZE "$BASE/$N"
 			else
 				cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 			fi
