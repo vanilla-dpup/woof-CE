@@ -24,7 +24,7 @@ For backward compatibility with [Puppy Linux](https://puppylinux.com), DISTRO_NA
 
 All SFss except those marked with (!) are optional and DISTRO_NAME should be able to boot without them.
 
-Users interested in running a customized, non-persistent DISTRO_NAME, can achieve this using the SFSs above puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. For example, if adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs contains etc/rc.d/rc.sysinit, this file overrides the one in puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs and the contents of /etc/rc.d/rc.sysinit match those of the file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. Any file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs that is not present in any SFS below it is "added" to /. To create a snapshot of a non-persistent session of DISTRO_NAME, create adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs from the contents of /initrd/pup_rw (see [Persistency](persistency.md)).
+Users interested in running a customized, non-persistent DISTRO_NAME, can achieve this using the SFSs above puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. For example, if adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs contains etc/rc.d/rc.sysinit, this file overrides the one in puppy_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs and the contents of /etc/rc.d/rc.sysinit match those of the file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs. Any file in adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs that is not present in any SFS below it is "added" to /. To create a snapshot of a non-persistent session of DISTRO_NAME, create adrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs from the contents of /initrd/pup_rw (see [PUPMODE](pupmode.md)).
 
 All other SFSs are sorted numerically before they're appended to the stack, after zdrv_DISTRO_FILE_PREFIX_DISTRO_VERSION.sfs:
 

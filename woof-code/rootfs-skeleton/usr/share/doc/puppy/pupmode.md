@@ -1,13 +1,6 @@
-# Persistency
+# PUPMODE
 
-[Since the Puppy Linux 2.x days](https://bkhome.org/archive/puppylinux/development/howpuppyworks.html), Puppy Linux supports various kinds of persistent and non-persistent sessions, also known as "PUPMODEs", and there are two ways to store changes: save folders and save files.
-
-DISTRO_NAME can be configured to run persistently using:
-* Bootflash, the DISTRO_NAME installer
-* pupsave, a tool that creates save folders and save files
-* [Boot Codes](boot-codes.md)
-
-Both Bootflash and pupsave allow choice between save folders and save files. Save files hold all changes in a single file, making them easy to backup and restore, and they support any underlying file system. However, they are limited in size and reserve space on the partition if the file system doesn't support sparse files. Save folders don't support all file systems, but they're not limited in size, they don't preallocate space and they're less likely to suffer from file system corruption. Both save files and save folders support encryption: if in doubt, use a folder.
+[Since the Puppy Linux 2.x days](https://bkhome.org/archive/puppylinux/development/howpuppyworks.html), Puppy Linux supports various kinds of persistent and non-persistent sessions, also known as "PUPMODEs".
 
 ## PUPMODE 5: No Persistency
 
@@ -21,8 +14,6 @@ Changes to the layered file system at / reside in RAM and can be copied to a sav
 
 DISTRO_NAME boots with PUPMODE 13 when a save folder or file is found and `pmedia=usbflash` or the save partition is a removable drive but `pmedia` is unspecified or `pmedia=cd`. Therefore, to switch from PUPMODE 13 to 12, replace `pmedia=usbflash` with `pmedia=atahd`.
 
-By default, DISTRO_NAME images contain a save folder, making PUPMODE 13 the default when booting from a flash drive.
-
 PUPMODE 13 can increase the lifespan of flash drives by reducing the number of writing operations, reduce read times of modified files and reduce therisk of data loss when using an unreliable disk.
 
 ## PUMODE 12: Full Persistency
@@ -33,7 +24,7 @@ DISTRO_NAME boots with PUPMODE 12 when a save folder or file is found but the ot
 
 ## Implementation Details
 
-Internally, the chosen persistency mode is written to PUPMODE in /etc/rc.d/PUPSTATE.
+PUPMODE is written to /etc/rc.d/PUPSTATE during the boot process.
 
 Under any PUPMODE, the writable layer is accessible at /initrd/pup_rw.
 

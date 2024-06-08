@@ -2,8 +2,10 @@
 
 ## For Users
 
+- [Bootflash](bootflash.md)
+- [pupsave](pupsave.md)
 - [Boot codes](boot-codes.md)
-- [Persistency](persistency.md)
+- [PUPMODE](pupmode.md)
 - [Configuration files](configuration-files.md)
 - [SFS Modules](sfs_load.md)
 - [.pet Packages](pet-packages.md)
