@@ -103,9 +103,9 @@ copy_efilinux_uefi_boot() {
 
 	UUID=$(blkid -o export ${PDRV} | grep ^UUID= | cut -f 2 -d =)
 	case ${PUPMODE} in
-		5)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID}" ;;
-		12)	APPEND="pfix=fsck pmedia=atahd pupsfs=${UUID} psave=${UUID}" ;;
-		13)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID} psave=${UUID}" ;;
+		5)	APPEND="pfix=fsckp,fsck pmedia=usbflash pupsfs=${UUID}" ;;
+		12)	APPEND="pfix=fsckp,fsck pmedia=atahd pupsfs=${UUID} psave=${UUID}" ;;
+		13)	APPEND="pfix=fsckp,fsck pmedia=usbflash pupsfs=${UUID} psave=${UUID}" ;;
 	esac
 
 	echo "-f \vmlinuz ${INITRD} ${APPEND}" > ${HOMEDIR}/EFI/boot/efilinux.cfg
@@ -127,9 +127,9 @@ create_syslinux_conf() {
 
 	UUID=$(blkid -o export ${PDRV} | grep ^UUID= | cut -f 2 -d =)
 	case ${PUPMODE} in
-		5)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID}" ;;
-		12)	APPEND="pfix=fsck pmedia=atahd pupsfs=${UUID} psave=${UUID}" ;;
-		13)	APPEND="pfix=fsck pmedia=usbflash pupsfs=${UUID} psave=${UUID}" ;;
+		5)	APPEND="pfix=fsckp,fsck pmedia=usbflash pupsfs=${UUID}" ;;
+		12)	APPEND="pfix=fsckp,fsck pmedia=atahd pupsfs=${UUID} psave=${UUID}" ;;
+		13)	APPEND="pfix=fsckp,fsck pmedia=usbflash pupsfs=${UUID} psave=${UUID}" ;;
 	esac
 
 	cat << EOF > ${HOMEDIR}/syslinux.cfg
