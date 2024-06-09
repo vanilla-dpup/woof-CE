@@ -787,7 +787,7 @@ case $PUPMODE in
  ;;
 esac
 
-EXTRASFSPATHS=`find /mnt/dev_save${PSUBDIR} /mnt/dev_save -maxdepth 1 -name '*.sfs' -size +0 -exec sh -c 'SFS={}; echo ${SFS##*/},$SFS' \; | sort -n | uniq | cut -f 2- -d ,`
+EXTRASFSPATHS=`find /mnt/pdrv${PSUBDIR} /mnt/pdrv /mnt/dev_save${PSUBDIR} /mnt/dev_save -maxdepth 1 -name '*.sfs' -size +0 -exec sh -c 'SFS={}; echo ${SFS##*/},$SFS' \; | sort -n | uniq | cut -f 2- -d ,`
 
 # load traditional SFSs in the traditional order
 stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_BDRVSFS" "b" "p"
