@@ -151,9 +151,10 @@ locate_puppy_src_files() { # set $SRCPATH
 	#-----
 	[ -n "${SRCPATH}" -a -f ${SRCPATH}/${DISTRO_PUPPYSFS} -a -f ${SRCPATH}/vmlinuz -a -f ${SRCPATH}/initrd.zst ] && return
 
-	PDEV1_MP=/initrd/mnt/dev_save
-	if [ -f ${PDEV1_MP}${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f ${PDEV1_MP}${PSUBDIR}/vmlinuz -a -f ${PDEV1_MP}${PSUBDIR}/initrd.zst ] ; then
-		SRCPATH=${PDEV1_MP}${PSUBDIR}
+	if [ -f /initrd/mnt/pdrv${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f /initrd/mnt/pdrv${PSUBDIR}/vmlinuz -a -f /initrd/mnt/pdrv${PSUBDIR}/initrd.zst ] ; then
+		SRCPATH=/initrd/mnt/pdrv${PSUBDIR}
+	elif [ -f /initrd/mnt/dev_save${PSUBDIR}/${DISTRO_PUPPYSFS} -a -f /initrd/mnt/dev_save${PSUBDIR}/vmlinuz -a -f /initrd/mnt/dev_save${PSUBDIR}/initrd.zst ] ; then
+		SRCPATH=/initrd/mnt/dev_save${PSUBDIR}
 	else
 		ASK=1 #last resort..
 	fi
