@@ -31,6 +31,7 @@ open)
   if [ -f /tmp/.lid-closed ]; then
     if [ -n "$WAYLAND_DISPLAY" ]; then
       wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
+      killall -HUP kanshi
     elif [ -n "$DISPLAY" ]; then
       xrandr --output "`xrandr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --auto
     fi
