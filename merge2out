@@ -127,12 +127,6 @@ fi
 #-------
 
 mkdir -p ${WOOF_OUT}
-echo "Choices:
-Host architecture:     $HOSTARCH
-Target architecture:   $TARGETARCH
-Compatible-distro:     $COMPATDISTRO
-Compat-distro version: $COMPATVERSION
-"  > ${WOOF_OUT}/merge2out.log
 
 echo
 echo "Directory '${WOOF_OUT}'
@@ -155,23 +149,23 @@ sdirs='boot initrd-progs kernel-kit packages-templates rootfs-packages rootfs-pe
 for d in $sdirs
 do
 	if [ -d ${WOOF_OUT}/${d} ] ; then
-		echo "Deleting ${WOOF_OUT}/${d}" | tee -a ${WOOF_OUT}/merge2out.log
+		echo "Deleting ${WOOF_OUT}/${d}"
 		rm -rf ${WOOF_OUT}/${d} 2> /dev/null
 	fi
 done
 sync
 
-echo | tee -a ${WOOF_OUT}/merge2out.log
-echo "Copying woof-code/*..." | tee -a ${WOOF_OUT}/merge2out.log
-cp -a -f --remove-destination woof-code/* ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+echo
+echo "Copying woof-code/*..."
+cp -a -f --remove-destination woof-code/* ${WOOF_OUT}/
 sync
-echo "Copying kernel-kit, initrd-progs..." | tee -a ${WOOF_OUT}/merge2out.log
-cp -a -f --remove-destination kernel-kit ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
-cp -a -f --remove-destination initrd-progs ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+echo "Copying kernel-kit, initrd-progs..."
+cp -a -f --remove-destination kernel-kit ${WOOF_OUT}/
+cp -a -f --remove-destination initrd-progs ${WOOF_OUT}/
 sync
-echo | tee -a ${WOOF_OUT}/merge2out.log
-echo "Copying woof-distro/${TARGETARCH}/${COMPATDISTRO}/*...  (files all levels)" | tee -a ${WOOF_OUT}/merge2out.log
-echo "Copying ${COMPATVERSION_DIR}/*..." | tee -a ${WOOF_OUT}/merge2out.log
+echo
+echo "Copying woof-distro/${TARGETARCH}/${COMPATDISTRO}/*...  (files all levels)"
+echo "Copying ${COMPATVERSION_DIR}/*..."
 #copy any top-level files, going down...
 for ONETOP in \
 `find woof-distro -mindepth 1 -maxdepth 1 -type f | tr '\n' ' '` \
@@ -179,10 +173,9 @@ for ONETOP in \
 `find woof-distro/${TARGETARCH}/${COMPATDISTRO} -mindepth 1 -maxdepth 1 -type f | tr '\n' ' '` \
 `find -L ${COMPATVERSION_DIR} -mindepth 1 -maxdepth 1 -type f | tr '\n' ' '`
 do
-	echo "    $ONETOP" >> ${WOOF_OUT}/merge2out.log
-	cp -a -f -L --remove-destination $ONETOP ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+	cp -a -f -L --remove-destination $ONETOP ${WOOF_OUT}/
 done
-echo | tee -a ${WOOF_OUT}/merge2out.log
+echo
 
 # merge_to_woof_out is from _00func
 . woof-code/_00func
@@ -199,14 +192,14 @@ if [ "$EXTRA_MERGE" != "" ];then
 	done
 	for ONE_FILE in `find ${EXTRA_MERGE} -mindepth 1 -maxdepth 1 -type f | tr '\n' ' '`
 	do
-		echo "    $ONE_FILE" | tee -a ${WOOF_OUT}/merge2out.log
-		cp -a -f --remove-destination $ONE_FILE ${WOOF_OUT}/ 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+		echo "    $ONE_FILE"
+		cp -a -f --remove-destination $ONE_FILE ${WOOF_OUT}/
 	done
 	( cd "${EXTRA_MERGE%/*}"
-	tar -cJf ${WOOF_OUT_REALPATH}/rootfs-skeleton/root/.packages/EXTRA_MERGE-${EXTRA_MERGE##*/}.tar.xz --exclude-vcs --exclude='woof.conf' ${EXTRA_MERGE##*/} ) 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+	tar -cJf ${WOOF_OUT_REALPATH}/rootfs-skeleton/root/.packages/EXTRA_MERGE-${EXTRA_MERGE##*/}.tar.xz --exclude-vcs --exclude='woof.conf' ${EXTRA_MERGE##*/} )
 fi
 
-ln -s rootfs-skeleton/usr/share/doc/puppy/woof-CE.md ${WOOF_OUT}/README.md 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+ln -s rootfs-skeleton/usr/share/doc/puppy/woof-CE.md ${WOOF_OUT}/README.md
 sync
 
 # new to avoid checkbox GUI; idea from peebee. See 3builddistro-Z
@@ -219,10 +212,10 @@ done
 )
 
 if [ "`stat -c %U:%G $0`" != 'root:root' ] ; then
-	[ "${WOOF_OUT}" != "/" ] && chown -R root:root ${WOOF_OUT} 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+	[ "${WOOF_OUT}" != "/" ] && chown -R root:root ${WOOF_OUT}
 fi
 
-echo -e "\nUndoing VCS-friendly stuff..." | tee -a ${WOOF_OUT}/merge2out.log
+echo -e "\nUndoing VCS-friendly stuff..."
 (
 cd ${WOOF_OUT}
 for d in $sdirs huge_kernel
@@ -235,7 +228,7 @@ sync
 if [ -f ./DISTRO_COMPAT_REPOS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION} ];then
 	[ -f ./DISTRO_COMPAT_REPOS ] && rm -f ./DISTRO_COMPAT_REPOS
 fi
-) 2>&1 | tee -a ${WOOF_OUT}/merge2out.log
+)
 
 #record target architecture in DISTRO_SPECS (will end up in /etc/ in Puppy build)...
 sed -i '/DISTRO_TARGETARCH=/d' ${WOOF_OUT}/DISTRO_SPECS
