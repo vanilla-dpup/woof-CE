@@ -12,4 +12,5 @@
 
 ## For Contributors
 
+- [Rebuilding DISTRO_NAME](rebuilding.md)
 - [woof - the Puppy builder](woof-CE.md)
