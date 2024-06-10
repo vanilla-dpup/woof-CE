@@ -416,7 +416,7 @@ case $CRYPT in
 upper
 work
 EOF
-		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}{upper,work}
+		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}/{upper,work}
 		;;
 
 	2)
@@ -429,7 +429,7 @@ EOF
 			touch --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
 			echo "upper/${DIR}" >> ${SAVEMNT}${SAVEPFIX}/.pfscrypt
 		done
-		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}upper/{root,home/spot} ${SAVEPFIX}work
+		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}/upper/{root,home/spot} ${SAVEPFIX}/work
 		;;
 
 	3)
