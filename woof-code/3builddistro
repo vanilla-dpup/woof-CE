@@ -3,7 +3,6 @@
 . ./_00func
 clearenv
 
-. ./WOOFMERGEVARS
 . ./DISTRO_SPECS
 . ./_00build.conf
 . ./DISTRO_PKGS_SPECS-${DISTRO_BINARY_COMPAT}-${DISTRO_COMPAT_VERSION}

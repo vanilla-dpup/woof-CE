@@ -24,7 +24,7 @@ chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build folder 0 
 losetup -d ${LOOP}
 mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
 
-if [ "$WOOF_TARGETARCH" = "x86_64" ]; then
+if [ "$DISTRO_TARGETARCH" = "x86_64" ]; then
 	echo "Building ${UEFI_IMG_BASE}"
 
 	dd if=/dev/zero of=${UEFI_IMG_BASE} bs=50M count=40 conv=sparse

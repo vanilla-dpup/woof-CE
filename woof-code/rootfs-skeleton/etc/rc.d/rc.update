@@ -172,41 +172,6 @@ case $PUPMODE in
  5)
   #PUPMODE=5 is first boot, ignore.
   basic_update
-  if [ -f /etc/rc.d/WOOFMERGEVARS ];then # inserted by 3builddistro.
-   . /etc/rc.d/WOOFMERGEVARS
-   if [ "$WOOF_HOSTARCH" != "$WOOF_TARGETARCH" -a -z "$WOOF_QEMU" ];then #woof did a cross-build
-    if [ "$WOOF_HOSTARCH" != "x86_64" -o "$WOOF_TARGETARCH" != "x86" ]; then
-     echo -n " cross-build-fix" >/dev/console
-     extended_update
-    fi
-   fi
-  fi
-  exit ###EXIT###
- ;;
- *) #PUPMODE=2 (full hd install) then just exit.
-  # need to consider situation of a full-hd install that is not pre-setup, as would normally be done by 3builddistro in Woof and the Universal Installer.
-  if [ -f /var/local/full_install_update_flag ] ; then
-   find -L / \( -mount -path '*/lib/*' -type l -name *.so -o -path '*/lib/*' -type l -name *.so.* \) -delete
-   basic_update
-   depmod_func
-   rm -f /var/local/full_install_update_flag
-   exit ###EXIT###
-  fi
-  if [ -f /var/local/full_install_1st_boot ] ; then
-   exit ###EXIT###
-  fi
-  basic_update
-  #code as per PUPMODE==5 above...
-  if [ -f /etc/rc.d/WOOFMERGEVARS ];then # inserted by 3builddistro.
-   . /etc/rc.d/WOOFMERGEVARS
-   if [ "$WOOF_HOSTARCH" != "$WOOF_TARGETARCH" -a -z "$WOOF_QEMU" ];then #woof did a cross-build
-    if [ "$WOOF_HOSTARCH" != "x86_64" -o "$WOOF_TARGETARCH" != "x86" ]; then
-     echo -n " cross-build-fix" >/dev/console
-     extended_update
-    fi
-   fi
-  fi
-  touch /var/local/full_install_1st_boot
   exit ###EXIT###
  ;;
 esac

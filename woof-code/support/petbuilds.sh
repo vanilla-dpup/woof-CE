@@ -21,7 +21,7 @@ HAVE_ROOTFS=0
 HAVE_BUSYBOX=0
 
 CHROOT_PFIX=
-if [ "$WOOF_HOSTARCH" = "x86_64" -a "$WOOF_TARGETARCH" = "x86" ]; then
+if [ "`uname -m`" = "x86_64" -a "$DISTRO_TARGETARCH" = "x86" ]; then
     echo "Simulating a 32-bit kernel"
     CHROOT_PFIX=linux32
 fi

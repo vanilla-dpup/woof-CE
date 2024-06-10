@@ -115,7 +115,7 @@ loadswap_func() { #w481 made into a function.
 [ $loglevel ] && LOGLEVEL=$loglevel #boot param.
 
 #if have just done a switch_root, output a 'done' message...
-[ $PUPMODE -ne 2 ] && status_func 0
+status_func 0
 
 export LANG=C
 
@@ -163,20 +163,18 @@ fi
 busybox mount --make-shared / 2>/dev/null
 
 # podman mounts a layered file system and it must not overlap with the one at /
-if [ $PUPMODE -ne 2 ] ; then
-	if [ -e /var/lib/containers ]; then
-		touch /var/lib/containers
-	else
-		mkdir /var/lib/containers 2>/dev/null
-	fi
-	busybox mount -o bind /initrd/pup_rw/var/lib/containers /var/lib/containers ;STATUS=$((STATUS+$?))
-	if [ -e /home/spot/.local/share/containers ]; then
-		touch /home/spot/.local/share/containers
-	else
-		install -d -o spot -g spot /home/spot/.local /home/spot/.local/share /home/spot/.local/share/containers 2>/dev/null
-	fi
-	busybox mount -o bind /initrd/pup_rw/home/spot/.local/share/containers /home/spot/.local/share/containers ;STATUS=$((STATUS+$?))
+if [ -e /var/lib/containers ]; then
+	touch /var/lib/containers
+else
+	mkdir /var/lib/containers 2>/dev/null
 fi
+busybox mount -o bind /initrd/pup_rw/var/lib/containers /var/lib/containers ;STATUS=$((STATUS+$?))
+if [ -e /home/spot/.local/share/containers ]; then
+	touch /home/spot/.local/share/containers
+else
+	install -d -o spot -g spot /home/spot/.local /home/spot/.local/share /home/spot/.local/share/containers 2>/dev/null
+fi
+busybox mount -o bind /initrd/pup_rw/home/spot/.local/share/containers /home/spot/.local/share/containers ;STATUS=$((STATUS+$?))
 
 status_func $STATUS
 
@@ -278,21 +276,14 @@ if [ "$SWAPON" = "yes" ];then
  ALLOCK=$(($FREEK + $EXTRAALLOCK))
  if [ "$(grep -m 1 '/initrd/mnt/tmpfs' /proc/mounts)" != "" ];then #mounted
   busybox mount -t tmpfs -o remount,size=${ALLOCK}k tmpfs /initrd/mnt/tmpfs
- elif [ $PUPMODE -eq 2 ];then #full-install
-  busybox mount -t tmpfs -o remount,size=${ALLOCK}k tmpfs /tmp
  fi
 fi
 
 # Setup /mnt/home symlink before sfs_load
 rm -f /mnt/home 2>/dev/null
-if [ $PUPMODE -eq 2 -o $PUPMODE -eq 77 ] ; then
- PUP_HOME='/'
- ln -sv / /mnt/home
-else
- if [ "$PUP_HOME" ];then #see /etc/rc.d/PUPSTATE
-   [ ! -d "/initrd${PUP_HOME}" ] && echo "ERROR: $PUP_HOME does not exist"
-   ln -sv /initrd${PUP_HOME} /mnt/home
- fi
+if [ "$PUP_HOME" ];then #see /etc/rc.d/PUPSTATE
+  [ ! -d "/initrd${PUP_HOME}" ] && echo "ERROR: $PUP_HOME does not exist"
+  ln -sv /initrd${PUP_HOME} /mnt/home
 fi
 
 #------ load extra sfs's if any ------
@@ -344,18 +335,6 @@ if [ ! -f /etc/rc.d/rc.local ];then
  echo '#When firewall is installed, will append lines to this file...' >> /etc/rc.d/rc.local
 else
  . /etc/rc.d/rc.local
-fi
-
-# SFR hack for IO bug http://murga-linux.com/puppy/viewtopic.php?p=681383#681383
-KERNVER=${KERNVER%%-*} # just for appending "-4g","-PAE" or whatever
-if [ ! "$PUPMODE" = 5 ];then  
-  if vercmp $KERNVER ge 3.2 ;then
-    if vercmp $KERNVER lt 3.8 ;then
-      case "$DEV1FS" in ntfs|vfat|ext2|exfat) # changed 130210, SFR
-        busybox mount -o remount,sync /dev/loop1 ;;
-      esac
-    fi
-  fi
 fi
 
 #that's it. next stop is /etc/profile...

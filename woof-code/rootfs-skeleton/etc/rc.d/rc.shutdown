@@ -92,7 +92,6 @@ case $PUPMODE in
   echo "$(gettext "Session not saved")" >/dev/console
   ;;
 
- 2)  echo -n ;; #echo "$(printf "$(gettext '%s mounted directly, session already saved.')" "$PDEV1")" >/dev/console
  12) echo "$(printf "$(gettext '%s mounted directly top layer, session already saved.')" "${SAVEFILE##*/}")" >/dev/console ;;
  13)
   #read a file named /tmp/session_ramdisk_result, the answer file whether save the ramdisk session to savefile or not
