@@ -45,7 +45,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 * The init script (/etc/rc.d/rc.sysinit) is shorter and much faster.
 * Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
-* 0setup, 1download, 2createpackages and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
+* 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
 
 ### Security
 

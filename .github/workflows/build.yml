@@ -83,11 +83,6 @@ jobs:
         sudo apt-get update -qq
         sudo apt-get install -y --no-install-recommends debootstrap
         [ ${{ inputs.compat-distro }} != devuan ] || curl https://git.devuan.org/devuan/debootstrap/raw/branch/master/scripts/ceres | sudo tee /usr/share/debootstrap/scripts/`echo ${{ inputs.compat-distro-version }} | sed s/64$//`
-    - name: 0setup
-      timeout-minutes: 10
-      run: |
-        cd ../woof-out_*
-        sudo -E ./0setup
     - name: 1download
       timeout-minutes: 120
       run: |
@@ -95,11 +90,6 @@ jobs:
         sudo mv local-repositories ../woof-out_*/
         cd ../woof-out_*
         sudo -E ./1download
-    - name: 2createpackages
-      timeout-minutes: 30
-      run: |
-        cd ../woof-out_*
-        echo | sudo -E ./2createpackages
     - name: Get cached kernel-kit output
       uses: dawidd6/action-download-artifact@v2
       with:
