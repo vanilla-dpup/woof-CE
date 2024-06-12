@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	madvise(dstm, srcstat.st_size, MADV_SEQUENTIAL);
 
 	if (srcstat.st_size > 0 && dststat.st_size == 0) {
-		memcmp(dstm, srcm, srcstat.st_size);
+		memcpy(dstm, srcm, srcstat.st_size);
 		wrote = srcstat.st_size;
 	} else {
 		do {
