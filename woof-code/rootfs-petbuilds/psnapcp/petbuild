@@ -1,0 +1,7 @@
+download() {
+    :
+}
+
+build() {
+    $CC $CFLAGS psnapcp.c $LDFLAGS -o /usr/bin/psnapcp
+}

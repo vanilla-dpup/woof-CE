@@ -187,24 +187,7 @@ do
 		if [ ! -e "$BASE/$N" ] ; then
 			cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 		else
-			read CTIME DTIME SIZE < <(stat -c "%Z %Y %s" "$BASE/$N")
-			if [ $SIZE -eq $NSIZE ] ; then
-				if [ ${NDTIME%%.*} -le $DTIME ] || cmp -s "$N" "$BASE/$N" ; then
-					if [ ${NCTIME%%.*} -gt $CTIME ] ; then
-						chmod "$BASE/$N" --reference="$N" 2>>/tmp/snapmergepuppy-error
-						chown-FULL "$BASE/$N" --reference="$N" 2>>/tmp/snapmergepuppy-error
-						touch "$BASE/$N" --reference="$N" 2>>/tmp/snapmergepuppy-error
-					fi
-				else
-					cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
-				fi
-			elif [ $NSIZE -gt $SIZE ] && cmp -s -n $SIZE "$N" "$BASE/$N" ; then
-				tail -c $(($NSIZE - $SIZE)) "$N" >> "$BASE/$N"
-			elif [ $NSIZE -lt $SIZE ] && cmp -s -n $NSIZE "$N" "$BASE/$N" ; then
-				truncate -c -s $NSIZE "$BASE/$N"
-			else
-				cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
-			fi
+			psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 		fi
 	fi
 done
