@@ -32,6 +32,7 @@
  */
 
 #include <string.h>
+#include <libgen.h>
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <gnome-menus-3.0/gmenu-tree.h>
@@ -170,19 +171,20 @@ void process_entry(GMenuTreeEntry *entry)
         }
     }
 
+    g_printf("  <item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)));
+
     if (g_desktop_app_info_get_boolean(app, G_KEY_FILE_DESKTOP_KEY_TERMINAL))
     {
-        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", g_strchomp(cmd));
+        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", g_strchomp(basename(cmd)));
         g_free(cmd);
         cmd = tmp;
+        g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", cmd);
     }
     else
     {
-        cmd = g_strchomp(cmd);
+        g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", g_strchomp(basename(cmd)));
     }
 
-    g_printf("  <item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0))),
-    g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", cmd),
     g_printf("  </item>\n");
 
     g_free(name);

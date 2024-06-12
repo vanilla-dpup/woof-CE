@@ -32,6 +32,7 @@
  */
 
 #include <string.h>
+#include <libgen.h>
 #include <glib.h>
 #include <glib/gprintf.h>
 #include <gnome-menus-3.0/gmenu-tree.h>
@@ -177,15 +178,24 @@ void process_entry(GMenuTreeEntry *entry)
         }
     }
 
+    if (icon[0] != '/' && (len = strlen(icon)) > 4)
+    {
+        if (icon[len - 4] == '.')
+        {
+            iconmod = g_strndup(icon, len - 4);
+        }
+    }
+
     if (g_desktop_app_info_get_boolean(app, G_KEY_FILE_DESKTOP_KEY_TERMINAL))
     {
-        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", g_strchomp(cmd));
+        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", g_strchomp(basename(cmd)));
         g_free(cmd);
         cmd = tmp;
+        g_printf("\t\titem(\" %s%%%s\",Exec \"%s\")\n", g_strjoinv("&amp;", g_strsplit(name, "&" ,0)), iconmod, cmd);
     }
     else
     {
-        cmd = g_strchomp(cmd);
+        g_printf("\t\titem(\" %s%%%s\",Exec \"%s\")\n", g_strjoinv("&amp;", g_strsplit(name, "&" ,0)), iconmod, g_strchomp(basename(cmd)));
     }
 
     if (icon[0] != '/' && (len = strlen(icon)) > 4)
@@ -195,8 +205,6 @@ void process_entry(GMenuTreeEntry *entry)
             iconmod = g_strndup(icon, len - 4);
         }
     }
-
-    g_printf("\t\titem(\" %s%%%s\",Exec \"%s\")\n", g_strjoinv("&amp;", g_strsplit(name, "&" ,0)), iconmod, cmd);
 
     g_free(name);
     g_free(cmd);
