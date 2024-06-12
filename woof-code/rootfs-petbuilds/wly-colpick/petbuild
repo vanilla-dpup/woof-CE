@@ -1,0 +1,9 @@
+download() {
+    [ -f wly-colpick-0.1.1.tar.gz ] || wget -t 3 -T 60 https://github.com/01micko/wly-colpick/archive/refs/tags/wly-colpick-0.1.1.tar.gz
+}
+
+build() {
+    tar -xzf wly-colpick-0.1.1.tar.gz
+    cd wly-colpick-wly-colpick-0.1.1
+    make PREFIX=/usr install
+}
