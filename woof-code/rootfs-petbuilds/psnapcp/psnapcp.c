@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#define CHUNK_SIZE 512
+
 int main(int argc, char *argv[])
 {
 	int src, dst;
@@ -16,15 +18,9 @@ int main(int argc, char *argv[])
 	unsigned char *srcm, *dstm;
 	off_t off = 0, chunk;
 	off_t wrote = 0;
-	long pagesize;
 
 	if (argc != 3) {
 		fprintf(stderr, "%s SRC DST\n", argv[0]);
-		return EXIT_FAILURE;
-	}
-
-	if ((pagesize = sysconf(_SC_PAGE_SIZE)) <= 0) {
-		fprintf(stderr, "Failed to get page size: %s\n", strerror(errno));
 		return EXIT_FAILURE;
 	}
 
@@ -82,7 +78,7 @@ int main(int argc, char *argv[])
 		wrote = srcstat.st_size;
 	} else {
 		do {
-			chunk = srcstat.st_size - off >= pagesize ? pagesize : srcstat.st_size - off;
+			chunk = srcstat.st_size - off >= CHUNK_SIZE ? CHUNK_SIZE : srcstat.st_size - off;
 
 			if (memcmp(&srcm[off], &dstm[off], chunk) != 0) {
 				memcpy(&dstm[off], &srcm[off], chunk);
