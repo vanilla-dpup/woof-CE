@@ -8,7 +8,7 @@
   </windowSwitcher>
 
   <placement>
-    <policy>automatic</policy>
+    <policy>cursor</policy>
   </placement>
 
   <!-- set by ptheme-labwc -->
