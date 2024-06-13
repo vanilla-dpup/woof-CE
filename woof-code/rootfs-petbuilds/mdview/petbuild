@@ -1,10 +1,10 @@
 download() {
-    [ -f mdview-7b037ee1b3.tar.gz ] || wget -t 3 -T 60 https://chiselapp.com/user/jamesbond/repository/mdview3/tarball/7b037ee1b3/mdview-7b037ee1b3.tar.gz
+    [ -f mdview-bfc04d27b4.tar.gz ] || wget -t 3 -T 60 --no-check-certificate https://chiselapp.com/user/jamesbond/repository/mdview3/tarball/bfc04d27b4/mdview-bfc04d27b4.tar.gz
 }
 
 build() {
-    tar -xzf mdview-7b037ee1b3.tar.gz
-    cd mdview-7b037ee1b3
+    tar -xzf mdview-bfc04d27b4.tar.gz
+    cd mdview-bfc04d27b4
     make
     install -D -m 755 mdview /usr/bin/mdview
     install -D -m 644 README.md /usr/share/doc/mdview/README.md
