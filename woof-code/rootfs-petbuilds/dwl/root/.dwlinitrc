@@ -9,26 +9,9 @@ for F in $WAYLAND_DISPLAY $WAYLAND_DISPLAY.lock; do
 	mount --bind $XDG_RUNTIME_DIR/$F $SPOT_RUNTIME_DIR/$F
 done
 
-[ "$GDK_BACKEND" = "x11" ] && export DISPLAY=:0
-
 echo "add $DISPLAY . `mcookie`" | xauth -q -f ~/.Xauthority
 cp -f ~/.Xauthority /home/spot/.Xauthority
 chown spot:spot /home/spot/.Xauthority
-
-if [ "$GDK_BACKEND" = "x11" ]; then
-	Xwayland-spot $DISPLAY &
-
-	MAX=100
-	CT=0
-	while ! xdpyinfo >/dev/null 2>&1; do
-		sleep 0.1
-		CT=$(( CT + 1 ))
-		if [ "$CT" -ge "$MAX" ]; then
-			echo "FATAL: $0: Gave up waiting for X server $DISPLAY"
-			exit 11
-		fi
-	done
-fi
 
 gsettings set org.gnome.desktop.interface enable-animations false
 run-as-spot gsettings set org.gnome.desktop.interface enable-animations false
@@ -42,24 +25,9 @@ run-as-spot gsettings set org.gnome.software download-updates-notify false
 dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY
 run-as-spot dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY
 
-if [ "$GDK_BACKEND" = "x11" ]; then
-	gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu:maximize,close"
-	run-as-spot gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu:maximize,close"
-	clean_desk_icons
-	fixPuppyPin ~/Choices/ROX-Filer/PuppyPin
-	roxfiler -p ~/Choices/ROX-Filer/PuppyPin
-	/sbin/pup_event_frontend_d &
-else
-	gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"
-	run-as-spot gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"
-	xdg_autostart.sh
-fi
+gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"
+run-as-spot gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"
+xdg_autostart.sh
 /usr/sbin/delayedrun &
 
-if [ "$GDK_BACKEND" = "x11" ]; then
-	CURRENTWM="`cat /etc/windowmanager 2>/dev/null`"
-	[ -z "$CURRENTWM" -o -z "`command -v $CURRENTWM`" ] && CURRENTWM="jwm"
-	$CURRENTWM &
-else
-	exec dwl-send /tmp/dwl.socket
-fi
+exec dwl-send /tmp/dwl.socket

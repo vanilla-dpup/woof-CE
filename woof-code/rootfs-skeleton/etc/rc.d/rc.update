@@ -86,8 +86,9 @@ basic_update() {
 	 fi
        done
 	
-	if [ -e /usr/sbin/fixmenus ] && [ -e /usr/bin/jwm-xdgmenu -o -e /usr/bin/icewm-xdgmenu -o -e /usr/bin/labwc-xdgmenu ] ; then
+	if [ /usr/bin/labwc-xdgmenu -o -e /usr/bin/sfwbar-xdgmenu ] ; then
 		LANG=C fixmenus #Reconstruct configuration files for JWM, IceWM...
+		[ -n "$WAYLAND_DISPLAY" ] && killall -HUP labwc sfwbar
 	fi
 	if [ -e /usr/bin/update-desktop-database -a -e /usr/bin/update-mime-database ] ; then
 		rm -f /usr/share/applications/mimeinfo.cache 2>/dev/null
@@ -212,15 +213,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
  echo "PKG_REPOS_ENABLED='${PKG_REPOS_ENABLED}'" >> /root/.packages/PKGS_MANAGEMENT
 
  cp -af ${NEWFILESMNTPT}/etc/DISTRO_SPECS /etc/
- cp -af /root/.jwmrc /root/DOTjwmrc.bak 2>/dev/null
- # Update if needed 
- if [ -f $OLDFILESMNTPT/etc/xdg/templates/_root_.jwmrc ] ; then
-  cp -af ${NEWFILESMNTPT}/etc/xdg/templates/_root_.jwmrc /etc/xdg/templates/
-  [ -f /usr/sbin/upgrade_ptheme_fix ] && upgrade_ptheme_fix
- fi
- cp -af /root/.icewm/menu /root/DOTicewmmenu.bak 2>/dev/null #v1.0.5
- cp -af ${NEWFILESMNTPT}/root/.jwmrc /root/ 2>/dev/null 
- cp -af ${NEWFILESMNTPT}/root/.icewm/menu /root/.icewm/ 2>/dev/null #v1.0.5
  #also update every boot and shutdown script...
  for i in rc.country rc.network rc.shutdown rc.sysinit rc.services
  do

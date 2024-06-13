@@ -164,7 +164,6 @@ if [ $# -ne 0 ]; then
 
 				cp -asn "$MNT"/* /
 				/etc/rc.d/rc.update w
-				pidof -s jwm > /dev/null && jwm -reload
 				[ $CLI -eq 0 ] && kill $PID
 			fi
 		elif [ $ACTION != load -a -n "$LOOPDEV" ]; then
@@ -198,7 +197,6 @@ if [ $# -ne 0 ]; then
 					rmdir "$MNT"
 					rm -f "$LIST"
 					/etc/rc.d/rc.update w
-					pidof -s jwm > /dev/null && jwm -reload
 					[ $PUPMODE -eq 12 ] && sync
 					[ $CLI -eq 0 ] && kill $PID
 				fi

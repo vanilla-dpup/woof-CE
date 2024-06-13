@@ -14,21 +14,10 @@ case $script2 in wmexit|wmreboot|wmpoweroff|restartwm) script=$script2 ; shift ;
 [ ! "$OK" ] && echo "ERROR: $script is not valid" && exit 1
 echo $script
 
-if pidof lxpanel >/dev/null 2>&1 ; then #probably running LXDE
-	#http://wiki.lxde.org/en/LXPanel#Fix_empty_menu_in_LXPanel
-	find ~/.cache/menus -name '*' -type f -delete
-fi
-
 #--------------
 case $script in
    restartwm)
-      ## Exit from window manager ##
-      # will cause return to xwin, which reads
-      # /tmp/wmexitmode.txt and will relaunch w.m.
-      NEXTWM="$1"
-      [ $NEXTWM ] || NEXTWM="`cat /etc/windowmanager`" #precaution.
-      echo -n "$NEXTWM" > /etc/windowmanager #this makes change permanent.
-      EXITMODE="$NEXTWM"
+      EXITMODE="restartwm"
       ;;
    wmexit)
       ## Exit from X, will cause return to xwin ##
@@ -56,16 +45,7 @@ echo -n "$EXITMODE" > /tmp/wmexitmode.txt
 ###########################################################
 
 while [ "`pidof snapmergepuppy`" ] ; do sleep 1 ; done
-sleep 0.2
 
-sync
-
-         #xfce       #lxde     #LXQt        #window managers
-for i in xfce4-panel lxsession lxqt-session `cat /etc/windowmanager` jwm icewm openbox X Xorg
-do
-	for pid in `pidof $i` ; do
-		kill $pid || kill -9 $pid
-	done
-done
+killall `cat /etc/windowmanager`
 
 ### END ###

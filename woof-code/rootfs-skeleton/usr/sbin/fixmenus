@@ -16,14 +16,11 @@
 [ "$HOME" = "/" ] && HOME='/root'
 export HOME
 
-[ -f $HOME/.jwm/menuheights ] && . $HOME/.jwm/menuheights
-
 LANG1="${LANG%_*}" #120207 ex: de
 
 for ONESRC in `ls /etc/xdg/templates/_* 2>/dev/null` #ex: _root_.jwmrc
 do
 	ONEDEST=${ONESRC##*/}    # basename: _root_.jwmrc
-	[ ! "$ONEDEST" = '_root_.jwmrc' ] && MENHEIGHT=''
 	if [ "$HOME" != "/root" ] ; then
 		ONEDEST=${ONEDEST//_root/$HOME} # _root.jwmrc -> /home/finn_.jwmrc
 	fi
@@ -32,45 +29,19 @@ do
  
 	[ -f $ONEDEST ] && mv -f $ONEDEST ${ONEDEST}-previous
 
-	[ "$MENHEIGHT" ] && MH=$MENHEIGHT || MH=24
-
 	TMPDEST=`mktemp $ONEDEST.XXXXXXXXXX`
 
-	sed "s|MENHEIGHT|$MH|" ${ONESRC} | \
-	(
 	while read ONELINE
 	do
 		case "$ONELINE" in PUPPYMENU*)
 			EXECMENU="${ONELINE#PUPPYMENU }" #remove leading PUPPYMENU
-			${EXECMENU} ${MENHEIGHT} #>> ${TMPDEST}
+			${EXECMENU} #>> ${TMPDEST}
 			continue
 		esac
 		echo "$ONELINE" #>> ${TMPDEST}
-	done
-	) > ${TMPDEST}
-
-	#120207 translate some strings... 120216...
-	if [ "$LANG1" != "en" ];then
-		if [ -f /usr/share/sss/menu_strings/menu_strings.${LANG1} ];then
-			sPTN="/^\[${ONETPL}\]/,/^$/p" #this is a multi-line block find expression.
-			CODEBLOCK="`sed -n "$sPTN" /usr/share/sss/menu_strings/menu_strings.${LANG1} | sed -e '/^#/d' -e '/%%/d' -e '/^$/d' -e '/^\[/d'`" #extracts just the relevant block of lines.
-			if [ "$CODEBLOCK" ];then
-				echo "$CODEBLOCK" > /tmp/fixmenus-translationblock
-				#121124 ensure that all [ ] are escaped... 121125 revert... 121126 restore, plus escape '.' chars...
-				sed -i -e 's%\[%\\[%g' -e 's$\]$\\]$g' -e 's%\\\\\[%\\[%g' -e 's%\\\\\]%\\]%g' /tmp/fixmenus-translationblock
-				sed -i -e 's%\.%\\.%g' -e 's%\\\\\.%\\.%g' /tmp/fixmenus-translationblock #note: 2nd ptn gets rid of prior escape char, so there remains just one.
-				sed -i -f /tmp/fixmenus-translationblock ${TMPDEST}
-			fi
-		fi
-	fi
+	done < ${ONESRC} > ${TMPDEST}
 
 	mv -f ${TMPDEST} ${ONEDEST}
 done
-
-#w001 support for fbpanel, lxpanel, openbox, fluxbox, pekwm...
-[ `which fbpanel_menu_refresh` ] && fbpanel_menu_refresh
-[ `which jwm2fluxbox` ] && jwm2fluxbox  ##current fluxbox_menu_refresh doesn't support menu icons while this does
-[ `which obmenu-refresh` ] && obmenu-refresh
-[ `which jwm2pekwm` ] && jwm2pekwm
 
 ###END###
