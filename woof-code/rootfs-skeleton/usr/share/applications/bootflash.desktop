@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Bootflash
-Icon=/usr/share/pixmaps/puppy/power.svg
+Icon=drive-removable-media
 Comment=Install Puppy
 Exec=bootflash
 Terminal=false

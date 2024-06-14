@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Firewall Setup
-Icon=/usr/share/pixmaps/puppy/firewall.svg
+Icon=security-high-symbolic
 Comment=Firewall Setup
 Exec=firewall_ng
 Terminal=false

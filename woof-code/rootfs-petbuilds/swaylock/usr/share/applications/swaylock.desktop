@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=swaylock
-Icon=/usr/share/pixmaps/puppy/screen_lock.svg
+Icon=system-lock-screen-symbolic
 Comment=Lock screen
 Comment[fr]= Verrou d'écran
 Exec=puplock -locknow

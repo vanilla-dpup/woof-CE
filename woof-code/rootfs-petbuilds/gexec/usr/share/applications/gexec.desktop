@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Gexec
-Icon=/usr/share/pixmaps/puppy/execute.svg
+Icon=application-x-executable
 Comment=execute a command
 Exec=gexec
 Terminal=false

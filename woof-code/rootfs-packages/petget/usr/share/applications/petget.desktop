@@ -4,5 +4,5 @@ Exec=petget %f
 Type=Application
 Categories=System
 MimeType=application/pet
-Icon=/usr/share/pixmaps/puppy/package_pet.svg
+Icon=package-x-generic
 NoDisplay=true
