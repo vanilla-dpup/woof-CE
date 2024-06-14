@@ -257,7 +257,7 @@ cat > $TMPFW << EOF_FWSTART
 # Modified for Puppy Linux by Michael Amadio <01micko@gmail.com> 2015
 
 # update the tray icon when done
-trap "killall -HUP firewallstatus 2>/dev/null" EXIT
+trap "killall -HUP sfwbar 2>/dev/null" EXIT
 
 ###############################################################################
 # 
@@ -1221,9 +1221,5 @@ urxvt -bg yellow -fg black -geometry 60X10+1+1 --hold -e /etc/init.d/rc.firewall
 p=$!
 sleep 6
 kill -9 $p 2>/dev/null
-
-# start the status icon
-pidof firewallstatus && exit
-[ -x /usr/bin/firewallstatus ] && exec /usr/bin/firewallstatus &
 
 # end

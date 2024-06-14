@@ -20,7 +20,7 @@ function("firewall_menu") {
 layout {
   image {
     value = Ico
-    interval = 5000
+    interval = 0
     tooltip = "Firewall " + Pad(State,0)
     action[1] = "firewall_ng"
     action[3] = Function "firewall_menu"
