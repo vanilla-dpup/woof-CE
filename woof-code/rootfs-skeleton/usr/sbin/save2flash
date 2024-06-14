@@ -33,7 +33,7 @@ if [ "$1" = "pup_event" ] ; then
 fi
 
 if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
-	yad --image=document-save --layer=overlay --edge=top --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons &
+	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons &
 	YAFPID=$!
 else
 	echo "Saving RAM to 'pup_save'..."
