@@ -90,13 +90,13 @@ do
 	echo ''$(gettext '(To shutdown PC type "poweroff", to reboot PC type "reboot")')''
 
 	WMEXITMODE="`cat /tmp/wmexitmode.txt 2>/dev/null`"
+	rm -f /tmp/wmexitmode.txt
 	case "$WMEXITMODE" in
 	poweroff|reboot)
 		exec $WMEXITMODE
 		;;
 
 	exit)
-		rm -f /tmp/wmexitmode.txt
 		exit
 		;;
 
