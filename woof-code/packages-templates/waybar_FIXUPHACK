@@ -79,7 +79,7 @@ cat << EOF > root/.config/waybar/config.jsonc
     "name": "bar2",
     "layer": "bottom",
     "position": "top",
-    "height": 36,
+    "margin-top": 16,
     "exclusive": false,
     "spacing": 8,
     "modules-center": [
@@ -105,7 +105,7 @@ cat << EOF > root/.config/waybar/config.jsonc
          "on-click": "defaultbrowser"
     },
     "custom/terminal": {
-         "format": "🖥️ ",
+         "format": "🖥️",
          "tooltip-format": "Terminal",
          "interval": "once",
          "on-click": "defaultterminal"
@@ -157,6 +157,10 @@ cat << EOF > root/.config/waybar/style.css
 
 .bar2 {
     background: none;
+}
+
+.bar2 * {
+    font-size: 32px;
 }
 
 button {
