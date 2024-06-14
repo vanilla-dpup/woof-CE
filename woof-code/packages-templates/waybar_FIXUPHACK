@@ -1,0 +1,154 @@
+mkdir -p root/.config/waybar
+
+cat << EOF > root/.config/waybar/config.jsonc
+// -*- mode: jsonc -*-
+{
+    "layer": "top",
+    "position": "bottom",
+    "height": 36,
+    "spacing": 4,
+    "modules-left": [
+        "custom/launcher",
+        "custom/files",
+        "custom/browser",
+        "custom/terminal",
+        "custom/help",
+        "custom/exit",
+        "wlr/taskbar"
+    ],
+    "modules-right": [
+        "wireplumber",
+        "battery",
+        "network",
+        "custom/firewall_ng",
+        "tray",
+        "clock"
+    ],
+    "custom/launcher": {
+	 "format": "🚀",
+	 "tooltip-format": "Launcher",
+	 "interval": "once",
+	 "on-click": "wofi --show drun -p '' --allow-images "
+    },
+    "custom/files": {
+	 "format": "📁",
+	 "tooltip-format": "File manager",
+	 "interval": "once",
+	 "on-click": "spacefm"
+    },
+    "custom/browser": {
+	 "format": "🌎",
+	 "tooltip-format": "Web browser",
+	 "interval": "once",
+	 "on-click": "x-www-browser"
+    },
+    "custom/terminal": {
+	 "format": "🖥️",
+	 "tooltip-format": "Terminal",
+	 "interval": "once",
+	 "on-click": "x-terminal-emulator"
+    },
+    "custom/help": {
+	 "format": "🛟",
+	 "tooltip-format": "Help",
+	 "interval": "once",
+	 "on-click": "puppyhelp"
+    },
+    "custom/exit": {
+	 "format": "🚪",
+	 "tooltip-format": "Exit",
+	 "interval": "once",
+	 "on-click": "logout_gui"
+    },
+    "wlr/taskbar": {
+         "format": "{icon} {title}",
+         "icon-size": 16,
+         "tooltip-format": "{title}",
+         "on-click": "activate",
+         "on-click-middle": "close"
+    },
+    "tray": {
+        "icon-size": 12,
+        "spacing": 4
+    },
+    "clock": {
+        "format": "{:%H:%M}",
+        "tooltip-format": "{:%Y-%m-%d}",
+        "on-click": "gsimplecal"
+    },
+    "wireplumber": {
+	"format": "🎚️ {volume}%",
+	"format-muted": "🔇 {volume}%",
+	"on-click": "pavucontrol"
+   },
+    "battery": {
+        "states": {
+            "good": 90,
+            "warning": 30,
+            "critical": 10
+        },
+        "format": "{icon} {capacity}%",
+        "format-charging": "⚡ {capacity}%",
+        "format-plugged": "🔌 {capacity}%",
+        "format-icons": ["🪫", "🔋", "🔋", "🔋", "🔋"],
+	"on-click": "batinfo"
+    },
+    "network": {
+        "format-wifi": "🌐 {signalStrength}%",
+        "format-ethernet": "🌐 wired",
+        "format": "🚫 offline",
+        "tooltip-format": "{ifname}",
+        "tooltip-format-wifi": "{essid}",
+        "on-click": "connman-gtk"
+    },
+    "custom/firewall_ng": {
+	"format": "{}",
+	"interval": "once",
+        "exec": "/usr/bin/firewallstatus",
+        "return-type":"json",
+	"on-click": "firewall_ng",
+	"signal": 8
+    }
+}
+EOF
+
+cat << EOF > root/.config/waybar/style.css
+* {
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
+window#waybar {
+    background-color: #F6F5F4;
+    color: #000000;
+    border-top: 1px solid #DEDDDC;
+}
+
+button {
+    background-color: #E1DEDB;
+    border: none;
+    border-radius: 0;
+    border-bottom: 4px solid #E1DEDB;
+}
+
+button:hover {
+    background: #EDEBE9;
+    border-bottom: 4px solid #CDC7C2;
+}
+
+#taskbar button.active {
+    background: #E1DEDB;
+    border-bottom: 4px solid #3584E4;
+}
+
+#custom-launcher, #custom-files, #custom-browser, #custom-terminal, #custom-help, #custom-exit, #clock {
+    padding: 4px;
+}
+EOF
+
+cat << EOF > usr/bin/firewallstatus
+#!/bin/sh
+
+[ \`iptables -nvL | wc -l\` -gt 10 ] && echo '{"text":"🛡️ on","tooltip":"Firewall on"}' || echo '{"text":"🔥 off","tooltip":"Firewall off"}'
+EOF
+chmod 755 usr/bin/firewallstatus

@@ -1,7 +1,0 @@
-download() {
-    :
-}
-
-build() {
-    $CC $CFLAGS -DGMENU_I_KNOW_THIS_IS_UNSTABLE `pkg-config --cflags glib-2.0 libgnome-menu-3.0` sfwbar-xdgmenu.c $LDFLAGS `pkg-config --libs glib-2.0 libgnome-menu-3.0` -o /usr/bin/sfwbar-xdgmenu
-}

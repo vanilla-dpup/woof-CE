@@ -86,9 +86,9 @@ basic_update() {
 	 fi
        done
 	
-	if [ /usr/bin/labwc-xdgmenu -o -e /usr/bin/sfwbar-xdgmenu ] ; then
+	if [ /usr/bin/labwc-xdgmenu ] ; then
 		LANG=C fixmenus #Reconstruct configuration files for JWM, IceWM...
-		[ -n "$WAYLAND_DISPLAY" ] && killall -HUP labwc sfwbar
+		[ -n "$WAYLAND_DISPLAY" ] && killall -HUP labwc
 	fi
 	if [ -e /usr/bin/update-desktop-database -a -e /usr/bin/update-mime-database ] ; then
 		rm -f /usr/share/applications/mimeinfo.cache 2>/dev/null

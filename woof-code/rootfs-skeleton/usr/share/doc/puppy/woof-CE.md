@@ -78,7 +78,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
   * initrd-progs/0initrd/init is the early init script, which searches for Puppy files, sets up an overlay file system and `switch_root`s into it
 * kernel-kit/ contains a tool that builds Puppy-compatible kernels from the [Debian](https://www.debian.org/) kernel
 * woof-distro/ contains configuration files
-  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail) and [yambar](https://codeberg.org/dnkl/yambar), or [labwc](https://labwc.github.io/) with [sfwbar](https://github.com/LBCrion/sfwbar)
+  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail) and [yambar](https://codeberg.org/dnkl/yambar), or [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar)
     * woof-distro/x86_64/debian/trixie64/DISTRO_SPECS contains the distro name and version
     * woof-distro/x86_64/debian/trixie64/DISTRO_PKGS_SPECS-debian-trixie contains a list of [Debian](https://www.debian.org/) 13 package sto include
     * woof-distro/x86_64/debian/trixie64/_00build.conf contains a list of packages to build from source (PETBUILDS) and other settings

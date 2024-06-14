@@ -263,12 +263,13 @@ else
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|gnome-mahjongg|gnome-mahjongg|exe,dev,doc,nls||deps:yes
 yes|labwc|labwc|exe,dev,doc,nls||deps:yes
-yes|libgnome-menu|libgnome-menu-3-dev|exe,dev,doc,nls||deps:yes # dependency of xdg-puppy-{labwc,sfwbar}
+yes|libgnome-menu|libgnome-menu-3-dev|exe,dev,doc,nls||deps:yes # dependency of xdg-puppy-labwc
 yes|lxterminal|lxterminal|exe,dev,doc,nls||deps:yes
 yes|nethack-console|nethack-console|exe,dev,doc,nls||deps:yes
 yes|numix-gtk-theme|numix-gtk-theme|exe,dev,doc,nls||deps:yes
-yes|sfwbar-deps|libjson-c-dev|exe,dev,doc,nls||deps:yes
 yes|swaybg|swaybg|exe,dev,doc,nls||deps:yes
+yes|waybar|waybar|exe,dev,doc,nls||deps:yes
+yes|wofi|wofi|exe,dev,doc,nls||deps:yes
 "
 fi
 
