@@ -2,18 +2,14 @@ mkdir -p root/.config/waybar
 
 cat << EOF > root/.config/waybar/config.jsonc
 // -*- mode: jsonc -*-
-{
+[{
+    "name": "bar1",
     "layer": "top",
     "position": "bottom",
     "height": 36,
     "spacing": 4,
     "modules-left": [
         "custom/launcher",
-        "custom/files",
-        "custom/browser",
-        "custom/terminal",
-        "custom/help",
-        "custom/exit",
         "wlr/taskbar"
     ],
     "modules-right": [
@@ -29,36 +25,6 @@ cat << EOF > root/.config/waybar/config.jsonc
 	 "tooltip-format": "Launcher",
 	 "interval": "once",
 	 "on-click": "wofi --show drun -p '' --allow-images "
-    },
-    "custom/files": {
-	 "format": "📁",
-	 "tooltip-format": "File manager",
-	 "interval": "once",
-	 "on-click": "spacefm"
-    },
-    "custom/browser": {
-	 "format": "🌎",
-	 "tooltip-format": "Web browser",
-	 "interval": "once",
-	 "on-click": "x-www-browser"
-    },
-    "custom/terminal": {
-	 "format": "🖥️",
-	 "tooltip-format": "Terminal",
-	 "interval": "once",
-	 "on-click": "x-terminal-emulator"
-    },
-    "custom/help": {
-	 "format": "🛟",
-	 "tooltip-format": "Help",
-	 "interval": "once",
-	 "on-click": "puppyhelp"
-    },
-    "custom/exit": {
-	 "format": "🚪",
-	 "tooltip-format": "Exit",
-	 "interval": "once",
-	 "on-click": "logout_gui"
     },
     "wlr/taskbar": {
          "format": "{icon} {title}",
@@ -109,7 +75,72 @@ cat << EOF > root/.config/waybar/config.jsonc
 	"on-click": "firewall_ng",
 	"signal": 8
     }
-}
+},{
+    "name": "bar2",
+    "layer": "bottom",
+    "position": "top",
+    "height": 36,
+    "exclusive": false,
+    "spacing": 8,
+    "modules-center": [
+        "custom/files",
+        "custom/browser",
+        "custom/terminal",
+        "custom/taskmanager",
+        "custom/texteditor",
+        "custom/imageeditor",
+        "custom/help",
+        "custom/exit"
+    ],
+    "custom/files": {
+         "format": "📁",
+         "tooltip-format": "File manager",
+         "interval": "once",
+         "on-click": "defaultfilemanager"
+    },
+    "custom/browser": {
+         "format": "🌎",
+         "tooltip-format": "Web browser",
+         "interval": "once",
+         "on-click": "defaultbrowser"
+    },
+    "custom/terminal": {
+         "format": "🖥️ ",
+         "tooltip-format": "Terminal",
+         "interval": "once",
+         "on-click": "defaultterminal"
+    },
+    "custom/taskmanager": {
+         "format": "⚙️",
+         "tooltip-format": "Task manager",
+         "interval": "once",
+         "on-click": "defaultprocessmanager"
+    },
+    "custom/texteditor": {
+         "format": "📝",
+         "tooltip-format": "Text editor",
+         "interval": "once",
+         "on-click": "defaulttexteditor"
+    },
+    "custom/imageeditor": {
+         "format": "🎨",
+         "tooltip-format": "Image editor",
+         "interval": "once",
+         "on-click": "defaultimageeditor"
+    },
+    "custom/help": {
+         "format": "🛟",
+         "tooltip-format": "Help",
+         "interval": "once",
+         "on-click": "puppyhelp"
+    },
+    "custom/exit": {
+         "format": "🚪",
+         "tooltip-format": "Exit",
+         "interval": "once",
+         "on-click": "logout_gui"
+    }
+}]
 EOF
 
 cat << EOF > root/.config/waybar/style.css
@@ -118,10 +149,14 @@ cat << EOF > root/.config/waybar/style.css
     font-size: 14px;
 }
 
-window#waybar {
+.bar1 {
     background-color: #F6F5F4;
     color: #000000;
     border-top: 1px solid #DEDDDC;
+}
+
+.bar2 {
+    background: none;
 }
 
 button {
@@ -141,7 +176,7 @@ button:hover {
     border-bottom: 4px solid #3584E4;
 }
 
-#custom-launcher, #custom-files, #custom-browser, #custom-terminal, #custom-help, #custom-exit, #clock {
+#custom-launcher, #clock {
     padding: 4px;
 }
 EOF
