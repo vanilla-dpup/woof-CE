@@ -1,7 +1,5 @@
 #!/bin/ash
 
-. /etc/rc.d/PUPSTATE
-
 export TEXTDOMAIN=xwin
 export OUTPUT_CHARSET=UTF-8
 
@@ -38,8 +36,8 @@ export PULSE_COOKIE=/home/spot/.config/pulse/cookie
 
 export WLR_XWAYLAND=/usr/bin/Xwayland-spot
 
-# hack for virtual machines (see https://github.com/swaywm/sway/issues/5834, https://github.com/swaywm/sway/issues/3814, etc') and hardware that needs third-party drivers
-if grep -qF QEMU /proc/cpuinfo || [ $PUPMODE -eq 5 ]; then
+# hack for virtual machines (see https://github.com/swaywm/sway/issues/5834, https://github.com/swaywm/sway/issues/3814, etc')
+if systemd-detect-virt -vq; then
 	export WLR_RENDERER_ALLOW_SOFTWARE=1
 	export WLR_NO_HARDWARE_CURSORS=1
 fi
