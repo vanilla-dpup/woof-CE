@@ -72,6 +72,8 @@ if [ $(id -u) -eq 0 ]; then
 `env`
 EOF
 
+	export USER=${XUSER}
+	export HOME=${USER_HOME}
 	export XDG_CONFIG_HOME=${USER_HOME}/.config
 	export XDG_CACHE_HOME=${USER_HOME}/.cache
 	export XDG_DATA_HOME=${USER_HOME}/.local/share
@@ -107,7 +109,7 @@ EOF
 		done
 	fi
 
-	exec su ${XUSER} -s /bin/ash -c '
+	exec setpriv --reuid=`id -u ${XUSER}` --regid=`id -g ${XUSER}` --clear-groups -- /bin/ash -c '
 # try to switch to original directory, unless it is under /root
 case "'"$CURDIR"'" in
 /root|/root/*)
