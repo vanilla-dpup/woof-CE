@@ -570,7 +570,6 @@ if [ "$pfix" ];then
    ram)     PRAMONLY="yes";;      #run in ram only (do not load ${DISTRO_FILE_PREFIX}save).
    rdsh)    RDSH="yes";;          #exit to shell in initial ramdisk.
    nox)     PNOX="yes";;          #do not start X.
-   clean)   PCLEAN="yes";;        #force version upgrade and cleanup.
    fsck)    PFSCK="yes";;         #do a fsck of ${DISTRO_FILE_PREFIX}save file.
    fsckp)   PFSCKP="yes";;        #do fsck before first mount of ext partitions
    *)       echo "pfix=$ONEFIX is not a known boot parameter";;
