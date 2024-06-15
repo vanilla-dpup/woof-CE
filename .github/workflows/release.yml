@@ -8,11 +8,11 @@ on:
       name:
         description: 'Human-readable name'
         required: true
-        default: 'JammyPup64 CE'
+        default: 'dpup'
       version:
         description: 'Version number'
         required: true
-        default: '10.0'
+        default: '11.0.0'
       suffix:
         description: 'Release name suffix, with leading -'
         required: false
@@ -24,19 +24,19 @@ on:
       compat-distro:
         description: 'Compatible distro'
         required: false
-        default: 'ubuntu'
+        default: 'debian'
       compat-distro-version:
         description: 'Compatible distro version'
         required: false
-        default: 'jammy64'
+        default: 'trixie64'
       kernel:
         description: 'Kernel version'
         required: false
-        default: '5.15.x'
+        default: 'debian-trixie'
       prefix:
         description: 'File name prefix'
         required: false
-        default: 'jammypup64ce'
+        default: 'dpup'
       release:
         type: boolean
         description: 'Upload release draft'
@@ -45,9 +45,10 @@ on:
         type: choice
         description: 'Build environment'
         options:
+          - ubuntu-24.04
           - ubuntu-22.04
           - ubuntu-20.04
-        default: 'ubuntu-22.04'
+        default: 'ubuntu-24.04'
 
 jobs:
   build:
@@ -68,15 +69,15 @@ jobs:
   upload:
     needs: build
     if: github.repository != 'puppylinux-woof-CE/woof-CE' && github.event.inputs.release == 'true'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ github.workflow }}-${{ github.event.inputs.arch }}-${{ github.event.inputs.compat-distro }}-${{ github.event.inputs.compat-distro-version }}-${{ github.run_number }}
           path: .
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.event.inputs.prefix }}-${{ github.event.inputs.version }}${{ github.event.inputs.suffix }}
           tag_name: ${{ github.event.inputs.prefix }}-${{ github.event.inputs.version }}${{ github.event.inputs.suffix }}

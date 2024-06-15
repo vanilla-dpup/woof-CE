@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-11.0.x')
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.release == 'sid' }}
     strategy:
       matrix:
@@ -18,7 +18,7 @@ jobs:
           - release: sid
             arch: x86_64
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Free space
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet # increase free space, we don't need these
       - name: Install dependencies
@@ -33,7 +33,7 @@ jobs:
       - name: Move build output
         run: sudo mv ../woof-out_*/kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kernel-kit-output-usrmerge-debian-${{ matrix.release }}-${{ matrix.arch }}
           path: output
