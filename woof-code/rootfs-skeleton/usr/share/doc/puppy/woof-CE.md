@@ -2,11 +2,18 @@
 
 This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE), the build system used to produce [Puppy Linux](https://puppylinux.com) releases.
 
-The goal is to build something similar to [DebianDog](https://debiandog.github.io/doglinux/), a highly [Debian](https://www.debian.org/)-compatible "live" distro with a layered file system, but with core features of [Puppy Linux](https://puppylinux.com), a distro that -
-* Provides a lightweight desktop environment and a variety of applications
-* Provides a fully functional package manager, [Flatpak](https://flatpak.org/) and support for extra read-only layers (sfs_load)
-* Supports non-persistent, fully persistent or "persistent-on-demand" sessions where the user can decide whether or not to save, and when
-* Provides the features that make Puppy great, but without losing compatibility with Debian, breaking updates or creating a big maintenance burden
+The goal is to build something similar to [DebianDog](https://debiandog.github.io/doglinux/), a highly [Debian](https://www.debian.org/)-compatible, portable, modular, hackable and lightweight distro with core features of [Puppy Linux](https://puppylinux.com), a distro that -
+* Provides the best features of dpup (Debian-based Puppy), but with big improvements
+  * Boots to a lightweight desktop environment with a variety of applications
+  * Supports non-persistent, fully persistent or "persistent-on-demand" sessions where the user can decide whether or not to save, and when
+     * But with more efficient, fast saving that reduces writing to storage
+     * But with improved support for encryption and sandboxing for unprivileged applications
+     * But with easier and more flexible session management
+  * Supports extra read-only layers (sfs_load)
+     * But with flexible naming and control over the stacking order
+  * Provides a fully functional package manager and [Flatpak](https://flatpak.org/)
+     * But with better compatibility and without risk of breakage on update
+* Provides a build system that makes it easy to reproduce, customize and develop
 
 ## Features
 
