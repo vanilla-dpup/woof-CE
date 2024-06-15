@@ -1,3 +1,14 @@
+mkdir -p etc/xdg/autostart
+cat << EOF > etc/xdg/autostart/waybar.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+NoDisplay=true
+Name=waybar
+Exec=waybar
+EOF
+chmod 644 etc/xdg/autostart/waybar.desktop
+
 mkdir -p root/.config/waybar
 
 cat << EOF > root/.config/waybar/config.jsonc
