@@ -171,7 +171,7 @@ yes|sgml-base|sgml-base|exe,dev,doc,nls||deps:yes
 yes|shared-mime-info|shared-mime-info|exe,dev>exe,doc,nls||deps:yes
 yes|squashfs-tools|squashfs-tools|exe,dev,doc,nls||deps:yes
 yes|sysfsutils|libsysfs2,sysfsutils|exe,dev,doc,nls||deps:yes
-yes|syslinux|syslinux,syslinux-common,syslinux-utils,syslinux-efi,extlinux,isolinux|exe,dev,doc,nls||deps:yes
+yes|syslinux|syslinux|exe,dev,doc,nls||deps:yes
 yes|tar|tar|exe,dev>null,doc,nls||deps:yes
 yes|time|time|exe,dev>null,doc,nls||deps:yes
 yes|transmission-gtk|transmission-gtk|exe,dev,doc,nls||deps:yes
