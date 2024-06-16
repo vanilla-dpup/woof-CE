@@ -257,7 +257,7 @@ if [ "$DISTRO_VARIANT" = "dwl" ]; then
 yes|foot|foot|exe,dev,doc,nls||deps:yes
 yes|tofi|tofi|exe,dev,doc,nls||deps:yes
 yes|wlroots|libwlroots-dev|exe,dev,doc,nls||deps:yes
-yes|yambar|yambar|exe,dev,doc,nls||deps:yes
+yes|yambar|yambar,fonts-font-awesome|exe,dev,doc,nls||deps:yes
 "
 else
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE

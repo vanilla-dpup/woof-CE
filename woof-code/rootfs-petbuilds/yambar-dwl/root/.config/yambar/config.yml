@@ -77,45 +77,48 @@ bar:
               type == "sink":
                 map:
                   conditions:
-                    muted: {string: {text: "🔇{linear_volume}%"}}
+                    muted: {string: {text: "\uf026 {linear_volume}%"}}
                     ~muted:
                       ramp:
                         tag: linear_volume
                         items:
-                          - string: {text: "🔈{linear_volume}%"}
-                          - string: {text: "🔉{linear_volume}%"}
-                          - string: {text: "🔊{linear_volume}%"}
+                          - string: {text: "\uf026 {linear_volume}%"}
+                          - string: {text: "\uf027 {linear_volume}%"}
+                          - string: {text: "\uf028 {linear_volume}%"}
     - script:
         path: /usr/bin/batmon
         content:
           map:
             on-click: batinfo
             conditions:
-              charging: {string: {text: "🔌{capacity}%"}}
+              charging: {string: {text: "\uf1e6 {capacity}%"}}
               ~charging:
                 map:
                   conditions:
                     capacity == -1: {string: {text: ""}}
-                    capacity >= 0 && capacity <= 20: {string: {text: "🪫{capacity}%"}}
-                    capacity > 20: {string: {text: "🔋{capacity}%"}}
+                    capacity >= 0 && capacity < 25: {string: {text: "\uf244 {capacity}%"}}
+                    capacity >= 25 && capacity < 50: {string: {text: "\uf243 {capacity}%"}}
+                    capacity >= 50 && capacity < 75: {string: {text: "\uf242 {capacity}%"}}
+                    capacity >= 75 && capacity < 95: {string: {text: "\uf241 {capacity}%"}}
+                    capacity >= 95: {string: {text: "\uf240 {capacity}%"}}
     - script:
         path: /usr/bin/netmon
         content:
           map:
             on-click: defaultconnect
             conditions:
-              state == ready: {string: {text: "🌐{state}"}}
-              state != ready: {string: {text: "🚫{state}"}}
+              state == ready: {string: {text: "\uf0c1 {state}"}}
+              state != ready: {string: {text: "\uf127 {state}"}}
     - clock:
         time-format: "%Y-%m-%d"
         content:
-          - string: {on-click: gsimplecal, text: "📅{time}"}
+          - string: {on-click: gsimplecal, text: "\uf073 {time}"}
     - clock:
         time-format: "%H:%M"
         content:
-          - string: {on-click: gsimplecal, text: "⏰{time}"}
+          - string: {on-click: gsimplecal, text: "\uf017 {time}"}
     - label:
         content:
           string:
             on-click: logout_gui
-            text: 🚪
+            text: "\uf011"
