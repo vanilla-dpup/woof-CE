@@ -64,6 +64,7 @@ EOF
 (
 echo "[ -e usr/bin/firefox ] && chroot . /usr/sbin/setup-spot firefox=true"
 echo "[ -e usr/bin/firefox-esr ] && chroot . /usr/sbin/setup-spot firefox-esr=true"
+echo "echo MOZ_ENABLE_WAYLAND=1 >> etc/environment"
 echo 'echo "setting up Firefox"'
 ) > pinstall.sh
 
