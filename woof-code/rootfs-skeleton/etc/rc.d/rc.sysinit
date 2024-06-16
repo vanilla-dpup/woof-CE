@@ -232,10 +232,10 @@ if [ $SFSLOCK -eq 2 ]; then
   nvme[0-9]*n[0-9]*p[0-9]*) PDEV="${PDEV1%p[0-9]*}" ;;
   esac
 
-  [ -n "$PDEV" ] && [ "`cat /sys/class/block/$PDEV/queue/discard_granularity`" = "0" ] && SFSLOCK=1
+  [ -n "$PDEV" ] && [ "`cat /sys/class/block/$PDEV/queue/discard_granularity`" = "0" ] && ! systemd-detect-virt -vq && SFSLOCK=1
 fi
 
-if [ $SFSLOCK -eq 1 -a -f /usr/local/sbin/sfslock ]; then
+if [ $SFSLOCK -eq 1 ]; then
 	echo -n "Copying to ram..." >/dev/console
 	(
 		. /etc/rc.d/BOOTCONFIG
