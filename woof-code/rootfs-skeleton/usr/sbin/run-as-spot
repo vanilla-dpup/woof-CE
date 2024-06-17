@@ -109,7 +109,7 @@ EOF
 		done
 	fi
 
-	exec setpriv --reuid=`id -u ${XUSER}` --regid=`id -g ${XUSER}` --clear-groups -- /bin/ash -c '
+	exec setpriv --reuid=`id -u ${XUSER}` --regid=`id -g ${XUSER}` --init-groups -- /bin/ash -c '
 # try to switch to original directory, unless it is under /root
 case "'"$CURDIR"'" in
 /root|/root/*)
