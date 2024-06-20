@@ -228,7 +228,7 @@ for NAME in $PKGS; do
 
     for EXTRAFILE in ../rootfs-petbuilds/${NAME}/*; do
         case "${EXTRAFILE##*/}" in
-        petbuild|*.patch|sha256.sum|*-*|DOTconfig|*.c|*.h) ;;
+        petbuild|*.patch|sha256.sum|*-*|DOTconfig|*.c|*.h|README.md) ;;
         *) cp -a $EXTRAFILE rootfs-complete/
         esac
     done

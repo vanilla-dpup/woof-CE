@@ -1,0 +1,3 @@
+This package implements a sandbox that restricts file system access for applications running as spot, using [Landlock](https://docs.kernel.org/userspace-api/landlock.html). This is a second layer of defense, in case directory permissions are messed up and spot can write to directories like /root and trigger code execution as root. Most importantly, it blocks direct access to the save partition, so spot can't modify files in / indirectly, by modifying files in the save folder.
+
+In addition, this package provides a tiny pkexec replacement that allows applications running as spot to run something as root, if the user approves.
