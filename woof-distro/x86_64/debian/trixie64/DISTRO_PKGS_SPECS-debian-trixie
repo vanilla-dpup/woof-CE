@@ -268,7 +268,6 @@ yes|lxterminal|lxterminal|exe,dev,doc,nls||deps:yes
 yes|nethack-console|nethack-console|exe,dev,doc,nls||deps:yes
 yes|swaybg|swaybg|exe,dev,doc,nls||deps:yes
 yes|waybar|waybar,fonts-font-awesome|exe,dev,doc,nls||deps:yes
-yes|wofi|wofi|exe,dev,doc,nls||deps:yes
 "
 fi
 

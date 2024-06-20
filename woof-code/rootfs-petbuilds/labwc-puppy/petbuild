@@ -3,5 +3,5 @@ download() {
 }
 
 build() {
-    :
+    $CC $CFLAGS altf1.c $LDFLAGS -o /usr/bin/altf1
 }

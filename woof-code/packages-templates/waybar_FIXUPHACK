@@ -15,12 +15,12 @@ cat << EOF > root/.config/waybar/config.jsonc
 // -*- mode: jsonc -*-
 [{
     "name": "bar1",
-    "layer": "top",
+    "layer": "bottom",
     "position": "bottom",
     "height": 36,
     "spacing": 4,
     "modules-left": [
-        "custom/launcher",
+        "custom/menu",
         "wlr/taskbar"
     ],
     "modules-right": [
@@ -31,11 +31,11 @@ cat << EOF > root/.config/waybar/config.jsonc
         "tray",
         "clock"
     ],
-    "custom/launcher": {
-	 "format": "\uf135",
-	 "tooltip-format": "Launcher",
+    "custom/menu": {
+	 "format": "\uf0c9",
+	 "tooltip": false,
 	 "interval": "once",
-	 "on-click": "wofi --show drun -p '' --allow-images "
+	 "on-click": "altf1"
     },
     "wlr/taskbar": {
          "format": "{icon} {title}",
@@ -192,7 +192,7 @@ button:hover {
     border-bottom: 4px solid #3584E4;
 }
 
-#custom-launcher, #clock {
+#custom-menu, #clock {
     padding: 4px;
 }
 EOF
