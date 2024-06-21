@@ -11,7 +11,7 @@ static float rootcolor[]             = COLOR(0x222222ff);
 static float bordercolor[]           = COLOR(0x444444ff);
 static float focuscolor[]            = COLOR(0x005577ff);
 static float urgentcolor[]           = COLOR(0xff0000ff);
-/* To conform the xdg-protocol, set the alpha to zero to restore the old behavior */
+/* This conforms to the xdg-protocol. Set the alpha to zero to restore the old behavior */
 static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 1.0f}; /* You can also use glsl colors */
 
 /* tagging - TAGCOUNT must be no greater than 31 */
@@ -20,12 +20,10 @@ static const float fullscreen_bg[]         = {0.1f, 0.1f, 0.1f, 1.0f}; /* You ca
 /* logging */
 static int log_level = WLR_ERROR;
 
-static const Rule rules[0] = {
-	/* app_id     title       tags mask     isfloating   monitor */
-	/* examples:
-	{ "Gimp",     NULL,       0,            1,           -1 },
-	{ "firefox",  NULL,       1 << 8,       0,           -1 },
-	*/
+static const Rule rules[] = {
+	/* app_id             title       tags mask     isfloating   monitor */
+	/* examples: */
+	{ "yad",              NULL,       0,            1,           -1 }, /* Start on currently visible tags floating, not tiled */
 };
 
 /* layout(s) */
@@ -96,6 +94,7 @@ LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE
 */
 static const enum libinput_config_accel_profile accel_profile = LIBINPUT_CONFIG_ACCEL_PROFILE_ADAPTIVE;
 static const double accel_speed = 0.0;
+
 /* You can choose between:
 LIBINPUT_CONFIG_TAP_MAP_LRM -- 1/2/3 finger tap maps to left/right/middle
 LIBINPUT_CONFIG_TAP_MAP_LMR -- 1/2/3 finger tap maps to left/middle/right
@@ -183,8 +182,6 @@ static const Key keys[] = {
 	{ WLR_MODIFIER_ALT,          XKB_KEY_F2,         spawn,          {.v = runcmd} },
 	{ WLR_MODIFIER_ALT,          XKB_KEY_F4,         killclient,     {0} },
 	{ MODKEY,                    XKB_KEY_r,          spawn,          {.v = runcmd} },
-	{ MODKEY,                    XKB_KEY_Up,         togglemaximizesel,          {0} },
-	{ MODKEY,                    XKB_KEY_Down,       toggleminimizesel,          {0} },
 
 	{ MODKEY|WLR_MODIFIER_SHIFT,                    XKB_KEY_L,          spawn,          {.v = lockcmd} },
 
