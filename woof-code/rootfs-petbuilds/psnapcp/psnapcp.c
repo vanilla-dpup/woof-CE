@@ -17,7 +17,6 @@ int main(int argc, char *argv[])
 	struct timeval times[2];
 	unsigned char *srcm, *dstm;
 	off_t off = 0, chunk;
-	off_t wrote = 0;
 
 	if (argc != 3) {
 		fprintf(stderr, "%s SRC DST\n", argv[0]);
@@ -29,14 +28,20 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if ((dst = open(argv[2], O_RDWR | O_CREAT)) < 0) {
+	if (fstat(src, &srcstat) < 0) {
+		fprintf(stderr, "Failed to stat %s: %s\n", argv[1], strerror(errno));
+		close(src);
+		return EXIT_FAILURE;
+	}
+
+	if ((dst = open(argv[2], O_RDWR | O_CREAT, srcstat.st_mode & ~S_IFMT)) < 0) {
 		fprintf(stderr, "Failed to open %s: %s\n", argv[2], strerror(errno));
 		close(src);
 		return EXIT_FAILURE;
 	}
 
-	if (fstat(src, &srcstat) < 0 || fstat(dst, &dststat) < 0) {
-		fprintf(stderr, "Failed to stat files: %s\n", strerror(errno));
+	if (fstat(dst, &dststat) < 0) {
+		fprintf(stderr, "Failed to stat %s: %s\n", argv[2], strerror(errno));
 		close(dst);
 		close(src);
 		return EXIT_FAILURE;
@@ -73,24 +78,18 @@ int main(int argc, char *argv[])
 	madvise(srcm, srcstat.st_size, MADV_SEQUENTIAL);
 	madvise(dstm, srcstat.st_size, MADV_SEQUENTIAL);
 
-	if (srcstat.st_size > 0 && dststat.st_size == 0) {
+	if (srcstat.st_size > 0 && dststat.st_size == 0)
 		memcpy(dstm, srcm, srcstat.st_size);
-		wrote = srcstat.st_size;
-	} else {
+	else {
 		do {
 			chunk = srcstat.st_size - off >= CHUNK_SIZE ? CHUNK_SIZE : srcstat.st_size - off;
 
-			if (memcmp(&srcm[off], &dstm[off], chunk) != 0) {
+			if (memcmp(&srcm[off], &dstm[off], chunk) != 0)
 				memcpy(&dstm[off], &srcm[off], chunk);
-				wrote += chunk;
-			}
 
 			off += chunk;
 		} while (off < srcstat.st_size);
 	}
-
-	if (wrote > 0)
-		printf("wrote %ld/%ld bytes (%.2f%%) to %s\n", wrote, srcstat.st_size, wrote * (float)100 / srcstat.st_size, argv[1]);
 
 	munmap(srcm, srcstat.st_size);
 
