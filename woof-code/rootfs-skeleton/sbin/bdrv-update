@@ -21,19 +21,11 @@ done < /initrd/pup_ro2/var/lib/dpkg/status
 		echo "$LINE" >> $F
 		if [ -z "$LINE" ]; then
 			NAME=`grep ^Package: $F | awk -F ": " '{print $2}'`
-			VERSION=`grep ^Version: $F | awk -F ": " '{print $2}'`
 
 			NF=/tmp/.dpkgstatus-${NAME}.new
 			if [ -f "$NF" ]; then
-				NEWVERSION=`grep ^Version: "$NF" | awk -F ": " '{print $2}'`
-				# take the package information from bdrv if it's a newer version
-				if [ -n "$VERSION" -a -n "$NEWVERSION" ]; then
-					vercmp "$NEWVERSION" gt "$VERSION" && cat "$NF" || cat $F
-				elif [ -n "$VERSION" -a -z "$NEWVERSION" ]; then
-					cat $F
-				else
-					cat "$NF"
-				fi
+				# prefer the newer package if it's still installed
+				cat "$NF"
 				rm -f "$NF"
 			else
 				cat $F
