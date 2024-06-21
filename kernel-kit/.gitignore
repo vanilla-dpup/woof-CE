@@ -1,8 +1,0 @@
-output
-sources
-build.log
-linux-*
-aufs_sources
-aufs-util
-DOTconfig
-sof-bin

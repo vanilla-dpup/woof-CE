@@ -4,23 +4,8 @@ download() {
 
 build() {
     tar -xzf gtkdialog-0.8.5c.tar.gz
-    if [ $PETBUILD_GTK -eq 3 ]; then
-        cd gtkdialog-0.8.5c
-        meson --buildtype=release --prefix=/usr --bindir=/usr/sbin -Dgtkver=3 -Dbash=true build
-        ninja -C build install
-
-        if pkg-config --exists gtk+-2.0; then
-            # a GTK+ 2 build for legacy applications that cannot be migrated to GTK+ 3 easily
-            ./autogen.sh --prefix=/usr --bindir=/usr/sbin
-            make -C src
-            install -m 755 src/gtkdialog /usr/sbin/gtk2dialog
-        else
-            ln -s gtkdialog /usr/sbin/gtk2dialog
-        fi
-    else
-        cd gtkdialog-0.8.5c
-        ./autogen.sh --prefix=/usr --bindir=/usr/sbin
-        make install
-        ln -s gtkdialog /usr/sbin/gtk2dialog
-    fi
+    cd gtkdialog-0.8.5c
+    meson --buildtype=release --prefix=/usr --bindir=/usr/sbin -Dgtkver=3 -Dbash=true build
+    ninja -C build install
+    ln -s gtkdialog /usr/sbin/gtk2dialog
 }

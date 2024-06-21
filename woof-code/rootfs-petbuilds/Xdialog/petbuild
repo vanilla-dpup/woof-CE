@@ -5,11 +5,7 @@ download() {
 build() {
     tar -xjf Xdialog-2.3.5.tar.bz2
     cd Xdialog-2.3.5
-    if [ $PETBUILD_GTK -eq 3 ]; then
-        ./configure --prefix=/usr --mandir=/usr/share/man --with-gtk3
-    else
-        ./configure --prefix=/usr --mandir=/usr/share/man --with-gtk2
-    fi
+    ./configure --prefix=/usr --mandir=/usr/share/man --with-gtk3
     make install
     rm -rf /usr/share/doc
 }

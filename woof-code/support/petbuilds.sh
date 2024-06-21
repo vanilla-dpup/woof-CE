@@ -26,30 +26,6 @@ if [ "`uname -m`" = "x86_64" -a "$DISTRO_TARGETARCH" = "x86" ]; then
     CHROOT_PFIX=linux32
 fi
 
-if [ -z "$PETBUILD_GTK" ]; then
-    echo "WARNING: PETBUILD_GTK is empty, this may be a hard error in the future"
-    [ -n "$GITHUB_ACTIONS" ] && exit 1
-
-    PETBUILD_GTK=2
-    if [ "$DISTRO_TARGETARCH" = "x86" ]; then
-        echo "Using GTK+ 2 for x86 petbuilds"
-    else
-        GTK3_PC=`find ../packages-${DISTRO_FILE_PREFIX} -name gtk+-3.0.pc | head -n 1`
-        if [ -n "$GTK3_PC" ]; then
-            GTK3_VER=`awk '/Version:/{print $2}' "${GTK3_PC}"`
-            vercmp "$GTK3_VER" ge 3.24.18
-            if [ $? -eq 0 ]; then
-                echo "Using GTK+ 3 for petbuilds"
-                PETBUILD_GTK=3
-            else
-                echo "Using GTK+ 2 for petbuilds, GTK+ 3 is too old"
-            fi
-        else
-            echo "Using GTK+ 2 for petbuilds, GTK+ 3 is missing"
-        fi
-    fi
-fi
-
 HERE=`pwd`
 PKGS=
 
@@ -127,7 +103,7 @@ EOF
 
         cp -a ../petbuild-sources/${NAME}/* petbuild-rootfs-complete-${NAME}/tmp/
         cp -a ../rootfs-petbuilds/${NAME}/* petbuild-rootfs-complete-${NAME}/tmp/
-        CC="$WOOF_CC" CXX="$WOOF_CXX" CFLAGS="$WOOF_CFLAGS" CXXFLAGS="$WOOF_CXXFLAGS" LDFLAGS="$WOOF_LDFLAGS" MAKEFLAGS="$MAKEFLAGS" CCACHE_DIR=/root/.ccache CCACHE_NOHASHDIR=1 PKG_CONFIG_PATH="$PKG_CONFIG_PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/root/.cache/__pycache__ PETBUILD_GTK=$PETBUILD_GTK $CHROOT_PFIX chroot petbuild-rootfs-complete-${NAME} bash -ec "cd /tmp && . /etc/DISTRO_SPECS && . ./petbuild && build"
+        CC="$WOOF_CC" CXX="$WOOF_CXX" CFLAGS="$WOOF_CFLAGS" CXXFLAGS="$WOOF_CXXFLAGS" LDFLAGS="$WOOF_LDFLAGS" MAKEFLAGS="$MAKEFLAGS" CCACHE_DIR=/root/.ccache CCACHE_NOHASHDIR=1 PKG_CONFIG_PATH="$PKG_CONFIG_PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/root/.cache/__pycache__ $CHROOT_PFIX chroot petbuild-rootfs-complete-${NAME} bash -ec "cd /tmp && . /etc/DISTRO_SPECS && . ./petbuild && build"
         ret=$?
         umount -l petbuild-rootfs-complete-${NAME}/root/.cache
         umount -l petbuild-rootfs-complete-${NAME}/root/.ccache
