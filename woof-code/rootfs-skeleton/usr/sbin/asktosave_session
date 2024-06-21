@@ -19,7 +19,7 @@ Press ENTER key to save session...
 Or, press TAB then ENTER to not save session...
 Or, wait 60 seconds to shutdown without saving session...')"
 
-if [ "$(pidof -s X Xorg $(cat /etc/windowmanager))" != "" ]; then
+if [ "$(pidof -s $(cat /etc/windowmanager))" != "" ]; then
  [ "$DISPLAY" == "" ] && export DISPLAY=:0
  [ "$WAYLAND_DISPLAY" == "" ] && export WAYLAND_DISPLAY=wayland-0
  [ "$XDG_RUNTIME_DIR" == "" ] && export XDG_RUNTIME_DIR=/tmp/runtime-root
