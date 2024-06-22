@@ -151,13 +151,7 @@ fi
 rm -f /etc/mtab
 ln -sv /proc/mounts /etc/mtab
 
-KERNVER="`uname -r`"
-
-if vercmp $KERNVER ge 5.7; then
-	busybox mount -t cgroup2 -o nsdelegate,memory_recursiveprot cgroup2 /sys/fs/cgroup ;STATUS=$((STATUS+$?))
-else
-	busybox mount -t cgroup2 -o nsdelegate cgroup2 /sys/fs/cgroup ;STATUS=$((STATUS+$?))
-fi
+busybox mount -t cgroup2 -o nsdelegate,memory_recursiveprot cgroup2 /sys/fs/cgroup ;STATUS=$((STATUS+$?))
 
 # simulate what systemd does but only for /, podman needs this
 busybox mount --make-shared / 2>/dev/null
@@ -245,7 +239,7 @@ if [ $SFSLOCK -eq 1 ]; then
 		LOCKED=0
 
 		# copy SFSs to RAM and prioritize frequently-accessed ones
-		for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-$KERNVER.sfs $EXTRASFSLIST; do
+		for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-`uname -r`.sfs $EXTRASFSLIST; do
 			BACKF=$(grep -l "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file | head -n 1)
 			[ -z "$BACKF" ] && continue
 			SFSSIZE=$(du -b $(cat $BACKF) | awk '{print $1}')
