@@ -377,6 +377,10 @@ button:hover {
 	border-left: 4px solid #3584E4;
 }
 
+#wireplumber, #battery, #network, #custom-firewall_ng {
+	font-size: 12px;
+}
+
 #custom-menu, #clock {
 	padding: 4px;
 }
