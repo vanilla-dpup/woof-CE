@@ -9,191 +9,376 @@ Exec=waybar
 EOF
 chmod 644 etc/xdg/autostart/waybar.desktop
 
-mkdir -p root/.config/waybar
+mkdir -p root/.config/waybar/presets/{Horizontal,Vertical}
 
-cat << EOF > root/.config/waybar/config.jsonc
+cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 // -*- mode: jsonc -*-
 [{
-    "name": "bar1",
-    "layer": "bottom",
-    "position": "bottom",
-    "height": 36,
-    "spacing": 4,
-    "modules-left": [
-        "custom/menu",
-        "wlr/taskbar"
-    ],
-    "modules-right": [
-        "wireplumber",
-        "battery",
-        "network",
-        "custom/firewall_ng",
-        "tray",
-        "clock"
-    ],
-    "custom/menu": {
-	 "format": "\uf0c9",
-	 "tooltip": false,
-	 "interval": "once",
-	 "on-click": "altf1"
-    },
-    "wlr/taskbar": {
-         "format": "{icon} {title}",
-         "icon-size": 16,
-         "tooltip-format": "{title}",
-         "on-click": "activate",
-         "on-click-middle": "close"
-    },
-    "tray": {
-        "icon-size": 12,
-        "spacing": 4
-    },
-    "clock": {
-        "format": "{:%H:%M}",
-        "tooltip-format": "{:%Y-%m-%d}",
-        "on-click": "gsimplecal"
-    },
-    "wireplumber": {
-	"format": "\uf028 {volume}%",
-	"format-muted": "\uf026 {volume}%",
-	"on-click": "pavucontrol"
-   },
-    "battery": {
-        "states": {
-            "good": 90,
-            "warning": 30,
-            "critical": 10
-        },
-        "format": "{icon} {capacity}%",
-        "format-charging": "\uf0e7 {capacity}%",
-        "format-plugged": "\uf1e6 {capacity}%",
-        "format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
-	"on-click": "batinfo"
-    },
-    "network": {
-        "format-wifi": "\uf1eb {signalStrength}%",
-        "format-ethernet": "\uf0c1 wired",
-        "format": "\uf127 offline",
-        "tooltip-format": "{ifname}",
-        "tooltip-format-wifi": "{essid}",
-        "on-click": "connman-gtk"
-    },
-    "custom/firewall_ng": {
-	"format": "{}",
-	"interval": "once",
-        "exec": "/usr/bin/firewallstatus",
-        "return-type":"json",
-	"on-click": "firewall_ng",
-	"signal": 8
-    }
+	"name": "bar1",
+	"layer": "bottom",
+	"position": "bottom",
+	"height": 36,
+	"spacing": 4,
+	"modules-left": [
+		"custom/menu",
+		"wlr/taskbar"
+	],
+	"modules-right": [
+		"wireplumber",
+		"battery",
+		"network",
+		"custom/firewall_ng",
+		"tray",
+		"clock"
+	],
+	"custom/menu": {
+		"format": "\uf0c9",
+		"tooltip": false,
+		"interval": "once",
+		"on-click": "altf1"
+	},
+	"wlr/taskbar": {
+		"format": "{icon} {title}",
+		"icon-size": 16,
+		"tooltip-format": "{title}",
+		"on-click": "activate",
+		"on-click-middle": "close"
+	},
+	"tray": {
+		"icon-size": 12,
+		"spacing": 4
+	},
+	"clock": {
+		"format": "{:%H:%M}",
+		"tooltip-format": "{:%Y-%m-%d}",
+		"on-click": "gsimplecal"
+	},
+	"wireplumber": {
+		"format": "\uf028 {volume}%",
+		"format-muted": "\uf026 {volume}%",
+		"on-click": "pavucontrol"
+	},
+	"battery": {
+		"states": {
+			"good": 90,
+			"warning": 30,
+			"critical": 10
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "\uf0e7 {capacity}%",
+		"format-plugged": "\uf1e6 {capacity}%",
+		"format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+		"on-click": "batinfo"
+	},
+	"network": {
+		"format-wifi": "\uf1eb {signalStrength}%",
+		"format-ethernet": "\uf0c1 wired",
+		"format": "\uf127 offline",
+		"tooltip-format": "{ifname}",
+		"tooltip-format-wifi": "{essid}",
+		"on-click": "connman-gtk"
+	},
+	"custom/firewall_ng": {
+		"format": "{}",
+		"interval": "once",
+		"exec": "/usr/bin/firewallstatus",
+		"return-type":"json",
+		"on-click": "firewall_ng",
+		"signal": 8
+	}
 },{
-    "name": "bar2",
-    "layer": "bottom",
-    "position": "top",
-    "margin-top": 16,
-    "exclusive": false,
-    "spacing": 8,
-    "modules-center": [
-        "custom/files",
-        "custom/browser",
-        "custom/terminal",
-        "custom/taskmanager",
-        "custom/texteditor",
-        "custom/imageeditor",
-        "custom/help",
-        "custom/exit"
-    ],
-    "custom/files": {
-         "format": "\uf07b",
-         "tooltip-format": "File manager",
-         "interval": "once",
-         "on-click": "defaultfilemanager"
-    },
-    "custom/browser": {
-         "format": "\uf0ac",
-         "tooltip-format": "Web browser",
-         "interval": "once",
-         "on-click": "defaultbrowser"
-    },
-    "custom/terminal": {
-         "format": "\uf120",
-         "tooltip-format": "Terminal",
-         "interval": "once",
-         "on-click": "defaultterminal"
-    },
-    "custom/taskmanager": {
-         "format": "\uf085",
-         "tooltip-format": "Task manager",
-         "interval": "once",
-         "on-click": "defaultprocessmanager"
-    },
-    "custom/texteditor": {
-         "format": "\uf044",
-         "tooltip-format": "Text editor",
-         "interval": "once",
-         "on-click": "defaulttexteditor"
-    },
-    "custom/imageeditor": {
-         "format": "\uf1fc",
-         "tooltip-format": "Image editor",
-         "interval": "once",
-         "on-click": "defaultimageeditor"
-    },
-    "custom/help": {
-         "format": "\uf1cd",
-         "tooltip-format": "Help",
-         "interval": "once",
-         "on-click": "puppyhelp"
-    },
-    "custom/exit": {
-         "format": "\uf011",
-         "tooltip-format": "Exit",
-         "interval": "once",
-         "on-click": "logout_gui"
-    }
+	"name": "bar2",
+	"layer": "bottom",
+	"position": "top",
+	"margin-top": 16,
+	"exclusive": false,
+	"spacing": 8,
+	"modules-center": [
+		"custom/files",
+		"custom/browser",
+		"custom/terminal",
+		"custom/taskmanager",
+		"custom/texteditor",
+		"custom/imageeditor",
+		"custom/help",
+		"custom/exit"
+	],
+	"custom/files": {
+		"format": "\uf07b",
+		"tooltip-format": "File manager",
+		"interval": "once",
+		"on-click": "defaultfilemanager"
+	},
+	"custom/browser": {
+		"format": "\uf0ac",
+		"tooltip-format": "Web browser",
+		"interval": "once",
+		"on-click": "defaultbrowser"
+	},
+	"custom/terminal": {
+		"format": "\uf120",
+		"tooltip-format": "Terminal",
+		"interval": "once",
+		"on-click": "defaultterminal"
+	},
+	"custom/taskmanager": {
+		"format": "\uf085",
+		"tooltip-format": "Task manager",
+		"interval": "once",
+		"on-click": "defaultprocessmanager"
+	},
+	"custom/texteditor": {
+		"format": "\uf044",
+		"tooltip-format": "Text editor",
+		"interval": "once",
+		"on-click": "defaulttexteditor"
+	},
+	"custom/imageeditor": {
+		"format": "\uf1fc",
+		"tooltip-format": "Image editor",
+		"interval": "once",
+		"on-click": "defaultimageeditor"
+	},
+	"custom/help": {
+		"format": "\uf1cd",
+		"tooltip-format": "Help",
+		"interval": "once",
+		"on-click": "puppyhelp"
+	},
+	"custom/exit": {
+		"format": "\uf011",
+		"tooltip-format": "Exit",
+		"interval": "once",
+		"on-click": "logout_gui"
+	}
 }]
 EOF
 
-cat << EOF > root/.config/waybar/style.css
+cat << EOF > root/.config/waybar/presets/Horizontal/style.css
 * {
-    font-family: FontAwesome, sans-serif;
-    font-size: 14px;
+	font-family: FontAwesome, sans-serif;
+	font-size: 14px;
 }
 
 .bar1 {
-    background-color: #F6F5F4;
-    color: #000000;
-    border-top: 1px solid #DEDDDC;
+	background-color: #F6F5F4;
+	color: #000000;
+	border-top: 1px solid #DEDDDC;
 }
 
 .bar2 {
-    background: none;
-    color: #F6F5F4;
+	background: none;
+	color: #F6F5F4;
 }
 
 .bar2 * {
-    font-size: 32px;
+	font-size: 32px;
 }
 
 button {
-    background-color: #E1DEDB;
-    border: none;
-    border-radius: 0;
-    border-bottom: 4px solid #E1DEDB;
+	background-color: #E1DEDB;
+	border: none;
+	border-radius: 0;
+	border-bottom: 4px solid #E1DEDB;
 }
 
 button:hover {
-    background: #EDEBE9;
-    border-bottom: 4px solid #CDC7C2;
+	background: #EDEBE9;
+	border-bottom: 4px solid #CDC7C2;
 }
 
 #taskbar button.active {
-    background: #E1DEDB;
-    border-bottom: 4px solid #3584E4;
+	background: #E1DEDB;
+	border-bottom: 4px solid #3584E4;
 }
 
 #custom-menu, #clock {
-    padding: 4px;
+	padding: 4px;
+}
+EOF
+
+cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
+// -*- mode: jsonc -*-
+[{
+	"name": "bar1",
+	"layer": "bottom",
+	"position": "left",
+	"spacing": 4,
+	"modules-left": [
+		"custom/menu",
+		"wlr/taskbar"
+	],
+	"modules-right": [
+		"wireplumber",
+		"battery",
+		"network",
+		"custom/firewall_ng",
+		"tray",
+		"clock"
+	],
+	"custom/menu": {
+		"format": "\uf0c9",
+		"tooltip": false,
+		"interval": "once",
+		"on-click": "altf1"
+	},
+	"wlr/taskbar": {
+		"format": "{icon}",
+		"icon-size": 16,
+		"tooltip-format": "{title}",
+		"on-click": "activate",
+		"on-click-middle": "close"
+	},
+	"tray": {
+		"icon-size": 12,
+		"spacing": 4
+	},
+	"clock": {
+		"format": "{:%H:%M}",
+		"tooltip-format": "{:%Y-%m-%d}",
+		"on-click": "gsimplecal"
+	},
+	"wireplumber": {
+		"format": "\uf028 {volume}%",
+		"format-muted": "\uf026 {volume}%",
+		"on-click": "pavucontrol"
+	},
+	"battery": {
+		"states": {
+			"good": 90,
+			"warning": 30,
+			"critical": 10
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "\uf0e7 {capacity}%",
+		"format-plugged": "\uf1e6 {capacity}%",
+		"format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+		"on-click": "batinfo"
+	},
+	"network": {
+		"format-wifi": "\uf1eb {signalStrength}%",
+		"format-ethernet": "\uf0c1 wired",
+		"format": "\uf127 offline",
+		"tooltip-format": "{ifname}",
+		"tooltip-format-wifi": "{essid}",
+		"on-click": "connman-gtk"
+	},
+	"custom/firewall_ng": {
+		"format": "{}",
+		"interval": "once",
+		"exec": "/usr/bin/firewallstatus",
+		"return-type":"json",
+		"on-click": "firewall_ng",
+		"signal": 8
+	}
+},{
+	"name": "bar2",
+	"layer": "bottom",
+	"position": "right",
+	"margin-right": 16,
+	"exclusive": false,
+	"spacing": 8,
+	"modules-center": [
+		"custom/files",
+		"custom/browser",
+		"custom/terminal",
+		"custom/taskmanager",
+		"custom/texteditor",
+		"custom/imageeditor",
+		"custom/help",
+		"custom/exit"
+	],
+	"custom/files": {
+		"format": "\uf07b",
+		"tooltip-format": "File manager",
+		"interval": "once",
+		"on-click": "defaultfilemanager"
+	},
+	"custom/browser": {
+		"format": "\uf0ac",
+		"tooltip-format": "Web browser",
+		"interval": "once",
+		"on-click": "defaultbrowser"
+	},
+	"custom/terminal": {
+		"format": "\uf120",
+		"tooltip-format": "Terminal",
+		"interval": "once",
+		"on-click": "defaultterminal"
+	},
+	"custom/taskmanager": {
+		"format": "\uf085",
+		"tooltip-format": "Task manager",
+		"interval": "once",
+		"on-click": "defaultprocessmanager"
+	},
+	"custom/texteditor": {
+		"format": "\uf044",
+		"tooltip-format": "Text editor",
+		"interval": "once",
+		"on-click": "defaulttexteditor"
+	},
+	"custom/imageeditor": {
+		"format": "\uf1fc",
+		"tooltip-format": "Image editor",
+		"interval": "once",
+		"on-click": "defaultimageeditor"
+	},
+	"custom/help": {
+		"format": "\uf1cd",
+		"tooltip-format": "Help",
+		"interval": "once",
+		"on-click": "puppyhelp"
+	},
+	"custom/exit": {
+		"format": "\uf011",
+		"tooltip-format": "Exit",
+		"interval": "once",
+		"on-click": "logout_gui"
+	}
+}]
+EOF
+
+cat << EOF > root/.config/waybar/presets/Vertical/style.css
+* {
+	font-family: FontAwesome, sans-serif;
+	font-size: 14px;
+}
+
+.bar1 {
+	background-color: #F6F5F4;
+	color: #000000;
+	border-right: 1px solid #DEDDDC;
+}
+
+.bar2 {
+	background: none;
+	color: #F6F5F4;
+}
+
+.bar2 * {
+	font-size: 32px;
+}
+
+button {
+	background-color: #E1DEDB;
+	border: none;
+	border-radius: 0;
+	border-left: 4px solid #E1DEDB;
+}
+
+button:hover {
+	background: #EDEBE9;
+	border-left: 4px solid #CDC7C2;
+}
+
+#taskbar button.active {
+	background: #E1DEDB;
+	border-left: 4px solid #3584E4;
+}
+
+#custom-menu, #clock {
+	padding: 4px;
 }
 EOF
 
@@ -203,3 +388,40 @@ cat << EOF > usr/bin/firewallstatus
 [ \`iptables -nvL | wc -l\` -gt 10 ] && echo '{"text":"\uf132 on","tooltip":"Firewall on"}' || echo '{"text":"\uf06d off","tooltip":"Firewall off"}'
 EOF
 chmod 755 usr/bin/firewallstatus
+
+cat << EOF > usr/bin/waybar-config
+#!/bin/sh
+
+PRESETS=
+for PRESET in ~/.config/waybar/presets/*; do
+	PRESETS="\$PRESETS \${PRESET##*/}"
+done
+
+while :; do
+	CHOICE=\`yad --title waybar-config --window-icon=gtk-preferences --width=240 --list --no-headers --column=theme --print-column=1 --separator= -- \$PRESETS\`
+	[ -z "\$CHOICE" ] && break
+
+	ln -sf presets/\${CHOICE}/config.jsonc ~/.config/waybar/config.jsonc
+	ln -sf presets/\${CHOICE}/style.css ~/.config/waybar/style.css
+
+	killall waybar
+	waybar &
+done
+EOF
+chmod 755 usr/bin/waybar-config
+
+ln -s presets/Horizontal/config.jsonc root/.config/waybar/config.jsonc
+ln -s presets/Horizontal/style.css root/.config/waybar/style.css
+
+cat << EOF > usr/share/applications/waybar-config.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=waybar-config
+Icon=sidebar-show-symbolic
+Comment=Change waybar preset
+Exec=waybar-config
+Terminal=false
+Type=Application
+Categories=X-Desktop-appearance
+GenericName=waybar-config
+EOF
