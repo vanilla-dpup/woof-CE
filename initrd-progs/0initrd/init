@@ -65,9 +65,6 @@ KFILESYSTEMS="$(cat /proc/filesystems | grep -v "nodev" | grep -v "fuseblk" | se
 #List linux filesystems
 LINUXFSLIST="ext2|ext3|ext4|xfs|btrfs|f2fs"
 
-#Filesystem to be fsck
-FSCKLIST="ext2|ext3|ext4|vfat|msdos|exfat"
-
 #=============================================================
 #                        FUNCTIONS
 #=============================================================
@@ -188,28 +185,6 @@ ensure_mounted() {
   sleep 3 # usb optical drive showing as /sys/block/sr0, but won't mount, needs more delay...
   /sbin/mountpartition /dev/${1} $ONE_MP $ONE_FS
   [ $? -ne 0 ] && { echo "${1} on $ONE_MP as $ONE_FS mount failed."; ONE_MP=""; return 1; }
- fi
- # fsckme.flg is created by rc.sysinit and deleted by rc.shutdown
- # this flag will be set for any prior improper shutdown. if have lots of installations
- # of puppy on the pc, the flag may not even be for this install of puppy, however, this is
- # the simplest implementation...
- if [ -f ${ONE_MP}/fsckme.flg ] ; then
-  #sda1,ext3,/PUPPYBOOT/precise/precisesave.4fs
-  FSCKME="`cat ${ONE_MP}/fsckme.flg`"
-  echo -e "${ONE_MP}/fsckme.flg\n  $FSCKME"
-  FSCK_PART="$(echo "$FSCKME" | cut -f 1 -d ",")"
-  FSCK_EXT="$(echo "$FSCKME" | cut -f 2 -d ",")"
-  FSCK_SAVEFILE="$(echo "$FSCKME" | cut -f 3 -d ",")"
-  rm -f ${ONE_MP}/fsckme.flg
-  [ "$FSCK_SAVEFILE" ] && PFSCK="yes"
-  [ "$PFSCKP" = "yes" ] && return # boot param, partition already fsck'ed
-  
-  if [ "$(echo "$FSCKLIST" | grep "${FSCK_EXT}")" != "" ]; then
-    umount ${ONE_MP}
-    [ "$FSCKME" ] && fsck_func /dev/${FSCK_PART} ${FSCK_EXT}
-    ensure_mounted "$1" "$2"
-  fi
-  
  fi
 }
 
