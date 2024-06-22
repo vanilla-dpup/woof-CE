@@ -800,7 +800,6 @@ echo '#(in /initrd) ...note, /mnt/home is a link to it.'
 echo '#Partition no. override on boot drive to which session is (or will be) saved...'
 echo "PSAVEPART='$SAVEPART'"
 echo "PSUBDIR='$PSUBDIR'"
-echo "PUNIONFS='overlay'"
 ) > /pup_new/etc/rc.d/PUPSTATE
 
 if [ "$PUPSAVE" ];then

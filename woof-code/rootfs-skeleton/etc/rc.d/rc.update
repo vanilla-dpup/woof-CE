@@ -258,17 +258,14 @@ fi
 cp -af ${NEWFILESMNTPT}/etc/DISTRO_SPECS /etc/
 touch /etc/DISTRO_SPECS #important, as snapmergepuppy uses '-u' cp option. ...huh, why?
 
-# if aufs layers have changed, may need to fix menu (etc)...
-. /etc/rc.d/PUPSTATE
-if [ "$PUNIONFS" = "aufs" -o "$PUNIONFS" = "overlay" ];then
-	. /etc/rc.d/BOOTCONFIG
-	if [ -n "$PREVUNIONRECORD" -a "$LASTUNIONRECORD" != "$PREVUNIONRECORD" ];then
-		echo -en " layered-filesystem \\033[1;35mnext boot will be faster!\\033[0;39m" > /dev/console
-		echo "$PUNIONFS layers have changed since previous boot, updating menus..."
-		update_cache_files
-	elif [ -z "$PREVUNIONRECORD" -a -n "$EXTRASFSLIST" ];then # first boot with extra SFSs loaded
-		update_cache_files
-	fi
+# if layers have changed, may need to fix menu (etc)...
+. /etc/rc.d/BOOTCONFIG
+if [ -n "$PREVUNIONRECORD" -a "$LASTUNIONRECORD" != "$PREVUNIONRECORD" ];then
+	echo -en " layered-filesystem \\033[1;35mnext boot will be faster!\\033[0;39m" > /dev/console
+	echo "layers have changed since previous boot, updating menus..."
+	update_cache_files
+elif [ -z "$PREVUNIONRECORD" -a -n "$EXTRASFSLIST" ];then # first boot with extra SFSs loaded
+	update_cache_files
 fi
 
 ### END ###

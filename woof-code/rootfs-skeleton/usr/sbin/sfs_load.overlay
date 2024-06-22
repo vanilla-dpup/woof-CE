@@ -4,8 +4,6 @@
 . /etc/rc.d/PUPSTATE
 . /etc/DISTRO_SPECS
 
-[ "$PUNIONFS" != "overlay" ] && exit 1
-
 export TEXTDOMAIN=sfs_load
 export OUTPUT_CHARSET=UTF-8
 
