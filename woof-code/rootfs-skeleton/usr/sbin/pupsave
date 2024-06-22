@@ -84,8 +84,8 @@ if [ -z "$SAVESIZE" ]; then
 	done
 fi
 
-if [ "$FSTYPE" = "ext4" -o "$FSTYPE" = "f2fs" ]; then
-	RETVAL="`yad --title=pupsave --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Encrypt the save folder?')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Yes')" 2 "$(gettext 'Only the home directory')" 3 "$(gettext 'No')" 3`"
+if [ "$STYLE" = "file" -o "$FSTYPE" = "ext4" -o "$FSTYPE" = "f2fs" ]; then
+	RETVAL="`yad --title=pupsave --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Encryption')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Yes')" 2 "$(gettext 'Only the home directory')" 3 "$(gettext 'No')" 3`"
 
 	case "$RETVAL" in
 	1|2|3)

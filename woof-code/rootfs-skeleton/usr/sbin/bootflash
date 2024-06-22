@@ -277,7 +277,7 @@ if [ $PUPMODE -eq 5 ] ; then
 elif [ -z "$CRYPT" ] ; then
 	[ -z "$WAYLAND_DISPLAY" -a -z "$DISPLAY" ] && exit 1
 
-	RETVAL="`yad --title=BootFlash --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Encrypt the save folder?')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Yes')" 2 "$(gettext 'Only the home directory')" 3 "$(gettext 'No')" 3`"
+	RETVAL="`yad --title=BootFlash --window-icon=dialog-question --width=640 --height=240 --button=gtk-ok --text="$(gettext 'Encryption')" --list --no-headers --column=:NUM --column=:TEXT --hide-column=1 --print-column=1 --separator= -- 1 "$(gettext 'Yes')" 2 "$(gettext 'Only the home directory')" 3 "$(gettext 'No')" 3`"
 
 	case "$RETVAL" in
 		1|2|3)
