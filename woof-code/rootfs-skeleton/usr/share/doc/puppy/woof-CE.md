@@ -78,6 +78,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * ext2 and ext3 save files are gone: all save files (including encrypted ones) use ext4, with or without journaling.
 * Bootflash supports only syslinux and efilinux, with one partition layout: a small FAT32 boot partition and a big ext4 (without journaling) or F2FS partition for SFSs and persistency.
 * initrd is zstd-compressed and built from rootfs binaries instead of a prebuilt, outdated and unmaintained set of static executables.
+* initrd supports file system repair for exFAT, FAT32 and F2FS partitions, not just ext{2,3,4}.
 
 ## Directory Structure
 
