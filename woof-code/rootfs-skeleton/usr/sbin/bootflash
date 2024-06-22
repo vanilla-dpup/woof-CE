@@ -68,7 +68,7 @@ create_drv() {
 	parted --script -- \
 		/dev/${XDEV} \
 		mklabel ${LABEL} \
-		mkpart primary fat32 0 64MiB \
+		mkpart primary fat32 1MiB 64MiB \
 		mkpart primary ext4 64MiB 100% \
 		set 1 ${BOOTFLAG} on
 
