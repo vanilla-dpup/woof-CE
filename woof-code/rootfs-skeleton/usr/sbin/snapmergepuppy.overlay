@@ -183,10 +183,13 @@ do
 		esac
 		[ "`readlink "$BASE/$N" 2>/dev/null`" = "$NDST" ] && continue
 		rm -rf "$BASE/$N"	# SFR: in case if folder has been replaced with a symlink (cp won't overwrite a dir with a symlink)
+		cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 	elif [ -L "$BASE/$N" -o -d "$BASE/$N" ];then
 		rm -rf "$BASE/$N" 2>>/tmp/snapmergepuppy-error
+		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
+	else
+		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 	fi
-	psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 done
 
 # make sure DISTRO_SPECS, PUPSTATE and BOOTCONFIG are saved: these files are modified by initrd, before NTP, and timestamps can be in the future
