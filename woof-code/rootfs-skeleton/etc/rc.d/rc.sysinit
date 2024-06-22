@@ -268,10 +268,10 @@ if [ "$SWAPON" = "yes" ];then
  # this code is meant to increase the size of the tmpfs
  EXTRAALLOCK=$(($EXTRAALLOCK / 2048)) #use half in KiB
  RAMSIZE=$(free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 2 -d ' ')
- if [ $PUPMODE -eq 13 ]; then
-  FREEK=$(($RAMSIZE * 3 / 4)) #3/4 of physical.
- else
+ if [ $PUPMODE -eq 12 ]; then
   FREEK=$(($RAMSIZE / 2)) #half of physical.
+ else
+  FREEK=$(($RAMSIZE * 3 / 4)) #3/4 of physical.
  fi
  ALLOCK=$(($FREEK + $EXTRAALLOCK))
  if [ "$(grep -m 1 '/initrd/mnt/tmpfs' /proc/mounts)" != "" ];then #mounted
