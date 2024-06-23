@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if ((src = open(argv[1], O_RDONLY)) < 0) {
+	if ((src = open(argv[1], O_RDONLY | O_NOATIME)) < 0) {
 		fprintf(stderr, "Failed to open %s: %s\n", argv[1], strerror(errno));
 		return EXIT_FAILURE;
 	}
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if ((dst = open(argv[2], O_RDWR | O_CREAT, srcstat.st_mode & ~S_IFMT)) < 0) {
+	if ((dst = open(argv[2], O_RDWR | O_CREAT | O_NOATIME, srcstat.st_mode & ~S_IFMT)) < 0) {
 		fprintf(stderr, "Failed to open %s: %s\n", argv[2], strerror(errno));
 		close(src);
 		return EXIT_FAILURE;
