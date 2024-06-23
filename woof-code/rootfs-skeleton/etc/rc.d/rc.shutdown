@@ -34,6 +34,9 @@ sfs_load --cli stop
 #see shinobar's msg in http://murga-linux.com/puppy/viewtopic.php?p=605451#605451
 umount -a -t cifs,smbfs,nfs,sshfs
 
+# ask init not to run a login shell again
+kill -USR1 1
+
 #=======================================================================
 # terminate stuff
 for EXE in /proc/[1-9]*/exe; do

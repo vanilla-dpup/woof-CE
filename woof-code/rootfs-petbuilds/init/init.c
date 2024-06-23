@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
 	sigset_t mask;
 	pid_t pid, reaped;
 	siginfo_t sig = {.si_signo = SIGUSR2};
-	int status, ret;
+	int status, ret, login = 1;
 
 	if (getpid() != 1) return EXIT_FAILURE;
 
@@ -184,6 +184,7 @@ int main(int argc, char *argv[])
 	if ((sigemptyset(&mask) < 0) ||
 	    (sigaddset(&mask, SIGCHLD) < 0) ||
 	    (sigaddset(&mask, SIGTERM) < 0) ||
+	    (sigaddset(&mask, SIGUSR1) < 0) ||
 	    (sigaddset(&mask, SIGUSR2) < 0) ||
 	    (sigprocmask(SIG_SETMASK, &mask, NULL) < 0))
 		goto shutdown;
@@ -200,11 +201,16 @@ int main(int argc, char *argv[])
 			break;
 		}
 
+		if (sig.si_signo == SIGUSR1) {
+			login = 0;
+			continue;
+		}
+
 		if (sig.si_signo != SIGCHLD) break;
 
 		while ((reaped = waitpid(-1, &status, WNOHANG)) > 0) {
 			if (!WIFEXITED(status) && !WIFSIGNALED(status)) continue;
-			if (reaped == pid && (pid = cttyhack(0)) < 0) break;
+			if (login && reaped == pid && (pid = cttyhack(0)) < 0) break;
 		}
 	}
 
