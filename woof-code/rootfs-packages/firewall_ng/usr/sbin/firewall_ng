@@ -103,12 +103,6 @@ process_ports() {
 
 }
 
-warning_func() {
-	title="$(gettext "Warning!")"
-	message="$(gettext "You don't seem to be connected to a network. You can configure your firewall but some features will not work correctly until you establish a connection and reconfigure the firewall.")"
-	yad --title="$title" --image=dialog-warning --text="$message" --button=gtk-ok
-}
-
 # get the current network interface and subnet
 while read -r dest gateway genmask flags metric ref use face;do
 	case $dest in
@@ -135,8 +129,6 @@ echo ${host}/${sub}
 echo $iface
 IFACE=$iface
 SUBNET=${host}/${sub}
-
-[ -z "$IFACE" ] && warning_func
 
 # setup
 [ -d "$CONFDIR" ] || mkdir -p "$CONFDIR"
