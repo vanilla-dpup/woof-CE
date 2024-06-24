@@ -103,33 +103,6 @@ process_ports() {
 
 }
 
-# get the current network interface and subnet
-while read -r dest gateway genmask flags metric ref use face;do
-	case $dest in
-		default)iface=$face
-		
-		;;
-	esac
-	case $face in
-		$iface)
-		case $dest in
-			[0-9]*.[0-9]*.[0-9]*.[0-9]*)host=$dest # very lazy regex
-			break;;
-		esac
-		;;
-	esac
-done < <(busybox route)
-
-while read -r inet subnet rest;do
-	case $inet in
-		inet)sub=${subnet#*/} && break;;
-	esac		
-done < <(busybox ip addr show $iface)
-echo ${host}/${sub}
-echo $iface
-IFACE=$iface
-SUBNET=${host}/${sub}
-
 # setup
 [ -d "$CONFDIR" ] || mkdir -p "$CONFDIR"
 if [ -f "$CONF" ];then
@@ -137,7 +110,6 @@ if [ -f "$CONF" ];then
 	CB_MAINTXT="$(gettext "Your firewall is configured. Change it to open ports if you have added extra services.")"
 else
 	CB_MAINTXT="$(gettext "The default setting is that all ports are blocked. Uncheck to allow you to check some ports.")"
-	GENERIC=true
 	LOGGING=false
 	MAIN=false
 	CONFIG_SSH=false
@@ -166,7 +138,6 @@ else
 		--form \
 		--scroll \
 		--field="$CB_MAINTXT":CHK $MAIN \
-		--field="$(gettext 'When this button is checked a generic firewall is generated on no specific interface.')":CHK $GENERIC \
 		--field="$(gettext 'Check this box to enable logging.')":CHK $LOGGING \
 		--field=:LBL "" \
 		--field="<b>$(gettext 'Choose which connections to allow through your firewall.')</b>
@@ -196,9 +167,8 @@ $(gettext 'Or:')
 	EXIT=$?
 fi
 case "$EXIT" in
-	0)IFS='|' read -r MAIN GENERIC LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_SAMBA_CLIENT CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS _ _ CONFIG_EXTRAS <<< "$RETVALS"
-	echo "GENERIC=$GENERIC
-LOGGING=$LOGGING
+	0)IFS='|' read -r MAIN LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_SAMBA_CLIENT CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS _ _ CONFIG_EXTRAS <<< "$RETVALS"
+	echo "LOGGING=$LOGGING
 MAIN=$MAIN
 CONFIG_SSH=$CONFIG_SSH
 CONFIG_CUPS=$CONFIG_CUPS
@@ -275,27 +245,12 @@ IPTR="\$IPT_PATH/iptables-restore"
 IP6TR="\$IPT_PATH/iptables-restore"
 EOF_FWSTART
 
-# generic or interface
-case $GENERIC in
-	true) IFACE=generic
-			IOPT=""
-			OOPT=""
-	;;
-	false) IFACE=$IFACE
-			IOPT="-i \$INET_IFACE"
-			OOPT="-o \$INET_IFACE"	
-	;;
-esac
-
 # logging
 echo '
 # logging' >> $TMPFW
 echo "LOGGING=$LOGGING" >> $TMPFW
 
 cat >> $TMPFW << EOF_FWNEXT
-# Internet Interface
-INET_IFACE="$IFACE"
-
 # Localhost Interface
 
 LO_IFACE="lo"
@@ -811,14 +766,6 @@ EOF_FWNEXT
 echo "
 ############################### Puppy Rules ###################################
 " >> $TMPFW
-if [ "$CONFIG_SAMBA" != "true" -a "$CONFIG_SAMBA_CLIENT" != "true" ];then
-	cat >> $TMPFW << EOF_SAMBA_NOT
-	
-# disallow netbios name resolution
-\$IPT -A udp_inbound -p UDP -s 0/0 --destination-port 137 -j DROP
-\$IPT -A udp_inbound -p UDP -s 0/0 --destination-port 138 -j DROP
-EOF_SAMBA_NOT
-fi
 
 cat >> $TMPFW << EOF_FWCOMMENT
 # Dynamic Address
@@ -840,25 +787,25 @@ if [ "$CONFIG_SAMBA" == "true" ];then
 	cat >> $TMPFW << EOF_SAMBA_UDP
 	
 # allow netbios name resolution for Samba server
-\$IPT -A udp_inbound -p UDP -s $SUBNET --destination-port 137 -j ACCEPT
-\$IPT -A udp_inbound -p UDP -s $SUBNET --destination-port 138 -j ACCEPT
+\$IPT -A udp_inbound -p UDP --destination-port 137 -j ACCEPT
+\$IPT -A udp_inbound -p UDP --destination-port 138 -j ACCEPT
 EOF_SAMBA_UDP
 fi
 if [ "$CONFIG_SAMBA_CLIENT" == "true" ];then
 	cat >> $TMPFW << EOF_SAMBA_UDP_CL
 	
 # allow netbios name resolution for Samba client
-\$IPT -A udp_inbound -p UDP -s $SUBNET --source-port 137 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
-\$IPT -A udp_inbound -p UDP -s $SUBNET --source-port 137 -m state --state NEW,ESTABLISHED -j ACCEPT
+\$IPT -A udp_inbound -p UDP --source-port 137 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
+\$IPT -A udp_inbound -p UDP --source-port 137 -m state --state NEW,ESTABLISHED -j ACCEPT
 
-\$IPT -A udp_inbound -p UDP -s $SUBNET --source-port 138 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
-\$IPT -A udp_inbound -p UDP -s $SUBNET --source-port 138 -m state --state NEW,ESTABLISHED -j ACCEPT
+\$IPT -A udp_inbound -p UDP --source-port 138 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
+\$IPT -A udp_inbound -p UDP --source-port 138 -m state --state NEW,ESTABLISHED -j ACCEPT
 
-\$IPT -A tcp_inbound -p TCP -s $SUBNET --source-port 139 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
-\$IPT -A tcp_inbound -p TCP -s $SUBNET --source-port 139 -m state --state NEW,ESTABLISHED -j ACCEPT
+\$IPT -A tcp_inbound -p TCP --source-port 139 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
+\$IPT -A tcp_inbound -p TCP --source-port 139 -m state --state NEW,ESTABLISHED -j ACCEPT
 
-\$IPT -A tcp_inbound -p TCP -s $SUBNET --source-port 445 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
-\$IPT -A tcp_inbound -p TCP -s $SUBNET --source-port 445 -m state --state NEW,ESTABLISHED -j ACCEPT
+\$IPT -A tcp_inbound -p TCP --source-port 445 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT || \
+\$IPT -A tcp_inbound -p TCP --source-port 445 -m state --state NEW,ESTABLISHED -j ACCEPT
 EOF_SAMBA_UDP_CL
 fi
 if [ "$CONFIG_CUPS" == "true" ];then
@@ -996,8 +943,8 @@ if [ "$CONFIG_SAMBA" == "true" ];then
 	cat >> $TMPFW << EOF_SAMBA_TCP
 	
 # allow Samba TCP communication
-\$IPT -A tcp_inbound -p TCP -s $SUBNET --destination-port 139 -j ACCEPT
-\$IPT -A tcp_inbound -p TCP -s $SUBNET --destination-port 445 -j ACCEPT
+\$IPT -A tcp_inbound -p TCP --destination-port 139 -j ACCEPT
+\$IPT -A tcp_inbound -p TCP --destination-port 445 -j ACCEPT
 EOF_SAMBA_TCP
 fi
 if [ "$CONFIG_CUPS" == "true" ];then
@@ -1077,17 +1024,17 @@ echo "Process INPUT chain ..."
 # Inbound Internet Packet Rules
 
 # Accept Established Connections
-\$IPT -A INPUT -p ALL $IOPT -m conntrack --ctstate ESTABLISHED,RELATED \
+\$IPT -A INPUT -p ALL -m conntrack --ctstate ESTABLISHED,RELATED \
 -j ACCEPT
-\$IP6T -A INPUT -p ALL $IOPT -m conntrack --ctstate ESTABLISHED,RELATED \
+\$IP6T -A INPUT -p ALL -m conntrack --ctstate ESTABLISHED,RELATED \
 -j ACCEPT
 
 # Route the rest to the appropriate user chain
-\$IPT -A INPUT -p TCP $IOPT -j tcp_inbound
-\$IPT -A INPUT -p UDP $IOPT -j udp_inbound
-\$IP6T -A INPUT -p UDP $IOPT -j udp_inbound
-\$IPT -A INPUT -p ICMP $IOPT -j icmp_packets
-\$IP6T -A INPUT -p ICMPV6 $IOPT -j icmp_packets
+\$IPT -A INPUT -p TCP -j tcp_inbound
+\$IPT -A INPUT -p UDP -j udp_inbound
+\$IP6T -A INPUT -p UDP -j udp_inbound
+\$IPT -A INPUT -p ICMP -j icmp_packets
+\$IP6T -A INPUT -p ICMPV6 -j icmp_packets
 
 # Drop without logging broadcasts that get this far.
 # Cuts down on log clutter.
@@ -1135,8 +1082,8 @@ echo "Process OUTPUT chain ..."
 \$IP6T -A OUTPUT -p ALL -o \$LO_IFACE -j ACCEPT
 
 # To internet
-\$IPT -A OUTPUT -p ALL $OOPT -j ACCEPT
-\$IP6T -A OUTPUT -p ALL $OOPT -j ACCEPT
+\$IPT -A OUTPUT -p ALL -j ACCEPT
+\$IP6T -A OUTPUT -p ALL -j ACCEPT
 
 # Log packets that still don't match
 if [ "\$LOGGING" = "true" ];then
