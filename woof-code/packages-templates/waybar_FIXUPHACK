@@ -203,6 +203,7 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 	"name": "bar1",
 	"layer": "bottom",
 	"position": "left",
+	"width": 60,
 	"spacing": 4,
 	"modules-left": [
 		"custom/menu",
@@ -230,7 +231,7 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"on-click-middle": "close"
 	},
 	"tray": {
-		"icon-size": 12,
+		"icon-size": 32,
 		"spacing": 4
 	},
 	"clock": {
