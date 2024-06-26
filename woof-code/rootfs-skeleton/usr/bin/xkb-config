@@ -1,0 +1,106 @@
+#!/bin/bash
+
+. ~/.xkbrc
+
+[ -z "$XKB_DEFAULT_LAYOUT" ] && XKB_DEFAULT_LAYOUT="us"
+[ -z "$XKB_DEFAULT_MODEL" ] && XKB_DEFAULT_MODEL="pc104"
+[ -z "$XKB_DEFAULT_OPTIONS" ] && XKB_DEFAULT_OPTIONS="grp:alt_shift_toggle"
+
+case "$1" in
+set-model)
+	DIALOG="yad --title=xkb-config --window-icon=input-keyboard-symbolic --width=600 --height=320 --list --no-headers --print-column=1 --separator= --column=:TEXT --column=:TEXT"
+	FOUND=0
+	while read LINE; do
+		if [ "$LINE" = "! model" ]; then
+			FOUND=1
+			continue
+		elif [ $FOUND -eq 1 ]; then
+			[ "${LINE:0:1}" = "!" ] && break
+			read MODEL DESC <<< "$LINE"
+			DIALOG="${DIALOG} ${MODEL} \"${DESC}\""
+		fi
+	done < /usr/share/X11/xkb/rules/evdev.lst
+
+	XKB_DEFAULT_MODEL=`eval $DIALOG`
+	[ $? -ne 0 ] && exit 1
+	;;
+
+add-layout)
+	DIALOG="yad --title=xkb-config --window-icon=input-keyboard-symbolic --width=600 --height=320 --list --no-headers --hide-column=1 --print-column=1 --separator= --column=:TEXT --column=:TEXT"
+	FOUND=0
+	while read LINE; do
+		if [ "$LINE" = "! layout" ]; then
+			FOUND=1
+			continue
+		elif [ $FOUND -eq 1 ]; then
+			[ "${LINE:0:1}" = "!" ] && break
+			read LAYOUT DESC <<< "$LINE"
+			DIALOG="${DIALOG} ${LAYOUT} \"${DESC}\""
+		fi
+	done < /usr/share/X11/xkb/rules/evdev.lst
+
+	NEW_LAYOUT=`eval $DIALOG`
+	[ $? -ne 0 ] && exit 1
+
+	DIALOG="yad --title=xkb-config --window-icon=input-keyboard-symbolic --width=600 --height=320 --list --no-headers --hide-column=1 --print-column=1 --separator= --column=:TEXT --column=:TEXT none None"
+	FOUND=0
+	ANY=0
+	while read LINE; do
+		if [ "$LINE" = "! variant" ]; then
+			FOUND=1
+			continue
+		elif [ $FOUND -eq 1 ]; then
+			[ "${LINE:0:1}" = "!" ] && break
+			read VARIANT VLAYOUT DESC <<< "$LINE"
+			[ "$VLAYOUT" != "${NEW_LAYOUT}:" ] && continue
+			DIALOG="${DIALOG} ${VARIANT} \"${DESC}\""
+			ANY=1
+		fi
+	done < /usr/share/X11/xkb/rules/evdev.lst
+
+	if [ $ANY -eq 1 ]; then
+		NEW_VARIANT=`eval $DIALOG`
+		[ $? -ne 0 ] && exit 1
+
+		[ "$NEW_VARIANT" = "none" ] && NEW_VARIANT=
+	else
+		NEW_VARIANT=
+	fi
+
+	if [ -z "$XKB_DEFAULT_LAYOUT" ]; then
+		XKB_DEFAULT_LAYOUT="${NEW_LAYOUT}"
+		XKB_DEFAULT_VARIANT="${NEW_VARIANT}"
+	else
+		XKB_DEFAULT_LAYOUT="${XKB_DEFAULT_LAYOUT},${NEW_LAYOUT}"
+		XKB_DEFAULT_VARIANT="${XKB_DEFAULT_VARIANT},${NEW_VARIANT}"
+	fi
+	;;
+
+reset)
+	XKB_DEFAULT_LAYOUT="us"
+	XKB_DEFAULT_MODEL="pc104"
+	XKB_DEFAULT_OPTIONS="grp:alt_shift_toggle"
+	XKB_DEFAULT_VARIANT=
+	;;
+
+*)
+	exec yad \
+	    --title=xkb-config \
+	    --window-icon=input-keyboard-symbolic \
+	    --width=240 \
+	    --form \
+	    --field "Set model:FBTN" "$0 set-model" \
+	    --field "Add layout:FBTN" "$0 add-layout" \
+	    --field "Reset:FBTN" "$0 reset" \
+	    --no-buttons \
+	    --use-interp
+	;;
+esac
+
+cat << EOF > ~/.xkbrc
+XKB_DEFAULT_LAYOUT=${XKB_DEFAULT_LAYOUT}
+XKB_DEFAULT_MODEL=${XKB_DEFAULT_MODEL}
+XKB_DEFAULT_OPTIONS=${XKB_DEFAULT_OPTIONS}
+XKB_DEFAULT_RULES=evdev
+XKB_DEFAULT_VARIANT=${XKB_DEFAULT_VARIANT}
+EOF
