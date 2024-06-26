@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=libinput-config
+Icon=input-mouse-symbolic
+Comment=Pointer device settings
+Exec=libinput-config
+Terminal=false
+Type=Application
+Categories=X-Setup-wizard
+GenericName=libinput-config

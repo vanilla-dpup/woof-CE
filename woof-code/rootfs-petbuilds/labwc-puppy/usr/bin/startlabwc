@@ -54,9 +54,9 @@ do
 	[ -n "$XKB_DEFAULT_VARIANT" ] && export XKB_DEFAULT_VARIANT
 
 	if [ -f /var/local/xwin_disable_xerrs_log_flag ]; then
-		dbus-run-session labwc > /dev/null 2>&1
+		dbus-run-session sh -c 'LD_PRELOAD=/usr/lib/labwc/libinput-cfg.so exec labwc' > /dev/null 2>&1
 	else
-		dbus-run-session labwc > /tmp/xerrs.log 2>&1
+		dbus-run-session sh -c 'LD_PRELOAD=/usr/lib/labwc/libinput-cfg.so exec labwc' > /tmp/xerrs.log 2>&1
 	fi
 
 	echo '--------'

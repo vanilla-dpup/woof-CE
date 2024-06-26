@@ -121,6 +121,7 @@ yes|less|less|exe,dev>null,doc,nls||deps:yes
 yes|libargon2-dev|libargon2-dev|exe,dev,doc,nls||deps:yes # needed by pfscrypt
 yes|libfuse2|libfuse2|exe,dev,doc,nls||deps:yes # used by AppImages
 yes|libgcrypt|libgcrypt20,libgcrypt20-dev|exe,dev,doc,nls||deps:yes # needed by weechat
+yes|libinput|libinput-dev|exe,dev,doc,nls||deps:yes
 yes|libgtk-layer-shell|libgtk-layer-shell-dev|exe,dev,doc,nls||deps:yes
 yes|libjpeg62|libjpeg62-turbo,libjpeg62-turbo-dev,libjpeg-dev|exe,dev,doc,nls||deps:yes
 yes|libmpfr|libmpfr6|exe,dev,doc,nls||deps:yes
