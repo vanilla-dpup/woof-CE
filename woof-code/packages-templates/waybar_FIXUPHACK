@@ -28,7 +28,6 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"battery",
 		"network",
 		"custom/firewall_ng",
-		"tray",
 		"clock"
 	],
 	"custom/menu": {
@@ -43,10 +42,6 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"tooltip-format": "{title}",
 		"on-click": "activate",
 		"on-click-middle": "close"
-	},
-	"tray": {
-		"icon-size": 12,
-		"spacing": 4
 	},
 	"clock": {
 		"format": "{:%H:%M}",
@@ -214,7 +209,6 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"battery",
 		"network",
 		"custom/firewall_ng",
-		"tray",
 		"clock"
 	],
 	"custom/menu": {
@@ -229,10 +223,6 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"tooltip-format": "{title}",
 		"on-click": "activate",
 		"on-click-middle": "close"
-	},
-	"tray": {
-		"icon-size": 32,
-		"spacing": 4
 	},
 	"clock": {
 		"format": "{:%H:%M}",
