@@ -1,0 +1,16 @@
+#!/bin/bash
+
+TZ_CB=
+while read TZ; do
+	if [ -z "$TZ_CB" ]; then
+		TZ_CB="${TZ#/usr/share/zoneinfo/}"
+	else
+		TZ_CB="${TZ_CB} ${TZ#/usr/share/zoneinfo/}"
+	fi
+done < <(ls -d /usr/share/zoneinfo/*/* | sort)
+
+TZ=`yad --title=tz-set --height=480 --width=240 --list --column=:TEXT --no-headers --separator= ${TZ_CB}`
+[ $? -ne 0 ] && exit
+
+echo ${TZ} > /etc/timezone
+ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime

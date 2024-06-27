@@ -1,8 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=xkb-config
+Name=Keyboard Settings
 Icon=input-keyboard-symbolic
-Comment=Keyboard settings
 Exec=xkb-config
 Terminal=false
 Type=Application

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Set Timezone
+Exec=tz-set
+Terminal=false
+Type=Application
+Categories=X-Setup-wizard
+GenericName=tz-set

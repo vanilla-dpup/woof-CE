@@ -1,8 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=libinput-config
+Name=Pointer Settings
 Icon=input-mouse-symbolic
-Comment=Pointer device settings
 Exec=libinput-config
 Terminal=false
 Type=Application
