@@ -2,39 +2,23 @@
 
 #set -x
 
-verify_not_running() {
-	while read j
-	do
-		case $j in "Name="*|"Exec="*)
-			name="${j#Name=}"
-			name="${name#Exec=}"
-			name="${name#sh -c }"
-			name="${name//\'/}"
-			name="${name//\"/}"
-			name="${name%% *}"
-			case $name in echo|sleep) #add more
-				return 0
-				break
-			esac
-			if pidof "$name" >/dev/null 2>&1 ; then
-				return 1
-				break
-			fi
-			;;
-		esac
-	done < "$1"
-	return 0
-}
-
 run_desktop() {
+	hidden=
+	exec=
 	while read j
 	do
-		case $j in "Exec="*)
-			ash -c "${j#Exec=}" &
-			break
+		case $j in
+		"Hidden="*)
+			hidden="${j#Hidden=}"
+			[ -n "$exec" ] && break
+			;;
+		"Exec="*)
+			exec="${j#Exec=}"
+			[ -n "$hidden" ] && break
 			;;
 		esac
 	done < "$1"
+	[ -n "$exec" -a "$hidden" != "true" ] && ash -c "$exec" &
 }
 
 #=================================================
@@ -47,9 +31,6 @@ do
 	case "$i" in
 	/etc/xdg/autostart/blueman.desktop|/etc/xdg/autostart/org.gnome.Software.desktop) continue ;;
 	esac
-	if ! verify_not_running $i ; then
-		continue
-	fi
 	run_desktop $i
 done
 
@@ -61,9 +42,6 @@ do
 		continue
 	fi
 	if [ -f /etc/xdg/autostart/${i} ] ; then
-		continue
-	fi
-	if ! verify_not_running $i ; then
 		continue
 	fi
 	run_desktop $i

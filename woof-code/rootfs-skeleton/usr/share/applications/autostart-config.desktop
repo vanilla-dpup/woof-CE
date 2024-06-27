@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Autostart Applications
+Exec=autostart-config
+Terminal=false
+Type=Application
+Categories=X-Setup-wizard
+GenericName=autostart-config

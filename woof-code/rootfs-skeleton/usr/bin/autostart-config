@@ -1,0 +1,43 @@
+#!/bin/bash
+
+DIALOG="yad --title=autostart-config --height=360 --width=240 --list --column=Enabled:CHK --column=:TEXT --column=Name:TEXT --hide-column=2 --print-all"
+
+while read DESKTOP; do
+	ENABLED=true
+	[ "`grep -m1 ^Hidden= $DESKTOP`" = "Hidden=true" ] && ENABLED=false
+
+	NAME=`grep -m1 ^Name= $DESKTOP`
+	[ -z "$NAME" ] && NAME=`grep -m1 ^GenericName= $DESKTOP`
+	if [ -z "$NAME" ]; then
+		NAME=${DESKTOP##*/}
+		NAME=${NAME%.desktop}
+	else
+		NAME=${NAME#*=}
+	fi
+
+	DIALOG="${DIALOG} ${ENABLED} ${DESKTOP} \"${NAME}\""
+done < <(ls /etc/xdg/autostart/*.desktop ~/.config/autostart/*.desktop)
+
+ENABLED=
+DISABLED=
+while read LINE; do
+	IFS='|' read CHECK DESKTOP _ <<< "$LINE"
+	if [ "$CHECK" = TRUE ]; then
+		ENABLED="${ENABLED} ${DESKTOP}"
+	else
+		DISABLED="${DISABLED} ${DESKTOP}"
+	fi
+done < <(eval $DIALOG)
+[ $? -ne 0 ] && exit
+
+for DESKTOP in $ENABLED; do
+	grep -qm1 ^Hidden=true ${DESKTOP} && sed -i '/^Hidden=true/d' ${DESKTOP}
+done
+
+for DESKTOP in $DISABLED; do
+	if grep -qm1 ^Hidden= ${DESKTOP}; then
+		sed -i 's/^Hidden=.*/Hidden=true/g' ${DESKTOP}
+	else
+		echo Hidden=true >> ${DESKTOP}
+	fi
+done
