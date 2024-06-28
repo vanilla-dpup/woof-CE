@@ -3,6 +3,8 @@
 DIALOG="yad --title=autostart-config --height=360 --width=240 --list --column=Enabled:CHK --column=:TEXT --column=Name:TEXT --hide-column=2 --print-all"
 
 while read DESKTOP; do
+	[ "$DESKTOP" = /etc/xdg/autostart/blueman.desktop -o "$DESKTOP" = /etc/xdg/autostart/org.gnome.Software.desktop ] && continue
+
 	ENABLED=true
 	[ "`grep -m1 ^Hidden= $DESKTOP`" = "Hidden=true" ] && ENABLED=false
 
