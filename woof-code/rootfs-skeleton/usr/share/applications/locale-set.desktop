@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Set Locale
+Exec=locale-set
+Terminal=false
+Type=Application
+Categories=X-Setup-wizard
+GenericName=locale-set

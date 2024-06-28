@@ -1,0 +1,5 @@
+cat << EOF > etc/profile.d/locale.sh
+. /etc/locale.conf
+export LC_ALL=\$LANG
+EOF
+chmod 644 etc/profile.d/locale.sh
