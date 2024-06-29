@@ -1,4 +1,4 @@
-From f55243c77005a2eb56574fac68794b1209289128 Mon Sep 17 00:00:00 2001
+From 6562e9000203162a9a2d1694d4ac0298c5548df0 Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
 Date: Fri, 21 Jun 2024 13:35:19 +0000
 Subject: [PATCH] Squashed commit of the following:
@@ -148,7 +148,7 @@ index 9308656..c66d376 100644
  
  # wayland-scanner is a tool which generates C headers and rigging for Wayland
 diff --git a/config.def.h b/config.def.h
-index a784eb4..fcd7a6d 100644
+index 646a3d6..69c6d7d 100644
 --- a/config.def.h
 +++ b/config.def.h
 @@ -6,11 +6,11 @@
@@ -176,7 +176,7 @@ index a784eb4..fcd7a6d 100644
  };
  
  /* monitors */
-@@ -45,7 +46,7 @@ static const MonitorRule monrules[] = {
+@@ -47,7 +48,7 @@ static const MonitorRule monrules[] = {
  	{ "eDP-1",    0.5f,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
  	*/
  	/* defaults */
@@ -185,7 +185,7 @@ index a784eb4..fcd7a6d 100644
  };
  
  /* keyboard */
-@@ -136,6 +137,7 @@ static const Key keys[] = {
+@@ -138,6 +139,7 @@ static const Key keys[] = {
  	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
  	{ MODKEY,                    XKB_KEY_f,          setlayout,      {.v = &layouts[1]} },
  	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
@@ -194,10 +194,10 @@ index a784eb4..fcd7a6d 100644
  	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
  	{ MODKEY,                    XKB_KEY_e,         togglefullscreen, {0} },
 diff --git a/dwl.c b/dwl.c
-index d48bf40..d808fbb 100644
+index 9fb50a7..a693447 100644
 --- a/dwl.c
 +++ b/dwl.c
-@@ -251,6 +251,7 @@ static void arrangelayer(Monitor *m, struct wl_list *list,
+@@ -252,6 +252,7 @@ static void arrangelayer(Monitor *m, struct wl_list *list,
  static void arrangelayers(Monitor *m);
  static void axisnotify(struct wl_listener *listener, void *data);
  static void buttonpress(struct wl_listener *listener, void *data);
@@ -205,7 +205,7 @@ index d48bf40..d808fbb 100644
  static void chvt(const Arg *arg);
  static void checkidleinhibitor(struct wlr_surface *exclude);
  static void cleanup(void);
-@@ -331,6 +332,7 @@ static void setmon(Client *c, Monitor *m, uint32_t newtags);
+@@ -332,6 +333,7 @@ static void setmon(Client *c, Monitor *m, uint32_t newtags);
  static void setpsel(struct wl_listener *listener, void *data);
  static void setsel(struct wl_listener *listener, void *data);
  static void setup(void);
@@ -213,7 +213,7 @@ index d48bf40..d808fbb 100644
  static void spawn(const Arg *arg);
  static void startdrag(struct wl_listener *listener, void *data);
  static void tag(const Arg *arg);
-@@ -410,6 +412,12 @@ static struct wlr_box sgeom;
+@@ -411,6 +413,12 @@ static struct wlr_box sgeom;
  static struct wl_list mons;
  static Monitor *selmon;
  
@@ -226,7 +226,7 @@ index d48bf40..d808fbb 100644
  #ifdef XWAYLAND
  static void activatex11(struct wl_listener *listener, void *data);
  static void associatex11(struct wl_listener *listener, void *data);
-@@ -429,6 +437,8 @@ static xcb_atom_t netatom[NetLast];
+@@ -430,6 +438,8 @@ static xcb_atom_t netatom[NetLast];
  /* attempt to encapsulate suck into one file */
  #include "client.h"
  
@@ -235,7 +235,7 @@ index d48bf40..d808fbb 100644
  /* function implementations */
  void
  applybounds(Client *c, struct wlr_box *bbox)
-@@ -475,6 +485,10 @@ applyrules(Client *c)
+@@ -476,6 +486,10 @@ applyrules(Client *c)
  			}
  		}
  	}
@@ -246,7 +246,7 @@ index d48bf40..d808fbb 100644
  	setmon(c, mon, newtags);
  }
  
-@@ -645,6 +659,24 @@ buttonpress(struct wl_listener *listener, void *data)
+@@ -646,6 +660,24 @@ buttonpress(struct wl_listener *listener, void *data)
  			event->time_msec, event->button, event->state);
  }
  
@@ -271,7 +271,7 @@ index d48bf40..d808fbb 100644
  void
  chvt(const Arg *arg)
  {
-@@ -687,6 +719,10 @@ cleanup(void)
+@@ -688,6 +720,10 @@ cleanup(void)
  	destroykeyboardgroup(&kb_group->destroy, NULL);
  
  	wl_display_destroy(dpy);
@@ -282,7 +282,7 @@ index d48bf40..d808fbb 100644
  	/* Destroy after the wayland display (when the monitors are already destroyed)
  	   to avoid destroying them with an invalid scene output. */
  	wlr_scene_node_destroy(&scene->tree.node);
-@@ -946,7 +982,20 @@ createmon(struct wl_listener *listener, void *data)
+@@ -949,7 +985,20 @@ createmon(struct wl_listener *listener, void *data)
  			m->lt[0] = r->lt;
  			m->lt[1] = &layouts[LENGTH(layouts) > 1 && r->lt != &layouts[1]];
  			strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, LENGTH(m->ltsymbol));
@@ -304,7 +304,7 @@ index d48bf40..d808fbb 100644
  			wlr_output_state_set_transform(&state, r->rr);
  			break;
  		}
-@@ -1082,6 +1131,8 @@ createpointer(struct wlr_pointer *pointer)
+@@ -1085,6 +1134,8 @@ createpointer(struct wlr_pointer *pointer)
  			libinput_device_config_accel_set_profile(device, accel_profile);
  			libinput_device_config_accel_set_speed(device, accel_speed);
  		}
@@ -313,7 +313,7 @@ index d48bf40..d808fbb 100644
  	}
  
  	wlr_cursor_attach_input_device(cursor, &pointer->base);
-@@ -1525,8 +1576,10 @@ keypress(struct wl_listener *listener, void *data)
+@@ -1528,8 +1579,10 @@ keypress(struct wl_listener *listener, void *data)
  	uint32_t keycode = event->keycode + 8;
  	/* Get a list of keysyms based on the keymap for this keyboard */
  	const xkb_keysym_t *syms;
@@ -325,7 +325,7 @@ index d48bf40..d808fbb 100644
  
  	int handled = 0;
  	uint32_t mods = wlr_keyboard_get_modifiers(&group->wlr_group->keyboard);
-@@ -1682,6 +1735,7 @@ mapnotify(struct wl_listener *listener, void *data)
+@@ -1684,6 +1737,7 @@ mapnotify(struct wl_listener *listener, void *data)
  	if ((p = client_get_parent(c))) {
  		c->isfloating = 1;
  		setmon(c, p->mon, p->tags);
@@ -333,7 +333,7 @@ index d48bf40..d808fbb 100644
  	} else {
  		applyrules(c);
  	}
-@@ -2198,7 +2252,10 @@ run(char *startup_cmd)
+@@ -2200,7 +2254,10 @@ run(char *startup_cmd)
  	 * instead of (0, 0) and then jumping. still may not be fully
  	 * initialized, as the image/coordinates are not transformed for the
  	 * monitor when displayed here */
@@ -345,7 +345,7 @@ index d48bf40..d808fbb 100644
  	wlr_cursor_set_xcursor(cursor, cursor_mgr, "default");
  
  	/* Run the Wayland event loop. This does not return until you exit the
-@@ -2253,6 +2310,8 @@ setfloating(Client *c, int floating)
+@@ -2255,6 +2312,8 @@ setfloating(Client *c, int floating)
  	wlr_scene_node_reparent(&c->scene->node, layers[c->isfullscreen ||
  			(p && p->isfullscreen) ? LyrFS
  			: c->isfloating ? LyrFloat : LyrTile]);
@@ -354,7 +354,7 @@ index d48bf40..d808fbb 100644
  	arrange(c->mon);
  	printstatus();
  }
-@@ -2539,6 +2598,13 @@ setup(void)
+@@ -2541,6 +2600,13 @@ setup(void)
  	 * pointer, touch, and drawing tablet device. We also rig up a listener to
  	 * let us know when new input devices are available on the backend.
  	 */
@@ -368,7 +368,7 @@ index d48bf40..d808fbb 100644
  	LISTEN_STATIC(&backend->events.new_input, inputdevice);
  	virtual_keyboard_mgr = wlr_virtual_keyboard_manager_v1_create(dpy);
  	LISTEN_STATIC(&virtual_keyboard_mgr->events.new_virtual_keyboard, virtualkeyboard);
-@@ -2581,6 +2647,107 @@ setup(void)
+@@ -2583,6 +2649,107 @@ setup(void)
  #endif
  }
  
@@ -476,7 +476,7 @@ index d48bf40..d808fbb 100644
  void
  spawn(const Arg *arg)
  {
-@@ -3141,6 +3308,7 @@ main(int argc, char *argv[])
+@@ -3143,6 +3310,7 @@ main(int argc, char *argv[])
  	/* Wayland requires XDG_RUNTIME_DIR for creating its communications socket */
  	if (!getenv("XDG_RUNTIME_DIR"))
  		die("XDG_RUNTIME_DIR must be set");
