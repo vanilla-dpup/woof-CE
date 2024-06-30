@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Screenshot
+Exec=mtpaint-screenshot
+Terminal=false
+Type=Application
+Categories=RasterGraphics;
