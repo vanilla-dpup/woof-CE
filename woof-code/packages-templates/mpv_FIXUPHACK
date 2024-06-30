@@ -4,3 +4,23 @@ echo '#!/bin/ash
 exec mpv "\$@"' > usr/local/bin/defaultmediaplayer
 chmod 755 usr/local/bin/defaultmediaplayer
 EOF
+
+cat << EOF > usr/bin/mpv-webcam
+#!/bin/sh
+
+exec mpv av://v4l2:/dev/video0 --profile=low-latency --untimed
+EOF
+chmod 755 usr/bin/mpv-webcam
+
+cat << EOF > usr/share/applications/mpv-webcam.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=Webcam
+Icon=camera-web
+Comment=View webcam with mpv
+Exec=mpv-webcam
+Terminal=false
+Type=Application
+Categories=X-Multimedia-video;
+EOF
+chmod 644 usr/share/applications/mpv-webcam.desktop
