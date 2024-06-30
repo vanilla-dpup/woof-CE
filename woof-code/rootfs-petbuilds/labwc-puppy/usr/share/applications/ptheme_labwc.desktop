@@ -1,6 +1,6 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=labwc theme switcher
+Name=labwc Theme Switcher
 Icon=window-new-symbolic
 Comment=Change window decoration
 Exec=ptheme-labwc

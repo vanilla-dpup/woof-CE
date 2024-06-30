@@ -4,7 +4,7 @@ cat << EOF > etc/xdg/autostart/waybar.desktop
 Encoding=UTF-8
 Type=Application
 NoDisplay=true
-Name=waybar
+Name=Panel Settings
 Exec=waybar
 EOF
 chmod 644 etc/xdg/autostart/waybar.desktop

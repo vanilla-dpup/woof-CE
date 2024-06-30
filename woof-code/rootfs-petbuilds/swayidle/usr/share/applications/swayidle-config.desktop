@@ -1,6 +1,6 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=swayidle-config
+Name=Screensaver Settings
 Icon=user-idle-symbolic
 Comment=Configure swayidle
 Exec=swayidle-config
