@@ -16,15 +16,17 @@ cat << EOF > rootfs-complete/usr/local/bin/uname
 EOF
 chmod 755 rootfs-complete/usr/local/bin/uname
 
-echo "Building ${BIOS_IMG_BASE}"
+if [ "$DISTRO_TARGETARCH" = "x86_64" -o "$DISTRO_TARGETARCH" = "x86" ]; then
+	echo "Building ${BIOS_IMG_BASE}"
 
-dd if=/dev/zero of=${BIOS_IMG_BASE} bs=50M count=40 conv=sparse
-LOOP=`losetup -f --show ${BIOS_IMG_BASE}`
-chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build folder 0 2 woofwoof
-losetup -d ${LOOP}
-mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
+	dd if=/dev/zero of=${BIOS_IMG_BASE} bs=50M count=40 conv=sparse
+	LOOP=`losetup -f --show ${BIOS_IMG_BASE}`
+	chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 13 /build folder 0 2 woofwoof
+	losetup -d ${LOOP}
+	mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
+fi
 
-if [ "$DISTRO_TARGETARCH" = "x86_64" ]; then
+if [ "$DISTRO_TARGETARCH" = "x86_64" -o "$DISTRO_TARGETARCH" = "arm64" ]; then
 	echo "Building ${UEFI_IMG_BASE}"
 
 	dd if=/dev/zero of=${UEFI_IMG_BASE} bs=50M count=40 conv=sparse
