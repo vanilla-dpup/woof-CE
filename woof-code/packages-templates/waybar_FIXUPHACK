@@ -95,6 +95,8 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"custom/taskmanager",
 		"custom/texteditor",
 		"custom/imageeditor",
+		"custom/wordprocessor",
+		"custom/spreadsheet",
 		"custom/help",
 		"custom/exit"
 	],
@@ -133,6 +135,18 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"tooltip-format": "Image editor",
 		"interval": "once",
 		"on-click": "defaultimageeditor"
+	},
+	"custom/wordprocessor": {
+		"format": "\uf15c",
+		"tooltip-format": "Word processor",
+		"interval": "once",
+		"on-click": "defaultwordprocessor"
+	},
+	"custom/spreadsheet": {
+		"format": "\uf0ce",
+		"tooltip-format": "Spreadsheet",
+		"interval": "once",
+		"on-click": "defaultspreadsheet"
 	},
 	"custom/help": {
 		"format": "\uf1cd",
@@ -276,6 +290,8 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"custom/taskmanager",
 		"custom/texteditor",
 		"custom/imageeditor",
+		"custom/wordprocessor",
+		"custom/spreadsheet",
 		"custom/help",
 		"custom/exit"
 	],
@@ -314,6 +330,18 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"tooltip-format": "Image editor",
 		"interval": "once",
 		"on-click": "defaultimageeditor"
+	},
+	"custom/wordprocessor": {
+		"format": "\uf15c",
+		"tooltip-format": "Word processor",
+		"interval": "once",
+		"on-click": "defaultwordprocessor"
+	},
+	"custom/spreadsheet": {
+		"format": "\uf0ce",
+		"tooltip-format": "Spreadsheet",
+		"interval": "once",
+		"on-click": "defaultspreadsheet"
 	},
 	"custom/help": {
 		"format": "\uf1cd",
