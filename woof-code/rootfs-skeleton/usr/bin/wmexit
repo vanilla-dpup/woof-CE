@@ -44,8 +44,6 @@ echo -n "$EXITMODE" > /tmp/wmexitmode.txt
 
 ###########################################################
 
-while [ "`pidof snapmergepuppy`" ] ; do sleep 1 ; done
-
 killall `cat /etc/windowmanager`
 
 ### END ###

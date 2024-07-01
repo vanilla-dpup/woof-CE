@@ -19,9 +19,6 @@ fi
 echo "${DISTRO_NAME} ${DISTRO_VERSION} $(gettext 'is now shutting down...')" > /dev/console
 echo "Executing /etc/rc.d/rc.shutdown..."
 
-#v2.0.0 there could be a save tmpfs->persistent-storage running...
-while pidof -sq snapmergepuppy; do sleep 1; done
-
 cd /
 killall -TERM `cat /etc/windowmanager` > /dev/null 2>&1 #just a precaution...
 
