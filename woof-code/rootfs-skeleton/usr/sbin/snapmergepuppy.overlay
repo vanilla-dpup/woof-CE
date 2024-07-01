@@ -28,18 +28,6 @@
 #140102 SFR: various fixes + gettext
 #140512 SFR: performance improvements
 
-remove_merge_lock() {
- if [ $? -ne 255 ]; then
-  [ -e /tmp/snapmergepuppy.lock ] && rm -f /tmp/snapmergepuppy.lock
- fi
-}
-
-trap remove_merge_lock EXIT
-trap remove_merge_lock SIGKILL
-trap remove_merge_lock SIGTERM
-
-[ -e /tmp/snapmergepuppy.lock ] && exit 255
-
 export TEXTDOMAIN=snapmergepuppy
 export OUTPUT_CHARSET=UTF-8
 
@@ -49,8 +37,6 @@ export LANG=C
 #variables created at bootup by 'init' script in initramfs...
 . /etc/rc.d/PUPSTATE
 . /etc/DISTRO_SPECS
-
-touch /tmp/snapmergepuppy.lock
 
 if [ $PUPMODE -ne 13 ] ; then
 	echo "$0: Wrong PUPMODE ($PUPMODE)"

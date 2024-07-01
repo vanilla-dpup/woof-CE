@@ -19,19 +19,6 @@ if pidof -s `cat /etc/windowmanager 2>/dev/null` >/dev/null 2>&1 ; then
 	fi
 fi
 
-if pidof snapmergepuppy 2>/dev/null ; then
-	echo "snapmergepuppy is running"
-	exit 1
-fi
-
-if [ "$1" = "pup_event" ] ; then
-	RUNPS="`busybox ps`"
-	#some apps should not be disturbed by this background stuff...
-	if [ "`echo "$RUNPS" | grep -w -E 'make|cc|gcc|imake|cmake|new2dir|xorriso|xorrecord|xine|gxine|petget|wget|axel|dotpup|mplayer|gmplayer|gcurl|gimv|burniso2cd|growisofs|cdrecord|pcdripper|xfmedia|xmms|ripoff|pdvdrsab|pburn|mhwaveedit|installpkg\.sh|downloadpkgs\.sh|removepreview\.sh'`" != "" ] ; then
-		exit 1
-	fi
-fi
-
 if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
 	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons &
 	YAFPID=$!
@@ -39,8 +26,7 @@ else
 	echo "Saving RAM to 'pup_save'..."
 fi
 
-sync
-nice -n 19 snapmergepuppy
+nice -n 19 flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy
 [ "$YAFPID" ] && kill $YAFPID
 
 exit 0
