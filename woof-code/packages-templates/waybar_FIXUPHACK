@@ -4,7 +4,7 @@ cat << EOF > etc/xdg/autostart/waybar.desktop
 Encoding=UTF-8
 Type=Application
 NoDisplay=true
-Name=Panel Settings
+Name=waybar
 Exec=waybar
 EOF
 chmod 644 etc/xdg/autostart/waybar.desktop
@@ -411,7 +411,7 @@ ln -s presets/Horizontal/style.css root/.config/waybar/style.css
 cat << EOF > usr/share/applications/waybar-config.desktop
 [Desktop Entry]
 Encoding=UTF-8
-Name=waybar-config
+Name=Panel Settings
 Icon=sidebar-show-symbolic
 Comment=Change waybar preset
 Exec=waybar-config
