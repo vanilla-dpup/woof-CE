@@ -116,7 +116,6 @@ case $PUPMODE in
   ;;
  *)
   echo "$(gettext "Session not saved")" >/dev/console
-  sleep 2
   ;;
 esac
 
