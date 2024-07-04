@@ -2,48 +2,10 @@
 #(c) copyright 2007 Barry Kauler LGPL v2
 #launched from ~/.xinitrc, so X is running.
 
-. /etc/DISTRO_SPECS
-
-sleep 1 # let the dust settle first.
-
-# slow cpus need more delay.... raspi: 697.95  my laptop: 4789.47  c201: <= 48
-DELAYFACTOR=0
-case "$DISTRO_TARGETARCH" in
-  arm*) BOGOMIPS=800 ;;
-esac
-if [ ! "$BOGOMIPS" ]; then
-  BOGOMIPS=`grep -m 1 -i '^bogomips' /proc/cpuinfo | tr -d ' ' | cut -f 2 -d ':' | cut -f 1 -d '.'`
-fi
-[ $BOGOMIPS ] && DELAYFACTOR=$((800 / $BOGOMIPS))
-[ $DELAYFACTOR -gt 0 ] && sleep $DELAYFACTOR
-
-# offer to popup a getting-started html page...
-# change logic so get these when first boot full install...
-if [ ! -f /var/local/delayedrun_firstboot_flag ];then
-  if [ ! -f /tmp/delayedrun_firstboot_flag ];then
-    # if quicksetup restarts X, reenter here jumps this...
-    touch /tmp/delayedrun_firstboot_flag
-  fi
-  if [ -c /dev/mixer -o -c /dev/snd/controlC0 ];then #test for sound ready, see /etc/init.d/10alsa.
-   aplay /usr/share/audio/2barks.au &
-  fi
-  if [ $BOGOMIPS -lt 800 ] ; then
-   sleep 20 # needs time especially on pi 1 and zero
-   welcome1stboot
-  else
-   welcome1stboot
-  fi
-  [ "$DISTRO_TARGETARCH" = "x86" ] && sleep 3 # problem as tray applets only got launched after welcome msg exited.
-  touch /var/local/delayedrun_firstboot_flag
-fi
-
 if [ -d /root/Startup ];then
  for A in /root/Startup/* ; do
   $A 2>/dev/null & 
-  [ "$DISTRO_TARGETARCH" = "x86" ] && sleep 0.2
  done
 fi
-
-touch /tmp/delayedrun_finished_flag
 
 ### END ###
