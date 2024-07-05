@@ -44,7 +44,7 @@ case $1 in
   nvme[0-9]*n[0-9]*p[0-9]*) DEV="${DEV%p[0-9]*}" ;;
   *) exit 0 ;;
   esac
-  N="`cat /sys/block/$DEV/queue/discard_granularity 2>/dev/null`"
+  N="`cat /sys/block/$DEV/queue/discard_max_bytes 2>/dev/null`"
   [ -z "$N" ] && exit 0
   [ $N -eq 0 ] && exit 0
 
