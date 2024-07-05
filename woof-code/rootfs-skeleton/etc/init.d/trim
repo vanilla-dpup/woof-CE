@@ -4,10 +4,11 @@
 [ $PUPMODE -eq 5 ] && exit 0
 mountpoint -q /initrd/mnt/dev_save || exit 0
 
-# check once a day if the last trim was at least a week ago; we can't
+# check once an hour if the last trim was at least a week ago; we can't
 # check only once a week, because the system clock can be inaccurate
-# without an internet connection
-POLL=$((60*60*24))
+# without an internet connection and sleep doesn't check for clock jump
+# when waking up from suspend
+POLL=$((60*60))
 INTERVAL=$(($POLL*7))
 
 loop() {
