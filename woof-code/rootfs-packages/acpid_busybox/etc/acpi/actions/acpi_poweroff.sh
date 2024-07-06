@@ -1,1 +1,3 @@
-../../../usr/bin/wmpoweroff
+#!/bin/sh
+
+exec wmpoweroff
