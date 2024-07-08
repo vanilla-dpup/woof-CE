@@ -7,12 +7,8 @@ fi
 EOF
 esac
 
-if [ -e etc/connman/main.conf ]; then
-	cat << EOF >> etc/connman/main.conf
-
-# Puppy customization
-BackgroundScanning = false
-FallbackTimeservers = pool.ntp.org
-EnableOnlineCheck = false
-EOF
-fi
+sed -e 's/^# BackgroundScanning =.*/BackgroundScanning = false/' \
+    -e 's/^# FallbackTimeservers =.*/FallbackTimeservers = pool.ntp.org/' \
+    -e 's/^# EnableOnlineCheck =.*/EnableOnlineCheck = false/' \
+    -e 's/^# AllowHostnameUpdates =.*/AllowHostnameUpdates = false/' \
+    -i etc/connman/main.conf
