@@ -27,6 +27,7 @@ else
 	PARTS=""
 	while read LINE; do
 		read TYPE NAME FSTYPE SIZE <<< "$LINE"
+		[ -z "$SIZE" ] && continue # if unknown, type is empty
 		PARTS="${PARTS} ${NAME} ${FSTYPE} ${SIZE}"
 	done < <(lsblk -r -o type,name,fstype,size | grep ^part)
 
