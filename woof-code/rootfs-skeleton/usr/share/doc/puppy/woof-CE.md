@@ -43,7 +43,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 * Copying of SFSs is enabled automatically only if Puppy files reside on storage that doesn't support TRIM and assumed to be a slow device, like a hard drive, a memory card, a flash drive or a DRAM-less SSD.
 * SFSs are not copied to a ramdisk (`pfix=ram|copy` or automatic) but locked in page cache (see woof-code/rootfs-petbuilds/sfslock) instead, freeing ramdisk space.
-* The RAM occupied by cached SFSs is freed automatically (using OOM score adjustment) if needed.
+* The RAM occupied by cached SFSs is freed automatically (using [PSI](https://docs.kernel.org/accounting/psi.html) or OOM score adjustment) if needed.
 * SFSs are prioritized and lower priority SFSs are not cached when cached SFSs occupy half of available RAM.
 * If possible, save files are created as [sparse files](https://en.wikipedia.org/wiki/Sparse_file), to reduce writing to disk and retain usable free space in the partition.
 * Encrypted save files are implemented using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html) instead of LUKS, allowing encryption of specific directories (like the user's home directory) rather than the entire save file.

@@ -237,6 +237,7 @@ if [ $SFSLOCK -eq 1 ]; then
 		MEMTOTAL=$((MEMTOTALK * 1000))
 		LOCKLIMIT=$((MEMTOTAL / 2))
 		LOCKED=0
+		FIRST=1
 
 		# copy SFSs to RAM and prioritize frequently-accessed ones
 		for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-`uname -r`.sfs $EXTRASFSLIST; do
@@ -247,7 +248,9 @@ if [ $SFSLOCK -eq 1 ]; then
 			[ $LOCKED -gt $LOCKLIMIT ] && break
 			LOOP=${BACKF%/loop/backing_file}
 			LOOP=${LOOP#/sys/devices/virtual/block/}
+			[ $FIRST -eq 1 ] && sfsunlockd
 			sfslock /dev/${LOOP} || break
+			FIRST=0
 		done
 	) &
 	echo -e "\\033[64G\\033[1;33m[backgrounded]\\033[0;39m" >/dev/console
