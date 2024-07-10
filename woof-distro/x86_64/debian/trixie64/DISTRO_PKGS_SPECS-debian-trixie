@@ -57,6 +57,7 @@ yes|libglib2.0-dev|libglib2.0-dev|exe,dev,doc,nls||deps:yes
 yes|libgtk-3-dev|libgtk-3-dev|exe,dev,doc,nls||deps:yes
 yes|libgtk-layer-shell|libgtk-layer-shell-dev|exe,dev,doc,nls||deps:yes
 yes|libjpeg62-turbo-dev|libjpeg62-turbo-dev|exe,dev,doc,nls||deps:yes
+yes|libnss-myhostname|libnss-myhostname|exe,dev,doc,nls||deps:yes
 yes|libpam|libpam0g-dev|exe,dev,doc,nls||deps:yes
 yes|librsvg2-bin|librsvg2-bin|exe,dev,doc,nls||deps:yes
 yes|libssl-dev|libssl-dev|exe,dev,doc,nls||deps:yes
