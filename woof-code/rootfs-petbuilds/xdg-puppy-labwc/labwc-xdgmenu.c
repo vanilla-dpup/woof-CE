@@ -152,6 +152,7 @@ void process_entry(GMenuTreeEntry *entry)
     gchar *name = g_strdup (g_app_info_get_name(G_APP_INFO(app)));
     gchar *cmd = g_strdup (g_app_info_get_commandline(G_APP_INFO(app)));
     gchar *tmp;
+    gchar *escaped;
     int i;
 
     for (i = 0; i < strlen(cmd) - 1; i++) {
@@ -173,20 +174,23 @@ void process_entry(GMenuTreeEntry *entry)
 
     g_printf("  <item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)));
 
+    escaped = g_markup_escape_text(g_file_test(g_strchomp(cmd), G_FILE_TEST_EXISTS) ? basename(cmd) : cmd, -1);
+
     if (g_desktop_app_info_get_boolean(app, G_KEY_FILE_DESKTOP_KEY_TERMINAL))
     {
-        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", g_strchomp(basename(cmd)));
+        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", escaped);
         g_free(cmd);
         cmd = tmp;
         g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", cmd);
     }
     else
     {
-        g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", g_strchomp(basename(cmd)));
+        g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", escaped);
     }
 
     g_printf("  </item>\n");
 
+    g_free(escaped);
     g_free(name);
     g_free(cmd);
     gmenu_tree_item_unref(entry);
