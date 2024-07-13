@@ -19,11 +19,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	while (poll(&pfd, 1, -1) > 0) {
-		if (pfd.revents & POLLPRI)
-			break;
-		continue;
-	}
+	while (poll(&pfd, 1, -1) > 0 && !(pfd.revents & POLLPRI));
 
 	close(pfd.fd);
 	execl("/usr/bin/killall", "/usr/bin/killall", "-9", "sfslock", (char *)NULL);
