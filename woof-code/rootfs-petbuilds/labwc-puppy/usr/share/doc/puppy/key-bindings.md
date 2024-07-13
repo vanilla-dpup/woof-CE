@@ -4,6 +4,8 @@
 * Alt+Tab: next window
 * Super+Up: maximize or unmaximize window
 * Super+Down: minimize window
+* Super+Left: fill left half of display
+* Super+Right: fill right half of display
 * Ctl+Alt+Left: previous workspace
 * Ctl+Alt+Right: next workspace
 * Super+1: workspace 1
