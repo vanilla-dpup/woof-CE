@@ -105,7 +105,7 @@ sync -f "$BASE/"
 # DIRECTORIES
 # =============================================================================
 
-find . -mount -type d | tail +2 | sed -e 's/\.\///' | grep -v -E '^mnt|^media|^initrd|^proc|^sys|^tmp|^root/tmp|^dev|^var/tmp|^var/lock' |
+find . -mount -type d | tail +2 | sed -e 's/\.\///' |
 while read -r N
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
@@ -138,9 +138,7 @@ find . -mount \
 	   -not -type c \
 	   -not -type s \
 	   -not -type p \
-	   -regextype posix-extended \
-	   -not \( -regex '^./initrd.*|^./mnt.*|^./media.*|^./proc.*|^./sys.*|^./tmp.*|^./pup_.*|^./zdrv_.*|^./root/tmp.*|.*_zdrv_.*|^./dev.*|^./var/run.*|^./root/ftpd.*|^./var/tmp.*|^./var/lock.*|.*\.XLOADED$' \) \
-	   -not \( -regex '.*\.thumbnails.*|.*\.part$|.*\.crdownload$' \) \
+	   -not -path './initrd/*' \
 	   -printf "%s|%P|%l\n" | sort -rn |
 while IFS='|' read -r NSIZE N NDST
 do
