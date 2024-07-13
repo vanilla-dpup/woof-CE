@@ -761,6 +761,7 @@ stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ZDRVSFS" "z" ""
 
 # under PUPMODE 12, a dynamically loaded SFS may leave behind symlinks in the save layer
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin chroot /pup_new /usr/sbin/sfs_load.overlay --cli stop
+rm -f /pup_new/run/sfs_load.lock
 
 # load all other SFSs, sorted numerically
 CNT=3
