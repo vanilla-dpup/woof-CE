@@ -2,6 +2,7 @@
 
 ## For Users
 
+- [Key bindings](key-bindings.md)
 - [Bootflash](bootflash.md)
 - [pupsave](pupsave.md)
 - [Boot codes](boot-codes.md)
