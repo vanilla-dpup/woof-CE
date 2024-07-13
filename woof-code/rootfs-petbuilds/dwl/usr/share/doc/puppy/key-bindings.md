@@ -19,6 +19,12 @@
 * Super+.: next monitor
 * Super+Shift+,: move window to previous monitor
 * Super+Shift+.: move window to next monitor
+* Super+0: show all windows
+* Super+Shift+0: set all tags for window
+* Super+[1-9]: view single tag
+* Super+Ctrl+[1-9]: show or hide windows with tag
+* Super+Shift+[1-9]: move window to tag
+* Super+Ctrl+Shift+[1-9]: toggle tag for window
 * Super+w: web browser
 * Ctrl+Alt+t: terminal
 * Alt+Tab: next window
