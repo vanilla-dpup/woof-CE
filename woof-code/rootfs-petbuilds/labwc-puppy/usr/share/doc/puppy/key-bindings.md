@@ -14,7 +14,8 @@
 * PrtScn: screenshot
 * Shift+PrtScn: partial screenshot
 * Super+Shift+s: partial screenshot
-* Alt+F1: menu
+* Alt+F1: root menu
+* Alt+Space: window menu
 * Alt+F2: launcher
 * Super+l: lock screen
 * Super+r: launcher
