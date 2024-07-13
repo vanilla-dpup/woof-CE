@@ -37,8 +37,8 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"on-click": "altf1"
 	},
 	"wlr/taskbar": {
-		"format": "{icon} {title}",
-		"icon-size": 16,
+		"format": "{icon}",
+		"icon-size": 24,
 		"tooltip-format": "{title}",
 		"on-click": "activate",
 		"on-click-middle": "close"
