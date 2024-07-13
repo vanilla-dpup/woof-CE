@@ -18,6 +18,8 @@
     <cornerRadius>0</cornerRadius>
   </theme>
 
+  <desktops number="3"/>
+
   <keyboard>
     <default />
 
@@ -33,6 +35,26 @@
 
     <keybind key="W-Down">
       <action name="Iconify" />
+    </keybind>
+
+    <keybind key="C-A-Left">
+      <action name="GoToDesktop" to="left" />
+    </keybind>
+
+    <keybind key="C-A-Right">
+      <action name="GoToDesktop" to="right" />
+    </keybind>
+
+    <keybind key="W-1">
+      <action name="GoToDesktop" to="1" />
+    </keybind>
+
+    <keybind key="W-2">
+      <action name="GoToDesktop" to="2" />
+    </keybind>
+
+    <keybind key="W-3">
+      <action name="GoToDesktop" to="3" />
     </keybind>
 
     <keybind key="XF86_AudioLowerVolume">
