@@ -256,8 +256,6 @@ if [ $SFSLOCK -eq 1 ]; then
 	echo -e "\\033[64G\\033[1;33m[backgrounded]\\033[0;39m" >/dev/console
 fi
 ######################LOAD SWAP#####################
-# we prefer not to use swap unless we have to; this should improve responsiveness if we don't have much RAM
-echo 5 > /proc/sys/vm/swappiness
 EXTRAALLOCK=0
 loadswap_func
 if [ "$SWAPON" = "yes" ];then
