@@ -1,0 +1,7 @@
+#!/bin/sh
+
+HOSTNAME=`yad --title=hostname-set --entry`
+[ -z "$HOSTNAME" ] && exit 1
+
+echo "$HOSTNAME" > /etc/hostname
+hostname -F /etc/hostname

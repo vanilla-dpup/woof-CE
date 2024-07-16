@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Set Hostname
+Exec=hostname-set
+Terminal=false
+Type=Application
+Categories=X-Setup-wizard
+GenericName=hostname-set
