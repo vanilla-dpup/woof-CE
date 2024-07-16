@@ -234,10 +234,7 @@ cat >> $TMPFW << EOF_FWNEXT
 echo "Flushing Tables ..."
 
 # Reset Default Policies
-iptables -P INPUT DROP
 iptables -P OUTPUT ACCEPT
-
-ip6tables -P INPUT DROP
 ip6tables -P OUTPUT ACCEPT
 
 # Flush all rules
@@ -250,9 +247,15 @@ ip6tables -X
 
 if [ "\$1" = "stop" ]
 then
+	iptables -P INPUT ACCEPT
+	ip6tables -P INPUT ACCEPT
+
 	echo "Firewall completely flushed!  Now running with no firewall."
 	exit 0
 fi
+
+iptables -P INPUT DROP
+ip6tables -P INPUT DROP
 
 ###############################################################################
 #
