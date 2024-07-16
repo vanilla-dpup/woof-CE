@@ -1,0 +1,8 @@
+download() {
+    :
+}
+
+build() {
+    $CC $CFLAGS `pkg-config --cflags libxxhash` update-adlist.c $LDFLAGS `pkg-config --libs libxxhash` -o /usr/sbin/update-adlist
+    $CC $CFLAGS `pkg-config --cflags libxxhash` nss-adlist.c $LDFLAGS `pkg-config --libs libxxhash` -shared -o `ls -d /usr/lib/*-linux-*`/libnss_adlist.so.2
+}

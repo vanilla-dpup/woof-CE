@@ -61,6 +61,7 @@ yes|libnss-myhostname|libnss-myhostname|exe,dev,doc,nls||deps:yes
 yes|libpam|libpam0g-dev|exe,dev,doc,nls||deps:yes
 yes|librsvg2-bin|librsvg2-bin|exe,dev,doc,nls||deps:yes
 yes|libssl-dev|libssl-dev|exe,dev,doc,nls||deps:yes
+yes|libxxhash-dev|libxxhash-dev|exe,dev,doc,nls||deps:yes # needed by pup_advert_blocker
 yes|parted|parted|exe,dev,doc,nls||deps:yes
 yes|pavucontrol|pavucontrol|exe,dev,doc,nls||deps:yes
 yes|pipewire|pipewire-pulse,pipewire-alsa,libspa-0.2-bluetooth,libpipewire-0.3-dev|exe,dev,doc,nls||deps:yes

@@ -1,0 +1,1 @@
+This is a fast version of pup-advert-blocker that blocks domains using a NSS module that performs binary search on /var/cache/pup_advert_blocker/adlist, a sorted array of XXH3 hashes, instead of appending many rows to /etc/hosts.

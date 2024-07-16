@@ -1,0 +1,6 @@
+sed -i 's/ dns$/ adlist dns/g' etc/nsswitch.conf
+
+rm -f etc/resolv.conf
+cp -f /etc/resolv.conf etc/resolv.conf
+chroot . /usr/sbin/pup-advert-blocker start
+rm -f etc/resolv.conf
