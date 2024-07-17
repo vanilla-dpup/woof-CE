@@ -11,6 +11,10 @@
     <policy>cursor</policy>
   </placement>
 
+  <resize>
+    <drawContents>no</drawContents>
+  </resize>
+
   <!-- set by ptheme-labwc -->
   <theme><name>Gradient-grey</name></theme>
 
