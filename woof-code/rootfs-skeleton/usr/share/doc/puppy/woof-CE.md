@@ -30,6 +30,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`.
 * SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`.
 * Rarely-used boot codes like `pimod` and `pwireless` are gone.
+* `puppyhelp` displays short and easy to maintain .md files, instead of displaying outdated and lengthy .html files using a web browser. Documentation is expanded to cover topics like boot codes, PUPMODEs and even rebuilding the currently running OS, allowing the user to learn the new system in offline-first manner.
 
 ### Compatibility
 
@@ -54,12 +55,15 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
 * 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
 * `save2flash` is much faster because it copies modified blocks rather than whole files from RAM to disk.
+* The pup-advert-blocker ad blocking tool is reimplemented using a [NSS module](https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) that checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line.
+* firewall_ng is enabled by default and much simplified: it produces a short list of rules what describe packets to accept, instead of explictly blocking many kinds of packets and accepting anything else. In addition, it no longer does things that make sense on a router or a server, but don't do anything in an endpoint.
 
 ### Security
 
 * Save folders support encryption, using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html).
 * The [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox that restricts file system access for applications running as spot is stricter and also prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777, but without this new restriction, spot can access /initrd/mnt/dev_save/*save/upper/root instead, to bypass the sandbox. This breaks compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
 * Most legacy X11 applications work thanks to [Xwayland](https://wayland.freedesktop.org/xserver.html), which is unprivileged and sandboxed.
+* Common sysfs hardening recommendations are applied out of the box.
 
 ### Modernization
 
