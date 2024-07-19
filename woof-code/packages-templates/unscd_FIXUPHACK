@@ -1,1 +1,1 @@
-sed -i -E 's/(enable-cache\s+hosts\s+)no/\1yes/' etc/nscd.conf
+sed -i -E -e 's/(enable-cache\s+hosts\s+)no/\1yes/' -e 's/^# max-threads .*/max-threads 64/' etc/nscd.conf
