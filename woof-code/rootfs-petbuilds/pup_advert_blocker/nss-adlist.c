@@ -67,6 +67,8 @@ enum nss_status _nss_adlist_gethostbyname2_r(const char *name,
 		return NSS_STATUS_UNAVAIL;
 	}
 
+	madvise(p, stbuf.st_size, MADV_RANDOM);
+
 	hash = XXH3_64bits(name, strlen(name));
 
 	if (!bsearch(&hash, p, stbuf.st_size / sizeof(hash), sizeof(hash), hashcmp)) {
