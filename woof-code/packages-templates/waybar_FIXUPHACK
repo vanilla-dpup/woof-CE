@@ -408,7 +408,7 @@ EOF
 cat << EOF > usr/bin/firewallstatus
 #!/bin/sh
 
-[ \`iptables -nvL | wc -l\` -gt 10 ] && echo '{"text":"\uf132 on","tooltip":"Firewall on"}' || echo '{"text":"\uf06d off","tooltip":"Firewall off"}'
+[ -n "\`nft list tables\`" ] && echo '{"text":"\uf132 on","tooltip":"Firewall on"}' || echo '{"text":"\uf06d off","tooltip":"Firewall off"}'
 EOF
 chmod 755 usr/bin/firewallstatus
 
