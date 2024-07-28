@@ -445,7 +445,6 @@ fi
 [ "$MAIN" = "false" -a "$CONFIG_SSH" = "false" -a "$CONFIG_CUPS" = "false" -a "$CONFIG_SAMBA" = "false" -a "$CONFIG_DLNA" = "false" -a "$CONFIG_NTP" = "false" -a "$CONFIG_FTP" = "false" -a "$CONFIG_HTTP" = "false" -a "$CONFIG_DNS" = "false" -a "$CONFIG_DHCP" = "false" -a "$CONFIG_NFS" = "false" ] && exit
 
 # run it!
-yad --image=system-run --layer=overlay --edge=top --text="Starting firewall" --no-buttons --timeout=2 &
 urxvt -bg yellow -fg black -geometry 60X10+1+1 --hold -e /etc/init.d/rc.firewall start &
 p=$!
 sleep 6
