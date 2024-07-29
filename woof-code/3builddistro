@@ -82,6 +82,16 @@ rmdir rootfs-skeleton/{bin,sbin}
 cp -a rootfs-skeleton/* rootfs-complete/
 sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" -e "s/DISTRO_FILE_PREFIX/$DISTRO_FILE_PREFIX/g" rootfs-complete/usr/share/doc/puppy/*.md
 install -m 644 ../README.md rootfs-complete/usr/share/doc/puppy/woof-CE.md
+cat << EOF > /tmp/index.md
+# ${DISTRO_NAME} ${DISTRO_VERSION}
+
+EOF
+while read LINE; do
+	IFS=: read NAME TITLE <<< "$LINE"
+	echo "- [${TITLE}](${NAME##*/})"
+done < <(grep -m1 '^# ' rootfs-complete/usr/share/doc/puppy/*.md | sed -E 's/:#\s+/:/g' | sort -f) >> /tmp/index.md
+mv -f /tmp/index.md rootfs-complete/usr/share/doc/puppy/
+chmod 644 rootfs-complete/usr/share/doc/puppy/index.md
 install -m 644 ../LICENSE rootfs-complete/usr/share/doc/puppy/LICENSE
 
 cd rootfs-complete
