@@ -1,0 +1,22 @@
+#!/bin/bash
+
+DIALOG="yad --title=services-config --height=360 --width=240 --list --column=Enabled:CHK --column=Name:TEXT --print-all"
+
+for SCRIPT in /etc/init.d/*; do
+	[ "$SCRIPT" = "/etc/init.d/dbus" ] && continue
+
+	if [ -x "$SCRIPT" ]; then
+		DIALOG="${DIALOG} true ${SCRIPT##*/}"
+	else
+		DIALOG="${DIALOG} false ${SCRIPT##*/}"
+	fi
+done
+
+while read LINE; do
+	IFS='|' read CHECK NAME <<< "$LINE"
+	if [ "$CHECK" = TRUE ]; then
+		[ -x "/etc/init.d/${NAME}" ] || chmod +x "/etc/init.d/${NAME}"
+	else
+		[ -x "/etc/init.d/${NAME}" ] && chmod -x "/etc/init.d/${NAME}"
+	fi
+done < <(eval $DIALOG)
