@@ -1,0 +1,11 @@
+cat << EOF > usr/share/applications/cups-admin.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=Printer Settings
+Icon=printer-symbolic
+Exec=xdg-open http://localhost:631/admin
+Terminal=false
+Type=Application
+Categories=X-SetupUtility;
+EOF
+chmod 644 usr/share/applications/cups-admin.desktop
