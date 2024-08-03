@@ -45,7 +45,6 @@ yes|exfatprogs|exfatprogs|exe,dev,doc,nls||deps:yes
 yes|f2fs-tools|f2fs-tools|exe,dev,doc,nls||deps:yes
 yes|gettext-base|gettext-base|exe,dev,doc,nls||deps:yes
 yes|locales|locales|exe,dev,doc,nls>exe||deps:yes
-yes|gxmessage|gxmessage|exe,dev,doc,nls||deps:yes
 yes|kmod|kmod|exe,dev,doc,nls||deps:yes
 yes|l3afpad|l3afpad|exe,dev,doc,nls||deps:yes
 yes|less|less|exe,dev>null,doc,nls||deps:yes
