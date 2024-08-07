@@ -1,6 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=Screenshot
+Icon=camera-photo-symbolic
 Exec=mtpaint-screenshot
 Terminal=false
 Type=Application

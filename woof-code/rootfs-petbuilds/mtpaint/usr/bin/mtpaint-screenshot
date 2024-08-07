@@ -1,8 +1,27 @@
 #!/bin/ash
 
+GEOM=""
+if [ "$1" = "full" ]; then
+	STYLE=2
+elif [ "$1" = "region" ]; then
+	STYLE=3
+elif command -v slurp > /dev/null; then
+	yad --title=Screenshot --window-icon=camera-photo-symbolic --button="Whole screen"\!edit-select-all-symbolic:2 --button="Select region"\!edit-select-symbolic:3
+	STYLE=$?
+	[ $STYLE -eq 2 -o $STYLE -eq 3 ] || exit
+else
+	STYLE=2
+fi
+
+[ $STYLE -eq 3 ] && GEOM="`slurp`"
+
 if [ -n "$WAYLAND_DISPLAY" ]; then
 	F=`mktemp /tmp/screenshot.XXXXXXXXXX`
-	grim $F
+	if [ -z "$GEOM" ]; then
+		grim $F
+	else
+		grim -g "$GEOM" $F
+	fi
 	mtpaint $F
 	rm -f $F
 else
