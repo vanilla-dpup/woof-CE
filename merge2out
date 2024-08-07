@@ -162,6 +162,8 @@ do
 done
 echo
 
+install -m 644 LICENSE ../${WOOF_OUT}/LICENSE
+install -m 644 LICENSE ../${WOOF_OUT}/rootfs-skeleton/usr/share/doc/puppy/LICENSE
 ln -s rootfs-skeleton/usr/share/doc/puppy/woof-CE.md ../${WOOF_OUT}/README.md
 
 chown -R root:root ../${WOOF_OUT}
