@@ -95,7 +95,6 @@ yes|slurp|slurp|exe,dev,doc,nls||deps:yes
 no|swayidle|swayidle|exe,dev,doc,nls||deps:yes # using swayidle petbuild without logind support
 no|swaylock|swaylock|exe,dev,doc,nls||deps: yes # using swaylock petbuild with root patch
 yes|wdisplays|wdisplays|exe,dev,doc,nls||deps:yes
-yes|wf-recorder|wf-recorder|exe,dev,doc,nls||deps:yes
 yes|wlopm|wlopm|exe,dev,doc,nls||deps:yes
 yes|wlr-randr|wlr-randr|exe,dev,doc,nls||deps:yes
 yes|xdg-desktop-portal-gtk|xdg-desktop-portal-gtk|exe,dev,doc,nls||deps:yes
@@ -159,6 +158,7 @@ yes|putty|putty|exe,dev,doc,nls||deps:yes
 yes|transmission-gtk|transmission-gtk|exe,dev,doc,nls||deps:yes
 yes|viewnior|viewnior|exe,dev,doc,nls||deps:yes
 yes|weechat|weechat,weechat-curses,weechat-headless|exe,dev,doc,nls||deps:yes
+yes|wf-recorder|wf-recorder|exe,dev,doc,nls||deps:yes
 yes|xarchiver|xarchiver|exe,dev,doc,nls||deps:yes
 yes|xournalpp|xournalpp|exe,dev,doc,nls||deps:yes
 "

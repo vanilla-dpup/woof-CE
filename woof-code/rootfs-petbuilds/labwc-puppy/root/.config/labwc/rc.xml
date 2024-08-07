@@ -78,11 +78,11 @@
     </keybind>
 
     <keybind key="S-Print">
-      <action name="Execute"><command>mtpaint-screenshot region</command></action>
+      <action name="Execute"><command>screenshot region</command></action>
     </keybind>
 
     <keybind key="W-S-s">
-      <action name="Execute"><command>mtpaint-screenshot region</command></action>
+      <action name="Execute"><command>screenshot region</command></action>
     </keybind>
 
     <keybind key="A-F1">

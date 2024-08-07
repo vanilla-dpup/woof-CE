@@ -1,0 +1,55 @@
+#!/bin/bash
+
+if [ "$1" = "full" ]; then
+	FULL=1
+elif [ "$1" = "region" ]; then
+	FULL=0
+elif command -v slurp > /dev/null; then
+	yad --layer=overlay --edge=bottom --button="Whole screen"\!edit-select-all-symbolic:2 --button="Select region"\!edit-select-symbolic:3 --button=gtk-cancel:1
+	RET=$?
+	[ $RET -eq 2 -o $RET -eq 3 ] || exit
+	FULL=1
+	[ $RET -eq 3 ] && FULL=0
+else
+	FULL=1
+fi
+
+GEOM=""
+[ $FULL -eq 0 ] && GEOM="`slurp`"
+
+VIDEO=0
+if command -v wf-recorder > /dev/null; then
+	yad --layer=overlay --edge=bottom --button=Image\!camera-photo-symbolic:2 --button=Video\!camera-video-symbolic:3 --button=gtk-cancel:1
+	RET=$?
+	[ $RET -eq 2 -o $RET -eq 3 ] || exit
+	[ $RET -eq 3 ] && VIDEO=1
+fi
+
+if [ $VIDEO -eq 0 ]; then
+	DST=`yad --layer=overlay --edge=bottom --file --save --confirm-overwrite --filename=screenshot.png`
+	[ -z "$DST" ] && exit
+
+	if [ -z "$GEOM" ]; then
+		grim "$DST"
+	else
+		grim -g "$GEOM" "$DST"
+	fi
+else
+	DST=`yad --layer=overlay --edge=bottom --file --save --confirm-overwrite --filename=recording.mkv`
+	[ -z "$DST" ] && exit
+
+	if [ -z "$GEOM" ]; then
+		wf-recorder -f "$DST" &
+	else
+		wf-recorder -f "$DST" -g "$GEOM" &
+	fi
+	PID=$!
+
+	yad --layer=overlay --edge=bottomright --button="Stop recording"\!gtk-stop
+	kill -INT $PID
+	while kill -0 $PID 2>/dev/null; do
+		sleep 0.5
+	done
+fi
+
+exec xdg-open "$DST"

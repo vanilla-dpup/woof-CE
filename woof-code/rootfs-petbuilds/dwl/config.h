@@ -128,7 +128,7 @@ static const char *volumeupcmd[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK
 static const char *volumedowncmd[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "1%-", NULL };
 static const char *mutecmd[] = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
 static const char *screenshotcmd[] = { "defaultscreenshot", NULL };
-static const char *regionscreenshotcmd[] = { "mtpaint-screenshot", "region", NULL };
+static const char *regionscreenshotcmd[] = { "screenshot", "region", NULL };
 static const char *browsercmd[] = { "defaultbrowser", NULL };
 
 static const Key keys[] = {
