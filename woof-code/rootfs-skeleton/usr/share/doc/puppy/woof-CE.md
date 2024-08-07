@@ -30,6 +30,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`.
 * SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`.
 * Rarely-used boot codes like `pimod` and `pwireless` are gone.
+* Puppy's elaborate configuration wizards are replaced with simple [yad](https://github.com/step-/yad)-based tools that do one thing: for example, a hostname changer and a locale changer.
 * `puppyhelp` displays short and easy to maintain .md files, instead of displaying outdated and lengthy .html files using a web browser. Documentation is expanded to cover topics like boot codes, PUPMODEs and even rebuilding the currently running OS, allowing the user to learn the new system in offline-first manner.
 
 ### Compatibility
@@ -56,7 +57,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
 * `save2flash` is much faster because it copies modified blocks rather than whole files from RAM to disk.
 * The pup-advert-blocker ad blocking tool is reimplemented using a [NSS module](https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) that checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line.
-* firewall_ng is enabled by default and much simplified: it produces a short list of rules what describe packets to accept, instead of explictly blocking many kinds of packets and accepting anything else. In addition, it no longer does things that make sense on a router or a server, but don't do anything in an endpoint.
+* firewall_ng is enabled by default, ported to [nftables](https://netfilter.org/projects/nftables) and much simplified: it produces a short list of rules what describe packets to accept, instead of explictly blocking many kinds of packets and accepting anything else. In addition, it no longer does things that make sense on a router or a server, but don't do anything in an endpoint.
 
 ### Security
 
@@ -70,6 +71,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Only dpup ([Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based Puppy) is supported.
 * Only Wayland is supported: support for X.Org and tools that modify xorg.conf is gone.
 * Only [PipeWire](https://pipewire.org/) is supported: support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone.
+* Screenshots, cropped screenshots and screen recording are supported out of the box, with key bindings.
 * Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
 * usrmerge is mandatory: support for the deprecated file system layout with separate /lib and /usr/lib, is gone.
 * Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported: support for aufs is gone.
