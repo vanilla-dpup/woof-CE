@@ -191,7 +191,7 @@ cd "$WD"
 error_msg () {
 	if [ "$SHUTDOWN" = "no" -a "$XRUNNING" = "yes" ];then
 		export DISPLAY=':0'
-		yad --image=dialog-warning --layer=overlay --edge=top --text="$1" --no-buttons --timeout=30
+		yad --image=dialog-warning --layer=overlay --edge=top --text="$1" --no-buttons --no-focus --timeout=30
 	else
 		echo "$1"
 	fi

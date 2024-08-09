@@ -258,7 +258,7 @@ fi
 
 msg="$(printf "$(gettext 'Creating %s/pupswap.swp...')" "${SWAP_PART}")"
 if [ $GUI ] ; then
-	yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons &
+	yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --no-focus &
 	pid=$!
 else
 	echo -e "\n\n$msg"
@@ -271,7 +271,7 @@ if [ $? -eq 0 ] ; then
 	msg="$(gettext 'pupswap.swp successfully created')"
 	if [ $GUI ] ; then
 		kill -9 $pid
-		yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
+		yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --no-focus --timeout=3
 	else
 		echo -e "\n$msg" && sleep 3
 	fi
@@ -279,7 +279,7 @@ else
 	msg="$(gettext 'Error(s) creating pupswap.swp')"
 	if [ $GUI ] ; then
 		kill -9 $pid
-		yad --image=dialog-error --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
+		yad --image=dialog-error --layer=overlay --edge=top --text="$msg" --no-buttons --no-focus --timeout=3
 	else
 		echo -e "\n$msg" && sleep 3
 	fi
@@ -300,11 +300,11 @@ if [ $TOTALSWAP -eq 0 ] ; then
 	if [ $? -eq 0 ] ; then
 		msg="$(printf "$(gettext "'%s' successfully loaded!")" "${SWAP_PART}/pupswap.swp")"
 		echo -e "\n$msg"
-		[ $GUI ] && yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
+		[ $GUI ] && yad --image=dialog-information --layer=overlay --edge=top --text="$msg" --no-buttons --no-focus --timeout=3
 	else
 		msg="$(printf "$(gettext "ERROR loading '%s'")" "${SWAP_PART}/pupswap.swp")"
 		echo -e "\n$msg"
-		[ $GUI ] && yad --image=dialog-error --layer=overlay --edge=top --text="$msg" --no-buttons --timeout=3
+		[ $GUI ] && yad --image=dialog-error --layer=overlay --edge=top --text="$msg" --no-buttons --no-focus --timeout=3
 	fi
 fi
 

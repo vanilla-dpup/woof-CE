@@ -1,6 +1,6 @@
-From 64f67bcca4a5328d4a999d21f489c744eea7c955 Mon Sep 17 00:00:00 2001
+From f2dc2949b7115c8978938b688570744d8be016db Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Fri, 17 May 2024 12:26:02 +0300
+Date: Tue, 21 May 2024 08:48:37 +0300
 Subject: [PATCH] add Meson port with layer-shell support
 
 ---
@@ -93,7 +93,7 @@ index 0000000..2ceeb76
 +add_project_arguments('-DGETTEXT_PACKAGE="yad"', language:'c')
 +i18n.gettext('yad')
 diff --git a/src/main.c b/src/main.c
-index b1419b0..cffd07d 100644
+index b1419b0..86469ad 100644
 --- a/src/main.c
 +++ b/src/main.c
 @@ -33,6 +33,10 @@
@@ -123,42 +123,42 @@ index b1419b0..cffd07d 100644
 +#ifdef HAVE_GTK_LAYER_SHELL
 +  if (options.data.layer)
 +    {
-+      if (strcmp(options.data.layer, "background") == 0)
++      if (strcasecmp (options.data.layer, "background") == 0)
 +        layer = GTK_LAYER_SHELL_LAYER_BACKGROUND;
-+      else if (strcmp(options.data.layer, "bottom") == 0)
++      else if (strcasecmp (options.data.layer, "bottom") == 0)
 +        layer = GTK_LAYER_SHELL_LAYER_BOTTOM;
-+      else if (strcmp(options.data.layer, "top") == 0)
++      else if (strcasecmp (options.data.layer, "top") == 0)
 +        layer = GTK_LAYER_SHELL_LAYER_TOP;
-+      else if (strcmp(options.data.layer, "overlay") == 0)
++      else if (strcasecmp (options.data.layer, "overlay") == 0)
 +        layer = GTK_LAYER_SHELL_LAYER_OVERLAY;
 +   }
 +
 +  if (options.data.edge)
 +    {
-+      if (strcmp(options.data.edge, "top") == 0)
++      if (strcasecmp (options.data.edge, "top") == 0)
 +        edge = GTK_LAYER_SHELL_EDGE_TOP;
-+      else if (strcmp(options.data.edge, "bottom") == 0)
++      else if (strcasecmp (options.data.edge, "bottom") == 0)
 +        edge = GTK_LAYER_SHELL_EDGE_BOTTOM;
-+      else if (strcmp(options.data.edge, "left") == 0)
++      else if (strcasecmp (options.data.edge, "left") == 0)
 +        edge = GTK_LAYER_SHELL_EDGE_LEFT;
-+      else if (strcmp(options.data.edge, "right") == 0)
++      else if (strcasecmp (options.data.edge, "right") == 0)
 +        edge = GTK_LAYER_SHELL_EDGE_RIGHT;
-+      else if (strcmp(options.data.edge, "topleft") == 0)
++      else if (strcasecmp (options.data.edge, "topleft") == 0)
 +        {
 +          edge = GTK_LAYER_SHELL_EDGE_LEFT;
 +          corner = GTK_LAYER_SHELL_EDGE_TOP;
 +        }
-+      else if (strcmp(options.data.edge, "topright") == 0)
++      else if (strcasecmp (options.data.edge, "topright") == 0)
 +        {
 +          edge = GTK_LAYER_SHELL_EDGE_RIGHT;
 +          corner = GTK_LAYER_SHELL_EDGE_TOP;
 +        }
-+      else if (strcmp(options.data.edge, "bottomleft") == 0)
++      else if (strcasecmp (options.data.edge, "bottomleft") == 0)
 +        {
 +          edge = GTK_LAYER_SHELL_EDGE_LEFT;
 +          corner = GTK_LAYER_SHELL_EDGE_BOTTOM;
 +        }
-+      else if (strcmp(options.data.edge, "bottomright") == 0)
++      else if (strcasecmp (options.data.edge, "bottomright") == 0)
 +        {
 +          edge = GTK_LAYER_SHELL_EDGE_RIGHT;
 +          corner = GTK_LAYER_SHELL_EDGE_BOTTOM;
@@ -166,21 +166,21 @@ index b1419b0..cffd07d 100644
 +    }
 +
 +     if (layer != GTK_LAYER_SHELL_LAYER_ENTRY_NUMBER || edge != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER || corner != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER)
-+       gtk_layer_init_for_window(GTK_WINDOW(dlg));
++       gtk_layer_init_for_window (GTK_WINDOW (dlg));
 +
 +     if (layer != GTK_LAYER_SHELL_LAYER_ENTRY_NUMBER)
-+       gtk_layer_set_layer(GTK_WINDOW(dlg), layer);
++       gtk_layer_set_layer (GTK_WINDOW (dlg), layer);
 +
 +     if (edge != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER)
 +       {
-+         gtk_layer_set_exclusive_zone(GTK_WINDOW(dlg), 0);
-+         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_LEFT, 20);
-+         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_RIGHT, 20);
-+         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_TOP, 10);
-+         gtk_layer_set_margin(GTK_WINDOW(dlg), GTK_LAYER_SHELL_EDGE_BOTTOM, 20);
-+         gtk_layer_set_anchor(GTK_WINDOW(dlg), edge, TRUE);
++         gtk_layer_set_exclusive_zone (GTK_WINDOW (dlg), 0);
++         gtk_layer_set_margin (GTK_WINDOW (dlg), GTK_LAYER_SHELL_EDGE_LEFT, 20);
++         gtk_layer_set_margin (GTK_WINDOW (dlg), GTK_LAYER_SHELL_EDGE_RIGHT, 20);
++         gtk_layer_set_margin (GTK_WINDOW (dlg), GTK_LAYER_SHELL_EDGE_TOP, 10);
++         gtk_layer_set_margin (GTK_WINDOW (dlg), GTK_LAYER_SHELL_EDGE_BOTTOM, 20);
++         gtk_layer_set_anchor (GTK_WINDOW (dlg), edge, TRUE);
 +         if (corner != GTK_LAYER_SHELL_EDGE_ENTRY_NUMBER)
-+           gtk_layer_set_anchor(GTK_WINDOW(dlg), corner, TRUE);
++           gtk_layer_set_anchor (GTK_WINDOW (dlg), corner, TRUE);
 +       }
 +#endif
 +

@@ -45,7 +45,7 @@ else
 	fi
 	PID=$!
 
-	yad --layer=overlay --edge=bottomright --button="Stop recording"\!gtk-stop
+	yad --layer=overlay --edge=bottomright --no-focus --button="Stop recording"\!gtk-stop
 	kill -INT $PID
 	while kill -0 $PID 2>/dev/null; do
 		sleep 0.5

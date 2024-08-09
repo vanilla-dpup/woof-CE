@@ -248,7 +248,7 @@ if [ $nTIMEOUT -a $nTIMEOUT -ne 0  ];then #assume 0 means never timeout.
  #note, jwm will use module16.xpm as the window icon...
  /tmp/pupdialog_exec --center --class="module16" --program=PUP${$}DLG --styles=/tmp/pupdialog_gtk3.css > /tmp/pupdialog_retvals${$} &
  dlgPID=$!
- yad --layer=overlay --edge=top --text=" ${SPLASHSTR}" --no-buttons --timeout=${nTIMEOUT} --timeout-indicator=bottom >/dev/null
+ yad --layer=overlay --edge=top --text=" ${SPLASHSTR}" --no-buttons --no-focus --timeout=${nTIMEOUT} --timeout-indicator=bottom >/dev/null
  if [ $? -eq 70 ];then #has timed out.
   kill $dlgPID
   rm -f /tmp/pupdialog_gtkrc${$}

@@ -324,7 +324,7 @@ esac
 
 X1PID=0
 if [ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] ; then
-	yad --image=system-run --layer=overlay --edge=top --text="$(printf "$(gettext 'Please wait, formatting %s drive...')" "${USBDRV}")" --no-buttons &
+	yad --image=system-run --layer=overlay --edge=top --text="$(printf "$(gettext 'Please wait, formatting %s drive...')" "${USBDRV}")" --no-buttons --no-focus &
 	X1PID=$!
 fi
 
@@ -353,7 +353,7 @@ if [ $? -ne 0 ];then
 fi
 
 if [ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] ; then
-	yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Please wait, copying files...')" --no-buttons &
+	yad --image=system-run --layer=overlay --edge=top --text="$(gettext 'Please wait, copying files...')" --no-buttons --no-focus &
 	X1PID=$!
 fi
 

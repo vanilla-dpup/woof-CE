@@ -15,7 +15,7 @@ if [ -z "$1" ]; then
 
 	IFS='|' read ID NAME VER <<< "$CHOICE"
 
-	yad --image=package-x-generic-symbolic --layer=overlay --edge=top --text="Removing ${NAME}" --no-buttons &
+	yad --image=package-x-generic-symbolic --layer=overlay --edge=top --text="Removing ${NAME}" --no-buttons --no-focus &
 	PID=$!
 
 	while read ABSPATH; do
@@ -44,7 +44,7 @@ fi
 
 yad --title petget --window-icon=gtk-preferences --button=gtk-yes --button=gtk-no --text="Install ${1##*/}?" || exit
 
-yad --image=package-x-generic-symbolic --layer=overlay --edge=top --text="Installing ${1##*/}" --no-buttons &
+yad --image=package-x-generic-symbolic --layer=overlay --edge=top --text="Installing ${1##*/}" --no-buttons --no-focus &
 PID=$!
 
 [ "`head -c 6 "$1" | od -A none -t x4`" = " 587a37fd 0000005a" ] && flag=J || flag=z

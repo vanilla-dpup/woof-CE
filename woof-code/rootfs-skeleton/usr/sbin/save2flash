@@ -20,7 +20,7 @@ if pidof -s `cat /etc/windowmanager 2>/dev/null` >/dev/null 2>&1 ; then
 fi
 
 if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
-	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons &
+	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons --no-focus &
 	YAFPID=$!
 else
 	echo "Saving RAM to 'pup_save'..."

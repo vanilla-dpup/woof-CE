@@ -15,9 +15,9 @@ export OUTPUT_CHARSET=UTF-8
 # error splash
 error_cond() {
 	if [ -z "$2" ]; then
-		yad --image=dialog-error --layer=overlay --edge=top --text="$1" --no-buttons --timeout=2
+		yad --image=dialog-error --layer=overlay --edge=top --text="$1" --no-buttons --no-focus --timeout=2
 	else
-		yad --image=dialog-information --layer=overlay --edge=top --text="$1" --no-buttons --timeout=2
+		yad --image=dialog-information --layer=overlay --edge=top --text="$1" --no-buttons --no-focus --timeout=2
 	fi
 	exit
 }

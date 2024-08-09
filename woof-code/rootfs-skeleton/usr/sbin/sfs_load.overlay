@@ -147,7 +147,7 @@ if [ $# -ne 0 ]; then
 				ASKMOUNT=0
 
 				if [ $CLI -eq 0 ]; then
-					yad  --image=system-run --layer=overlay --edge=top --text="$(gettext Loading) ${SFS##*/}" --no-buttons &
+					yad  --image=system-run --layer=overlay --edge=top --text="$(gettext Loading) ${SFS##*/}" --no-buttons --no-focus &
 					PID=$!
 				fi
 
@@ -176,7 +176,7 @@ if [ $# -ne 0 ]; then
 				fi
 				if [ $? -eq 0 ]; then
 					if [ $CLI -eq 0 ]; then
-						yad  --image=system-run --layer=overlay --edge=top --text="$(gettext Unloading) ${SFS##*/}" --no-buttons &
+						yad  --image=system-run --layer=overlay --edge=top --text="$(gettext Unloading) ${SFS##*/}" --no-buttons --no-focus &
 						PID=$!
 					fi
 					LIST="/var/lib/sfs_load.overlay/${MNT#/initrd/}"

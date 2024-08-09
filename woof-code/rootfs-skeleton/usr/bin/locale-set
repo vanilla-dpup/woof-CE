@@ -10,7 +10,7 @@ LOCALE=`yad --title=locale-set --height=480 --width=240 --list --column=:TEXT --
 
 LOCALE="${LOCALE% }"
 
-yad --image=dialog-information --layer=overlay --edge=top --text="Setting locale to ${LOCALE}" --no-buttons &
+yad --image=dialog-information --layer=overlay --edge=top --text="Setting locale to ${LOCALE}" --no-buttons --no-focus &
 PID=$!
 
 sed -i 's/^[^#]/# &/g' /etc/locale.gen

@@ -6,6 +6,7 @@ build() {
     tar -xzf yad-0.42.81.tar.gz
     cd yad-0.42.81
     patch -p1 < ../layer-shell.patch
+    patch -p1 < ../focus.patch
     meson --buildtype=release --prefix=/usr build
     ninja -C build install
 }
