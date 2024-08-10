@@ -31,9 +31,6 @@
 export TEXTDOMAIN=snapmergepuppy
 export OUTPUT_CHARSET=UTF-8
 
-OLDLANG="$LANG"
-export LANG=C
-
 #variables created at bootup by 'init' script in initramfs...
 . /etc/rc.d/PUPSTATE
 . /etc/DISTRO_SPECS
@@ -43,14 +40,6 @@ if [ $PUPMODE -ne 13 ] ; then
 	exit 1
 fi
 
-SAVEPART="`echo -n "$PUPSAVE" | cut -f 1 -d ','`"
-
-SHUTDOWN="no"
-pidof rc.shutdown >/dev/null && SHUTDOWN="yes"
-XRUNNING="no"
-pidof -s `cat /etc/windowmanager 2>/dev/null` >/dev/null 2>&1 && XRUNNING="yes"
-
-PATH="/bin:/sbin:/usr/bin:/usr/sbin:/usr/X11R7/bin"
 WD="`pwd`"
 
  # all the action takes places inside $SNAP
@@ -109,7 +98,7 @@ find . -mount -type d | tail +2 | sed -e 's/\.\///' |
 while read -r N
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
-	[ "$XRUNNING" = "yes" ] && [ -f /tmp/wmexitmode.txt ] && exit
+	[ -f /tmp/wmexitmode.txt ] && exit
 	rm -f "$BASE/$N" 2>/dev/null
 	mkdir -p "$BASE/$N"
 	#i think nathan advised this, to handle non-root user (SFR: improved/simplified)
@@ -124,9 +113,6 @@ sync -f "$BASE/"
 # FILES
 # =============================================================================
 
-FREEBASE=`df -B 1 | grep -m1 "^$BASEDEV" | tr -s ' ' | cut -f 4 -d ' '` #110212 Jemimah #110222 shinobar # SFR: result in bytes (see 'find' below)
-
-rm -f /tmp/snapmergepuppy-nospace #110222 shinobar
 rm -f /tmp/snapmergepuppy-error   #140102 SFR
 
 #Copy Files... v409 remove '^var'. 100222 shinobar: more exclusions. 100422 added ^root/ftpd. 100429 modify 'trash' exclusion. 100820 added var/tmp 120103 rerwin: add .XLOADED # SFR: added dev/snd # SFR: added .crdownload
@@ -139,27 +125,16 @@ find . -mount \
 	   -not -type s \
 	   -not -type p \
 	   -not -path './initrd/*' \
-	   -printf "%s|%P|%l\n" | sort -rn |
-while IFS='|' read -r NSIZE N NDST
+	   -printf "%P|%l\n" |
+while IFS='|' read -r N NDST
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
-	[ "$XRUNNING" = "yes" ] && [ -f /tmp/wmexitmode.txt ] && exit
+	[ -f /tmp/wmexitmode.txt ] && exit
 
 	if [ ! -e "$N" ] && [ ! -L "$N" ] ; then
 		continue # SFR: skip non-existing files (btw, '-e' won't detect broken symlinks, so '-L' is necessary!)
 	fi
 
-	#stop saving if not enough room left in ${DISTRO_FILE_PREFIX}save file...
-	if [ $((NSIZE+204800)) -gt $FREEBASE ]; then	# 204800 = 200K slack space
-		FREEBASE=`df -B 1 | grep -m1 "^$BASEDEV" | tr -s ' ' | cut -f 4 -d ' '` #110212 Jemimah: this is very slow; try not to check every iteration #110222 shinobar: fix for pup_ro10 and more
-		if [ $((NSIZE+204800)) -gt $FREEBASE ]; then	#110212 Jemimah.
-			touch /tmp/snapmergepuppy-nospace  #110222 shinobar
-			break
-		fi
-	else
-		FREEBASE=$((FREEBASE-NSIZE)) #110212 Jemimah: keep track of the worst case
-	fi
- 
 	if [ -L "$N" ];then
 		case "$NDST" in
 		/initrd/pup_ro1|/initrd/pup_ro1/*|/initrd/pup_ro2|/initrd/pup_ro2/*) ;;
@@ -188,36 +163,15 @@ cd "$WD"
 
 # =============================================================================
 
-error_msg () {
-	if [ "$SHUTDOWN" = "no" -a "$XRUNNING" = "yes" ];then
-		export DISPLAY=':0'
-		yad --image=dialog-warning --layer=overlay --edge=top --text="$1" --no-buttons --no-focus --timeout=30
-	else
-		echo "$1"
-	fi
-}
-
-export LANG="$OLDLANG"
-ERRSTATUS=0
-
-if [ -f /tmp/snapmergepuppy-nospace ]; then #110222 shinobar
-	ERRMSG="$(gettext 'WARNING!
-Unable to save all files. You need to delete some.')"
-	error_msg "$ERRMSG"
-	ERRSTATUS=1
-fi
-
-sed -i '/No such file or directory/d' /tmp/snapmergepuppy-error	# discard errors caused by bad timing
-
 if [ -s /tmp/snapmergepuppy-error ]; then	#140102 SFR
-	ERRMSG="$(gettext "WARNING!
-There were some errors detected.
-(see '/tmp/snapmergepuppy-error' for details)
-Filesystem check of the savefile (pfix=fsck) is highly recommended.")"
-	error_msg "$ERRMSG"
-	ERRSTATUS=1
+	ERRMSG="$(gettext 'Saving did not complete without any errors.')"
+	if [ -n "$WAYLAND_DISPLAY" ];then
+		yad --image=dialog-warning --layer=overlay --edge=top --text="$ERRMSG" --button=Details --button=gtk-close --no-focus
+		[ $? -eq 0 ] && yad --title=save2flash --width=640 --height=480 --text-info --filename=/tmp/snapmergepuppy-error --button=gtk-ok &
+	else
+		echo "$ERRMSG"
+	fi
+	exit 1
 fi
-
-exit $ERRSTATUS
 
 # =============================================================================
