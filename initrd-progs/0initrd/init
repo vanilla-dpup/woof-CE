@@ -59,12 +59,6 @@ if [ ! "$LOGLEVEL" ] ; then
   LOGLEVEL=3
 fi
 
-#List the builtin filesystem support
-KFILESYSTEMS="$(cat /proc/filesystems | grep -v "nodev" | grep -v "fuseblk" | sed -e "s#\t##g" | tr '\n' '|' | sed -e 's#|$##g')"
-
-#List linux filesystems
-LINUXFSLIST="ext2|ext3|ext4|xfs|btrfs|f2fs"
-
 #=============================================================
 #                        FUNCTIONS
 #=============================================================
@@ -403,12 +397,6 @@ setup_psave(){ # setup savefile or savefolder
  fi
 }
 
-set_fs_linux() {
-# "$1" - file system type - ex: ext4
- ONE_FS_IS_LINUX=""
- [ "$(echo "$LINUXFSLIST" | grep "$1")" != "" ] && ONE_FS_IS_LINUX="yes"
-}
-
 find_save_file() {
 # "$1" - mount point - ex:  /mnt/pdrv
 # "$2" - partition name - ex: sdb2
@@ -420,7 +408,7 @@ find_save_file() {
   IS_OK=""
   case $ONE_SAVE in
    *.4fs) [ -s "$ONE_SAVE" ] && IS_OK="yes" ;;
-   *) [ "$ONE_FS_IS_LINUX" = "yes" ] && [ -d "$ONE_SAVE" ] && IS_OK="yes" ;;
+   *) [ -d "$ONE_SAVE" ] && IS_OK="yes" ;;
   esac
   [ "$IS_OK" = "yes" ] && PUP_SAVES="${PUP_SAVES}${2},${3},${SAVE_DIR}$(basename $ONE_SAVE)
 "
@@ -441,8 +429,7 @@ $TRY_PARTS_LAST"
  fi
  echo "TRY_PARTS='${TRY_PARTS}'" #debug
  [ "$TRY_PARTS" ] || return
- for ONETRY in $TRY_PARTS;do
-  ONE_PART="$(echo -n "$ONETRY" | cut -f 1 -d '|')"
+ for ONE_PART in $TRY_PARTS;do
   ensure_mounted "$ONE_PART" "/mnt/pdrv"
   if [ "$ONE_MP" ];then
    if [ "$LOOK_SAVE" -a "$SAVEPART" = "" ];then
@@ -467,9 +454,7 @@ $TRY_PARTS_LAST"
 }
 
 get_part_info() {
- probepart -hr > /tmp/probepart.log
- probedisk > /tmp/probedisk.log
- HAVE_PARTS="$(cat /tmp/probepart.log | grep -E "$KFILESYSTEMS" | cut -f 1-2 -d '|' | sed -e 's%/dev/%%')"
+ HAVE_PARTS="$(lsblk -rno type,name | grep ^part | cut -f 2 -d ' ')"
 }
 
 wait_for_dev() {

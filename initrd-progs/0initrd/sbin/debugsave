@@ -9,8 +9,8 @@ fi
 dmesg > /tmp/dmesg.txt
 
 (
-  for i in "cat /proc/cmdline" probedisk probepart \
-    mount "cat /proc/partitions" df lsof ps
+  for i in "cat /proc/cmdline" "lsblk -rno type,rm,name,size,vendor,model" \
+    mount df lsof ps
   do
     echo '------------------------'
     echo "      $i"
