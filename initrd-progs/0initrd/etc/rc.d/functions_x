@@ -35,23 +35,3 @@ fx_format_bytes() {
 	fi
 	echo "$FORMATTEDSIZE"
 }
-
-# $1 = drv_name
-fx_drv_is_optical() {
-	[ $1 ] || return 1
-	local xtype
-	if [ -e /sys/block/${1}/device/type ] ; then
-		read -r xtype < /sys/block/${1}/device/type
-		[ "$xtype" = "5" ] && return 0
-	fi
-	return 1
-}
-
-# $1 = drv_name
-fx_drv_is_usb() {
-	[ $1 ] || return 1
-	case $(readlink /sys/block/${1}) in *"/usb"[0-9]*)
-		return 0 ;;
-	esac
-	return 1
-}
