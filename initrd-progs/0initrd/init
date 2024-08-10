@@ -349,37 +349,12 @@ setup_psave(){ # setup savefile or savefolder
   #- fix for empty pupsaves (missing /initrd/DISTRO_SPECS)
   if [ ! -f "$SAVE_LAYER/initrd/DISTRO_SPECS" ] ; then
     touch /tmp/rc_update_force_pm5 # see /etc/rc.d/rc.update
-    PCLEAN=""
-  fi
-  #-
-  if [ "$PCLEAN" != "yes" -a -f "$SAVE_LAYER/initrd/DISTRO_SPECS" ];then
+  else
     validate_pupsave_upgrade /DISTRO_SPECS $SAVE_LAYER/initrd/DISTRO_SPECS
     case $? in
-      0) PCLEAN="yes" ;; # perform upgrade
+      0) touch /tmp/version_update_flag ;; # perform upgrade
       1) PUPSAVE=""   ;; # do not perform upgrade
     esac
-  fi
-  if [ "$PCLEAN" = "yes" ];then
-   #do upgrade processing
-   touch /tmp/version_update_flag
-   CURDIR="$(pwd)"
-   cd "$SAVE_LAYER"
-   #delete critical system files
-   #keep rc.local - user customisations and/or fixes.
-   echo "Removing $(ls ./lib/modules/$KERNELVER/modules.*)"
-   rm -f ./lib/modules/$KERNELVER/modules.*
-   RC_STUFF="$(ls ./etc/rc.d/rc.* | grep -v "/rc.local$" | tr '\n' ' ')"
-   rm -fv $RC_STUFF
-   rm -fv ./etc/rc.d/funct*
-   #iterate over all files in save
-   for ONE_FILE in $(find . -type c -print); do
-    [ "`stat -c '%t,%T' "$ONE_FILE" 2>/dev/null`" != '0,0' ] && continue
-    [ "${ONE_FILE%/*}" = "./root/.config/autostart" ] && continue #keep autostart changes
-    echo "Removing ${ONE_FILE}" 
-    rm -f "$ONE_FILE" #remove whiteout file
-   done
-   cd "$CURDIR"
-   sync
   fi
   check_status 0
  else
