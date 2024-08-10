@@ -4,7 +4,6 @@
 #   DISTRO_SPECS OLD_DISTRO_SPECS
 #
 # variables to check:
-#   - WOOF_VERSION
 #   - DISTRO_NAME
 #   - DISTRO_VERSION
 #
@@ -23,10 +22,6 @@ fi
 . "$1"
 OLD_DISTRO_SPECS="$2"
 
-KERNELVER="$(uname -r)"
-DIALOG_TITLE="${DISTRO_NAME} ${DISTRO_VERSION} - Linux ${KERNELVER} - `uname -m`"
-
-OLD_WOOF_VERSION="$(grep '^WOOF_VERSION=' $OLD_DISTRO_SPECS | cut -f 2 -d '=' | tr -d "'" | tr -d '"')"
 OLD_DISTRO_NAME="$(grep '^DISTRO_NAME=' $OLD_DISTRO_SPECS | cut -f 2 -d '=' | tr -d "'" | tr -d '"')"
 OLD_DISTRO_VERSION="$(grep '^DISTRO_VERSION' $OLD_DISTRO_SPECS | cut -f 2 -d '=' | tr -d "'" | tr -d '"')"
 
@@ -56,13 +51,6 @@ elif [ "$DISTRO_VERSION" != "$OLD_DISTRO_VERSION" ]; then
 -     DISTRO_VERSION=\\033[1;36m${DISTRO_VERSION}\\033[0;39m
 - OLD_DISTRO_VERSION=\\033[1;36m${OLD_DISTRO_VERSION}\\033[0;39m  [pupsave]
 "
-
-elif [ "$WOOF_VERSION" != "$OLD_WOOF_VERSION" ]; then
-  MSG="
--     WOOF_VERSION=\\033[1;36m${WOOF_VERSION}\\033[0;39m
-- OLD_WOOF_VERSION=\\033[1;36m${OLD_WOOF_VERSION}\\033[0;39m  [pupsave]
-"
-
 fi
 
 if [ "$MSG" ] ; then
