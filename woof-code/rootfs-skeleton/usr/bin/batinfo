@@ -7,4 +7,4 @@ for i in /sys/class/power_supply/*; do
 	[ "`cat scope`" = System ] && break
 done
 
-for i in * ; do [ "$i" = 'uevent' ] && continue; [ -d "$i" ] && continue; echo -n "${i}: " && cat $i ; done | exec yad --title="Battery Info" --width=300 --height=400 --text-info --back=thistle --filename=/dev/stdin --button=gtk-ok
+for i in * ; do [ "$i" = 'uevent' ] && continue; [ -d "$i" ] && continue; echo -n "${i}: " && cat $i ; done | exec yad --title="Battery Info" --width=300 --height=400 --text-info --back=thistle --button=gtk-ok

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+logread -F | exec yad --title="System Log" --text-info --tail --width=640 --height=480 --button=gtk-close
