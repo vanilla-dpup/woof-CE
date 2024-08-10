@@ -22,21 +22,10 @@ eval_gettext () {
 export appver='0.3'
 export title='Pup Advert Blocker'
 
-# download the ads list
-download_adlist () {
-	curl -m 10 https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0\.0\.0\.0' | grep -v '^0\.0\.0\.0 [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$' | sed 's/\s*#.*//g' | cut -f 2 -d ' ' | update-adlist
-}
-
-# creates an empty ad list
-empty_adlist () {
-	rm -f /var/cache/pup_advert_blocker/adlist
-}
-	
 success () {
 	# tell user 
 	yad --title="$title" --window-icon=dialog-information --image=dialog-information --button=gtk-ok \
 --text="$(gettext '<b>Success - your settings have been changed.</b>
-Your hosts file has been updated.
 Restart your browser to see the changes.')"
 }
 
@@ -49,11 +38,15 @@ yad --title="$title" --window-icon=dialog-information --width=640 --height=240 -
 
 case "$1" in
   start)
-    download_adlist
+    rm -f /var/cache/pup_advert_blocker/disabled
     success
     ;;
   stop)
-    empty_adlist
+    touch /var/cache/pup_advert_blocker/disabled
+    success
+    ;;
+  update)
+    curl -m 10 https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0\.0\.0\.0' | grep -v '^0\.0\.0\.0 [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$' | sed 's/\s*#.*//g' | cut -f 2 -d ' ' | update-adlist
     success
     ;;
   *)
@@ -64,11 +57,14 @@ case "$1" in
       --form \
       --columns=2 \
       --field "$(gettext '<b>Start blocker</b>
-Download and block the latest list of known advertising servers.')":LBL "" \
+Start blocking known advertisnig servers.')":LBL "" \
       --field "$(gettext '<b>Stop blocker</b>
 Stop blocking known advertising servers.')":LBL "" \
+      --field "$(gettext '<b>Update list</b>
+Download the latest list of known advertising servers.')":LBL "" \
       --field \!gtk-yes:FBTN "$0 start" \
       --field \!gtk-no:FBTN "$0 stop" \
+      --field \!gtk-refresh:FBTN "$0 update" \
       --button=gtk-help \
       --button=gtk-quit \
       --use-interp

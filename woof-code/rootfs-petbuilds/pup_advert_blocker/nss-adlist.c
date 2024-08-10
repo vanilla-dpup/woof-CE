@@ -44,6 +44,11 @@ enum nss_status _nss_adlist_gethostbyname2_r(const char *name,
 		return NSS_STATUS_UNAVAIL;
 	}
 
+	if (stat("/var/cache/pup_advert_blocker/disabled", &stbuf) == 0) {
+		*errnop = ENOENT;
+		return NSS_STATUS_UNAVAIL;
+	}
+
 	if ((fd = open("/var/cache/pup_advert_blocker/adlist", O_RDONLY)) < 0) {
 		*errnop = ENOENT;
 		return NSS_STATUS_UNAVAIL;
