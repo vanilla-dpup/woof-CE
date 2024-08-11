@@ -18,6 +18,7 @@ mount -t sysfs none /sys
 mount -t rootfs -o remount,rw rootfs /
 
 mount -t devtmpfs devtmpfs /dev 2>/dev/null
+ln -s /proc/self/fd /dev/fd
 
 # this is not required for huge kernels and actually fails
 # but it's needed by other type of kernels for the usb stuff to work

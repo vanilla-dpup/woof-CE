@@ -395,11 +395,12 @@ search_func() {
  while read ONE_PART;do
   ensure_mounted "$ONE_PART" "/mnt/pdrv"
   if [ "$ONE_MP" ];then
-   if [ "$LOOK_SAVE" -a "$SAVEPART" = "" ];then
-    set_fs_linux "$ONE_FS"
+   if [ "$LOOK_SAVE" ];then
     find_save_file "$ONE_MP" "$ONE_PART" "$ONE_FS"
     if [ "$PUP_SAVES" ];then
      SAVEPART="$ONE_PART"
+     LOOK_SAVE=""
+     [ "$LOOK_PUP" ] || return
     fi
    fi
    if [ "$LOOK_PUP" ];then
@@ -408,7 +409,9 @@ search_func() {
      PDRV_SFS="$ONE_SFS"
      P_PART="$ONE_PART"
      DEV1FS="$ONE_FS"
-     break;
+     LOOK_PUP=""
+     [ "$LOOK_SAVE" ] || return
+     continue
     fi
    fi
    umount $ONE_MP
@@ -514,7 +517,7 @@ fi
 if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
  search_func
  NUM=0
- while [ "$LOOK_PUP" -a "$P_PART" = "" ] || [ "$LOOK_SAVE" -a "$SAVEPART" = "" ];do
+ while [ "$LOOK_PUP" -o "$LOOK_SAVE" ];do
   [ $NUM -ge $WAITDEV ] && break
   printf "${L_WAITING_FOR_DEV}\n" "$WAITDEV" "$NUM" "$WAITDEV" > /dev/console
   sleep 1
@@ -568,7 +571,6 @@ if [ "${SAVE_MP}" != "" -a "$PRAMONLY" != "yes" ];then #have mounted save? parti
  #not sorted yet, may be pupmode=12
  if [ $PUPMODE -eq 5 ];then
   #have to find savefile/savefolder
-  set_fs_linux "$SAVE_FS"
   [ "$PUP_SAVES" ] || find_save_file "${SAVE_MP}" "$SAVEPART" "$SAVE_FS"
   echo "PUP_SAVES=${PUP_SAVES}" #debug
   if [ "$PUP_SAVES" ];then
