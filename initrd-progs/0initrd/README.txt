@@ -124,10 +124,7 @@ Boot parameters:
 
 pmedia=<atahd|ataflash|usbhd|usbflash|cd> 
    Indicates the type of boot device.
-   If it's "cd" then all partitions are searched for Puppy files and a save layer file.
-   If the first 3 characters are "usb", then any searching is restricted to only usb devices.
    If the last 5 characters are "flash" the top layer in the stack remains the tmpfs in memory, otherwise any found save layer becomes the top layer in the stack.
-   This boot parameter should always be provided.
 
 psubdir=</path/to/install/directory>
    If the Puppy files are not in the root of a partition, but in a sub-directory, the path of this directory, relative to the partition root, must be specified with this parameter.

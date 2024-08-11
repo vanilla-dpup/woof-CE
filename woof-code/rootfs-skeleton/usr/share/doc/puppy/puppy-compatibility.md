@@ -1,4 +1,12 @@
-# .pet Packages
+# Puppy Compatibility
+
+## Boot Codes
+
+In Puppy, the early boot process searches all partitions for Puppy files if `pmedia=cd` but `pupsfs` is not specified, and searches all partitions for save folders or files if `pmedia=cd` but `psave` is not specified. `pmedia=usbflash` also enables such searches, but only on USB devices.
+
+Unlike Puppy, DISTRO_NAME always falls back to search on all partitions if needed. Specifying `pmedia` is not mandatory.
+
+## .pet Packages
 
 DISTRO_NAME provides partial backward compatibility with old .pet packages, through petget. Many .pet packages are old and unmaintained: some even depend on [ROX-Filer](https://rox.sourceforge.net/desktop/ROX-Filer), [JWM](http://joewing.net/projects/jwm/) or [X.Org](https://www.x.org/).
 
