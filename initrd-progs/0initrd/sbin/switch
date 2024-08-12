@@ -2,7 +2,6 @@
 #if have dropped to a shell in initramfs, type 'exec switch' to keep going.
 
 sync
-[ -d "/proc/bus/usb" ] && umount /proc/bus/usb
 umount /sys
 umount /dev 2>/dev/null
 umount /proc

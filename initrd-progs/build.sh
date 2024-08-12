@@ -12,6 +12,10 @@ generate_initrd() {
 			cp -anLf ../../sandbox3/rootfs-complete${LIB} lib/
 		done
 	done
+	for BIN in `chroot  ../../sandbox3/rootfs-complete busybox --list`; do
+		ln -s busybox bin/${BIN}
+	done
+
 	cp -f ../DISTRO_SPECS .
 
 	. ./DISTRO_SPECS
