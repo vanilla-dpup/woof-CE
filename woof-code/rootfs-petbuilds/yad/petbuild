@@ -1,12 +1,10 @@
 download() {
-    [ -f yad-0.42.81.tar.gz ] || wget -t 3 -T 60 -O yad-0.42.81.tar.gz https://github.com/step-/yad/archive/refs/tags/0.42.81.tar.gz
+    [ -f yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz ] || wget -t 3 -T 60 -O yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz https://github.com/step-/yad/archive/cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz
 }
 
 build() {
-    tar -xzf yad-0.42.81.tar.gz
-    cd yad-0.42.81
-    patch -p1 < ../layer-shell.patch
-    patch -p1 < ../focus.patch
+    tar -xzf yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz
+    cd yad-cfe6c7064f3daff80953a09a890537a8e68b8d11
     meson --buildtype=release --prefix=/usr build
     ninja -C build install
 }
