@@ -76,7 +76,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * usrmerge is mandatory: support for the deprecated file system layout with separate /lib and /usr/lib, is gone.
 * Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported: support for aufs is gone.
 * PPM is gone: packages in the build come from the upstream distro, rootfs-packages or rootfs-petbuilds (built from source).
-* Most old tools that use [gtkdialog](https://github.com/puppylinux-woof-CE/gtkdialog) are ported to [yad](https://github.com/step-/yad).
+* Remaining old tools that use [gtkdialog](https://github.com/puppylinux-woof-CE/gtkdialog) are ported to [yad](https://github.com/step-/yad) and the former is gone.
 * kernel-kit builds the [Debian](https://www.debian.org/) kernel source and support for other types of kernels is gone.
 * kernel-kit's firmware picker is gone: fdrv is built by moving /usr/lib/firmware out of the main SFS.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
