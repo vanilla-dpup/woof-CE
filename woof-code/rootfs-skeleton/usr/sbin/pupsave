@@ -3,6 +3,7 @@
 export TEXTDOMAIN=pupsave
 
 . /etc/DISTRO_SPECS
+. /etc/rc.d/PUPSTATE
 
 PSAVEPARTUUID=
 PSUBDIR=
@@ -176,9 +177,19 @@ EOF
 	;;
 
 3)
-	mkdir -p ${SAVEMNT}${SAVEPFIX}
+	mkdir -p ${SAVEMNT}${SAVEPFIX}/{upper,work}
 	;;
 esac
+
+if [ $PUPMODE -eq 5 ]; then
+	yad --title=pupsave --icon=dialog-question --text="$(gettext 'Save now?')" --button=gtk-yes --button=gtk-no
+	if [ $? -eq 0 ]; then
+		yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving")" --no-buttons --no-focus &
+		PID=$!
+		snapmergepuppy ${SAVEMNT}${SAVEPFIX}/upper
+		kill $PID
+	fi
+fi
 
 if [ "$STYLE" = "file" ]; then
 	umount -l ${SAVEMNT}

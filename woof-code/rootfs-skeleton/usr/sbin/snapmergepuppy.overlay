@@ -35,9 +35,15 @@ export OUTPUT_CHARSET=UTF-8
 . /etc/rc.d/PUPSTATE
 . /etc/DISTRO_SPECS
 
-if [ $PUPMODE -ne 13 ] ; then
-	echo "$0: Wrong PUPMODE ($PUPMODE)"
-	exit 1
+# files are copied from $SNAP/* to $BASE/
+BASE="$1"
+if [ -z "$BASE" ] ; then
+	if [ $PUPMODE -ne 13 ] ; then
+		echo "$0: Wrong PUPMODE ($PUPMODE)"
+		exit 1
+	fi
+
+	BASE="/initrd/pup_ro1"
 fi
 
 WD="`pwd`"
@@ -45,13 +51,6 @@ WD="`pwd`"
  # all the action takes places inside $SNAP
 SNAP="/initrd/pup_rw"
 cd $SNAP || exit 1
-
-# files are copied from $SNAP/* to $BASE/
-BASE="/initrd/pup_ro1"
-BASEDEV="`grep -m1 /initrd/mnt/dev_save /proc/mounts | cut -f 1 -d ' '`"
-
-# Precautions
-[ "$BASEDEV" ] || { echo "$BASEDEV is not mounted!"; exit 1; }
 
 echo "Merging $SNAP onto $BASE..."
 

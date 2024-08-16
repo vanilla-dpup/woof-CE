@@ -11,4 +11,6 @@ Both save files and folders support encryption, and pupsave offers choice betwee
 * Encryption of the home directory: smaller tamper resistance and privacy gains but with reduced overhead
 * No encryption at all
 
+If DISTRO_NAME is running non-persistently, pupsave also offers to save the current system state to the newly created save folder or file.
+
 By default, DISTRO_NAME images contain a save folder with an encrypted home folder and passphrase "woofwoof".
