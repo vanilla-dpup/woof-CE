@@ -185,9 +185,6 @@ if [ -f /initrd/tmp/version_update_flag ]; then
  rm -f /initrd/tmp/version_update_flag 2>/dev/null
  echo -n " to $DISTRO_VERSION" >/dev/console
 
- depmod_func #run depmod
-  
- basic_update
  bdrv-update
 fi
 
