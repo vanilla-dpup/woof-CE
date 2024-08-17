@@ -17,40 +17,6 @@ status_func() {
 #set -x
 
 . /etc/DISTRO_SPECS
-if [ "$DISTRO_ARCHDIR" ] ; then
-	ARCHDIR="/$DISTRO_ARCHDIR"
-fi
-
-if [ ! -f /etc/ld.so.cache ] ; then
-	ldconfig 2>/dev/null
-fi
-
-if [ ! -f /usr/lib${ARCHDIR}/gconv/gconv-modules.cache ] ; then
-	iconvconfig 2>/dev/null # creates /usr/lib/gconv/gconv-modules.cache
-fi
-
-if [ -e /etc/dconf/db/local.d/ ] && [ "$(ls -1 /etc/dconf/db/local.d/)" != "" ]; then
-	dconf update 2>/dev/null 
-fi
-
-if [ -e /usr/bin/update-pango-querymodules ] ; then
-	update-pango-querymodules
-elif [ -e /usr/bin/pango-querymodules ] ; then
-	pango-querymodules --update-cache
-fi
-
-if [ -e /usr/bin/update-gdk-pixbuf-loaders ] ; then
-	update-gdk-pixbuf-loaders
-elif [ -e /usr/bin/gdk-pixbuf-query-loaders ] ; then
-	gdk-pixbuf-query-loaders --update-cache
-fi
-
-if [ ! -f /usr/share/mime/mime.cache ] && [ -e /usr/bin/update-mime-database -a -d /usr/share/mime ] ; then
-	echo -n "Executing update-mime-database /usr/share/mime..." >/dev/console
-	update-mime-database -V /usr/share/mime/
-	status_func $?
-	UPDATE_MIME_DATABASE_DONE=1
-fi
 
 #=============================================================
 # main
@@ -61,14 +27,7 @@ PUPMODE="$1"
 
 echo -n "Updating..." >/dev/console #updating
 
-KERNVER="`uname -r`"
-
-depmod_func() { #then run depmod to overwrite any depmod files on OLD layer...
-  echo "Executing depmod, to update module files..."
-  depmod
-}
-
-basic_update() {
+update_cache_files() {
        
        for gtkcmd in gtk gtk4
        do
@@ -90,15 +49,13 @@ basic_update() {
 		LANG=C fixmenus #Reconstruct configuration files for JWM, IceWM...
 		[ -n "$WAYLAND_DISPLAY" ] && killall -HUP labwc
 	fi
-	if [ -e /usr/bin/update-desktop-database -a -e /usr/bin/update-mime-database ] ; then
+	if [ -e /usr/bin/update-desktop-database ] ; then
 		rm -f /usr/share/applications/mimeinfo.cache 2>/dev/null
 		update-desktop-database /usr/share/applications
 		rm -f /usr/local/share/applications/mimeinfo.cache 2>/dev/null
 		[ -d /usr/local/share/applications ] && update-desktop-database /usr/local/share/applications
 	fi
-}
 
-extended_update() {
 	#these are normally done in 3builddistro.
 	ldconfig 2>/dev/null
 	iconvconfig 2>/dev/null # creates /usr/lib/gconv/gconv-modules.cache
@@ -107,7 +64,7 @@ extended_update() {
 		fc-cache -f 2>/dev/null # some sfs files may have fonts
 	fi
 
-	if [ -e /usr/bin/update-mime-database -a "$UPDATE_MIME_DATABASE_DONE" != "1" ] ; then
+	if [ -e /usr/bin/update-mime-database ] ; then
 		[ -d /usr/share/mime ] && update-mime-database /usr/share/mime
 		[ -d /usr/local/share/mime ] && update-mime-database /usr/local/share/mime
 	fi
@@ -132,16 +89,11 @@ extended_update() {
 	done
 
 	[ -x /usr/bin/mandb ] && mandb # this makes man -k work
-}
 
-update_cache_files() {
-	basic_update
-	extended_update
-	depmod_func -a 2>/dev/null # some sfs may have kernel modules
+	depmod 2>/dev/null # some sfs may have kernel modules
 	
 	# some sfs may have udev hardware database
 	systemd-hwdb update 2>/dev/null
-	[ "$(udevadm --help 2>&1 | grep hwdb)" != "" ] && udevadm hwdb --update  
 }
 
 #===========================================================================
@@ -159,25 +111,7 @@ if [ -f /initrd/tmp/rc_update_force_pm5 ] ; then
 	PUPMODE=5
 fi
 
-case $PUPMODE in
- "12") #no tmpfs, ${DISTRO_FILE_PREFIX}save.3fs (pup_rw), nothing (pup_ro1), ${DISTRO_PUPPYSFS} (pup_ro2)
-  #example: boot from live-cd, ${DISTRO_FILE_PREFIX}save.3fs on a fast h.d. partition.
-  NEWFILESMNTPT="/initrd/pup_ro2"
-  OLDFILESMNTPT="/initrd/pup_rw"
- ;;
- "13") #tmpfs (pup_rw), ${DISTRO_FILE_PREFIX}save.3fs (pup_ro1), ${DISTRO_PUPPYSFS} (pup_ro2).
-  #example: boot from usb flash, ${DISTRO_FILE_PREFIX}save.3fs on flash media (needs restrained writes).
-  NEWFILESMNTPT="/initrd/pup_ro2"
-  OLDFILESMNTPT="/initrd/pup_ro1"
- ;;
- 5)
-  #PUPMODE=5 is first boot, ignore.
-  basic_update
-  exit ###EXIT###
- ;;
-esac
-
-. ${NEWFILESMNTPT}/etc/DISTRO_SPECS #has DISTRO_VERSION, DISTRO_BINARY_COMPAT, DISTRO_FILE_PREFIX
+. /initrd/pup_ro2/etc/DISTRO_SPECS #has DISTRO_VERSION, DISTRO_BINARY_COMPAT, DISTRO_FILE_PREFIX
 
 #===========================================================================
 
@@ -193,8 +127,7 @@ fi
 #stuff to update on every boot...
 
 #think have to do this everytime...
-cp -af ${NEWFILESMNTPT}/etc/DISTRO_SPECS /etc/
-touch /etc/DISTRO_SPECS #important, as snapmergepuppy uses '-u' cp option. ...huh, why?
+cp -af /initrd/pup_ro2/etc/DISTRO_SPECS /etc/
 
 # if layers have changed, may need to fix menu (etc)...
 . /etc/rc.d/BOOTCONFIG
