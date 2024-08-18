@@ -15,7 +15,7 @@
 
 #exec &>/tmp/validate_pupsave ; set -x # debug
 
-if [ ! -f "$1" ] && [ ! -f "$2" ] ; then
+if [ ! -f "$1" ] || [ ! -f "$2" ] ; then
   exit 2
 fi
 

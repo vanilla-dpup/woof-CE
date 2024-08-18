@@ -344,16 +344,11 @@ setup_psave(){ # setup savefile or savefolder
  #[ "$PUPSAVE" ] && decrypt directory at SAVE_LAYER
  if [ "$PUPSAVE" ];then
   SAVE_NAME="$(basename $SAVE_REL_FN)"
-  #- fix for empty pupsaves (missing /initrd/DISTRO_SPECS)
-  if [ ! -f "$SAVE_LAYER/initrd/DISTRO_SPECS" ] ; then
-    touch /tmp/rc_update_force_pm5 # see /etc/rc.d/rc.update
-  else
-    validate_pupsave_upgrade /DISTRO_SPECS $SAVE_LAYER/initrd/DISTRO_SPECS
-    case $? in
-      0) touch /tmp/version_update_flag ;; # perform upgrade
-      1) PUPSAVE=""   ;; # do not perform upgrade
-    esac
-  fi
+  validate_pupsave_upgrade /DISTRO_SPECS $SAVE_LAYER/initrd/DISTRO_SPECS
+  case $? in
+    0) touch /tmp/version_update_flag ;; # perform upgrade
+    1) PUPSAVE=""   ;; # do not perform upgrade
+  esac
   check_status 0
  else
   check_status 1

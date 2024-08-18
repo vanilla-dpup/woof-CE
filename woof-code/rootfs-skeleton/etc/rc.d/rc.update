@@ -103,14 +103,6 @@ if [ "$PUPMODE" = "w" ] ; then #chroot from woof
 	exit
 fi
 
-# /initrd/tmp/rc_update_force_pm5 is created by the initrd init script
-#   empty pupsaves cause problems
-#   in such a case we have to update everything.
-if [ -f /initrd/tmp/rc_update_force_pm5 ] ; then
-	echo "rc.update: Empty pupsave? Simulating PUPMODE=5 ..."
-	PUPMODE=5
-fi
-
 . /initrd/pup_ro2/etc/DISTRO_SPECS #has DISTRO_VERSION, DISTRO_BINARY_COMPAT, DISTRO_FILE_PREFIX
 
 #===========================================================================
