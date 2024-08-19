@@ -20,7 +20,7 @@ L_ERROR_IS_TOO_CRITICAL="Error is too critical, dropping out to console..."
 L_PAUSING_60_SECONDS="Pausing for 60 seconds..."
 L_LOADING_FILE="Loading '%s'..." #printf
 L_LOADING_PUPSAVE='Loading savefolder %s [%s]...' #printf
-L_LOADING_PUPSAVE_FILE='Loading savefile %s [%s] (%s)...' #printf
+L_LOADING_PUPSAVE_FILE='Loading savefile %s [%s]...' #printf
 L_ADDING_SAVE_LAYER_FAILED="adding %s to overlay stack failed." #printf
 L_WAITING_FOR_DEV='Waiting %s seconds for slow storage devices [%s/%s].' #printf
 L_WAITING_FOR_PART='Waiting for partition [%s]' #printf
@@ -52,7 +52,6 @@ export INIT_SCRIPT=1
 PATH="/bin:/sbin"
 export KERNELVER="$(uname -r)"
 . /DISTRO_SPECS #v412 has DISTRO_VERSION, DISTRO_FILE_PREFIX
-. /etc/rc.d/functions_x
 
 if [ ! "$LOGLEVEL" ] ; then
   echo '3' > /proc/sys/kernel/printk # '3' is the standard loglevel.
@@ -285,8 +284,7 @@ stack_onepupdrv() {
 setup_psave(){ # setup savefile or savefolder
  SAVE_REL_FN="$(echo "$PUPSAVE" | cut -f 3 -d ',')"
  if [ -f "${SAVE_MP}${SAVE_REL_FN}" ];then #savefile
-  PUPSAVE_SIZE="$(fx_format_bytes $(stat -c %s "${SAVE_MP}${SAVE_REL_FN}"))"
-  echo -n "$(printf "${L_LOADING_PUPSAVE_FILE}" "$SAVE_REL_FN" "$SAVEPART" "$PUPSAVE_SIZE")" > /dev/console
+  echo -n "$(printf "${L_LOADING_PUPSAVE_FILE}" "$SAVE_REL_FN" "$SAVEPART")" > /dev/console
  else
   echo -n "$(printf "${L_LOADING_PUPSAVE}" "$SAVE_REL_FN" "$SAVEPART")" > /dev/console
  fi
@@ -617,7 +615,7 @@ if [ "$PUPSAVE" ];then #refine pupmode
  if [ $PUPMODE -eq 12 ];then
   SAVE_LAYER="/pup_rw"
   if [ -z "$PMEDIA" -o "$PMEDIA" = "cd" ] ; then
-   [ "`cat /sys/block/$(fx_get_drvname $SAVEPART)/removable`" = "1" ] && xPM=13
+   [ "`lsblk -nro rm /dev/${SAVEPART}`" = "1" ] && xPM=13
   fi
   if [ "${PMEDIA:3}" = "flash" -o "$xPM" = "13" ];then
    PUPMODE=$(($PUPMODE + 1)) #PUPMODE=13

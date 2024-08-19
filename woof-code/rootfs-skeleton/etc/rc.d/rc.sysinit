@@ -38,7 +38,6 @@
 #160609 rerwin: Add wait for USB3 driver.
 
 export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
-. /etc/rc.d/functions_x
 
 #================================================================
 #              functions used by the script
@@ -72,7 +71,7 @@ loadswap_func() { #w481 made into a function.
  while read _ ONESWAP SWAPSIZEBYTES
  do
   EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
-  echo -n "Loading swap partition $ONESWAP ("$(fx_format_bytes $SWAPSIZEBYTES)")..." >/dev/console #loading swap partition
+  echo -n "Loading swap partition ${ONESWAP}..." >/dev/console #loading swap partition
   chmod 0660 $ONESWAP
   swapon $ONESWAP
   status_func $?
@@ -87,7 +86,7 @@ loadswap_func() { #w481 made into a function.
  fi
  if [ "${SWAPFILE}" ] ; then
   SWAPSIZEBYTES=`stat -c %s ${SWAPFILE}` #bytes
-  echo -n "Loading swap file ${SWAPFILE} ("$(fx_format_bytes $SWAPSIZEBYTES)")..." >/dev/console
+  echo -n "Loading swap file ${SWAPFILE}..." >/dev/console
   chmod 0660 $SWAPFILE
   swapon ${SWAPFILE} ; ret=$? ; status_func $ret
   if [ $ret -eq 0 ] ; then
