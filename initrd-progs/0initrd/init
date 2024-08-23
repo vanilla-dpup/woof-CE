@@ -383,7 +383,6 @@ find_save_file() {
 }
 
 search_func() {
- echo "HAVE_PARTS='${HAVE_PARTS}'" #debug
  while read ONE_PART;do
   ensure_mounted "$ONE_PART" "/mnt/pdrv"
   if [ "$ONE_MP" ];then
