@@ -45,8 +45,6 @@ for i in $(cat /proc/cmdline) ; do
   esac
 done
 
-export TERMINFO="/etc/terminfo"
-export LANG=C
 export INIT_SCRIPT=1
 
 PATH="/bin:/sbin"
