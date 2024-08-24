@@ -6,8 +6,8 @@ Boot codes can change DISTRO_NAME's behavior, speed up the boot process, make th
 * `pfix=copy`: enables locking of loaded SFS to RAM even if boot device supports TRIM.
 * `pfix=ram`: disables persistency, enables locking of loaded SFS to RAM even if boot device supports TRIM and disables search for partitions containing a save file or folder.
 * `pmedia=usbflash`: activates PUPMODE 13 (see [PUPMODE](pupmode.md)).
-* `pupsfs=UUID|label`: specifies the partition containing SFSs using its UUID or label, and disables search for this partition.
-* `psave=UUID|label`: specifies the partition containing save folders or files using its UUID or label, and disables search for this partition.
+* `pupsfs=name|UUID|label`: specifies the partition containing SFSs using its name, UUID or label, and disables search for this partition.
+* `psave=name|UUID|label`: specifies the partition containing save folders or files using its name, UUID or label, and disables search for this partition.
 * `psubdir=/relative/path`: specifies a subdirectory for SFSs and a save folders or files.
 * `waitdev=seconds`: specifies the timeout for search for SFSs and save folders or files. If unspecified, the default is 5 seconds.
 * `pfix=fsck`: enables file system error repair for save files.

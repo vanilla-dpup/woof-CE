@@ -6,7 +6,7 @@
 #   $2: $SAVE_MP
 #
 # creates /tmp/savefile_loop with the following variables
-#   $SAVEFILE_LOOP $SFFS (it must be sourced)
+#   $SAVEFILE_LOOP (it must be sourced)
 #
 
 L_CANNOT_RESIZE_PUPSAVE="SORRY, cannot resize %s" #printf
@@ -53,10 +53,6 @@ fi
 
 #===================================================================
 
-SFFS=$(blkid "$SAVE_FN" | grep -o ' TYPE=".*' | cut -f 2 -d '"')
-
-#===================================================================
-
 SAVEFILE_LOOP="$(losetup -f)"
 losetup $SAVEFILE_LOOP $SAVE_FN
 
@@ -77,7 +73,6 @@ fi
 
 (
   echo "SAVEFILE_LOOP=$SAVEFILE_LOOP"
-  echo "SFFS=$SFFS"
 ) > /tmp/savefile_loop
 
 ### END ###

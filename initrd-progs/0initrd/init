@@ -123,24 +123,22 @@ wait_for_blkid() {
  # $1 value to look for
  BLKID_PART=''
  [ "$1" ] || return
- local PART DIDMSG NUM
- DIDMSG=''
  # use loop to wait for device, if not found immediately
  for NUM in $(seq 1 15); do
-  PART="$(blkid | grep "$1" | grep -E "^/dev/$1| LABEL=.$1| UUID=.$1" | cut -f1 -d':' | cut -f3 -d'/')"
-  [ "$PART" ] && break
-  [ $NUM -eq 1 ] && { echo -n "$(printf "$L_WAITING_FOR_PART" "${1}")" > /dev/console; DIDMSG='yes'; }
+  while read LINE; do
+   case "$LINE" in
+   "$1 "*|*" $1 "*|*" $1")
+    BLKID_PART="/dev/${LINE%% *}"
+    [ $NUM -gt 1 ] && check_status 0
+    return
+    ;;
+   esac
+  done < <(lsblk -rno name,uuid,partlabel)
+  [ $NUM -eq 1 ] && echo -n "$(printf "$L_WAITING_FOR_PART" "${1}")" > /dev/console
   sleep 1
   echo -en "\\033[1;33m.\\033[0;39m" >/dev/console #yellow dot
  done
- [ "$PART" ] && BLKID_PART="$PART"
- if [ "$DIDMSG" ];then
-  if [ "$PART" ];then
-   check_status 0
-  else
-   check_status 1
-  fi
- fi
+ check_status 1
 }
 
 decode_id() {
@@ -167,7 +165,7 @@ ensure_mounted() {
   ONE_FS="$(grep -m1 "^/dev/${1} " /proc/mounts | cut -f 3 -d ' ')"
   return
  fi
- ONE_FS="$(blkid /dev/${1} | grep -o ' TYPE=.*' | cut -f 2 -d '"')"
+ ONE_FS="$(lsblk -no fstype /dev/${1})"
  ONE_MP="${2}"
  if [ "$PFSCKP" = "yes" ] ; then # pfix=fsckp
    fsck_func /dev/${1} $ONE_FS
@@ -294,10 +292,10 @@ setup_psave(){ # setup savefile or savefolder
   echo "--SAVEFILE-- $SAVE_FN" #debug
   /sbin/load_ext_file "$SAVE_FN" "$SAVE_MP" #reads $PFSCK
   if [ -f /tmp/savefile_loop ] ; then
-    . /tmp/savefile_loop # $SAVEFILE_LOOP $SFFS
+    . /tmp/savefile_loop # $SAVEFILE_LOOP
     mkdir /pup_loop
-    echo "mount -t $SFFS -o noatime $SAVEFILE_LOOP /pup_loop" #debug
-    mount -t $SFFS -o noatime $SAVEFILE_LOOP /pup_loop
+    echo "mount -o noatime $SAVEFILE_LOOP /pup_loop" #debug
+    mount -o noatime $SAVEFILE_LOOP /pup_loop
     if [ $? -ne 0 ]; then
       PUPSAVE=""
     else
