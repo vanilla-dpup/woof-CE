@@ -24,7 +24,7 @@ if [ "$IS_MOUNTED" ] ; then
 fi
 
 [ -z "$MNT_DIR" ] && MNT_DIR=/mnt/$xdev
-[ -z "$MNT_FS" ]  && MNT_FS=$(lsblk -no fstype /dev/$xdev 2>/dev/null)
+[ -z "$MNT_FS" ]  && MNT_FS=$(blkid /dev/$xdev 2>/dev/null | grep -o ' TYPE=".*"' | cut -f 2 -d '"')
 mkdir -p ${MNT_DIR}
 
 #-----------------------------------------------------
