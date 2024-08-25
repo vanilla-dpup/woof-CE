@@ -123,15 +123,11 @@ wait_for_blkid() {
  [ "$1" ] || return
  # use loop to wait for device, if not found immediately
  for NUM in $(seq 1 15); do
-  while read LINE; do
-   case "$LINE" in
-   "$1 "*|*" $1 "*|*" $1")
-    BLKID_PART="/dev/${LINE%% *}"
-    [ $NUM -gt 1 ] && check_status 0
-    return
-    ;;
-   esac
-  done < <(lsblk -rno name,uuid,partlabel)
+  BLKID_PART="$(blkid | grep "$1" | grep -E "^/dev/$1| LABEL=.$1| UUID=.$1" | cut -f1 -d':' | cut -f3 -d'/')"
+  if [ "$BLKID_PART" ]; then
+   [ $NUM -gt 1 ] && check_status 0
+   return
+  fi
   [ $NUM -eq 1 ] && echo -n "$(printf "$L_WAITING_FOR_PART" "${1}")" > /dev/console
   sleep 1
   echo -en "\\033[1;33m.\\033[0;39m" >/dev/console #yellow dot
@@ -163,7 +159,7 @@ ensure_mounted() {
   ONE_FS="$(grep -m1 "^/dev/${1} " /proc/mounts | cut -f 3 -d ' ')"
   return
  fi
- ONE_FS="$(lsblk -no fstype /dev/${1})"
+ ONE_FS="$(blkid /dev/${1} | grep -o ' TYPE=.*' | cut -f 2 -d '"')"
  ONE_MP="${2}"
  if [ "$PFSCKP" = "yes" ] ; then # pfix=fsckp
    fsck_func /dev/${1} $ONE_FS
@@ -376,7 +372,7 @@ find_save_file() {
 
 search_func() {
  while read ONE_PART;do
-  ensure_mounted "$ONE_PART" "/mnt/pdrv"
+  ensure_mounted "$ONE_PART" "/mnt/$ONE_PART"
   if [ "$ONE_MP" ];then
    if [ "$LOOK_SAVE" ];then
     find_save_file "$ONE_MP" "$ONE_PART" "$ONE_FS"
@@ -489,12 +485,9 @@ if [ "$P_BP_ID" ];then #specified as parameter
   [ "$ONE_SFS" ] && { PDRV_SFS="$ONE_SFS"; DEV1FS="$ONE_FS"; }
  fi
 else #not specified anywhere
- #determine what to search for
- LOOK_SAVE="yes"
- [ "$SAVE_BP_ID" -o "$PRAMONLY" = "yes" ] && LOOK_SAVE=""
  LOOK_PUP=yes
 fi
-
+[ -z "$SAVE_BP_ID" -a "$PRAMONLY" != "yes" ] && LOOK_SAVE="yes"
 if [ "$LOOK_PUP" -o "$LOOK_SAVE" ];then #something to search for
  search_func
  NUM=0
