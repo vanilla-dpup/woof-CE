@@ -373,7 +373,7 @@ find_save_file() {
 
 search_func() {
  while read ONE_PART;do
-  ensure_mounted "$ONE_PART" "/mnt/$ONE_PART"
+  ensure_mounted "$ONE_PART" "/mnt/pdrv"
   if [ "$ONE_MP" ];then
    if [ "$LOOK_SAVE" ];then
     find_save_file "$ONE_MP" "$ONE_PART" "$ONE_FS"
