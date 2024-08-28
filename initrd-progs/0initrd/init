@@ -24,6 +24,7 @@ L_LOADING_PUPSAVE_FILE='Loading savefile %s [%s]...' #printf
 L_ADDING_SAVE_LAYER_FAILED="adding %s to overlay stack failed." #printf
 L_WAITING_FOR_DEV='Waiting %s seconds for slow storage devices [%s/%s].' #printf
 L_WAITING_FOR_PART='Waiting for partition [%s]' #printf
+L_BOOT_FASTER='set %s to boot faster!' #printf
 L_PRE_MESSAGE="Loading puppy main sfs file."
 L_ERR_PDRV_INCOMPLETE="%s information is incomplete." #printf
 L_ERR_ONEPART_NOT_OK="%s %s is not Ok." #printf
@@ -377,6 +378,7 @@ search_func() {
    if [ "$LOOK_SAVE" ];then
     find_save_file "$ONE_MP" "$ONE_PART" "$ONE_FS"
     if [ "$PUP_SAVES" ];then
+     printf "\\033[1;35m${L_BOOT_FASTER}\n\\033[0;39m" psave=$(blkid /dev/${ONE_PART} | tr ' ' '\n' | grep ^UUID= | cut -f 2 -d \") >/dev/console
      SAVEPART="$ONE_PART"
      LOOK_SAVE=""
     fi
@@ -384,6 +386,7 @@ search_func() {
    if [ "$LOOK_PUP" ];then
     find_drv_file "$ONE_MP" "$DISTRO_PUPPYSFS" ""
     if [ "$ONE_SFS" ];then
+     printf "\\033[1;35m${L_BOOT_FASTER}\n\\033[0;39m" pupsfs=$(blkid /dev/${ONE_PART} | tr ' ' '\n' | grep ^UUID= | cut -f 2 -d \") >/dev/console
      PDRV_SFS="$ONE_SFS"
      P_PART="$ONE_PART"
      DEV1FS="$ONE_FS"
