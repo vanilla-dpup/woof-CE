@@ -287,6 +287,7 @@ sfs_load --cli start
 #######################VERSION UPDATE##########################
 echo "VERSION UPDATE"
 # rc.update determines what is to be updated according to $PUMODE
+echo -n "Updating..." >/dev/console
 /etc/rc.d/rc.update $PUPMODE
 status_func $STATUS
 

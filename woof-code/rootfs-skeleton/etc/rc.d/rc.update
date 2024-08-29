@@ -3,20 +3,10 @@
 #This script is called by /etc/rc.d/rc.sysinit. the purpose is to perform
 #any required updates to files when a new version of Puppy is booted.
 
-status_func() {
-	if [ $1 -eq 0 ];then
-		echo -e "\\033[74G\\033[1;32mdone\\033[0;39m" >/dev/console
-	else
-		echo -e "\\033[72G\\033[1;31mfailed\\033[0;39m" >/dev/console
-	fi
-}
-
 #=============================================================
 # automatically update some stuff
 
 #set -x
-
-. /etc/DISTRO_SPECS
 
 #=============================================================
 # main
@@ -25,8 +15,6 @@ PUPMODE="$1"
 
 [ "$PUPMODE" = "" ] && exit
 
-echo -n "Updating..." >/dev/console #updating
-
 update_cache_files() {
        
        for gtkcmd in gtk gtk4
@@ -34,7 +22,6 @@ update_cache_files() {
 	if [ -e /usr/bin/${gtkcmd}-update-icon-cache ] ; then
 		#gtk-update-icon-cache /usr/share/icons/hicolor
 		#gtk-update-icon-cache /usr/local/share/icons/hicolor 2>/dev/null
-		echo -n " gtk-icon-cache" >/dev/console
 		find /usr/share/icons -maxdepth 1 -mindepth 1 -type d | \
 		while read dir ; do
 			[ -h "$dir" ] && continue
@@ -103,14 +90,10 @@ if [ "$PUPMODE" = "w" ] ; then #chroot from woof
 	exit
 fi
 
-. /initrd/pup_ro2/etc/DISTRO_SPECS #has DISTRO_VERSION, DISTRO_BINARY_COMPAT, DISTRO_FILE_PREFIX
-
 #===========================================================================
 
 if [ -f /initrd/tmp/version_update_flag ]; then
  rm -f /initrd/tmp/version_update_flag 2>/dev/null
- echo -n " to $DISTRO_VERSION" >/dev/console
-
  bdrv-update
 fi
 
@@ -124,8 +107,6 @@ cp -af /initrd/pup_ro2/etc/DISTRO_SPECS /etc/
 # if layers have changed, may need to fix menu (etc)...
 . /etc/rc.d/BOOTCONFIG
 if [ -n "$PREVUNIONRECORD" -a "$LASTUNIONRECORD" != "$PREVUNIONRECORD" ];then
-	echo -en " layered-filesystem \\033[1;35mnext boot will be faster!\\033[0;39m" > /dev/console
-	echo "layers have changed since previous boot, updating menus..."
 	update_cache_files
 elif [ -z "$PREVUNIONRECORD" -a -n "$EXTRASFSLIST" ];then # first boot with extra SFSs loaded
 	update_cache_files
