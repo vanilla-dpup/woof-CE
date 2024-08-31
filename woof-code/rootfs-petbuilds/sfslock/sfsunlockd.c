@@ -22,6 +22,6 @@ int main(int argc, char *argv[]) {
 	while (poll(&pfd, 1, -1) > 0 && !(pfd.revents & POLLPRI));
 
 	close(pfd.fd);
-	execl("/usr/bin/killall", "/usr/bin/killall", "-9", "sfslock", (char *)NULL);
+	execl("/usr/bin/killall", "/usr/bin/killall", "sfslock", (char *)NULL);
 	return EXIT_FAILURE;
 }
