@@ -1,5 +1,5 @@
 download() {
-    [ -f mdview-bfc04d27b4.tar.gz ] || wget -t 3 -T 60 --no-check-certificate https://chiselapp.com/user/jamesbond/repository/mdview3/tarball/bfc04d27b4/mdview-bfc04d27b4.tar.gz
+    [ -f mdview-bfc04d27b4.tar.gz ] || curl --fail --insecure --retry 3 --max-time 60 -o mdview-bfc04d27b4.tar.gz https://chiselapp.com/user/jamesbond/repository/mdview3/tarball/bfc04d27b4/mdview-bfc04d27b4.tar.gz
 }
 
 build() {

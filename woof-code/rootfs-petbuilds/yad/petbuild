@@ -1,5 +1,5 @@
 download() {
-    [ -f yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz ] || wget -t 3 -T 60 -O yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz https://github.com/step-/yad/archive/cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz
+    [ -f yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz https://github.com/step-/yad/archive/cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz
 }
 
 build() {

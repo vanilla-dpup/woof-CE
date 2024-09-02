@@ -1,7 +1,7 @@
 download() {
-    [ -f deadbeef-1.8.8.tar.bz2 ] || wget -t 3 -T 60 -O deadbeef-1.8.8.tar.bz2 https://sourceforge.net/projects/deadbeef/files/travis/linux/1.8.8/deadbeef-1.8.8.tar.bz2/download
-    [ -f ddb_output_pw-0b099d13ab0e89d9934aabdeb2872f0f66ea6960.tar.gz ] || wget -t 3 -T 60 -O ddb_output_pw-0b099d13ab0e89d9934aabdeb2872f0f66ea6960.tar.gz https://github.com/DeaDBeeF-Player/ddb_output_pw/archive/0b099d13ab0e89d9934aabdeb2872f0f66ea6960.tar.gz
-    [ -f autogen-b8832d713253dfe899dbeea9df6c152f88d280d6.sh ] || wget -t 3 -T 60 -O autogen-b8832d713253dfe899dbeea9df6c152f88d280d6.sh https://raw.githubusercontent.com/DeaDBeeF-Player/deadbeef/b8832d713253dfe899dbeea9df6c152f88d280d6/autogen.sh
+    [ -f deadbeef-1.8.8.tar.bz2 ] || curl --fail --location --retry 3 --max-time 60 -o deadbeef-1.8.8.tar.bz2 https://sourceforge.net/projects/deadbeef/files/travis/linux/1.8.8/deadbeef-1.8.8.tar.bz2/download
+    [ -f ddb_output_pw-0b099d13ab0e89d9934aabdeb2872f0f66ea6960.tar.gz ] || curl --location --fail --retry 3 --max-time 60 -o ddb_output_pw-0b099d13ab0e89d9934aabdeb2872f0f66ea6960.tar.gz https://github.com/DeaDBeeF-Player/ddb_output_pw/archive/0b099d13ab0e89d9934aabdeb2872f0f66ea6960.tar.gz
+    [ -f autogen-b8832d713253dfe899dbeea9df6c152f88d280d6.sh ] || curl --fail --retry 3 --max-time 60 -o autogen-b8832d713253dfe899dbeea9df6c152f88d280d6.sh https://raw.githubusercontent.com/DeaDBeeF-Player/deadbeef/b8832d713253dfe899dbeea9df6c152f88d280d6/autogen.sh
 }
 
 build() {

@@ -1,5 +1,5 @@
 download() {
-    [ -f vercmp-66f9c9d6cefe318f2b9181a6a53c99b54651416a.c ] || wget -t 3 -T 60 -O vercmp-66f9c9d6cefe318f2b9181a6a53c99b54651416a.c https://raw.githubusercontent.com/puppylinux-woof-CE/initrd_progs/66f9c9d6cefe318f2b9181a6a53c99b54651416a/pkg/w_apps_static/w_apps/vercmp.c
+    [ -f vercmp-66f9c9d6cefe318f2b9181a6a53c99b54651416a.c ] || curl --fail --retry 3 --max-time 60 -o vercmp-66f9c9d6cefe318f2b9181a6a53c99b54651416a.c https://raw.githubusercontent.com/puppylinux-woof-CE/initrd_progs/66f9c9d6cefe318f2b9181a6a53c99b54651416a/pkg/w_apps_static/w_apps/vercmp.c
 }
 
 build() {

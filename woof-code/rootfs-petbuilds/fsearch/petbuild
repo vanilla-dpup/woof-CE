@@ -1,5 +1,5 @@
 download() {
-    [ -f fsearch-0.2.2.tar.gz ] || wget -t 3 -T 60 -O fsearch-0.2.2.tar.gz https://codeload.github.com/cboxdoerfer/fsearch/tar.gz/refs/tags/0.2.2
+    [ -f fsearch-0.2.2.tar.gz ] || curl --fail --retry 3 --max-time 60 -o fsearch-0.2.2.tar.gz https://codeload.github.com/cboxdoerfer/fsearch/tar.gz/refs/tags/0.2.2
 }
 
 build() {

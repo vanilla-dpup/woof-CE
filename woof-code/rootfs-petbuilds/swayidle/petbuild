@@ -1,5 +1,5 @@
 download() {
-    [ -f swayidle-1.8.0.tar.gz ] || wget -t 3 -T 60 https://github.com/swaywm/swayidle/releases/download/1.8.0/swayidle-1.8.0.tar.gz
+    [ -f swayidle-1.8.0.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o swayidle-1.8.0.tar.gz https://github.com/swaywm/swayidle/releases/download/1.8.0/swayidle-1.8.0.tar.gz
 }
 
 build() {

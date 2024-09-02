@@ -1,5 +1,5 @@
 download() {
-    [ -f gmeasures-0.7.tar.gz ] || wget -t 3 -T 60 https://distro.ibiblio.org/puppylinux/sources/g/gmeasures-0.7.tar.gz
+    [ -f gmeasures-0.7.tar.gz ] || curl --fail --retry 3 --max-time 60 -o gmeasures-0.7.tar.gz https://distro.ibiblio.org/puppylinux/sources/g/gmeasures-0.7.tar.gz
 }
 
 build() {

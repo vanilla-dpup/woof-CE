@@ -1,5 +1,5 @@
 download() {
-    [ -f chayang-61ad53b0.tar.gz ] || wget -t 3 -T 60 -O chayang-61ad53b0.tar.gz https://git.sr.ht/~emersion/chayang/archive/61ad53b0.tar.gz
+    [ -f chayang-61ad53b0.tar.gz ] || curl --fail --retry 3 --max-time 60 -o chayang-61ad53b0.tar.gz https://git.sr.ht/~emersion/chayang/archive/61ad53b0.tar.gz
 }
 
 build() {

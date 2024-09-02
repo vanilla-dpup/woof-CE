@@ -1,5 +1,5 @@
 download() {
-    [ -f mtpaint-3.50.09.zip ] || wget -t 3 -T 60 -O mtpaint-3.50.09.zip https://github.com/wjaguar/mtPaint/archive/199472ad6a4ecee6c8583fb5a504a2e99712b4fc.zip
+    [ -f mtpaint-3.50.09.zip ] || curl --fail --location --retry 3 --max-time 60 -o mtpaint-3.50.09.zip https://github.com/wjaguar/mtPaint/archive/199472ad6a4ecee6c8583fb5a504a2e99712b4fc.zip
 }
 
 build() {

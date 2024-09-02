@@ -1,5 +1,5 @@
 download() {
-    [ -f epdfview_old-6f907bd.tar.gz ] || wget -t 3 -T 60 -O epdfview_old-6f907bd.tar.gz https://github.com/Flow-It/epdfview_old/archive/6f907bdca84c55eb28906516ab589a0e532fae5b.tar.gz
+    [ -f epdfview_old-6f907bd.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o epdfview_old-6f907bd.tar.gz https://github.com/Flow-It/epdfview_old/archive/6f907bdca84c55eb28906516ab589a0e532fae5b.tar.gz
 }
 
 build() {

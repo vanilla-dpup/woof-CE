@@ -1,5 +1,5 @@
 download() {
-    [ -f efilinux-5781d5505189169758cfa0de43ceef9049af822e.zip ] || wget -t 3 -T 60 -O efilinux-5781d5505189169758cfa0de43ceef9049af822e.zip https://github.com/puppylinux-woof-CE/efilinux/archive/5781d5505189169758cfa0de43ceef9049af822e.zip
+    [ -f efilinux-5781d5505189169758cfa0de43ceef9049af822e.zip ] || curl --fail --location --retry 3 --max-time 60 -o efilinux-5781d5505189169758cfa0de43ceef9049af822e.zip https://github.com/puppylinux-woof-CE/efilinux/archive/5781d5505189169758cfa0de43ceef9049af822e.zip
 }
 
 build() {

@@ -1,5 +1,5 @@
 download() {
-    [ -f swaylock-1.8.0.tar.gz ] || wget -t 3 -T 60 https://github.com/swaywm/swaylock/releases/download/v1.8.0/swaylock-1.8.0.tar.gz
+    [ -f swaylock-1.8.0.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o swaylock-1.8.0.tar.gz https://github.com/swaywm/swaylock/releases/download/v1.8.0/swaylock-1.8.0.tar.gz
 }
 
 build() {
