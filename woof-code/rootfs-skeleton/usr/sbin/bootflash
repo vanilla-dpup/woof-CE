@@ -48,10 +48,11 @@ fi
 
 # $1: device
 # $2: boot partition
-# $3: save partitoin
+# $3: save partition
 # $4: fileystem (ext4 or f2fs)
 # $5: partition table type (msdos or gpt)
 # $6: boot flag (boot or esp)
+# $7: partition type (primary or "")
 create_drv() {
 	local XDEV=${1}
 	local PBOOTPART=${2}
@@ -59,6 +60,7 @@ create_drv() {
 	local XFSTYPE2=${4}
 	local LABEL=${5}
 	local BOOTFLAG=${6}
+	local PARTTYPE=${7}
 
 	#-- wipe_existing_partition_table_and_filesystem_signatures
 	dd if=/dev/zero of=/dev/${XDEV} bs=1M count=10
@@ -68,8 +70,8 @@ create_drv() {
 	parted --script -- \
 		/dev/${XDEV} \
 		mklabel ${LABEL} \
-		mkpart primary fat32 1MiB 64MiB \
-		mkpart primary ext4 64MiB 100% \
+		mkpart "${PARTTYPE}" fat32 1MiB 64MiB \
+		mkpart "${PARTTYPE}" ext4 64MiB 100% \
 		set 1 ${BOOTFLAG} on
 
 	sync
@@ -329,10 +331,10 @@ if [ -n "$WAYLAND_DISPLAY" -o -n "$DISPLAY" ] ; then
 fi
 
 if [ "$BOOTLOADER" = "syslinux" ] ; then
-	create_drv ${USBDRV} ${PBOOTPART} ${PSAVEPART} ${FSTYPE2} msdos boot
+	create_drv ${USBDRV} ${PBOOTPART} ${PSAVEPART} ${FSTYPE2} msdos boot primary
 	dd if=/usr/lib/SYSLINUX/mbr.bin of=/dev/${USBDRV##*/}
 elif [ "$BOOTLOADER" = "efilinux" ] ; then
-	create_drv ${USBDRV} ${PBOOTPART} ${PSAVEPART} ${FSTYPE2} gpt esp
+	create_drv ${USBDRV} ${PBOOTPART} ${PSAVEPART} ${FSTYPE2} gpt esp ""
 else
 	exit 1
 fi
