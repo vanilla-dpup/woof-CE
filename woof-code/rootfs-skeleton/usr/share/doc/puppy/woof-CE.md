@@ -15,11 +15,13 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
      * But with better compatibility and without risk of breakage on update
 * Provides a build system that makes it easy to reproduce, customize and develop
 
+![Vanilla Dpup screenshot](https://vanilla-dpup.github.io/screenshot3.png)
+
 ## Features
 
 ### Simplicity
 
-* SFSs don't need to be "queued" by the user for loading at boot time: instead, the init script loads all SFSs under psubdir (if specified) and the partition root, under both the save partition or the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order. The stacking order of the traditional *drv SFS is retained, for backward compatibility.
+* SFSs don't need to be "queued" by the user for loading at boot time: instead, the init script loads all SFSs under `psubdir` (if specified) and the partition root, under both the save partition and the boot partition. SFSs are sorted numerically before loading, so 2something.sfs is loaded before 10something.sfs. This allows loading of extra SFSs without persistency and allows the user to control the stacking order. The stacking order of the traditional *drv SFS is retained, for backward compatibility.
 * Support for PUPMODEs other than 5 (live), 12 (automatic persistency) and 13 (on-demand persistency) is gone.
 * Support PUPMODE 13 with periodic saving is gone. The user can run `save2flash` to save now, or save at shutdown.
 * Support for the devx SFS is gone and development packages can be installed individually, without having to download the entire devx.
@@ -55,14 +57,14 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * The init script (/etc/rc.d/rc.sysinit) and the shutdown script (/etc/rc.d/rc.shutdown) are shorter and much faster.
 * Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
 * 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
-* `save2flash` is much faster because it copies modified blocks rather than whole files from RAM to disk.
+* `save2flash` is much faster because it preallocates space when files grow and only copies appended or modified blocks when files change.
 * The pup-advert-blocker ad blocking tool is reimplemented using a [NSS module](https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) that checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line.
 * firewall_ng is enabled by default, ported to [nftables](https://netfilter.org/projects/nftables) and much simplified: it produces a short list of rules what describe packets to accept, instead of explictly blocking many kinds of packets and accepting anything else. In addition, it no longer does things that make sense on a router or a server, but don't do anything in an endpoint.
 
 ### Security
 
 * Save folders support encryption, using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html).
-* The [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox that restricts file system access for applications running as spot is stricter and also prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777, but without this new restriction, spot can access /initrd/mnt/dev_save/*save/upper/root instead, to bypass the sandbox. This breaks compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
+* A [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox restricts file system access for applications running as spot and prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777 and blocks attempts to bypass it by accessing /initrd/mnt/dev_save/*save/upper/root instead. This reduces compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
 * Most legacy X11 applications work thanks to [Xwayland](https://wayland.freedesktop.org/xserver.html), which is unprivileged and sandboxed.
 * Common sysfs hardening recommendations are applied out of the box.
 
@@ -81,8 +83,9 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * kernel-kit's firmware picker is gone: fdrv is built by moving /usr/lib/firmware out of the main SFS.
 * ISO images are gone: the woof-CE build output is a bootable flash drive image and `isoboot` is gone.
 * ntfs-3g is replaced with [ntfs3](https://www.kernel.org/doc/html/next/filesystems/ntfs3.html).
-* ext2 and ext3 save files are gone: all save files (including encrypted ones) use ext4, with or without journaling.
+* ext2 and ext3 save files are gone: all save files (including encrypted ones) use ext4 (without journaling).
 * Bootflash supports only syslinux and efilinux, with one partition layout: a small FAT32 boot partition and a big ext4 (without journaling) or F2FS partition for SFSs and persistency.
+* mke2fs is no longer preconfigured to disable modern ext4 features like `64bit` and `metadata_csum_seed`, because maintaining compatibility with ancient boot loaders is no longer a concern.
 * initrd is zstd-compressed and built from rootfs binaries instead of a prebuilt, outdated and unmaintained set of static executables.
 * initrd supports file system repair for exFAT, FAT32 and F2FS partitions, not just ext{2,3,4}.
 
@@ -92,9 +95,9 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
   * initrd-progs/0initrd/init is the early init script, which searches for Puppy files, sets up an overlay file system and `switch_root`s into it
 * kernel-kit/ contains a tool that builds Puppy-compatible kernels from the [Debian](https://www.debian.org/) kernel
 * woof-distro/ contains configuration files
-  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [dwl](https://github.com/djpohly/dwl) with the [snail layout](https://github.com/djpohly/dwl/wiki/snail) and [yambar](https://codeberg.org/dnkl/yambar), or [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar)
+  * woof-distro/x86_64/debian/trixie64 builds a [Debian](https://www.debian.org/) 13 based Puppy, featuring [dwl](https://codeberg.org/dwl/dwl) with the [snail layout](https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/snail) and [yambar](https://codeberg.org/dnkl/yambar), or [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar)
     * woof-distro/x86_64/debian/trixie64/DISTRO_SPECS contains the distro name and version
-    * woof-distro/x86_64/debian/trixie64/DISTRO_PKGS_SPECS-debian-trixie contains a list of [Debian](https://www.debian.org/) 13 package sto include
+    * woof-distro/x86_64/debian/trixie64/DISTRO_PKGS_SPECS-debian-trixie contains a list of [Debian](https://www.debian.org/) 13 packages to include
     * woof-distro/x86_64/debian/trixie64/_00build.conf contains a list of packages to build from source (PETBUILDS) and other settings
 * woof-code/ contains most of woof-CE itself and the Puppy skeleton (minus initramfs)
   * woof-code/rootfs-skeleton contains the Puppy root file system skeleton
