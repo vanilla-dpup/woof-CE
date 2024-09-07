@@ -141,7 +141,7 @@ done
 
 rm -f rootfs-complete/pet.specs
 
-rm -f rootfs-complete/etc/fonts/conf.d/10-hinting-slight.conf rootfs-complete/etc/fonts/conf.d/10-autohint.conf
+rm -f rootfs-complete/etc/fonts/conf.d/10-hinting-slight.conf
 ln -s /usr/share/fontconfig/conf.avail/10-hinting-none.conf rootfs-complete/etc/fonts/conf.d/
 
 cat << EOF > rootfs-complete/etc/issue
@@ -176,9 +176,7 @@ mv rootfs-complete/usr/lib/firmware fdrv/usr/lib/
 rm -rf ucode
 mkdir -p ucode/kernel/x86/microcode
 cat fdrv/usr/lib/firmware/intel-ucode/* > ucode/kernel/x86/microcode/GenuineIntel.bin
-rm -f fdrv/usr/lib/firmware/intel-ucode/*
 cat fdrv/usr/lib/firmware/amd-ucode/* > ucode/kernel/x86/microcode/AuthenticAMD.bin
-rm -f fdrv/usr/lib/firmware/amd-ucode/*
 cd ucode
 find . | cpio -o -H newc > ../build/ucode.cpio
 cd ..
