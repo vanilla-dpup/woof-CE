@@ -40,8 +40,6 @@ generic_func() {
  return 0
 }
 
-CHOWN=0
-
 for ONEAPP in $SPOTAPPS
 do
 
@@ -71,13 +69,6 @@ do
  elif [ "$ONEAPPcurrent" != "${ONEAPPname}=${ONEAPPvalue}" ];then
   sed -i -e "s%^${ONEAPPname}=.*%${ONEAPPname}=${ONEAPPvalue}%" /root/.spot-status
  fi
- 
- case ${ONEAPPvalue} in true|TRUE|yes|YES|on|ON)
-   CHOWN=1 ;;
- esac
-
 done
-
-[ $CHOWN -eq 1 ] && find ${SPOT_HOME} \( ! -user spot -or ! -group spot \) -exec chown -h spot:spot {} \;
 
 ###END###

@@ -164,6 +164,7 @@ rm -f rootfs-complete/usr/lib/udev/hwdb.bin
 chroot rootfs-complete /usr/sbin/auto-setup-spot
 chroot rootfs-complete /etc/rc.d/rc.update w
 
+chroot rootfs-complete chown -R spot:spot /home/spot
 chmod 700 rootfs-complete/root rootfs-complete/home/spot
 
 rm -rf build
