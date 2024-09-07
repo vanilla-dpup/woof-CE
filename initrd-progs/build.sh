@@ -5,18 +5,18 @@ generate_initrd() {
 	mkdir -p ZZ_initrd-expanded/{bin,lib}
 	cp -rf 0initrd/* ZZ_initrd-expanded
 	cd ZZ_initrd-expanded
-	cp -aLf ../../sandbox3/rootfs-complete/lib*/*-linux-*/ld-linux-*.so.2 lib/
+	cp -aLf /lib*/*-linux-*/ld-linux-*.so.2 lib/
 	for BIN in usr/bin/busybox usr/bin/lsblk usr/sbin/pfscrypt sbin/e2fsck sbin/fsck.f2fs sbin/fsck.fat usr/sbin/fsck.exfat sbin/resize2fs; do
-		cp -af ../../sandbox3/rootfs-complete/${BIN} bin/
-		for LIB in `chroot  ../../sandbox3/rootfs-complete ldd /${BIN} | awk '{print $3}'`; do
-			cp -anLf ../../sandbox3/rootfs-complete${LIB} lib/
+		cp -af /${BIN} bin/
+		for LIB in `ldd /${BIN} | awk '{print $3}'`; do
+			cp -anLf ${LIB} lib/
 		done
 	done
-	for BIN in `chroot  ../../sandbox3/rootfs-complete busybox --list`; do
+	for BIN in `busybox --list`; do
 		ln -s busybox bin/${BIN}
 	done
 
-	cp -f ../DISTRO_SPECS .
+	cp -f /etc/DISTRO_SPECS .
 
 	. ./DISTRO_SPECS
 	case "$DISTRO_TARGETARCH" in *64) ln -s lib lib64 ;; esac
@@ -25,12 +25,9 @@ generate_initrd() {
 	chroot . e2fsck -V 2>/dev/null
 	chroot . fsck.fat --help 2>/dev/null
 
-	find . | cpio -o -H newc > ../initrd
+	find . | cpio -o -H newc | zstd -19 > ../initrd.zst
 	cd ..
-	zstd -19 -f initrd
-
-	echo -e "\n***        INITRD: initrd.zst [${ARCH}]"
-	echo -e "*** /DISTRO_SPECS: ${DISTRO_NAME} ${DISTRO_VERSION} ${DISTRO_TARGETARCH}"
+	rm -rf ZZ_initrd-expanded
 }
 
 generate_initrd

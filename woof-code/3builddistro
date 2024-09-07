@@ -221,16 +221,14 @@ DISTRO_ADRVSFS='${ADRVSFS}'
 DISTRO_YDRVSFS='${YDRVSFS}'
 EOF
 
-cd ../initrd-progs
-cp -f ../sandbox3/rootfs-complete/etc/DISTRO_SPECS .
-./build.sh || exit 1
-cd ../sandbox3
+cp -a ../initrd-progs rootfs-complete/
+chroot rootfs-complete sh -c "cd /initrd-progs && ./build.sh" || exit 1
+mv -f rootfs-complete/initrd-progs/initrd.zst build/
+rm -rf rootfs-complete/initrd-progs
 
 cp -f ../kernel-kit/output/vmlinuz-* build/vmlinuz
 cp -f ../kernel-kit/output/kbuild-*.sfs build/
 cp -f ../kernel-kit/output/kernel-modules-*.sfs build/${ZDRVSFS}
-
-mv -f ../initrd-progs/initrd.zst build/
 
 mksquashfs fdrv build/${FDRVSFS} ${SFSCOMP}
 mksquashfs nlsx build/${NLSXSFS} ${SFSCOMP}
