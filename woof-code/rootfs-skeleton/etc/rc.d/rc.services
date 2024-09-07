@@ -1,8 +1,9 @@
 #!/bin/ash
 
-for S in rc.firewall trim; do
-	[ -x /etc/init.d/$S ] && /etc/init.d/$S $1
-done
+if [ "$1" = "start" ]; then
+	[ -x /etc/init.d/rc.firewall ] && /etc/init.d/rc.firewall start
+	[ -x /etc/init.d/trim ] && /etc/init.d/trim start
+fi
 
 for S in /etc/rc5.d/*
 do
