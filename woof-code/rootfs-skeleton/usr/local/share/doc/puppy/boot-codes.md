@@ -12,6 +12,7 @@ Boot codes can change DISTRO_NAME's behavior, speed up the boot process, make th
 * `waitdev=seconds`: specifies the timeout for search for SFSs and save folders or files. If unspecified, the default is 5 seconds.
 * `pfix=fsck`: enables file system error repair for save files.
 * `pfix=fsckp`: enables file system error repair for mounted partitions.
+* `pfix=scrub`: free disk space and improve responsiveness by searching for files copied from SFSs to the save layer and deleting them **immediately**. If unspecified, this cleanup is performed automatically on update.
 * `pfix=rdsh`: drops to a rescue shell at the end of the early boot process.
 * `pfix=nox`: disables automatic start of the graphical desktop.
 * `loglevel=number`: specifies the verbosity level, using a printk log level: the default is 3 (KERN_ERR) and 7 (KERN_DEBUG) makes {/initrd,}/tmp/bootinit.log extra verbose.

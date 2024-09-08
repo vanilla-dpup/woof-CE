@@ -60,6 +60,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * `save2flash` is much faster because it preallocates space when files grow and only copies appended or modified blocks when files change.
 * The pup-advert-blocker ad blocking tool is reimplemented using a [NSS module](https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) that checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line.
 * firewall_ng is enabled by default, ported to [nftables](https://netfilter.org/projects/nftables) and much simplified: it produces a short list of rules what describe packets to accept, instead of explictly blocking many kinds of packets and accepting anything else. In addition, it no longer does things that make sense on a router or a server, but don't do anything in an endpoint.
+* Files spilled to the save layer on `apt upgrade` or metadata change (like `chmod`) are cleaned up on update if possible, shrinking the save layer and preventing performance degradation as more and more files reside on disk without the SFS advantages of compression and caching in RAM.
 
 ### Security
 

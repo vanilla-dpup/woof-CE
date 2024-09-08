@@ -21,6 +21,7 @@ L_PAUSING_60_SECONDS="Pausing for 60 seconds..."
 L_LOADING_FILE="Loading '%s'..." #printf
 L_LOADING_PUPSAVE='Loading savefolder %s [%s]...' #printf
 L_LOADING_PUPSAVE_FILE='Loading savefile %s [%s]...' #printf
+L_SCRUBBING_PUPSAVE="Scrubbing save layer..."
 L_ADDING_SAVE_LAYER_FAILED="adding %s to overlay stack failed." #printf
 L_WAITING_FOR_DEV='Waiting %s seconds for slow storage devices [%s/%s].' #printf
 L_WAITING_FOR_PART='Waiting for partition [%s]' #printf
@@ -328,22 +329,31 @@ setup_psave(){ # setup savefile or savefolder
  else
   PUPSAVE=""
  fi
- #[ "$PUPSAVE" ] && decrypt directory at SAVE_LAYER
  if [ "$PUPSAVE" ];then
   SAVE_NAME="$(basename $SAVE_REL_FN)"
   check_status 0
+  [ -f ${SAVE_LAYER}/initrd/DISTRO_SPECS ] && ! cmp -s /DISTRO_SPECS ${SAVE_LAYER}/initrd/DISTRO_SPECS && PSCRUB="yes"
+  if [ "$PSCRUB" = "yes" ];then
+   echo -n "${L_SCRUBBING_PUPSAVE}" > /dev/console
+   while read F;do
+    N="${SAVE_LAYER}${F#/pup_new}"
+    [ -L "${N}" -o ! -f "${N}" ] && continue
+    cmp -s "${F}" "${N}" || continue
+    [ "`stat -c '%u %g %a' "${F}"`" = "`stat -c '%u %g %a' "${N}"`" ] || continue
+    rm -f "${N}"
+   done < <(find /pup_new -type f -not -wholename /pup_new/initrd/DISTRO_SPECS)
+   check_status 0
+  fi
  else
   check_status 1
- fi
- if [ ! "$PUPSAVE" ] ; then
-   echo "No pupsave. Setting PUPMODE 5" #debug
-   if ! [ -L $SAVE_LAYER ] ; then # $SAVE_LAYER is a true mp
-     echo -e "Unmounting savefile\numount -d $SAVE_LAYER" #debug
-     umount -d $SAVE_LAYER
-   fi
-   PUPMODE=5
-   SAVE_MP=""
-   SAVE_LAYER=""
+  echo "No pupsave. Setting PUPMODE 5" #debug
+  if ! [ -L $SAVE_LAYER ] ; then # $SAVE_LAYER is a true mp
+    echo -e "Unmounting savefile\numount -d $SAVE_LAYER" #debug
+    umount -d $SAVE_LAYER
+  fi
+  PUPMODE=5
+  SAVE_MP=""
+  SAVE_LAYER=""
  fi
 }
 
@@ -450,6 +460,7 @@ else
 fi
 
 RDSH=""
+PSCRUB=""
 if [ "$pfix" ];then
  for ONEFIX in $(echo -n "$pfix" | tr ',' ' ')
  do
@@ -459,6 +470,7 @@ if [ "$pfix" ];then
    nox)     PNOX="yes";;          #do not start X.
    fsck)    PFSCK="yes";;         #do a fsck of ${DISTRO_FILE_PREFIX}save file.
    fsckp)   PFSCKP="yes";;        #do fsck before first mount of ext partitions
+   scrub)   PSCRUB="yes";;        #delete files copied from SFSs to the save layer
    *)       echo "pfix=$ONEFIX is not a known boot parameter";;
   esac
  done
@@ -535,6 +547,38 @@ PUP_LAYER="$SFS_MP"
 #if SAVEPART is not the same as P_PART
 #moved up here to ensure config files are available
 [ "$SAVEPART" ] && ensure_save_mounted
+
+EXTRASFSPATHS=`find /mnt/pdrv${PSUBDIR} /mnt/pdrv /mnt/dev_save${PSUBDIR} /mnt/dev_save -maxdepth 1 -name '*.sfs' -size +0 -exec sh -c 'SFS={}; echo ${SFS##*/},$SFS' \; | sort -n | uniq | cut -f 2- -d ,`
+
+# load traditional SFSs in the traditional order
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_BDRVSFS" "b" "p"
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_YDRVSFS" "y" "p"
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ADRVSFS" "a" "p"
+stack_onepupdrv "$EXTRASFSPATHS" "nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs" "nls" ""
+stack_onepupdrv "$EXTRASFSPATHS" "docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs" "doc" ""
+stack_onepupdrv "$EXTRASFSPATHS" "kbuild-${KERNELVER}.sfs" "k" ""
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_FDRVSFS" "f" ""
+stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ZDRVSFS" "z" ""
+
+# load all other SFSs, sorted numerically
+CNT=3
+for ONE_SFS in $EXTRASFSPATHS; do
+ ONE_NAME="${ONE_SFS##*/}"
+
+ # skip SFSs from other Puppy family distros
+ case "$ONE_NAME" in
+ *_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs) ;;
+ puppy_*.sfs|*drv_*.sfs|kbuild-*.sfs|devx_*.sfs|nlsx_*.sfs|docx_*.sfs) continue ;;
+ esac
+
+ stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" "" || continue
+ if [ -z "$EXTRASFSLIST" ]; then
+  EXTRASFSLIST="${ONE_NAME}"
+ else
+  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
+ fi
+ CNT=$(($CNT + 1))
+done
 
 #find PUPSAVE, sortout pupmode
 PUPMODE=5
@@ -644,42 +688,6 @@ case $PUPMODE in
  ;;
 esac
 
-EXTRASFSPATHS=`find /mnt/pdrv${PSUBDIR} /mnt/pdrv /mnt/dev_save${PSUBDIR} /mnt/dev_save -maxdepth 1 -name '*.sfs' -size +0 -exec sh -c 'SFS={}; echo ${SFS##*/},$SFS' \; | sort -n | uniq | cut -f 2- -d ,`
-
-# load traditional SFSs in the traditional order
-stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_BDRVSFS" "b" "p"
-stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_YDRVSFS" "y" "p"
-stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ADRVSFS" "a" "p"
-stack_onepupdrv "$EXTRASFSPATHS" "nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs" "nls" ""
-stack_onepupdrv "$EXTRASFSPATHS" "docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs" "doc" ""
-stack_onepupdrv "$EXTRASFSPATHS" "kbuild-${KERNELVER}.sfs" "k" ""
-stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_FDRVSFS" "f" ""
-stack_onepupdrv "$EXTRASFSPATHS" "$DISTRO_ZDRVSFS" "z" ""
-
-# under PUPMODE 12, a dynamically loaded SFS may leave behind symlinks in the save layer
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin chroot /pup_new /usr/local/sbin/sfs_load.overlay --cli stop
-rm -f /pup_new/run/sfs_load.lock
-
-# load all other SFSs, sorted numerically
-CNT=3
-for ONE_SFS in $EXTRASFSPATHS; do
- ONE_NAME="${ONE_SFS##*/}"
-
- # skip SFSs from other Puppy family distros
- case "$ONE_NAME" in
- *_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs) ;;
- puppy_*.sfs|*drv_*.sfs|kbuild-*.sfs|devx_*.sfs|nlsx_*.sfs|docx_*.sfs) continue ;;
- esac
-
- stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" "" || continue
- if [ -z "$EXTRASFSLIST" ]; then
-  EXTRASFSLIST="${ONE_NAME}"
- else
-  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
- fi
- CNT=$(($CNT + 1))
-done
-
 mkdir -p /pup_new/etc/rc.d
 ( # > /pup_new/etc/rc.d/PUPSTATE
 echo "PUPMODE=$PUPMODE"
@@ -708,6 +716,10 @@ else
 fi
 echo "EXTRASFSLIST='${EXTRASFSLIST}'" >> /pup_new/etc/rc.d/BOOTCONFIG
 echo "LASTUNIONRECORD='$(echo -n $NEWUNIONRECORD)'" >> /pup_new/etc/rc.d/BOOTCONFIG
+
+# under PUPMODE 12, a dynamically loaded SFS may leave behind symlinks in the save layer
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin chroot /pup_new /usr/local/sbin/sfs_load.overlay --cli stop
+rm -f /pup_new/run/sfs_load.lock
 
 echo -n "${L_SWITCH_ROOT}" > /dev/console
 
