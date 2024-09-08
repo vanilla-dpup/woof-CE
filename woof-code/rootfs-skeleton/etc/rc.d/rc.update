@@ -92,13 +92,6 @@ fi
 
 #===========================================================================
 
-if [ -f /initrd/tmp/version_update_flag ]; then
- rm -f /initrd/tmp/version_update_flag 2>/dev/null
- bdrv-update
-fi
-
-#===========================================================================
-
 #stuff to update on every boot...
 
 #think have to do this everytime...
