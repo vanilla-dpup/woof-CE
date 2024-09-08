@@ -38,3 +38,4 @@ jobs:
           name: kernel-kit-output-usrmerge-debian-${{ matrix.release }}-${{ matrix.arch }}
           path: output
           retention-days: 16
+          compression-level: 0

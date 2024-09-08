@@ -157,3 +157,4 @@ jobs:
           *.img.gz
           woof-CE.tar.gz
         retention-days: ${{ inputs.retention }}
+        compression-level: 0
