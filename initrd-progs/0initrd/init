@@ -232,11 +232,19 @@ do_stack_onepupdrv() {
  if [ "$ONE_PREP" ];then
   remount_overlay -e "s~lowerdir=([^,]+)~lowerdir=${SFS_MP}:\1~" -e "s~lowerdir=,~lowerdir=${SFS_MP},~"
   [ $? -eq 0 ] || return 5
-  NEWUNIONRECORD="${ONE_BASENAME} ${NEWUNIONRECORD}"
+  if [ -n "$NEWUNIONRECORD" ];then
+   NEWUNIONRECORD="${ONE_BASENAME} ${NEWUNIONRECORD}"
+  else
+   NEWUNIONRECORD="${ONE_BASENAME}"
+  fi
  else
   remount_overlay -e "s~lowerdir=([^,]+)~lowerdir=\1:${SFS_MP}~" -e "s~lowerdir=,~lowerdir=${SFS_MP},~"
   [ $? -eq 0 ] || return 5
-  NEWUNIONRECORD="${NEWUNIONRECORD}${ONE_BASENAME} "
+  if [ -n "$NEWUNIONRECORD" ];then
+   NEWUNIONRECORD="${NEWUNIONRECORD} ${ONE_BASENAME}"
+  else
+   NEWUNIONRECORD="${ONE_BASENAME}"
+  fi
  fi
  return 0
 }
@@ -332,16 +340,36 @@ setup_psave(){ # setup savefile or savefolder
  if [ "$PUPSAVE" ];then
   SAVE_NAME="$(basename $SAVE_REL_FN)"
   check_status 0
-  [ -f ${SAVE_LAYER}/initrd/DISTRO_SPECS ] && ! cmp -s /DISTRO_SPECS ${SAVE_LAYER}/initrd/DISTRO_SPECS && PSCRUB="yes"
-  if [ "$PSCRUB" = "yes" ];then
+
+  if [ -z "$PSCRUB" ];then
+   if [ -f ${SAVE_LAYER}/initrd/DISTRO_SPECS ] && ! cmp -s /DISTRO_SPECS ${SAVE_LAYER}/initrd/DISTRO_SPECS;then
+    PSCRUB="yes"
+   elif [ -f ${SAVE_LAYER}/etc/rc.d/BOOTCONFIG ];then
+    . ${SAVE_LAYER}/etc/rc.d/BOOTCONFIG
+    [ -n "$LASTUNIONRECORD" -a "$NEWUNIONRECORD" != "$LASTUNIONRECORD" ] && PSCRUB="wh"
+   fi
+  fi
+
+  if [ -n "$PSCRUB" ];then
    echo -n "${L_SCRUBBING_PUPSAVE}" > /dev/console
-   while read F;do
-    N="${SAVE_LAYER}${F#/pup_new}"
-    [ -L "${N}" -o ! -f "${N}" ] && continue
-    cmp -s "${F}" "${N}" || continue
-    [ "`stat -c '%u %g %a' "${F}"`" = "`stat -c '%u %g %a' "${N}"`" ] || continue
-    rm -f "${N}"
-   done < <(find /pup_new -type f -not -wholename /pup_new/initrd/DISTRO_SPECS)
+
+   # clean up SFS contentes copied to the save layer
+   if [ "$PSCRUB" = "yes" ];then
+    while read F;do
+     N="${SAVE_LAYER}${F#/pup_new}"
+     [ -L "${N}" -o ! -f "${N}" ] && continue
+     cmp -s "${F}" "${N}" || continue
+     [ "`stat -c '%u %g %a' "${F}"`" = "`stat -c '%u %g %a' "${N}"`" ] || continue
+     rm -f "${N}"
+    done < <(find /pup_new -type f -not -wholename /pup_new/initrd/DISTRO_SPECS)
+   fi
+
+   # clean up leftover overlay whiteouts
+   while read N;do
+    F="/pup_new${N#${SAVE_LAYER}}"
+    [ -e "${F}" -o -L "${F}" ] || rm -f "${N}"
+   done < <(find ${SAVE_LAYER}/ -type c)
+
    check_status 0
   fi
  else
@@ -523,7 +551,7 @@ mount -t tmpfs tmpfs /mnt/tmpfs
 [ -d "/mnt/tmpfs/pup_rw" ] || mkdir /mnt/tmpfs/pup_rw
 
 NEWUNIONRECORD=""
-EXTRASFSLIST=""
+NEWEXTRASFSLIST=""
 
 do_stack_onepupdrv "$PDRV_SFS" "ro2"
 STATUS=$?
@@ -572,10 +600,10 @@ for ONE_SFS in $EXTRASFSPATHS; do
  esac
 
  stack_onepupdrv "$EXTRASFSPATHS" "$ONE_NAME" "ro${CNT}" "" || continue
- if [ -z "$EXTRASFSLIST" ]; then
-  EXTRASFSLIST="${ONE_NAME}"
+ if [ -z "$NEWEXTRASFSLIST" ]; then
+  NEWEXTRASFSLIST="${ONE_NAME}"
  else
-  EXTRASFSLIST="${EXTRASFSLIST} ${ONE_NAME}"
+  NEWEXTRASFSLIST="${NEWEXTRASFSLIST} ${ONE_NAME}"
  fi
  CNT=$(($CNT + 1))
 done
@@ -659,12 +687,7 @@ case $PUPMODE in
     #prepend ro1 - #SAVE_LAYER=/pup_ro1
     rm -rf ${SAVE_LAYER}/tmp #in case last boot was pupmode=12
     mount -o remount,size=75% /mnt/tmpfs
-    remount_overlay "s~lowerdir=([^,]+)~lowerdir=${SAVE_LAYER}:\1~"
-    if [ $? -eq 0 ];then
-      [ "$SAVE_NAME" ] && NEWUNIONRECORD="$SAVE_NAME $NEWUNIONRECORD"
-    else
-      printf "${L_ADDING_SAVE_LAYER_FAILED}\n" "$SAVE_LAYER"
-    fi
+    remount_overlay "s~lowerdir=([^,]+)~lowerdir=${SAVE_LAYER}:\1~" || printf "${L_ADDING_SAVE_LAYER_FAILED}\n" "$SAVE_LAYER"
   fi
  ;;
  12) #replace rw
@@ -677,7 +700,6 @@ case $PUPMODE in
     remount_overlay -e "s~upperdir=[^,]+~upperdir=${SAVE_LAYER}~" -e "s~workdir=[^,]+~workdir=${WORKDIR}~"
     if [ $? -eq 0 ];then
       rm -rf /mnt/tmpfs/pup_rw
-      [ "$SAVE_NAME" ] && NEWUNIONRECORD="$SAVE_NAME $NEWUNIONRECORD"
     else
       printf "${L_ADDING_SAVE_LAYER_FAILED}\n" "$SAVE_LAYER"
     fi
@@ -714,8 +736,8 @@ if [ "$PUPSAVE" ];then
 else
  echo "PREVUNIONRECORD=''" >> /pup_new/etc/rc.d/BOOTCONFIG
 fi
-echo "EXTRASFSLIST='${EXTRASFSLIST}'" >> /pup_new/etc/rc.d/BOOTCONFIG
-echo "LASTUNIONRECORD='$(echo -n $NEWUNIONRECORD)'" >> /pup_new/etc/rc.d/BOOTCONFIG
+echo "EXTRASFSLIST='${NEWEXTRASFSLIST}'" >> /pup_new/etc/rc.d/BOOTCONFIG
+echo "LASTUNIONRECORD='${NEWUNIONRECORD}'" >> /pup_new/etc/rc.d/BOOTCONFIG
 
 # under PUPMODE 12, a dynamically loaded SFS may leave behind symlinks in the save layer
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin chroot /pup_new /usr/local/sbin/sfs_load.overlay --cli stop
