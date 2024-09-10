@@ -31,10 +31,10 @@ exec run-as-spot \"$1\" \"\$@\"" > "$SCRIPT"
 generic_func() {
  case $ONEAPPvalue in
   true)
-   run_as_spot ${ONEAPPpath}/${ONEAPPname} /usr/local/bin/${ONEAPPname}
+   run_as_spot ${ONEAPPpath}/${ONEAPPname} ~/.local/bin/${ONEAPPname}
   ;;
   false)
-   [ -e /usr/local/bin/${ONEAPPname} ] && rm -f /usr/local/bin/${ONEAPPname}
+   [ -e ~/.local/bin/${ONEAPPname} ] && rm -f ~/.local/bin/${ONEAPPname}
   ;;
  esac
  return 0
@@ -45,7 +45,7 @@ do
 
  ONEAPPname="`echo -n "$ONEAPP" | cut -f 1 -d '='`"  #ex: seamonkey
  ONEAPPvalue="`echo -n "$ONEAPP" | cut -f 2 -d '='`" #ex: true
- ONEAPPspec="`find ${PATH//:/ } -mindepth 1 -maxdepth 1 -name ${ONEAPPname} | grep -vF /usr/local/bin/${ONEAPPname} | head -n 1`"
+ ONEAPPspec="`find ${PATH//:/ } -mindepth 1 -maxdepth 1 -name ${ONEAPPname} | grep -vF ~/.local/bin/${ONEAPPname} | head -n 1`"
  if [ ! "$ONEAPPspec" ];then
   #executable does not exist, so remove from list, if there...
   sed -i -e "/^${ONEAPPname}=/d" /root/.spot-status

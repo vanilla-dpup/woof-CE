@@ -2,6 +2,7 @@
 
 export PATH="$PATH:/usr/local/games:/usr/games"
 [ -d /var/lib/flatpak/exports/bin ] && export PATH="$PATH:/var/lib/flatpak/exports/bin"
+[ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
 if command -v startlabwc >/dev/null 2>&1 ; then
 	if [ ! -f /tmp/bootcnt.txt ] ; then

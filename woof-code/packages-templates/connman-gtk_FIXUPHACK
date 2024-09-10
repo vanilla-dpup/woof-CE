@@ -2,12 +2,12 @@ cat << EOF > pinstall.sh
 echo -e '#!/bin/sh\nexec connman-gtk' > usr/local/bin/defaultconnect
 chmod 755 usr/local/bin/defaultconnect
 
-cat << EOF2 > usr/local/bin/connman-gtk
+cat << EOF2 > root/.local/bin/connman-gtk
 #!/bin/sh
 
 run-as-spot gsettings set net.connman.gtk launch-to-tray false
 
 exec run-as-spot /usr/bin/connman-gtk "\\\$@"
 EOF2
-chmod 755 usr/local/bin/connman-gtk
+chmod 755 ~ root/.local/bin/connman-gtk
 EOF

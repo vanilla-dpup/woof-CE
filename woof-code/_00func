@@ -22,7 +22,7 @@ function clearenv() {
 		export XDG_RUNTIME_DIR=/tmp/runtime-root
 		export LC_ALL=en_US.UTF-8
 		export XDG_DATA_DIRS=/usr/share:/usr/local/share
-		export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
+		export PATH=/root/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
 		export DEBIAN_FRONTEND=noninteractive
 	fi
 }
