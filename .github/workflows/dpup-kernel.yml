@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name != 'schedule' || (github.repository == 'puppylinux-woof-CE/woof-CE' && github.ref == 'refs/heads/testing')
+    if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-10.0.x')
     runs-on: ubuntu-22.04
     container:
       image: debian:${{ matrix.release }}-slim
@@ -27,12 +27,6 @@ jobs:
           - release: bookworm
             arch: x86
             base: config.i386_none_686-pae.xz
-          - release: trixie
-            arch: x86_64
-            base: config.amd64_none_amd64.xz
-          - release: sid
-            arch: x86_64
-            base: config.amd64_none_amd64.xz
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
