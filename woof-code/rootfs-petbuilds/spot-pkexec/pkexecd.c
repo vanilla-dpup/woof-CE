@@ -44,7 +44,7 @@ void exec_child(const pid_t pid, char *argv[])
 
 void run_cmd(const pid_t pid, char *buf, const size_t len)
 {
-	static char *argv[32] = {"/usr/sbin/pkexec-ask"};
+	static char *argv[32] = {"/usr/local/sbin/pkexec-ask"};
 	pid_t ask, reaped;
 	int argc, status;
 

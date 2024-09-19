@@ -1,5 +1,5 @@
-mkdir -p etc/xdg/autostart
-cat << EOF > etc/xdg/autostart/waybar.desktop
+mkdir -p root/.config/autostart
+cat << EOF > root/.config/autostart/waybar.desktop
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
@@ -7,7 +7,7 @@ NoDisplay=true
 Name=waybar
 Exec=waybar
 EOF
-chmod 644 etc/xdg/autostart/waybar.desktop
+chmod 644 root/.config/autostart/waybar.desktop
 
 mkdir -p root/.config/waybar/presets/{Horizontal,Vertical}
 

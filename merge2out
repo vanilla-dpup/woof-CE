@@ -163,8 +163,8 @@ done
 echo
 
 install -m 644 LICENSE ../${WOOF_OUT}/LICENSE
-install -m 644 LICENSE ../${WOOF_OUT}/rootfs-skeleton/usr/share/doc/puppy/LICENSE
-ln -s rootfs-skeleton/usr/share/doc/puppy/woof-CE.md ../${WOOF_OUT}/README.md
+install -m 644 LICENSE ../${WOOF_OUT}/rootfs-skeleton/usr/local/share/doc/puppy/LICENSE
+ln -s rootfs-skeleton/usr/local/share/doc/puppy/woof-CE.md ../${WOOF_OUT}/README.md
 
 chown -R root:root ../${WOOF_OUT}
 
@@ -185,8 +185,8 @@ else
 	echo "BUILD_FROM_WOOF=\"No woof-CE-git info available\"" >> ../${WOOF_OUT}/DISTRO_SPECS
 fi
 tar -C .. -c ${WOOF_OUT} | xz -9 > ../${WOOF_OUT}.tar.xz
-mkdir -p ../${WOOF_OUT}/rootfs-skeleton/usr/share/woof-CE
-mv -f ../${WOOF_OUT}.tar.xz ../${WOOF_OUT}/rootfs-skeleton/usr/share/woof-CE/${WOOF_OUT}.tar.xz
+mkdir -p ../${WOOF_OUT}/rootfs-skeleton/usr/local/share/woof-CE
+mv -f ../${WOOF_OUT}.tar.xz ../${WOOF_OUT}/rootfs-skeleton/usr/local/share/woof-CE/${WOOF_OUT}.tar.xz
 
 echo
 echo "Directory '${WOOF_OUT}'

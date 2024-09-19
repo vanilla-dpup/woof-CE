@@ -3,7 +3,7 @@ download() {
 }
 
 build() {
-    $CC $CFLAGS altf1.c $LDFLAGS -o /usr/bin/altf1
-    mkdir -p /usr/lib/labwc
-    $CC $CFLAGS `pkg-config --cflags libinput` libinput-cfg.c $LDFLAGS `pkg-config --libs libinput` -ldl -shared -o /usr/lib/labwc/libinput-cfg.so
+    $CC $CFLAGS altf1.c $LDFLAGS -o /usr/local/bin/altf1
+    mkdir -p /usr/local/lib/labwc
+    $CC $CFLAGS `pkg-config --cflags libinput` libinput-cfg.c $LDFLAGS `pkg-config --libs libinput` -ldl -shared -o /usr/local/lib/labwc/libinput-cfg.so
 }

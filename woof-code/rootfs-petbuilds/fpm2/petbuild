@@ -5,7 +5,7 @@ download() {
 build() {
     tar -xJf fpm2-0.90.tar.xz
     cd fpm2-0.90
-    ./configure --prefix=/usr
+    ./configure
     make install
-    sed -i 's/^Categories=.*/Categories=X-Personal;/' /usr/share/applications/fpm2.desktop
+    sed -i 's/^Categories=.*/Categories=X-Personal;/' /usr/local/share/applications/fpm2.desktop
 }

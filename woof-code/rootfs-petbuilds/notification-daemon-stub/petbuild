@@ -31,5 +31,5 @@ build() {
 EOF
     gdbus-codegen --interface-prefix org.freedesktop.Notifications. --generate-c-code generated-code org.freedesktop.Notifications.xml
 
-    $CC $CFLAGS `pkg-config --cflags gio-2.0 gio-unix-2.0` generated-code.c main.c $LDFLAGS `pkg-config --libs gio-2.0 gio-unix-2.0` -o /usr/bin/notification-daemon-stub
+    $CC $CFLAGS `pkg-config --cflags gio-2.0 gio-unix-2.0` generated-code.c main.c $LDFLAGS `pkg-config --libs gio-2.0 gio-unix-2.0` -o /usr/local/bin/notification-daemon-stub
 }

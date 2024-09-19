@@ -1,4 +1,4 @@
-cat << EOF > etc/xdg/autostart/kanshi.desktop
+cat << EOF > root/.config/autostart/kanshi.desktop
 [Desktop Entry]
 Version=1.0
 Name=kanshi
@@ -6,7 +6,7 @@ Comment=kanshi
 Exec=sh -c "ls ~/.config/kanshi/*.profile || kanshi-gen; exec kanshi"
 Terminal=false
 EOF
-chmod 644 etc/xdg/autostart/kanshi.desktop
+chmod 644 root/.config/autostart/kanshi.desktop
 
 mkdir -p root/.config/kanshi
 echo 'include ~/.config/kanshi/*.profile' > root/.config/kanshi/config

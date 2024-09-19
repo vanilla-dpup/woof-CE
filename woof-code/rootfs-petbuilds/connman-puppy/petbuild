@@ -3,6 +3,6 @@ download() {
 }
 
 build() {
-    mkdir -p /usr/libexec/connman
-    $CC -D_GNU_SOURCE $CFLAGS libadjtime.c $LDFLAGS -shared -o /usr/libexec/connman/libadjtime.so
+    mkdir -p /usr/local/lib/connman
+    $CC -D_GNU_SOURCE $CFLAGS libadjtime.c $LDFLAGS -shared -o /usr/local/lib/connman/libadjtime.so
 }

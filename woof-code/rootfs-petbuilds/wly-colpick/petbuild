@@ -5,5 +5,5 @@ download() {
 build() {
     tar -xzf wly-colpick-0.1.1.tar.gz
     cd wly-colpick-wly-colpick-0.1.1
-    make PREFIX=/usr install
+    make install
 }

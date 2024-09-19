@@ -14,8 +14,8 @@ build() {
     patch -p1 < ../mount.patch
     patch -p1 < ../unmount.patch
     patch -p1 < ../puppy-defaults.patch
-    ./configure --prefix=/usr --disable-startup-notification --disable-superuser-checks --disable-desktop-integration --disable-video-thumbnails --with-gtk3
+    ./configure --disable-startup-notification --disable-superuser-checks --disable-desktop-integration --disable-video-thumbnails --with-gtk3
     make install
-    rm -rf /usr/bin/spacefm-installer /usr/share/applications/{spacefm-find,spacefm-folder-handler}.desktop /usr/share/icons/Faenza
-    sed -e 's/^Categories=.*/Categories=FileManager/' -i /usr/share/applications/spacefm.desktop
+    rm -rf /usr/local/bin/spacefm-installer /usr/local/share/applications/{spacefm-find,spacefm-folder-handler}.desktop /usr/local/share/icons/Faenza
+    sed -e 's/^Categories=.*/Categories=FileManager/' -i /usr/local/share/applications/spacefm.desktop
 }

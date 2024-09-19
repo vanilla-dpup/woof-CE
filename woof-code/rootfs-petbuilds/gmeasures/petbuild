@@ -7,13 +7,13 @@ build() {
     cd gmeasures-0.7
     patch -p1 < ../gtk3.patch
     patch -p1 < ../gcc14.patch
-    ./autogen.sh --prefix=/usr
+    ./autogen.sh
     make install
-    mkdir -p /usr/share/doc
-    mv /usr/doc/gmeasures /usr/share/doc/
-    rmdir /usr/doc 2>/dev/null
-    mkdir -p /usr/share/applications
-    cat << EOF > /usr/share/applications/gmeasures.desktop
+    mkdir -p /usr/local/share/doc
+    mv /usr/local/doc/gmeasures /usr/local/share/doc/
+    rmdir /usr/local/doc 2>/dev/null
+    mkdir -p /usr/local/share/applications
+    cat << EOF > /usr/local/share/applications/gmeasures.desktop
 [Desktop Entry]
 Name=gMeasures
 Comment=Weights and measures converter

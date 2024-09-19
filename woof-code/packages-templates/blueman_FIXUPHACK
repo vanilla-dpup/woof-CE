@@ -1,6 +1,6 @@
 cat << EOF > pinstall.sh
 [ -f root/.spot-status ] && mv -f root/.spot-status root/.spot-status.orig
-chroot . /usr/sbin/setup-spot blueman-applet=true
-chroot . /usr/sbin/setup-spot blueman-manager=true
+chroot . setup-spot blueman-applet=true
+chroot . setup-spot blueman-manager=true
 [ -f root/.spot-status.orig ] && mv -f root/.spot-status.orig root/.spot-status || rm -f root/.spot-status
 EOF

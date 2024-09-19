@@ -6,5 +6,5 @@ build() {
     tar -xzf gexec-0.5.1.tar.gz
     cd gexec-0.5.1
     make
-    install -m 755 gexec /usr/bin/gexec
+    install -m 755 gexec /usr/local/bin/gexec
 }

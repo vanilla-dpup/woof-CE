@@ -3,5 +3,5 @@ download() {
 }
 
 build() {
-    $CC $CFLAGS `pkg-config --cflags glib-2.0` -D_GNU_SOURCE urxvt.c $LDFLAGS `pkg-config --libs glib-2.0` -o /usr/bin/lxterminal-urxvt
+    $CC $CFLAGS `pkg-config --cflags glib-2.0` -D_GNU_SOURCE urxvt.c $LDFLAGS `pkg-config --libs glib-2.0` -o /usr/local/bin/lxterminal-urxvt
 }

@@ -5,6 +5,6 @@ download() {
 build() {
     tar -xzf yad-cfe6c7064f3daff80953a09a890537a8e68b8d11.tar.gz
     cd yad-cfe6c7064f3daff80953a09a890537a8e68b8d11
-    meson --buildtype=release --prefix=/usr build
+    meson --buildtype=release build
     ninja -C build install
 }

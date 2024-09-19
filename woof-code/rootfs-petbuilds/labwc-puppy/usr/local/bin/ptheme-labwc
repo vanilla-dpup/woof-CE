@@ -1,0 +1,14 @@
+#!/bin/ash
+
+THEMES=
+for THEME in /usr/local/share/themes/* /usr/share/themes/*; do
+	[ -f ${THEME}/openbox-3/themerc ] && THEMES="$THEMES ${THEME##*/}"
+done
+
+while :; do
+	CHOICE=`yad --title "labwc theme switcher" --window-icon=gtk-preferences --height=300 --list --no-headers --column=theme --print-column=1 --separator= -- $THEMES`
+	[ -z "$CHOICE" ] && break
+
+	sed -i "s~<theme><name>.*</name></theme>~<theme><name>${CHOICE}</name></theme>~" ~/.config/labwc/rc.xml
+	labwc -r
+done

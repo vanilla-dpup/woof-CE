@@ -6,10 +6,10 @@ build() {
     tar -xzf epdfview_old-6f907bd.tar.gz
     cd epdfview_old-6f907bdca84c55eb28906516ab589a0e532fae5b
     if command -v cups-config > /dev/null; then
-        meson --buildtype=release --prefix=/usr -Denable-printing=true build
+        meson --buildtype=release -Denable-printing=true build
     else
-        meson --buildtype=release --prefix=/usr build
+        meson --buildtype=release build
     fi
     ninja -C build install
-    sed -i 's/^Categories=.*/Categories=X-Document-viewer;/' /usr/share/applications/epdfview.desktop
+    sed -i 's/^Categories=.*/Categories=X-Document-viewer;/' /usr/local/share/applications/epdfview.desktop
 }

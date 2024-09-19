@@ -5,6 +5,6 @@ download() {
 build() {
     tar -xzf chayang-61ad53b0.tar.gz
     cd chayang-61ad53b0
-    meson --buildtype=release --prefix=/usr build
+    meson --buildtype=release build
     ninja -C build install
 }

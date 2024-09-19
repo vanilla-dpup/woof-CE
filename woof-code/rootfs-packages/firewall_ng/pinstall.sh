@@ -1,1 +1,1 @@
-chroot . /usr/sbin/firewall_ng enable
+chroot . firewall_ng enable

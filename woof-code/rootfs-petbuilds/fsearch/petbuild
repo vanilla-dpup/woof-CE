@@ -5,7 +5,7 @@ download() {
 build() {
     tar -xzf fsearch-0.2.2.tar.gz
     cd fsearch-0.2.2
-    meson --buildtype=release --prefix=/usr build
+    meson --buildtype=release build
     ninja -C build install
-    sed -i 's/^Categories=.*/Categories=X-Filesystem-find;/' /usr/share/applications/io.github.cboxdoerfer.FSearch.desktop
+    sed -i 's/^Categories=.*/Categories=X-Filesystem-find;/' /usr/local/share/applications/io.github.cboxdoerfer.FSearch.desktop
 }

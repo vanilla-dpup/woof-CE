@@ -6,6 +6,6 @@ build() {
     tar -xzf swaylock-1.8.0.tar.gz
     cd swaylock-1.8.0
     patch -p1 < ../root.patch
-    meson --buildtype=release --prefix=/usr -Dpam=disabled -Dgdk-pixbuf=enabled -Dzsh-completions=false -Dbash-completions=false -Dfish-completions=false build
+    meson --buildtype=release -Dpam=disabled -Dgdk-pixbuf=enabled -Dzsh-completions=false -Dbash-completions=false -Dfish-completions=false build
     ninja -C build install
 }

@@ -51,17 +51,6 @@ EOF
             done
 
             cp -f /etc/resolv.conf petbuild-rootfs-complete/etc/
-            cp -f ../packages-templates/ca-certificates/pinstall.sh petbuild-rootfs-complete/
-            # required for void
-            chroot petbuild-rootfs-complete ldconfig
-            chroot petbuild-rootfs-complete sh /pinstall.sh
-            rm -f petbuild-rootfs-complete/pinstall.sh
-
-            # required for slacko
-            chroot petbuild-rootfs-complete ldconfig
-
-            # the shared-mime-info PET used by fossa64 doesn't put its pkg-config file in /usr/lib/x86_64-linux-gnu/pkgconfig
-            PKG_CONFIG_PATH=`dirname $(find petbuild-rootfs-complete devx -name '*.pc' 2>/dev/null) 2>/dev/null | sed -e s/^petbuild-rootfs-complete//g -e s/^devx//g | sort | uniq | tr '\n' :`
 
             HAVE_ROOTFS=1
         fi
@@ -103,7 +92,7 @@ EOF
 
         cp -a ../petbuild-sources/${NAME}/* petbuild-rootfs-complete-${NAME}/tmp/
         cp -a ../rootfs-petbuilds/${NAME}/* petbuild-rootfs-complete-${NAME}/tmp/
-        CC="$WOOF_CC" CXX="$WOOF_CXX" CFLAGS="$WOOF_CFLAGS" CXXFLAGS="$WOOF_CXXFLAGS" LDFLAGS="$WOOF_LDFLAGS" MAKEFLAGS="$MAKEFLAGS" CCACHE_DIR=/root/.ccache CCACHE_NOHASHDIR=1 PKG_CONFIG_PATH="$PKG_CONFIG_PATH" PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/root/.cache/__pycache__ $CHROOT_PFIX chroot petbuild-rootfs-complete-${NAME} bash -ec "cd /tmp && . /etc/DISTRO_SPECS && . ./petbuild && build"
+        CC="$WOOF_CC" CXX="$WOOF_CXX" CFLAGS="$WOOF_CFLAGS" CXXFLAGS="$WOOF_CXXFLAGS" LDFLAGS="$WOOF_LDFLAGS" MAKEFLAGS="$MAKEFLAGS" CCACHE_DIR=/root/.ccache CCACHE_NOHASHDIR=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/root/.cache/__pycache__ $CHROOT_PFIX chroot petbuild-rootfs-complete-${NAME} bash -ec "cd /tmp && . /etc/DISTRO_SPECS && . ./petbuild && build"
         ret=$?
         umount -l petbuild-rootfs-complete-${NAME}/root/.cache
         umount -l petbuild-rootfs-complete-${NAME}/root/.ccache
@@ -134,51 +123,18 @@ EOF
         rm -f ../petbuild-output/${NAME}-${HASH}/etc/ld.so.cache
         rm -f ../petbuild-output/${NAME}-${HASH}/root/.wget-hsts
 
-        rm -f ../petbuild-output/${NAME}-${HASH}/usr/share/icons/hicolor/icon-theme.cache
-        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/lib/python*
-        rm -rf ../petbuild-output/${NAME}-${HASH}/lib/pkgconfig
-        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/lib/pkgconfig
-        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/share/pkgconfig
-        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/include
+        rm -f ../petbuild-output/${NAME}-${HASH}/usr/local/share/icons/hicolor/icon-theme.cache
+        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/local/lib/python*
+        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/local/lib/pkgconfig
+        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/local/share/pkgconfig
+        rm -rf ../petbuild-output/${NAME}-${HASH}/usr/local/include
 
         find ../petbuild-output/${NAME}-${HASH} -name '.wh*' -delete
         find ../petbuild-output/${NAME}-${HASH} -name '*.a' -delete
         find ../petbuild-output/${NAME}-${HASH} -name '*.la' -delete
 
-        case $DISTRO_BINARY_COMPAT in
-        slackware64) # in slacko64, we move all shared libraries to lib64
-            for LIBDIR in lib usr/lib; do
-                [ ! -d ../petbuild-output/${NAME}-${HASH}/${LIBDIR} ] && continue
-                mkdir -p ../petbuild-output/${NAME}-${HASH}/${LIBDIR}64
-                for SO in `ls ../petbuild-output/${NAME}-${HASH}/${LIBDIR}/*.so* 2>/dev/null`; do
-                    mv -f $SO ../petbuild-output/${NAME}-${HASH}/${LIBDIR}64/
-                done
-                if [ -d ../petbuild-output/${NAME}-${HASH}/${LIBDIR}/gio ]; then
-                    mv -f ../petbuild-output/${NAME}-${HASH}/${LIBDIR}/gio ../petbuild-output/${NAME}-${HASH}/${LIBDIR}64/
-                fi
-                rmdir ../petbuild-output/${NAME}-${HASH}/${LIBDIR} 2>/dev/null
-            done
-            ;;
-
-        raspbian|debian|devuan|ubuntu|trisquel) # in debian, we move all shared libraries to ARCHDIR, e.g. lib/arm-linux-gnueabihf
-            for PFIX in "" /usr; do
-                for LIBDIR in lib64 lib; do
-                    [ ! -d ../petbuild-output/${NAME}-${HASH}${PFIX}/${LIBDIR} ] && continue
-                    mkdir -p ../petbuild-output/${NAME}-${HASH}${PFIX}/lib/${ARCHDIR}
-                    for SO in `ls ../petbuild-output/${NAME}-${HASH}${PFIX}/${LIBDIR}/*.so* 2>/dev/null`; do
-                        mv -f $SO ../petbuild-output/${NAME}-${HASH}${PFIX}/lib/${ARCHDIR}/
-                    done
-                    if [ -d ../petbuild-output/${NAME}-${HASH}${PFIX}/${LIBDIR}/gio ]; then
-                        mv -f ../petbuild-output/${NAME}-${HASH}${PFIX}/${LIBDIR}/gio ../petbuild-output/${NAME}-${HASH}${PFIX}/lib/${ARCHDIR}/
-                    fi
-                    rmdir ../petbuild-output/${NAME}-${HASH}${PFIX}/${LIBDIR}/${ARCHDIR} 2>/dev/null
-                    rmdir ../petbuild-output/${NAME}-${HASH}${PFIX}/${LIBDIR} 2>/dev/null
-                done
-            done
-            ;;
-        esac
-
-        rmdir ../petbuild-output/${NAME}-${HASH}/usr/share/* 2>/dev/null
+        rmdir ../petbuild-output/${NAME}-${HASH}/usr/local/share/* 2>/dev/null
+        rmdir ../petbuild-output/${NAME}-${HASH}/usr/local/* 2>/dev/null
         rmdir ../petbuild-output/${NAME}-${HASH}/usr/* 2>/dev/null
         rmdir ../petbuild-output/${NAME}-${HASH}/* 2>/dev/null
 

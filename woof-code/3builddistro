@@ -43,15 +43,8 @@ for PKG in `chroot rootfs-complete dpkg-query -W -f '${Package}\n' | grep -E -e 
 	chroot rootfs-complete apt-get remove --purge -y $PKG
 done
 
-# blacklist packages that may conflict with petbuilds
-chroot rootfs-complete apt-mark hold busybox
-chroot rootfs-complete apt-mark hold busybox-static
-
-# snap is broken without systemd
-[ "$DISTRO_BINARY_COMPAT" = "devuan" ] || chroot rootfs-complete apt-mark hold snapd
-
-# prevent updates
-chroot rootfs-complete apt-mark hold `chroot rootfs-complete dpkg-query -W -f '${binary:Package}\n' | tr '\n' ' '`
+# reenable package removal or update
+chroot rootfs-complete apt-mark unhold `chroot rootfs-complete apt-mark showhold`
 
 # set locale to en_US.UTF-8
 echo "LANG=en_US.UTF-8" >> rootfs-complete/etc/default/locale
@@ -63,7 +56,7 @@ cat << EOF >> rootfs-complete/etc/apt/apt.conf.d/00puppy
 # https://github.com/debuerreotype/debuerreotype/blob/6952be0a084e834bd25aa623c94f6ad342899b55/scripts/debuerreotype-minimizing-config#L88
 DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
-DPkg::Post-Invoke { "/usr/sbin/auto-setup-spot"; };
+DPkg::Post-Invoke { "/usr/local/sbin/auto-setup-spot"; };
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
 
@@ -74,12 +67,7 @@ chroot rootfs-complete adduser spot video
 chroot rootfs-complete adduser spot render
 chroot rootfs-complete adduser spot audio
 
-rm -rf rootfs-skeleton
-cp -a ../rootfs-skeleton .
-mv -f rootfs-skeleton/bin/* rootfs-skeleton/usr/bin/
-mv -f rootfs-skeleton/sbin/* rootfs-skeleton/usr/sbin/
-rmdir rootfs-skeleton/{bin,sbin}
-cp -a rootfs-skeleton/* rootfs-complete/
+cp -a ../rootfs-skeleton/* rootfs-complete/
 
 cd rootfs-complete
 for TEMPLATE in ../../packages-templates/*; do
@@ -122,7 +110,7 @@ PETBUILDS="init sfslock pfscrypt psnapcp $FOUND_PETBUILDS"
 CROSSBUILD=0
 . ../support/petbuilds.sh
 
-sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" -e "s/DISTRO_FILE_PREFIX/$DISTRO_FILE_PREFIX/g" rootfs-complete/usr/share/doc/puppy/*.md
+sed -i -e "s/DISTRO_NAME/$DISTRO_NAME/g" -e "s/DISTRO_VERSION/$DISTRO_VERSION/g" -e "s/DISTRO_FILE_PREFIX/$DISTRO_FILE_PREFIX/g" rootfs-complete/usr/local/share/doc/puppy/*.md
 cat << EOF > /tmp/index.md
 # ${DISTRO_NAME} ${DISTRO_VERSION}
 
@@ -130,14 +118,9 @@ EOF
 while read LINE; do
 	IFS=: read NAME TITLE <<< "$LINE"
 	echo "- [${TITLE}](${NAME##*/})"
-done < <(grep -m1 '^# ' rootfs-complete/usr/share/doc/puppy/*.md | sed -E 's/:#\s+/:/g' | sort -f) >> /tmp/index.md
-mv -f /tmp/index.md rootfs-complete/usr/share/doc/puppy/
-chmod 644 rootfs-complete/usr/share/doc/puppy/index.md
-
-# prevent apt from replacing petbuilds with bigger or incompatible packages
-for NAME in $PETBUILDS; do
-	chroot rootfs-complete apt-mark hold ${NAME}
-done
+done < <(grep -m1 '^# ' rootfs-complete/usr/local/share/doc/puppy/*.md | sed -E 's/:#\s+/:/g' | sort -f) >> /tmp/index.md
+mv -f /tmp/index.md rootfs-complete/usr/local/share/doc/puppy/
+chmod 644 rootfs-complete/usr/local/share/doc/puppy/index.md
 
 rm -f rootfs-complete/pet.specs
 
@@ -161,7 +144,7 @@ rm -rf rootfs-complete/var/cache/ldconfig/*
 
 rm -f rootfs-complete/usr/lib/udev/hwdb.bin
 
-chroot rootfs-complete /usr/sbin/auto-setup-spot
+chroot rootfs-complete /usr/local/sbin/auto-setup-spot
 chroot rootfs-complete /etc/rc.d/rc.update w
 
 chroot rootfs-complete chown -R spot:spot /home/spot

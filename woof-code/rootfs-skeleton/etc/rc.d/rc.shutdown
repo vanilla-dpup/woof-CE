@@ -6,7 +6,7 @@
 
 [ -f /tmp/debugshutdown ] && exec &>/dev/console
 
-export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 if [ ! -f /tmp/debugshutdown ] ; then
 	clear
@@ -112,7 +112,7 @@ case $PUPMODE in
   if [ $retval -eq 0 ]; then 
     echo "$(printf "$(gettext 'Saving session to %s (%s)...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
     rm -f /tmp/wmexitmode.txt
-    /usr/sbin/snapmergepuppy
+    /usr/local/sbin/snapmergepuppy
   fi 
   ;;
  *)

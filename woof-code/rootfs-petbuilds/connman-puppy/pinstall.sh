@@ -1,1 +1,1 @@
-echo /usr/libexec/connman/libadjtime.so >> etc/ld.so.preload
+echo /usr/local/lib/connman/libadjtime.so >> etc/ld.so.preload

@@ -28,6 +28,6 @@ run-as-spot dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY
 gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"
 run-as-spot gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"
 xdg_autostart.sh
-/usr/sbin/delayedrun &
+/usr/local/sbin/delayedrun &
 
 exec dwl-send /tmp/dwl.socket

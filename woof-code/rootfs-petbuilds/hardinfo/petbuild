@@ -5,8 +5,8 @@ download() {
 build() {
     tar -xzf hardinfo-2834bf9.tar.gz
     cd hardinfo-2834bf97172427d0313cdb14c594e932b9a9e011
-    cmake -B build -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=libexec -DHARDINFO_GTK3=1
+    cmake -B build -DHARDINFO_GTK3=1
     cmake --build build
     cmake --install build
-    sed -i -e 's/^Name=.*/Name=HardInfo/' -e '/^Name\[.*/d' /usr/share/applications/hardinfo.desktop
+    sed -i -e 's/^Name=.*/Name=HardInfo/' -e '/^Name\[.*/d' /usr/local/share/applications/hardinfo.desktop
 }

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+exec mdview /usr/local/share/doc/puppy/index.md

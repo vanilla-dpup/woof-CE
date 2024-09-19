@@ -8,17 +8,17 @@ if command -v startlabwc >/dev/null 2>&1 ; then
 		touch /tmp/bootcnt.txt
 		startlabwc
 	else
-		/usr/sbin/pm13 cli
+		/usr/local/sbin/pm13 cli
 	fi
 elif command -v startdwl >/dev/null 2>&1 ; then
 	if [ ! -f /tmp/bootcnt.txt ] ; then
 		touch /tmp/bootcnt.txt
 		startdwl
 	else
-		/usr/sbin/pm13 cli
+		/usr/local/sbin/pm13 cli
 	fi
 else
-	/usr/sbin/pm13 cli
+	/usr/local/sbin/pm13 cli
 fi
 
 ### END ###

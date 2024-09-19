@@ -7,7 +7,7 @@ echo '#!/bin/sh
 exec weechat-shell' > usr/local/bin/defaultchat
 chmod 755 usr/local/bin/defaultchat
 
-chroot . /usr/sbin/setup-spot weechat=true
+chroot . setup-spot weechat=true
 
 chroot . run-as-spot weechat-headless -r '/set irc.server_default.msg_part \"\";/set irc.server_default.msg_quit \"\";/quit'
 chroot . run-as-spot weechat-headless -r '/set irc.ctcp.clientinfo \"\";/set irc.ctcp.finger \"\";/set irc.ctcp.source \"\";/set irc.ctcp.time \"\";/set irc.ctcp.userinfo \"\";/set irc.ctcp.version \"\";/quit'

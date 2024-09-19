@@ -1,1 +1,1 @@
-chroot . /usr/sbin/setup-spot gplaces=true
+chroot . setup-spot gplaces=true

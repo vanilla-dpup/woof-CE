@@ -29,4 +29,4 @@ gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu:minimize,m
 run-as-spot gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu:minimize,maximize,close"
 
 xdg_autostart.sh
-/usr/sbin/delayedrun &
+/usr/local/sbin/delayedrun &

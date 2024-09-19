@@ -5,6 +5,6 @@ download() {
 build() {
     tar -xzf swayidle-1.8.0.tar.gz
     cd swayidle-1.8.0
-    meson --buildtype=release --prefix=/usr -Dlogind=disabled -Dzsh-completions=false -Dbash-completions=false -Dfish-completions=false build
+    meson --buildtype=release -Dlogind=disabled -Dzsh-completions=false -Dbash-completions=false -Dfish-completions=false build
     ninja -C build install
 }

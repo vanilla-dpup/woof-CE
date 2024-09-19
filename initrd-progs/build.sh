@@ -6,7 +6,7 @@ generate_initrd() {
 	cp -rf 0initrd/* ZZ_initrd-expanded
 	cd ZZ_initrd-expanded
 	cp -aLf /lib*/*-linux-*/ld-linux-*.so.2 lib/
-	for BIN in usr/bin/busybox usr/bin/lsblk usr/sbin/pfscrypt sbin/e2fsck sbin/fsck.f2fs sbin/fsck.fat usr/sbin/fsck.exfat sbin/resize2fs; do
+	for BIN in usr/bin/busybox usr/bin/lsblk usr/local/sbin/pfscrypt sbin/e2fsck sbin/fsck.f2fs sbin/fsck.fat usr/sbin/fsck.exfat sbin/resize2fs; do
 		cp -af /${BIN} bin/
 		for LIB in `ldd /${BIN} | awk '{print $3}'`; do
 			cp -anLf ${LIB} lib/

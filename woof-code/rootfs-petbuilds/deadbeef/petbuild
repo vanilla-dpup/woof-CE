@@ -20,8 +20,7 @@ build() {
         DISABLE_OUTPUT="--disable-pulse --disable-alsa"
     fi
     CFLAGS="$CFLAGS -Wno-incompatible-pointer-types -Wno-int-conversion" \
-    ./configure --prefix=/usr \
-                --disable-nullout \
+    ./configure --disable-nullout \
                 --disable-oss \
                 --disable-vfs-curl \
                 --disable-lfm \

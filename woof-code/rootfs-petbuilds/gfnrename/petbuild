@@ -7,13 +7,13 @@ build() {
     cd gfnrename-0.6
     patch -p1 < ../gtk3.patch
     patch -p1 < ../gcc14.patch
-    ./autogen.sh --prefix=/usr
+    ./autogen.sh
     make install
-    mkdir -p /usr/share/doc
-    mv /usr/doc/gfnrename /usr/share/doc/
-    rmdir /usr/doc 2>/dev/null
-    mkdir -p /usr/share/applications
-    cat << EOF > /usr/share/applications/gfnrename.desktop
+    mkdir -p /usr/local/share/doc
+    mv /usr/local/doc/gfnrename /usr/local/share/doc/
+    rmdir /usr/local/doc 2>/dev/null
+    mkdir -p /usr/local/share/applications
+    cat << EOF > /usr/local/share/applications/gfnrename.desktop
 [Desktop Entry]
 Name=gFnRename
 Comment=Easily rename multiple files
