@@ -41,6 +41,7 @@ yes|desktop-file-utils|desktop-file-utils|exe,dev,doc,nls||deps:yes
 yes|dialog|dialog|exe,dev>null,doc,nls||deps:yes
 no|dkms|dkms|exe,dev>exe,doc,nls||deps:yes
 yes|dosfstools|dosfstools|exe,dev>null,doc,nls||deps:yes
+yes|erofs-utils|erofs-utils|exe,dev,doc,nls||deps:yes
 yes|exfatprogs|exfatprogs|exe,dev,doc,nls||deps:yes
 yes|f2fs-tools|f2fs-tools|exe,dev,doc,nls||deps:yes
 yes|gettext-base|gettext-base|exe,dev,doc,nls||deps:yes
@@ -67,7 +68,6 @@ yes|pipewire|pipewire-pulse,pipewire-alsa,libspa-0.2-bluetooth,libpipewire-0.3-d
 yes|pigz|pigz|exe,dev,doc,nls||deps:yes
 yes|procps|procps|exe,dev,doc,nls||deps:yes
 yes|psmisc|psmisc|exe,dev>null,doc,nls||deps:yes
-yes|squashfs-tools|squashfs-tools|exe,dev,doc,nls||deps:yes
 yes|udev|udev|exe,dev,doc,nls||deps:yes
 yes|wireless-regdb|wireless-regdb|exe,dev,doc,nls||deps:yes
 yes|wireplumber|wireplumber|exe,dev,doc,nls||deps:yes

@@ -60,11 +60,11 @@ mkdir -p ${KBUILD_DIR}/usr/src/${KBUILD_DIR}
 mkdir -p ${KBUILD_DIR}/usr/lib/modules/${kernel_version}
 ln -s ../../../src/${KBUILD_DIR} ${KBUILD_DIR}/usr/lib/modules/${kernel_version}/build
 ln -s ../../../src/${KBUILD_DIR} ${KBUILD_DIR}/usr/lib/modules/${kernel_version}/source
-mksquashfs ${KBUILD_DIR} output/${KBUILD_DIR}.sfs ${SFSCOMP} || exit 1
+mkfs.erofs ${SFSCOMP} output/${KBUILD_DIR}.sfs ${KBUILD_DIR} || exit 1
 rm -rf ${KBUILD_DIR}
 
 KERNEL_MODULES_SFS_NAME="kernel-modules-${kernel_version}.sfs"
-mksquashfs output/linux_kernel-${kernel_version} output/${KERNEL_MODULES_SFS_NAME} ${SFSCOMP} || exit 1
+mkfs.erofs ${SFSCOMP} output/${KERNEL_MODULES_SFS_NAME} output/linux_kernel-${kernel_version} || exit 1
 rm -rf output/linux_kernel-${kernel_version}
 
 echo "Done!"

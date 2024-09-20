@@ -1,6 +1,6 @@
 # SFS Modules
 
-SFS modules are [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) images containing a read-only directory hierarchy. DISTRO_NAME uses [overlayfs](https://docs.kernel.org/filesystems/overlayfs.html) to stack SFSs on top of each other and present their contents as a unified directory hierarchy.
+SFS modules are [EROFS](https://docs.kernel.org/filesystems/erofs.html) or [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) images containing a read-only directory hierarchy. DISTRO_NAME uses [overlayfs](https://docs.kernel.org/filesystems/overlayfs.html) to stack SFSs on top of each other and present their contents as a unified directory hierarchy.
 
 ## Loading
 
@@ -39,10 +39,10 @@ Therefore, to control the stacking order of these SFSs, prefix their names with 
 
 To create /tmp/app.sfs from /tmp/app:
 
-	mksquashfs /tmp/app /tmp/app.sfs -comp zstd -Xcompression-level 19 -b 256K -no-exports -no-xattrs
+	mkfs.erofs -x0 -zlz4hc,12 -C262144 /tmp/app.sfs /tmp/app
 
 To load app.sfs on startup, place it under the root (or `psubdir`, if set) of the save partition or boot partition.
 
 Once app.sfs is loaded, /tmp/app/usr/bin/a can be accessed through /usr/bin/a.
 
-See `man mksquashfs` for more SFS creation options.
+See `man mkfs.erofs` for more SFS creation options.

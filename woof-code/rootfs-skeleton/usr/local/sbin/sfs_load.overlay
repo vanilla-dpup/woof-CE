@@ -139,7 +139,7 @@ if [ $# -ne 0 ]; then
 				[ $FOUND -eq 0 ] && exit 1
 
 				mkdir -p "$MNT" || continue
-				mount -r -t squashfs -o loop,noatime "$SFS" "$MNT"
+				mount -r -t erofs,squashfs -o loop,noatime "$SFS" "$MNT"
 				if [ $? -ne 0 ]; then
 					rmdir "$MNT"
 					continue
@@ -220,7 +220,7 @@ if [ $# -ne 0 ]; then
 		mkdir -p "$MNT"
 		mountpoint -q "$MNT"
 		if [ $? -ne 0 ]; then
-			mount -r -t squashfs -o loop,noatime "$SFS" "$MNT" || continue
+			mount -r -t erofs,squashfs -o loop,noatime "$SFS" "$MNT" || continue
 		fi
 
 		defaultfilemanager "$MNT" &

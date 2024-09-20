@@ -213,10 +213,10 @@ cp -f ../kernel-kit/output/vmlinuz-* build/vmlinuz
 cp -f ../kernel-kit/output/kbuild-*.sfs build/
 cp -f ../kernel-kit/output/kernel-modules-*.sfs build/${ZDRVSFS}
 
-mksquashfs fdrv build/${FDRVSFS} ${SFSCOMP}
-mksquashfs nlsx build/${NLSXSFS} ${SFSCOMP}
-mksquashfs docx build/${DOCXSFS} ${SFSCOMP}
-mksquashfs rootfs-complete build/${PUPPYSFS} ${SFSCOMP}
+mkfs.erofs ${SFSCOMP} build/${FDRVSFS} fdrv
+mkfs.erofs ${SFSCOMP} build/${NLSXSFS} nlsx
+mkfs.erofs ${SFSCOMP} build/${DOCXSFS} docx
+mkfs.erofs ${SFSCOMP} build/${PUPPYSFS} rootfs-complete
 
 WOOF_OUTPUT="woof-output-${DISTRO_FILE_PREFIX}-${DISTRO_VERSION}"
 mkdir -p ../${WOOF_OUTPUT}

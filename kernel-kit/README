@@ -36,7 +36,7 @@ distro which is compatible with the target distro.
 
 REQUIRED:
 gcc - for compilation
-mksquashfs - for compressing the kernel source sfs, will build without
+erofs-utils - for compressing the kernel source sfs
 
 CREDIT
 ------

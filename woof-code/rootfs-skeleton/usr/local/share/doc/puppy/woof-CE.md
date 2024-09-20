@@ -55,6 +55,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 ### Speed
 
 * The init script (/etc/rc.d/rc.sysinit) and the shutdown script (/etc/rc.d/rc.shutdown) are shorter and much faster.
+* SFSs can use [EROFS](https://docs.kernel.org/filesystems/erofs.html) instead of [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) and all built-in SFSs use the former.
 * Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
 * 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
 * `save2flash` is much faster because it preallocates space when files grow and only copies appended or modified blocks when files change.
@@ -122,7 +123,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 ## Usage
 
-	sudo apt-get install -y --no-install-recommends debootstrap squashfs-tools
+	sudo apt-get install -y --no-install-recommends debootstrap erofs-utils
 
 Then:
 

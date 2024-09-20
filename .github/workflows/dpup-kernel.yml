@@ -22,7 +22,7 @@ jobs:
       - name: Free space
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet # increase free space, we don't need these
       - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap erofs-utils
       - name: merge2out
         timeout-minutes: 5
         run: sudo -E ./merge2out woof-distro/${{ matrix.arch }}/debian/${{ matrix.release }}64
