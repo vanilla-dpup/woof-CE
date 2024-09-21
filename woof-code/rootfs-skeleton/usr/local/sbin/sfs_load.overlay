@@ -199,6 +199,17 @@ if [ $# -ne 0 ]; then
 					[ $CLI -eq 0 ] && kill $PID
 				fi
 				;;
+			/mnt/*)
+				if [ $QUIET -eq 1 ]; then
+					:
+				else
+					yad --title sfs_load --window-icon=dialog-question --image=dialog-question --text "$(gettext "Do you want to unmount") ${SFS}?" --form --button="gtk-yes:0" --button="gtk-no:1"
+				fi
+				if [ $? -eq 0 ]; then
+					umount -l "$MNT"
+					rmdir "$MNT"
+				fi
+				;;
 			esac
 
 			ASKMOUNT=0
