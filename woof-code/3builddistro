@@ -69,6 +69,9 @@ chroot rootfs-complete adduser spot audio
 
 cp -a ../rootfs-skeleton/* rootfs-complete/
 
+chroot rootfs-complete chown -R spot:spot /home/spot
+chmod 700 rootfs-complete/root rootfs-complete/home/spot
+
 cd rootfs-complete
 for TEMPLATE in ../../packages-templates/*; do
 	NAME=${TEMPLATE##*/}
