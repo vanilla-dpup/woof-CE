@@ -39,7 +39,7 @@ Therefore, to control the stacking order of these SFSs, prefix their names with 
 
 To create /tmp/app.sfs from /tmp/app:
 
-	mkfs.erofs -x0 -zlz4hc,12 -C262144 /tmp/app.sfs /tmp/app
+	mkfs.erofs -x0 -zzstd,19 -C262144 /tmp/app.sfs /tmp/app
 
 To load app.sfs on startup, place it under the root (or `psubdir`, if set) of the save partition or boot partition.
 
