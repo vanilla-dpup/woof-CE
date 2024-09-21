@@ -52,6 +52,12 @@ WD="`pwd`"
 SNAP="/initrd/pup_rw"
 cd $SNAP || exit 1
 
+YAFPID=""
+if [ -n "$WAYLAND_DISPLAY" ] ; then
+	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons --no-focus &
+	YAFPID=$!
+fi
+
 echo "Merging $SNAP onto $BASE..."
 
 # =============================================================================
@@ -161,6 +167,8 @@ psnapcp /etc/rc.d/BOOTCONFIG "$BASE/etc/rc.d/BOOTCONFIG"
 cd "$WD"
 
 # =============================================================================
+
+[ -n "$YAFPID" ] && kill $YAFPID
 
 if [ -s /tmp/snapmergepuppy-error ]; then	#140102 SFR
 	ERRMSG="$(gettext 'Saving did not complete without any errors.')"

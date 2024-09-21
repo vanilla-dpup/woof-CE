@@ -7,27 +7,7 @@ if [ $PUPMODE -ne 13 ] ; then
 	exit 1
 fi
 
-if pidof -s `cat /etc/windowmanager 2>/dev/null` >/dev/null 2>&1 ; then
-	if [ -z "$DISPLAY" ] ; then
-		export DISPLAY=':0'
-	fi
-	if [ -z "$WAYLAND_DISPLAY" ] ; then
-		export WAYLAND_DISPLAY='wayland-0'
-	fi
-	if [ -z "$XDG_RUNTIME_DIR" ] ; then
-		export XDG_RUNTIME_DIR='/tmp/runtime-root'
-	fi
-fi
-
-if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
-	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons --no-focus &
-	YAFPID=$!
-else
-	echo "Saving RAM to 'pup_save'..."
-fi
-
 nice -n 19 flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy
-[ "$YAFPID" ] && kill $YAFPID
 
 exit 0
 
