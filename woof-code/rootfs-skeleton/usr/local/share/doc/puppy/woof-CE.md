@@ -123,7 +123,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 ## Usage
 
-	sudo apt-get install -y --no-install-recommends debootstrap erofs-utils
+	sudo apt-get install -y --no-install-recommends debootstrap
 
 Then:
 

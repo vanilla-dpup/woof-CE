@@ -213,10 +213,14 @@ cp -f ../kernel-kit/output/vmlinuz-* build/vmlinuz
 cp -f ../kernel-kit/output/kbuild-*.sfs build/
 cp -f ../kernel-kit/output/kernel-modules-*.sfs build/${ZDRVSFS}
 
-mkfs.erofs ${SFSCOMP} build/${FDRVSFS} fdrv
-mkfs.erofs ${SFSCOMP} build/${NLSXSFS} nlsx
-mkfs.erofs ${SFSCOMP} build/${DOCXSFS} docx
-mkfs.erofs ${SFSCOMP} build/${PUPPYSFS} rootfs-complete
+mkdir -p rootfs/sandbox3
+mount --bind . rootfs/sandbox3
+chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${FDRVSFS} fdrv"
+chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${NLSXSFS} nlsx"
+chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${DOCXSFS} docx"
+chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${PUPPYSFS} rootfs-complete"
+umount -l rootfs/sandbox3
+rmdir rootfs/sandbox3
 
 WOOF_OUTPUT="woof-output-${DISTRO_FILE_PREFIX}-${DISTRO_VERSION}"
 mkdir -p ../${WOOF_OUTPUT}
