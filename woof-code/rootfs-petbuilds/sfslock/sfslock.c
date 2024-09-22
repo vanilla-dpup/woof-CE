@@ -49,6 +49,8 @@ int main(int argc, char *argv[])
 		close(comm[1]);
 		while (!(sigwait(&mask, &sig) < 0 || sig == SIGTERM));
 		syslog(LOG_INFO, "unlocking %s", argv[1]);
+		munlockall();
+		posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
 	}
 	else {
 		close(comm[1]);
