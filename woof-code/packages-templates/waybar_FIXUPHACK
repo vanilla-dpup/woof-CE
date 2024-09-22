@@ -18,9 +18,10 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 	"layer": "bottom",
 	"position": "bottom",
 	"height": 36,
+	"margin-left": 42,
+	"margin-right": 42,
 	"spacing": 4,
 	"modules-left": [
-		"custom/menu",
 		"wlr/taskbar"
 	],
 	"modules-right": [
@@ -30,12 +31,6 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"custom/firewall_ng",
 		"clock"
 	],
-	"custom/menu": {
-		"format": "\uf0c9",
-		"tooltip": false,
-		"interval": "once",
-		"on-click": "altf1"
-	},
 	"wlr/taskbar": {
 		"format": "{icon}",
 		"icon-size": 24,
@@ -202,7 +197,7 @@ button:hover {
 	border-bottom: 4px solid #3584E4;
 }
 
-#custom-menu, #clock {
+#clock {
 	padding: 4px;
 }
 EOF
@@ -214,9 +209,10 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 	"layer": "bottom",
 	"position": "left",
 	"width": 60,
+	"margin-top": 40,
+	"margin-bottom": 40,
 	"spacing": 4,
 	"modules-left": [
-		"custom/menu",
 		"wlr/taskbar"
 	],
 	"modules-right": [
@@ -226,12 +222,6 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"custom/firewall_ng",
 		"clock"
 	],
-	"custom/menu": {
-		"format": "\uf0c9",
-		"tooltip": false,
-		"interval": "once",
-		"on-click": "altf1"
-	},
 	"wlr/taskbar": {
 		"format": "{icon}",
 		"icon-size": 32,
@@ -402,7 +392,7 @@ button:hover {
 	font-size: 12px;
 }
 
-#custom-menu, #clock {
+#clock {
 	padding: 4px;
 }
 EOF
