@@ -39,14 +39,17 @@ yad --title="$title" --window-icon=dialog-information --width=640 --height=240 -
 case "$1" in
   start)
     rm -f /var/cache/pup_advert_blocker/disabled
+    nscd -i hosts
     success
     ;;
   stop)
     touch /var/cache/pup_advert_blocker/disabled
+    nscd -i hosts
     success
     ;;
   update)
     curl -m 10 https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | grep '^0\.0\.0\.0' | grep -v '^0\.0\.0\.0 [0-9]*\.[0-9]*\.[0-9]*\.[0-9]*$' | sed 's/\s*#.*//g' | cut -f 2 -d ' ' | update-adlist
+    nscd -i hosts
     success
     ;;
   *)
