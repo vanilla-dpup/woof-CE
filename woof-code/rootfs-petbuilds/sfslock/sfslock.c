@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
 	if ((fd = open(argv[1], O_RDONLY)) < 0) return EXIT_FAILURE;
 	if ((minsize = sysconf(_SC_PAGESIZE)) <= 0 || (size = lseek(fd, 0, SEEK_END)) == (off_t)-1 || size < minsize) return EXIT_FAILURE;
 
-	openlog("sfslock", LOG_CONS | LOG_PID, LOG_USER);
+	openlog("sfslock", LOG_PID, LOG_USER);
 	syslog(LOG_INFO, "locking %s", argv[1]);
 
 	if ((pid = fork()) < 0) return EXIT_FAILURE;
