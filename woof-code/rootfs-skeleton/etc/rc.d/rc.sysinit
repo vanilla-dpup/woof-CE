@@ -240,15 +240,13 @@ if [ $SFSLOCK -eq 1 ]; then
 
 		# copy SFSs to RAM and prioritize frequently-accessed ones
 		for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-`uname -r`.sfs $EXTRASFSLIST; do
-			BACKF=$(grep -l "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file | head -n 1)
+			BACKF=$(grep -hm1 "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file)
 			[ -z "$BACKF" ] && continue
-			SFSSIZE=$(du -b $(cat $BACKF) | awk '{print $1}')
+			SFSSIZE=$(du -b "$BACKF" | awk '{print $1}')
 			LOCKED=$(($LOCKED + $SFSSIZE))
 			[ $LOCKED -gt $LOCKLIMIT ] && break
-			LOOP=${BACKF%/loop/backing_file}
-			LOOP=${LOOP#/sys/devices/virtual/block/}
 			[ $FIRST -eq 1 ] && sfsunlockd
-			sfslock /dev/${LOOP} || break
+			sfslock "$BACKF" || break
 			FIRST=0
 		done
 	) &
