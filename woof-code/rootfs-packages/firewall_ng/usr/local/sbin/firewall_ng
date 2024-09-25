@@ -206,9 +206,6 @@ cat > $TMPFW << EOF_FWSTART
 
 # Modified for Puppy Linux by Michael Amadio <01micko@gmail.com> 2015
 
-# update the tray icon when done
-trap "killall -42 waybar 2>/dev/null" EXIT
-
 ###############################################################################
 # 
 # Local Settings

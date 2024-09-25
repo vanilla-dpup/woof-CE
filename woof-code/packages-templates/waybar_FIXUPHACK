@@ -28,7 +28,6 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"wireplumber",
 		"battery",
 		"network",
-		"custom/firewall_ng",
 		"clock"
 	],
 	"wlr/taskbar": {
@@ -67,14 +66,6 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 		"tooltip-format": "{ifname}",
 		"tooltip-format-wifi": "{essid}",
 		"on-click": "connman-gtk"
-	},
-	"custom/firewall_ng": {
-		"format": "{}",
-		"interval": "once",
-		"exec": "/usr/bin/firewallstatus",
-		"return-type":"json",
-		"on-click": "firewall_ng",
-		"signal": 8
 	}
 },{
 	"name": "bar2",
@@ -219,7 +210,6 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"wireplumber",
 		"battery",
 		"network",
-		"custom/firewall_ng",
 		"clock"
 	],
 	"wlr/taskbar": {
@@ -258,14 +248,6 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 		"tooltip-format": "{ifname}",
 		"tooltip-format-wifi": "{essid}",
 		"on-click": "connman-gtk"
-	},
-	"custom/firewall_ng": {
-		"format": "{}",
-		"interval": "once",
-		"exec": "/usr/bin/firewallstatus",
-		"return-type":"json",
-		"on-click": "firewall_ng",
-		"signal": 8
 	}
 },{
 	"name": "bar2",
@@ -388,7 +370,7 @@ button:hover {
 	border-left: 4px solid #3584E4;
 }
 
-#wireplumber, #battery, #network, #custom-firewall_ng {
+#wireplumber, #battery, #network {
 	font-size: 12px;
 }
 
@@ -396,13 +378,6 @@ button:hover {
 	padding: 4px;
 }
 EOF
-
-cat << EOF > usr/bin/firewallstatus
-#!/bin/sh
-
-[ -n "\`nft list tables\`" ] && echo '{"text":"\uf132 on","tooltip":"Firewall on"}' || echo '{"text":"\uf06d off","tooltip":"Firewall off"}'
-EOF
-chmod 755 usr/bin/firewallstatus
 
 cat << EOF > usr/bin/waybar-config
 #!/bin/sh
