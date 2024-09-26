@@ -6,14 +6,24 @@
 #include <sys/mman.h>
 #include <linux/ioprio.h>
 #include <syslog.h>
+#include <sched.h>
+#include <poll.h>
+#include <sys/signalfd.h>
+
+#define TRIGGER "some 100000 1000000"
+
+static void xclose(void *p)
+{
+	close(*(int *)p);
+}
+#define autoclose __attribute__((cleanup(xclose)))
 
 static int oom_score_adj(void)
 {
-	int adj;
+	autoclose int adj;
 
 	if ((adj = open("/proc/self/oom_score_adj", O_WRONLY)) < 0) return -1;
-	if (write(adj, "1000", sizeof("1000") - 1) != sizeof("1000") - 1) { close(adj); return -1; }
-	close(adj);
+	if (write(adj, "1000", sizeof("1000") - 1) != sizeof("1000") - 1) return -1;
 	return 0;
 }
 
@@ -25,11 +35,17 @@ int main(int argc, char *argv[])
 	void *p;
 	long minsize;
 	pid_t pid;
-	int fd, comm[2], sig;
+	int comm[2];
+	autoclose int sigfd = -1, psi = -1, fd = -1;
+	struct sched_param param;
+	struct pollfd pfd[2] = {{.events = POLLIN}, {.events = POLLPRI}};
 
-	if (argc != 2 || sigemptyset(&mask) < 0 || sigaddset(&mask, SIGTERM) < 0 || sigprocmask(SIG_SETMASK, &mask, NULL) < 0) return EXIT_FAILURE;
+	if (argc != 2 || sigemptyset(&mask) < 0 || sigaddset(&mask, SIGTERM) < 0 || sigprocmask(SIG_SETMASK, &mask, NULL) < 0 || (sigfd = signalfd(-1, &mask, 0)) < 0) return EXIT_FAILURE;
 
-	if (syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 7)) < 0 || oom_score_adj() < 0) return EXIT_FAILURE;
+	param.sched_priority = sched_get_priority_min(SCHED_FIFO);
+	if (sched_setscheduler(0, SCHED_FIFO, &param) < 0 || syscall(__NR_ioprio_set, IOPRIO_WHO_PROCESS, 0, IOPRIO_PRIO_VALUE(IOPRIO_CLASS_IDLE, 7)) < 0 || oom_score_adj() < 0) return EXIT_FAILURE;
+
+	if ((psi = open("/proc/pressure/memory", O_RDWR)) < 0 || write(psi, TRIGGER, sizeof(TRIGGER) -1) != sizeof(TRIGGER) -1) return EXIT_FAILURE;
 
 	if (pipe(comm) < 0) return EXIT_FAILURE;
 	if ((fd = open(argv[1], O_RDONLY)) < 0) return EXIT_FAILURE;
@@ -47,8 +63,11 @@ int main(int argc, char *argv[])
 		}
 		write(comm[1], "0", 1);
 		close(comm[1]);
-		while (!(sigwait(&mask, &sig) < 0 || sig == SIGTERM));
+		pfd[0].fd = sigfd;
+		pfd[1].fd = psi;
+		poll(pfd, 2, -1);
 		syslog(LOG_INFO, "unlocking %s", argv[1]);
+		munmap(p, (size_t)size);
 		munlockall();
 		posix_fadvise(fd, 0, 0, POSIX_FADV_DONTNEED);
 	}
@@ -56,9 +75,11 @@ int main(int argc, char *argv[])
 		close(comm[1]);
 		if (read(comm[0], &ok, 1) == 1) {
 			syslog(LOG_INFO, "locked %s", argv[1]);
+			close(comm[0]);
 			closelog();
 			return EXIT_SUCCESS;
 		}
+		close(comm[0]);
 		syslog(LOG_NOTICE, "failed to lock %s", argv[1]);
 	}
 

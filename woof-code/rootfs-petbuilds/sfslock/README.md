@@ -2,4 +2,4 @@ sfslock is a tool that maps a file to memory, populates all mapped pages and loc
 
 sfslock voluntarily increases its OOM score, so it should be the first process to be killed when running low on RAM.
 
-On memory pressure, sfsunlockd kills all running sfslock processes to free memory.
+In addition, sfslock monitors the system for memory pressure and terminates voluntarily to free memory.

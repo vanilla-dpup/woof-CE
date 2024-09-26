@@ -5,5 +5,4 @@ download() {
 build() {
     mkdir -p /usr/local/sbin
     $CC $CFLAGS -D_GNU_SOURCE sfslock.c $LDFLAGS -o /usr/local/sbin/sfslock
-    $CC $CFLAGS sfsunlockd.c $LDFLAGS -o /usr/local/sbin/sfsunlockd
 }
