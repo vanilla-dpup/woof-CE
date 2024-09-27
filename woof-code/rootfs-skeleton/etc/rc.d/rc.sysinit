@@ -175,17 +175,6 @@ busybox mount -a #Load fstab entries
 
 sysctl --system
 
-## process some specific kernel params here
-SFSLOCK=2
-for i in $(cat /proc/cmdline) ; do
-	case $i in
-		xerrs)   rm -f /var/local/xwin_disable_xerrs_log_flag ;; # see xwin / bootmanager
-		noxerrs) touch /var/local/xwin_disable_xerrs_log_flag ;; # see xwin / bootmanager
-		pfix=copy|pfix=copy,*|pfix=*,copy,*|pfix=*,copy|pfix=ram|pfix=ram,*|pfix=*,ram,*|pfix=*,ram) SFSLOCK=1 ;;
-		pfix=nocopy|pfix=nocopy,*|pfix=*,nocopy,*|pfix=*,nocopy) SFSLOCK=0 ;;
-	esac
-done
-
 #################LOAD KERNEL MODULES################
 echo "LOAD KERNEL MODULES"
 echo -n "Loading kernel modules..." >/dev/console
@@ -217,6 +206,13 @@ mount -t devpts -o noexec,nosuid,gid=5,mode=600 devpts /dev/pts
 
 status_func 0
 
+SFSLOCK=2
+for i in $(cat /proc/cmdline) ; do
+	case $i in
+		pfix=copy|pfix=copy,*|pfix=*,copy,*|pfix=*,copy|pfix=ram|pfix=ram,*|pfix=*,ram,*|pfix=*,ram) SFSLOCK=1 ;;
+		pfix=nocopy|pfix=nocopy,*|pfix=*,nocopy,*|pfix=*,nocopy) SFSLOCK=0 ;;
+	esac
+done
 if [ $SFSLOCK -eq 2 ]; then
   PDEV=""
   case "$PDEV1" in
