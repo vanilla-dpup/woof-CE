@@ -103,10 +103,6 @@ chroot rootfs apt-get upgrade -y
 PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n'`
 chroot rootfs apt-get install -y $PKGS
 
-# add busybox, missing package recommendations and gnome-software
-chroot rootfs apt-get install -y busybox net-tools hostname iputils-ping traceroute netcat-openbsd rfkill dc fdisk vim-tiny command-not-found gnome-software fwupd
-[ -e rootfs/usr/bin/flatpak ] && chroot rootfs apt-get install -y gnome-software-plugin-flatpak
-
 # impersonate Puppy
 install -m 644 ../DISTRO_SPECS rootfs/etc/DISTRO_SPECS
 

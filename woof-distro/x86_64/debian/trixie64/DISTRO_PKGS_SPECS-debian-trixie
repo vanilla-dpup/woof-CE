@@ -29,6 +29,7 @@ FALLBACKS_COMPAT_VERSIONS=''
 
 PKGS_SPECS_TABLE='
 yes|alsa-lib|libasound2t64,libasound2-data,libasound2-dev,alsa-topology-conf,alsa-ucm-conf|exe,dev,doc,nls||deps:yes
+yes|busybox|busybox|exe,dev,doc,nls||deps:yes
 yes|bzip2|bzip2|exe,dev,doc,nls||deps:yes
 yes|ca-certificates|ca-certificates|exe,dev,doc,nls||deps:yes
 yes|connman|connman|exe,dev,doc,nls||deps:yes
@@ -45,6 +46,8 @@ yes|erofs-utils|erofs-utils|exe,dev,doc,nls||deps:yes
 yes|exfatprogs|exfatprogs|exe,dev,doc,nls||deps:yes
 yes|f2fs-tools|f2fs-tools|exe,dev,doc,nls||deps:yes
 yes|gettext-base|gettext-base|exe,dev,doc,nls||deps:yes
+yes|hostname|hostname|exe,dev,doc,nls||deps:yes
+yes|iproute2|iproute2|exe,dev,doc,nls||deps:yes
 yes|locales|locales|exe,dev,doc,nls>exe||deps:yes
 yes|kmod|kmod|exe,dev,doc,nls||deps:yes
 yes|l3afpad|l3afpad|exe,dev,doc,nls||deps:yes
@@ -69,6 +72,7 @@ yes|pigz|pigz|exe,dev,doc,nls||deps:yes
 yes|procps|procps|exe,dev,doc,nls||deps:yes
 yes|psmisc|psmisc|exe,dev>null,doc,nls||deps:yes
 yes|udev|udev|exe,dev,doc,nls||deps:yes
+yes|vim-tiny|vim-tiny|exe,dev,doc,nls||deps:yes
 yes|wireless-regdb|wireless-regdb|exe,dev,doc,nls||deps:yes
 yes|wireplumber|wireplumber|exe,dev,doc,nls||deps:yes
 yes|wpa_supplicant|wpasupplicant|exe,dev>null,doc,nls||deps:yes
@@ -125,6 +129,7 @@ if [ "$DISTRO_VARIANT" != "barebones" ]; then
 yes|alsa-utils|alsa-utils|exe,dev,doc,nls||deps:yes
 yes|bash-completion|bash-completion|exe,dev>null,doc,nls||deps:yes
 yes|blueman|blueman|exe,dev,doc,nls||deps:yes
+yes|command-not-found|command-not-found|exe,dev,doc,nls||deps:yes
 yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
 yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev,libfaad-dev|exe,dev,doc,nls||deps:yes
 yes|epdfview-deps|libpoppler-glib-dev|exe,dev,doc,nls||deps:yes
@@ -134,9 +139,11 @@ yes|firefox-esr|firefox-esr,firefox-esr-l10n-all|exe,dev,doc,nls||deps:yes
 yes|flatpak|flatpak|exe,dev,doc,nls||deps:yes
 yes|fonts-liberation|fonts-liberation|exe,dev,doc,nls||deps:yes
 yes|fonts-noto|fonts-noto-core,fonts-noto-mono,fonts-noto-cjk,fonts-noto-color-emoji|exe,dev,doc,nls||deps:yes
+yes|fwupd|fwupd|exe,dev,doc,nls||deps:yes
 yes|galculator|galculator|exe,dev>null,doc,nls||deps:yes
 yes|gdmap|gdmap|exe,dev,doc,nls||deps:yes
 yes|geany|geany|exe,dev,doc,nls||deps:yes
+yes|gnome-software|gnome-software,gnome-software-plugin-flatpak|exe,dev,doc,nls||deps:yes
 yes|gparted|gparted|exe,dev,doc,nls||deps:yes
 yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
 yes|hardinfo-deps|libjson-glib-dev|exe,dev,doc,nls||deps:yes
