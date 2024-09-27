@@ -228,6 +228,25 @@ if [ $SFSLOCK -eq 2 ]; then
   [ -n "$PDEV" ] && [ "`cat /sys/class/block/$PDEV/queue/discard_max_bytes`" = "0" ] && ! systemd-detect-virt -vq && SFSLOCK=1
 fi
 
+######################LOAD SWAP#####################
+EXTRAALLOCK=0
+loadswap_func
+if [ "$SWAPON" = "yes" ];then
+ # resize tmpfs
+ # this code is meant to increase the size of the tmpfs
+ EXTRAALLOCK=$(($EXTRAALLOCK / 2048)) #use half in KiB
+ RAMSIZE=$(free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 2 -d ' ')
+ if [ $PUPMODE -eq 12 ]; then
+  FREEK=$(($RAMSIZE / 2)) #half of physical.
+ else
+  FREEK=$(($RAMSIZE * 3 / 4)) #3/4 of physical.
+ fi
+ ALLOCK=$(($FREEK + $EXTRAALLOCK))
+ if [ "$(grep -m 1 '/initrd/mnt/tmpfs' /proc/mounts)" != "" ];then #mounted
+  busybox mount -t tmpfs -o remount,size=${ALLOCK}k tmpfs /initrd/mnt/tmpfs
+ fi
+fi
+
 if [ $SFSLOCK -eq 1 ]; then
 	echo -n "Copying to ram..." >/dev/console
 	(
@@ -248,24 +267,6 @@ if [ $SFSLOCK -eq 1 ]; then
 		done
 	) &
 	echo -e "\\033[64G\\033[1;33m[backgrounded]\\033[0;39m" >/dev/console
-fi
-######################LOAD SWAP#####################
-EXTRAALLOCK=0
-loadswap_func
-if [ "$SWAPON" = "yes" ];then
- # resize tmpfs
- # this code is meant to increase the size of the tmpfs
- EXTRAALLOCK=$(($EXTRAALLOCK / 2048)) #use half in KiB
- RAMSIZE=$(free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 2 -d ' ')
- if [ $PUPMODE -eq 12 ]; then
-  FREEK=$(($RAMSIZE / 2)) #half of physical.
- else
-  FREEK=$(($RAMSIZE * 3 / 4)) #3/4 of physical.
- fi
- ALLOCK=$(($FREEK + $EXTRAALLOCK))
- if [ "$(grep -m 1 '/initrd/mnt/tmpfs' /proc/mounts)" != "" ];then #mounted
-  busybox mount -t tmpfs -o remount,size=${ALLOCK}k tmpfs /initrd/mnt/tmpfs
- fi
 fi
 
 # Setup /mnt/home symlink before sfs_load
