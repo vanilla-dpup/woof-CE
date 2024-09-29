@@ -62,6 +62,8 @@ defaultPref("app.shield.optoutstudies.enabled", true);
 defaultPref("datareporting.healthreport.uploadEnabled", false);
 defaultPref("dom.private-attribution.submission.enabled", false);
 defaultPref("browser.discovery.enabled", false);
+defaultPref("network.captive-portal-service.enabled", false);
+defaultPref("network.connectivity-service.enabled", false);
 EOF
 
 cat << EOF > ${FFDIR}/defaults/pref/puppy-settings.js
