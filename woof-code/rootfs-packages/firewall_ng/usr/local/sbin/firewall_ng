@@ -31,7 +31,7 @@ mk_entry() {
 	PORT=$1
 	PROTO=$2
 	IPRANGE=$3
-	echo -e "nft 'insert rule inet filter firewall_ng ip saddr $IPRANGE ${PROTO,,} dport $PORT counter accept'" >> $FILE
+	echo -e "nft 'insert rule inet filter firewall_ng_in ip saddr $IPRANGE ${PROTO,,} dport $PORT counter accept'" >> $FILE
 }
 
 # parse input from extras gui
@@ -113,12 +113,15 @@ else
 	CONFIG_DNS=false
 	CONFIG_DHCP=false
 	CONFIG_NFS=false
+	CONFIG_MDNS=false
+	CONFIG_SSDP=false
+	CONFIG_NATPMP=false
 	CONFIG_EXTRAS=""
 fi
 
 if [ "$1" = "enable" ]; then
 	echo "Enabling firewall"
-	RETVALS="true|false|||false|false|false|false|false|false|false|false|false|false||||"
+	RETVALS="true|false|||false|false|false|false|false|false|false|false|false|false|false|false|false||||"
 	EXIT=0
 else
 	RETVALS="$(yad \
@@ -142,6 +145,9 @@ $(gettext 'Check your required remote connections or leave the default.')":LBL "
 		--field="DNS - $(gettext 'Domain Name Services')":CHK $CONFIG_DNS \
 		--field="DHCP - $(gettext 'DHCP Server')":CHK $CONFIG_DHCP \
 		--field="NFS - $(gettext 'Network File Sharing Protocol (UNIX)')":CHK $CONFIG_NFS \
+		--field="mDNS - $(gettext 'Multicast DNS')":CHK $CONFIG_MDNS \
+		--field="SSDP - $(gettext 'Simple Service Discovery Protocol')":CHK $CONFIG_SSDP \
+		--field="NAT-PMP - $(gettext 'NAT Port Mapping Protocol')":CHK $CONFIG_NATPMP \
 		--field=:LBL "" \
 		--field="$(gettext 'Place a space delimited array of ports and options in the box below. Up to 10 can be specified. You must comma delimit the options.
 Specifying the port number only allows inbound TCP and UDP traffic from any source.')
@@ -156,7 +162,7 @@ $(gettext 'Or:')
 	EXIT=$?
 fi
 case "$EXIT" in
-	0)IFS='|' read -r MAIN LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS _ _ CONFIG_EXTRAS _ <<< "$RETVALS"
+	0)IFS='|' read -r MAIN LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS CONFIG_MDNS CONFIG_SSDP CONFIG_NATPMP _ _ CONFIG_EXTRAS _ <<< "$RETVALS"
 	echo "LOGGING=$LOGGING
 MAIN=$MAIN
 CONFIG_SSH=$CONFIG_SSH
@@ -169,6 +175,9 @@ CONFIG_HTTP=$CONFIG_HTTP
 CONFIG_DNS=$CONFIG_DNS
 CONFIG_DHCP=$CONFIG_DHCP
 CONFIG_NFS=$CONFIG_NFS
+CONFIG_MDNS=$CONFIG_MDNS
+CONFIG_SSDP=$CONFIG_SSDP
+CONFIG_NATPMP=$CONFIG_NATPMP
 CONFIG_EXTRAS=\"$CONFIG_EXTRAS\"" > $CONF # (re)write config
 	process_ports "$CONFIG_EXTRAS"
 	;;
@@ -235,7 +244,8 @@ then
 fi
 
 nft 'add table inet filter'
-nft 'add chain inet filter firewall_ng { type filter hook input priority 0 ; policy drop ; }'
+nft 'add chain inet filter firewall_ng_in { type filter hook input priority 0 ; policy drop ; }'
+nft 'add chain inet filter firewall_ng_out { type filter hook output priority 0 ; policy accept ; }'
 
 ###############################################################################
 #
@@ -247,16 +257,16 @@ nft 'add chain inet filter firewall_ng { type filter hook input priority 0 ; pol
 # Comment the line below if you want pings logged, but it
 # will likely fill your logs.
 if [ "\$LOGGING" = "true" ];then
-	nft 'add rule inet filter firewall_ng icmp type echo-request counter drop'
-	nft 'add rule inet filter firewall_ng meta l4proto ipv6-icmp icmpv6 type echo-request counter drop'
+	nft 'add rule inet filter firewall_ng_in icmp type echo-request counter drop'
+	nft 'add rule inet filter firewall_ng_in meta l4proto ipv6-icmp icmpv6 type echo-request counter drop'
 fi
 
 # Time Exceeded
-nft 'add rule inet filter firewall_ng icmp type time-exceeded counter accept'
-nft 'add rule inet filter firewall_ng meta l4proto ipv6-icmp icmpv6 type time-exceeded counter accept'
+nft 'add rule inet filter firewall_ng_in icmp type time-exceeded counter accept'
+nft 'add rule inet filter firewall_ng_in meta l4proto ipv6-icmp icmpv6 type time-exceeded counter accept'
 
 # Neighbour Discovery
-nft 'add rule inet filter firewall_ng meta l4proto ipv6-icmp ip6 saddr fe80::/10 counter accept'
+nft 'add rule inet filter firewall_ng_in meta l4proto ipv6-icmp ip6 saddr fe80::/10 counter accept'
 
 # Dynamic Address
 # If DHCP, the initial request is a broadcast. The response
@@ -264,23 +274,23 @@ nft 'add rule inet filter firewall_ng meta l4proto ipv6-icmp ip6 saddr fe80::/10
 # allow the DHCP ports to alleviate this problem.
 # If you receive your dynamic address by a different means, you
 # can probably comment this line.
-nft 'add rule inet filter firewall_ng udp sport 67 udp dport 68 counter accept'
-nft 'add rule inet filter firewall_ng ip6 daddr fe80::/64 udp dport 546 ct state new counter accept'
+nft 'add rule inet filter firewall_ng_in udp sport 67 udp dport 68 counter accept'
+nft 'add rule inet filter firewall_ng_in ip6 daddr fe80::/64 udp dport 546 ct state new counter accept'
 EOF_FWNEXT
 
 if [ "$CONFIG_SAMBA" == "true" ];then
 	cat >> $TMPFW << EOF_SAMBA_UDP
 	
 # allow netbios name resolution for Samba server
-nft 'insert rule inet filter firewall_ng udp dport 137 counter accept'
-nft 'insert rule inet filter firewall_ng udp dport 138 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 137 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 138 counter accept'
 EOF_SAMBA_UDP
 fi
 if [ "$CONFIG_CUPS" == "true" ];then
 	cat >> $TMPFW << EOF_CUPS_UDP
 
 # allow CUPS printing to this server - requires CUPS to be shared
-nft 'insert rule inet filter firewall_ng udp dport 631 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 631 counter accept'
 EOF_CUPS_UDP
 fi
 
@@ -288,7 +298,7 @@ if [ "$CONFIG_NTP" == "true" ];then
 	cat >> $TMPFW << EOF_NTP
 
 # Network Time Protocol (NTP) Server
-nft 'insert rule inet filter firewall_ng udp dport 123 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 123 counter accept'
 EOF_NTP
 fi
 
@@ -296,7 +306,7 @@ if [ "$CONFIG_DNS" == "true" ];then
 	cat >> $TMPFW << EOF_DNS
 
 # DNS Server
-nft 'insert rule inet filter firewall_ng udp dport 53 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 53 counter accept'
 EOF_DNS
 fi
 
@@ -305,7 +315,7 @@ if [ "$CONFIG_DHCP" == "true" ];then
 
 # External DHCP Server
 # Allow DHCP client request packets inbound from external network
-nft 'insert rule inet filter firewall_ng udp sport 68 udp dport 67 counter'
+nft 'insert rule inet filter firewall_ng_in udp sport 68 udp dport 67 counter'
 
 # Dynamic Address
 # If DHCP, the initial request is a broadcast. The response
@@ -313,7 +323,7 @@ nft 'insert rule inet filter firewall_ng udp sport 68 udp dport 67 counter'
 # allow the DHCP ports to alleviate this problem.
 # If you receive your dynamic address by a different means, you
 # can probably comment this line.
-nft 'insert rule inet filter firewall_ng udp sport 67 udp dport 68 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp sport 67 udp dport 68 counter accept'
 EOF_DHCP
 fi
 
@@ -327,23 +337,64 @@ if [ "$CONFIG_NFS" == "true" ];then
 # http://www.lowth.com/LinWiz/nfs_help.html
 
 # NFS Server - portmapper
-nft 'insert rule inet filter firewall_ng udp dport 111 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 111 counter accept'
 
 # NFS Server - statd
-nft 'insert rule inet filter firewall_ng udp dport 9400 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 9400 counter accept'
 
 # NFS Server - NFS daemon
-nft 'insert rule inet filter firewall_ng udp dport 2049 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 2049 counter accept'
 
 # NFS Server - lockd
-nft 'insert rule inet filter firewall_ng udp dport 9041 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 9041 counter accept'
 
 # NFS Server - mountd
-nft 'insert rule inet filter firewall_ng udp dport 9042 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 9042 counter accept'
 
 # NFS Server - quotad
-nft 'insert rule inet filter firewall_ng udp dport 9043 counter accept'
+nft 'insert rule inet filter firewall_ng_in udp dport 9043 counter accept'
 EOF_NFS
+fi
+cat >> $TMPFW << EOF_MID
+
+EOF_MID
+if [ "$CONFIG_MDNS" != "true" ];then
+	cat >> $TMPFW << EOF_MDNS
+
+# mDNS
+
+nft 'add rule inet filter firewall_ng_in ip daddr 224.0.0.251 udp dport 5353 drop'
+nft 'add rule inet filter firewall_ng_in ip6 daddr ff02::fb udp dport 5353 drop'
+
+nft 'add rule inet filter firewall_ng_out ip daddr 224.0.0.251 udp dport 5353 drop'
+nft 'add rule inet filter firewall_ng_out ip6 daddr ff02::fb udp dport 5353 drop'
+EOF_MDNS
+fi
+cat >> $TMPFW << EOF_MID
+
+EOF_MID
+if [ "$CONFIG_SSDP" != "true" ];then
+	cat >> $TMPFW << EOF_SSDP
+
+# SSDP
+
+nft 'add rule inet filter firewall_ng_in ip daddr 239.255.255.250 udp dport 1900 drop'
+nft 'add rule inet filter firewall_ng_in ip6 daddr ff02::c udp dport 1900 drop'
+nft 'add rule inet filter firewall_ng_in ip6 daddr ff05::c udp dport 1900 drop'
+
+nft 'add rule inet filter firewall_ng_out ip daddr 239.255.255.250 udp dport 1900 drop'
+nft 'add rule inet filter firewall_ng_out ip6 daddr ff02::c udp dport 1900 drop'
+nft 'add rule inet filter firewall_ng_out ip6 daddr ff05::c udp dport 1900 drop'
+EOF_SSDP
+fi
+if [ "$CONFIG_NATPMP" != "true" ];then
+	cat >> $TMPFW << EOF_NATPMP
+
+# NAT-PMP
+
+nft 'add rule inet filter firewall_ng_in udp dport 5350 drop'
+nft 'add rule inet filter firewall_ng_out udp dport 5351 drop'
+EOF_NATPMP
 fi
 cat >> $TMPFW << EOF_MID
 
@@ -354,39 +405,39 @@ if [ "$CONFIG_HTTP" == "true" ];then
 # Web Server
 
 # HTTP
-nft 'insert rule inet filter firewall_ng tcp dport 80 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 80 counter accept'
 EOF_HTTP
 fi
 if [ "$CONFIG_FTP" == "true" ];then
 	cat >> $TMPFW << EOF_FTP
 	
 # FTP Server (Control)
-nft 'insert rule inet filter firewall_ng tcp dport 21 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 21 counter accept'
 
 # FTP Client (Data Port for non-PASV transfers)
-nft 'insert rule inet filter firewall_ng tcp dport 20 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 20 counter accept'
 EOF_FTP
 fi
 if [ "$CONFIG_SSH" == "true" ];then
 	cat >> $TMPFW << EOF_SSH
 
 # sshd
-nft 'insert rule inet filter firewall_ng tcp dport 22 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 22 counter accept'
 EOF_SSH
 fi
 if [ "$CONFIG_SAMBA" == "true" ];then
 	cat >> $TMPFW << EOF_SAMBA_TCP
 	
 # allow Samba TCP communication
-nft 'insert rule inet filter firewall_ng tcp dport 139 counter accept'
-nft 'insert rule inet filter firewall_ng tcp dport 445 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 139 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 445 counter accept'
 EOF_SAMBA_TCP
 fi
 if [ "$CONFIG_CUPS" == "true" ];then
 	cat >> $TMPFW << EOF_CUPS_TCP
 
 # allow CUPS ipp printing to this server - requires CUPS to be shared
-nft 'insert rule inet filter firewall_ng tcp dport 631 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 631 counter accept'
 EOF_CUPS_TCP
 fi
 
@@ -394,7 +445,7 @@ if [ "$CONFIG_DLNA" == "true" ];then
 	cat >> $TMPFW << EOF_CUPS_DLNA
 
 # allow dlna multimedia server
-nft 'insert rule inet filter firewall_ng tcp dport 8200 counter accept'
+nft 'insert rule inet filter firewall_ng_in tcp dport 8200 counter accept'
 EOF_CUPS_DLNA
 fi
 
@@ -416,14 +467,14 @@ cat >> $TMPFW << EOF_REST
 echo "Setting firewall rules ..."
 
 # Allow all on localhost interface
-nft 'add rule inet filter firewall_ng iifname "lo" counter accept'
+nft 'add rule inet filter firewall_ng_in iifname "lo" counter accept'
 
 # Accept Established Connections
-nft 'add rule inet filter firewall_ng ct state related,established counter accept'
+nft 'add rule inet filter firewall_ng_in ct state related,established counter accept'
 
 # Log packets that still don't match
 if [ "\$LOGGING" = "true" ];then
-	nft 'add rule inet filter firewall_ng limit rate 3/minute burst 3 packets counter log prefix "input packet died: "'
+	nft 'add rule inet filter firewall_ng_in limit rate 3/minute burst 3 packets counter log prefix "input packet died: "'
 fi
 EOF_REST
 
@@ -431,7 +482,7 @@ if [ -f "$TMPFW" ];then
 	[ "$1" != "enable" ] && sh /etc/init.d/rc.firewall stop && sleep 1
 	echo "copying firewall"
 	cp -af "$TMPFW" /etc/init.d/rc.firewall
-	[ "$MAIN" = "true" -o "$CONFIG_SSH" = "true" -o "$CONFIG_CUPS" = "true" -o "$CONFIG_SAMBA" = "true" -o "$CONFIG_DLNA" = "true" -o "$CONFIG_NTP" = "true" -o "$CONFIG_FTP" = "true" -o "$CONFIG_HTTP" = "true" -o "$CONFIG_DNS" = "true" -o "$CONFIG_DHCP" = "true" -o "$CONFIG_NFS" = "true" ] && chmod 755 /etc/init.d/rc.firewall || chmod 644 /etc/init.d/rc.firewall
+	[ "$MAIN" = "true" -o "$CONFIG_SSH" = "true" -o "$CONFIG_CUPS" = "true" -o "$CONFIG_SAMBA" = "true" -o "$CONFIG_DLNA" = "true" -o "$CONFIG_NTP" = "true" -o "$CONFIG_FTP" = "true" -o "$CONFIG_HTTP" = "true" -o "$CONFIG_DNS" = "true" -o "$CONFIG_DHCP" = "true" -o "$CONFIG_NFS" = "true" -o "$CONFIG_MDNS" = "true" -o "$CONFIG_SSDP" = "true" -o "$CONFIG_NATPMP" = "true" ] && chmod 755 /etc/init.d/rc.firewall || chmod 644 /etc/init.d/rc.firewall
 	rm -f "$TMPFW"
 else
 	echo "Something went wrong"
@@ -439,7 +490,7 @@ else
 fi
 
 [ "$1" = "enable" ] && exit
-[ "$MAIN" = "false" -a "$CONFIG_SSH" = "false" -a "$CONFIG_CUPS" = "false" -a "$CONFIG_SAMBA" = "false" -a "$CONFIG_DLNA" = "false" -a "$CONFIG_NTP" = "false" -a "$CONFIG_FTP" = "false" -a "$CONFIG_HTTP" = "false" -a "$CONFIG_DNS" = "false" -a "$CONFIG_DHCP" = "false" -a "$CONFIG_NFS" = "false" ] && exit
+[ "$MAIN" = "false" -a "$CONFIG_SSH" = "false" -a "$CONFIG_CUPS" = "false" -a "$CONFIG_SAMBA" = "false" -a "$CONFIG_DLNA" = "false" -a "$CONFIG_NTP" = "false" -a "$CONFIG_FTP" = "false" -a "$CONFIG_HTTP" = "false" -a "$CONFIG_DNS" = "false" -a "$CONFIG_DHCP" = "false" -a "$CONFIG_NFS" = "false" -a "$CONFIG_MDNS" = "false" -a "$CONFIG_SSDP" = "false" -a "$CONFIG_NATPMP" = "false" ] && exit
 
 # run it!
 urxvt -bg yellow -fg black -geometry 60X10+1+1 --hold -e /etc/init.d/rc.firewall start &
