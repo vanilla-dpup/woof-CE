@@ -47,9 +47,6 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (dststat.st_size == srcstat.st_size && dststat.st_mtime >= srcstat.st_mtime)
-		goto meta;
-
 	if (dststat.st_size != srcstat.st_size && ftruncate(dst, srcstat.st_size) < 0) {
 		fprintf(stderr, "Failed to set %s size: %s\n", argv[2], strerror(errno));
 		close(dst);
