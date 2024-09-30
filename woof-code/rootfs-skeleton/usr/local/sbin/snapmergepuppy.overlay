@@ -47,6 +47,7 @@ if [ -z "$BASE" ] ; then
 fi
 
 WD="`pwd`"
+COLS="`tput cols`"
 
  # all the action takes places inside $SNAP
 SNAP="/initrd/pup_rw"
@@ -56,9 +57,10 @@ YAFPID=""
 if [ -n "$WAYLAND_DISPLAY" ] ; then
 	yad --image=document-save --layer=overlay --edge=bottomright --text="$(gettext "Saving RAM to 'pup_save'...")" --no-buttons --no-focus &
 	YAFPID=$!
+else
+	gettext "Saving RAM to 'pup_save'..."
+	echo
 fi
-
-echo "Merging $SNAP onto $BASE..."
 
 # =============================================================================
 # WHITEOUTS
@@ -79,6 +81,7 @@ do
 		[ "`stat -c '%t,%T' "$BASE/$N"`" = '0,0' ] && continue
 	fi
 
+	printf "\\033[0G\\033[K%.*s" "$COLS" "$N"
 	rm -rf "$BASE/$N"
  
 	#if file exists on a lower layer, have to save the whiteout file...
@@ -104,6 +107,7 @@ while read -r N
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
 	[ -f /tmp/wmexitmode.txt ] && exit
+	printf "\\033[0G\\033[K%.*s" "$COLS" "$N"
 	rm -f "$BASE/$N" 2>/dev/null
 	mkdir -p "$BASE/$N"
 	#i think nathan advised this, to handle non-root user (SFR: improved/simplified)
@@ -140,6 +144,8 @@ do
 		continue # SFR: skip non-existing files (btw, '-e' won't detect broken symlinks, so '-L' is necessary!)
 	fi
 
+	printf "\\033[0G\\033[K%.*s" "$COLS" "$N"
+
 	if [ -L "$N" ];then
 		case "$NDST" in
 		/initrd/pup_ro1|/initrd/pup_ro1/*|/initrd/pup_ro2|/initrd/pup_ro2/*) ;;
@@ -155,6 +161,7 @@ do
 		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
 	fi
 done
+echo -e "\\033[0G\\033[KDone"
 
 # make sure DISTRO_SPECS, PUPSTATE and BOOTCONFIG are saved: these files are modified by initrd, before NTP, and timestamps can be in the future
 mkdir -p "$BASE/initrd" "$BASE/etc/rc.d"

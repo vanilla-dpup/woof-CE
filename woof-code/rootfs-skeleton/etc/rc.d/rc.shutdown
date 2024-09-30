@@ -112,7 +112,7 @@ case $PUPMODE in
   if [ $retval -eq 0 ]; then 
     echo "$(printf "$(gettext 'Saving session to %s (%s)...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
     rm -f /tmp/wmexitmode.txt
-    /usr/local/sbin/snapmergepuppy
+    /usr/local/sbin/snapmergepuppy >/dev/console 2>&1
   fi 
   ;;
  *)
