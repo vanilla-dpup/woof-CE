@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 	}
 
 	if ((src = open(argv[1], O_RDONLY | O_NOATIME)) < 0) {
+		if (errno == ENOENT)
+			return EXIT_SUCCESS;
 		fprintf(stderr, "Failed to open %s: %s\n", argv[1], strerror(errno));
 		return EXIT_FAILURE;
 	}
