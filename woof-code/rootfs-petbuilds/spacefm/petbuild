@@ -2,6 +2,7 @@ download() {
     [ -f spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8.zip ] || curl --fail --location --retry 3 --max-time 60 -o spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8.zip https://github.com/IgnorantGuru/spacefm/archive/e6f291858067e73db44fb57c90e4efb97b088ac8.zip
     [ -f 0001-glibc-2.28-compatibility.patch ] || curl --fail --retry 3 --max-time 60 -o 0001-glibc-2.28-compatibility.patch https://raw.githubusercontent.com/mati75/spacefm/5c3db627540cc9bfc9c57e29c6fac070eee12e99/debian/patches/0001-glibc-2.28-compatibility.patch
     [ -f fix-gcc10-fno-common.patch ] || curl --fail --retry 3 --max-time 60 -o fix-gcc10-fno-common.patch https://raw.githubusercontent.com/mati75/spacefm/5c3db627540cc9bfc9c57e29c6fac070eee12e99/debian/patches/fix-gcc10-fno-common.patch
+    [ -f fix-ftbfs-gcc14.patch ] || curl --fail --retry 3 --max-time 60 -o fix-ftbfs-gcc14.patch https://raw.githubusercontent.com/mati75/spacefm/63ba6ff0377153c3fb5b3c8002baa4b15e6cf410/debian/patches/fix-ftbfs-gcc14.patch
 }
 
 build() {
@@ -9,7 +10,7 @@ build() {
     cd spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8
     patch -p1 < ../0001-glibc-2.28-compatibility.patch
     patch -p1 < ../fix-gcc10-fno-common.patch
-    patch -p1 < ../gcc14.patch
+    patch -p1 < ../fix-ftbfs-gcc14.patch
     patch -p1 < ../wayland.patch
     patch -p1 < ../mount.patch
     patch -p1 < ../unmount.patch
