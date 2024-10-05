@@ -12,7 +12,7 @@
 
 int main(int argc, char *argv[])
 {
-	int src, dst;
+	int src, dst, sync = 0;
 	struct stat srcstat, dststat;
 	struct timeval times[2];
 	unsigned char *srcm, *dstm;
@@ -47,9 +47,6 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (dststat.st_size == srcstat.st_size && dststat.st_mtime >= srcstat.st_mtime)
-		goto meta;
-
 	if (dststat.st_size != srcstat.st_size && ftruncate(dst, srcstat.st_size) < 0) {
 		fprintf(stderr, "Failed to set %s size: %s\n", argv[2], strerror(errno));
 		close(dst);
@@ -78,14 +75,18 @@ int main(int argc, char *argv[])
 	madvise(srcm, srcstat.st_size, MADV_SEQUENTIAL);
 	madvise(dstm, srcstat.st_size, MADV_SEQUENTIAL);
 
-	if (srcstat.st_size > 0 && dststat.st_size == 0)
+	if (srcstat.st_size > 0 && dststat.st_size == 0) {
 		memcpy(dstm, srcm, srcstat.st_size);
+		sync = 1;
+	}
 	else {
 		do {
 			chunk = srcstat.st_size - off >= CHUNK_SIZE ? CHUNK_SIZE : srcstat.st_size - off;
 
-			if (memcmp(&srcm[off], &dstm[off], chunk) != 0)
+			if (memcmp(&srcm[off], &dstm[off], chunk) != 0) {
 				memcpy(&dstm[off], &srcm[off], chunk);
+				sync = 1;
+			}
 
 			off += chunk;
 		} while (off < srcstat.st_size);
@@ -93,7 +94,7 @@ int main(int argc, char *argv[])
 
 	munmap(srcm, srcstat.st_size);
 
-	if (msync(dstm, srcstat.st_size, MS_SYNC) < 0) {
+	if (sync && msync(dstm, srcstat.st_size, MS_SYNC) < 0) {
 		fprintf(stderr, "Failed to flush changes to disk: %s\n", strerror(errno));
 		munmap(dstm, srcstat.st_size);
 		close(dst);

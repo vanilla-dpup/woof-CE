@@ -126,8 +126,15 @@ while read -r N
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
 	[ "$XRUNNING" = "yes" ] && [ -f /tmp/wmexitmode.txt ] && exit
-	rm -f "$BASE/$N" 2>/dev/null
-	mkdir -p "$BASE/$N"
+	if [ -L "$BASE/$N" ];then
+		rm -f "$BASE/$N" 2>/dev/null
+		mkdir "$BASE/$N"
+	elif [ ! -e "$BASE/$N" ];then
+		mkdir "$BASE/$N"
+	elif [ ! -d "$BASE/$N" ];then
+		rm -f "$BASE/$N" 2>/dev/null
+		mkdir "$BASE/$N"
+	fi
 	#i think nathan advised this, to handle non-root user (SFR: improved/simplified)
 	chmod "$BASE/$N" --reference="$N"
 	chown-FULL "$BASE/$N" --reference="$N"
