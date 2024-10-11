@@ -6,6 +6,8 @@ In Puppy, the early boot process searches all partitions for Puppy files if `pme
 
 Unlike Puppy, DISTRO_NAME always falls back to search on all partitions if needed. Specifying `pmedia` is not mandatory.
 
+In addition, DISTRO_NAME does not support `pfix=fsckp`: `pfix=fsck` in DISTRO_NAME is equivalent to `pfix=fsck,fsckp` in Puppy. In other words, `pfix=fsck` enables file system error repair on all file systems mounted during the boot process and not only the file system inside the save file (if used).
+
 ## .pet Packages
 
 DISTRO_NAME provides partial backward compatibility with old .pet packages, through petget. Many .pet packages are old and unmaintained: some even depend on [ROX-Filer](https://rox.sourceforge.net/desktop/ROX-Filer), [JWM](http://joewing.net/projects/jwm/) or [X.Org](https://www.x.org/).

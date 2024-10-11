@@ -10,8 +10,7 @@ Boot codes can change DISTRO_NAME's behavior, speed up the boot process, make th
 * `psave=name|UUID|label`: specifies the partition containing save folders or files using its name, UUID or label, and disables search for this partition.
 * `psubdir=/relative/path`: specifies a subdirectory for SFSs and a save folders or files.
 * `waitdev=seconds`: specifies the timeout for search for SFSs and save folders or files. If unspecified, the default is 5 seconds.
-* `pfix=fsck`: enables file system error repair for save files.
-* `pfix=fsckp`: enables file system error repair for mounted partitions.
+* `pfix=fsck`: enables file system error repair for all ext2, ext3, ext4, F2FS, FAT32 and exFAT file systems mounted during the boot process.
 * `pfix=scrub`: free disk space and improve responsiveness by searching for files copied from SFSs to the save layer and deleting them **immediately**. If unspecified, this cleanup is performed automatically on update.
 * `pfix=rdsh`: drops to a rescue shell at the end of the early boot process.
 * `pfix=nox`: disables automatic start of the graphical desktop.

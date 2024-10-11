@@ -152,14 +152,13 @@ psave=<partition>  Specifies the save layer  partition
 
 ------------------------------------------------------------
 
-pfix=<ram, nox, nocopy, fsck, fsckp, rdsh, <number>>
+pfix=<ram, nox, nocopy, fsck, rdsh, <number>>
    The pfix parameter is a ',' separated list of 1 or more of the above sub-parameters.
    ram:      run in ram only (do not load ${DISTRO_FILE_PREFIX}save).
    nox:      do not start X.
    copy:     copy .sfs files into ram
    nocopy:   do not copy .sfs files into ram (default is copy if ram > 1024 MB, while free ramdisk space is >= 64 MB).
-   fsck:     do fsck of ${DISTRO_FILE_PREFIX}save.?fs file.
-   fsckp:    do fsck before first mount of supported partitions.
+   fsck:     do fsck before first mount of supported file systems.
    rdsh:     exit to shell in initial ramdisk.
    <number>: blacklist last <number> folders (multisession). e.g. pfix=3
 
