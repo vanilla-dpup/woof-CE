@@ -1,0 +1,11 @@
+#!/bin/bash
+
+[ -z "$ID_NET_NAME_PATH" -o -z "$ID_NET_NAME_MAC" ] && exit
+
+MAC="`cat /var/lib/mac-changer/$ID_NET_NAME_MAC 2>/dev/null`"
+if [ -z "$MAC" ]; then
+	MAC=$(printf %02x:%02x:%02x:%02x:%02x:%02x $((($RANDOM % 256) & 0xfe)) $((RANDOM % 256)) $(($RANDOM % 256)) $(($RANDOM % 256)) $(($RANDOM % 256)) $(($RANDOM % 256)))
+	echo "$MAC" > /var/lib/mac-changer/$ID_NET_NAME_MAC
+fi
+
+exec ip link set dev "$ID_NET_NAME_PATH" address "$MAC"

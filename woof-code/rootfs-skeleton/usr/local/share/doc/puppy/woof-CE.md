@@ -69,6 +69,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * A [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox restricts file system access for applications running as spot and prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777 and blocks attempts to bypass it by accessing /initrd/mnt/dev_save/*save/upper/root instead. This reduces compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
 * Most legacy X11 applications work thanks to [Xwayland](https://wayland.freedesktop.org/xserver.html), which is unprivileged and sandboxed.
 * Common sysfs hardening recommendations are applied out of the box.
+* The MAC address is randomized when a network interface is brought up for the first time, to reduce device and user fingerprintability but without breaking things like DHCP reservations.
 
 ### Modernization
 
