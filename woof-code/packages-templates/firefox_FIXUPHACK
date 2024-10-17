@@ -40,6 +40,11 @@ defaultPref("identity.fxaccounts.toolbar.enabled", false);
 defaultPref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons", false);
 defaultPref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features", false);
 defaultPref("browser.tabs.firefox-view", false);
+defaultPref("browser.newtabpage.activity-stream.showSponsored", false);
+defaultPref("browser.newtabpage.activity-stream.showSponsoredTopSites", false);
+defaultPref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons", false);
+defaultPref("browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features", false);
+defaultPref("browser.urlbar.suggest.trending", false);
 
 // disable autoplay
 defaultPref("media.autoplay.default", 5);
@@ -51,11 +56,16 @@ defaultPref("pdfjs.disabled", true);
 defaultPref("privacy.trackingprotection.enabled", true);
 defaultPref("privacy.resistFingerprinting", true);
 defaultPref("privacy.donottrackheader.enabled", true);
+defaultPref("privacy.globalprivacycontrol.enabled", true);
 defaultPref("toolkit.telemetry.enabled", false);
 defaultPref("toolkit.telemetry.unified", false);
 defaultPref("toolkit.telemetry.reportingpolicy.firstRun", false);
 defaultPref("app.normandy.enabled", false);
 defaultPref("datareporting.policy.dataSubmissionEnabled", false);
+defaultPref("app.shield.optoutstudies.enabled", true);
+defaultPref("datareporting.healthreport.uploadEnabled", false);
+defaultPref("dom.private-attribution.submission.enabled", false);
+defaultPref("browser.discovery.enabled", false);
 EOF
 
 cat << EOF > ${FFDIR}/defaults/pref/puppy-settings.js
