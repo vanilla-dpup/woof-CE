@@ -26,6 +26,20 @@ if command -v wf-recorder > /dev/null; then
 fi
 
 if [ $VIDEO -eq 0 ]; then
+	if command -v wl-copy > /dev/null; then
+		yad --layer=overlay --edge=bottom --button="Copy to clipboard"\!edit-copy-symbolic:2 --button="Save to file"\!document-save-as-symbolic:3 --button=gtk-cancel:1
+		RET=$?
+		if [ $RET -eq 2 ]; then
+			if [ -z "$GEOM" ]; then
+				grim - | wl-copy -t image/png
+			else
+				grim -g "$GEOM" - | wl-copy -t image/png
+			fi
+			exit
+		fi
+		[ $RET -ne 3 ] && exit
+	fi
+
 	DST=`yad --layer=overlay --edge=bottom --file --save --confirm-overwrite --filename=screenshot.png`
 	[ -z "$DST" ] && exit
 
