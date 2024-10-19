@@ -7,7 +7,7 @@ if [ $PUPMODE -ne 13 ] ; then
 	exit 1
 fi
 
-nice -n 19 flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy
+nice -n 19 -- ionice -c 2 -n 7 -- flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy
 
 exit 0
 
