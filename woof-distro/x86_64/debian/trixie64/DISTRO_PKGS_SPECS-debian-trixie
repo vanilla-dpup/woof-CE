@@ -52,6 +52,7 @@ yes|locales|locales|exe,dev,doc,nls>exe||deps:yes
 yes|kmod|kmod|exe,dev,doc,nls||deps:yes
 yes|l3afpad|l3afpad|exe,dev,doc,nls||deps:yes
 yes|less|less|exe,dev>null,doc,nls||deps:yes
+yes|libbpf-dev|libbpf-dev|exe,dev,doc,nls||deps:yes
 yes|libc6-dev|libc6-dev|exe,dev,doc,nls||deps:yes
 yes|libargon2-dev|libargon2-dev|exe,dev,doc,nls||deps:yes # needed by pfscrypt
 yes|libfreetype-dev|libfreetype-dev|exe,dev,doc,nls||deps:yes
@@ -187,7 +188,9 @@ yes|automake|automake,autotools-dev|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|autopoint|autopoint|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|binutils|binutils|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|bison|bison|exe>dev,dev,doc>dev,nls>dev||deps:yes
+yes|bpftool|bpftool|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|ccache|ccache|exe>dev,dev,doc>dev,nls>dev||deps:yes
+yes|clang|clang|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|cmake|cmake|exe>dev,dev,doc>dev,nls>dev||deps:yes # build-time dependency of hardinfo
 yes|dwarves|dwarves|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 yes|flex|flex|exe>dev,dev,doc>dev,nls>dev||deps:yes
@@ -200,6 +203,7 @@ yes|libelf-dev|libelf-dev|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 yes|libtool|libtool,libtool-bin|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|linux-header|linux-libc-dev|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|linux-source|linux-source|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
+yes|llvm|llvm|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|m4|m4|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|make|make|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|meson|meson|exe>dev,dev,doc>dev,nls>dev||deps:yes

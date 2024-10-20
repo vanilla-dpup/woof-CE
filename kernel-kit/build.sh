@@ -43,6 +43,7 @@ make -j`nproc` bzImage modules || exit 1
 echo "Creating the kernel package"
 make INSTALL_MOD_PATH=`pwd`/../output/linux_kernel-${kernel_version}/usr INSTALL_MOD_STRIP=1 modules_install
 cp -f arch/x86/boot/bzImage ../output/vmlinuz-${kernel_version}
+bpftool btf dump file vmlinux format c > ../output/vmlinux-${kernel_version}.h
 rm -f ../output/linux_kernel-${kernel_version}/usr/lib/modules/${kernel_version}/{build,source}
 mkdir -p ../output/linux_kernel-${kernel_version}/boot
 cp -f .config ../output/linux_kernel-${kernel_version}/boot/config-${kernel_version}

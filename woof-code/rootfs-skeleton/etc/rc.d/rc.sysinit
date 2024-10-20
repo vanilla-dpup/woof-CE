@@ -128,6 +128,7 @@ mount -t tmpfs -onosuid,noexec,size=10%,mode=755 tmpfs /run
 mount -t tmpfs -onodev,noexec,nosuid,size=20%,mode=1777 /run/lock
 mount -t proc -onodev,noexec,nosuid proc /proc
 mount -t sysfs -onodev,noexec,nosuid sysfs /sys
+mount -t debugfs none /sys/kernel/debug
 mount -t pstore pstore /sys/fs/pstore
 [ -d /sys/firmware/efi/efivars ] && mount -t efivarfs none /sys/firmware/efi/efivars
 
@@ -296,6 +297,7 @@ echo -n "Setting up services (network" >/dev/console
 hostname -F /etc/hostname
 
 busybox hwclock -s
+rtclock
 
 mkdir -p /var/run/dbus
 chown messagebus /var/run/dbus

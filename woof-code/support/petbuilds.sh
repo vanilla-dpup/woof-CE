@@ -50,6 +50,8 @@ EOF
                 chmod 755 petbuild-rootfs-complete/usr/bin/$PROG
             done
 
+            cp -f ../kernel-kit/output/vmlinux-*.h petbuild-rootfs-complete/usr/include/vmlinux.h
+
             cp -f /etc/resolv.conf petbuild-rootfs-complete/etc/
 
             HAVE_ROOTFS=1
