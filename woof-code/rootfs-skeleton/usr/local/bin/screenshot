@@ -14,8 +14,18 @@ else
 	FULL=1
 fi
 
-GEOM=""
-[ $FULL -eq 0 ] && GEOM="`slurp`"
+if [ $FULL -eq 0 ]; then
+	GEOM="`slurp`"
+	[ -z "$GEOM" ] && exit
+else
+	OUTPUTS="`wlr-randr | grep -m 2 -v '^ ' | cut -f 1 -d ' ' | sed 's/\n/ /g'`"
+	OUTPUT="${OUTPUTS%% *}"
+	[ -z "$OUTPUT" ] && exit
+	if [ "$OUTPUT" != "$OUTPUTS" ]; then
+		OUTPUT="`slurp -p -f %o`"
+		[ -z "$OUTPUT" ] && exit
+	fi
+fi
 
 VIDEO=0
 if command -v wf-recorder > /dev/null; then
@@ -30,10 +40,10 @@ if [ $VIDEO -eq 0 ]; then
 		yad --layer=overlay --edge=bottom --button="Copy to clipboard"\!edit-copy-symbolic:2 --button="Save to file"\!document-save-as-symbolic:3 --button=gtk-cancel:1
 		RET=$?
 		if [ $RET -eq 2 ]; then
-			if [ -z "$GEOM" ]; then
-				grim - | wl-copy -t image/png
-			else
+			if [ $FULL -eq 0 ]; then
 				grim -g "$GEOM" - | wl-copy -t image/png
+			else
+				grim -o "$OUTPUT" - | wl-copy -t image/png
 			fi
 			exit
 		fi
@@ -43,19 +53,19 @@ if [ $VIDEO -eq 0 ]; then
 	DST=`yad --layer=overlay --edge=bottom --file --save --confirm-overwrite --filename=screenshot.png`
 	[ -z "$DST" ] && exit
 
-	if [ -z "$GEOM" ]; then
-		grim "$DST"
-	else
+	if [ $FULL -eq 0 ]; then
 		grim -g "$GEOM" "$DST"
+	else
+		grim -o "$OUTPUT" "$DST"
 	fi
 else
 	DST=`yad --layer=overlay --edge=bottom --file --save --confirm-overwrite --filename=recording.mkv`
 	[ -z "$DST" ] && exit
 
-	if [ -z "$GEOM" ]; then
-		wf-recorder -f "$DST" &
+	if [ $FULL -eq 0 ]; then
+		wf-recorder -g "$GEOM" -f "$DST" &
 	else
-		wf-recorder -f "$DST" -g "$GEOM" &
+		wf-recorder -o "$OUTPUT" -f "$DST" &
 	fi
 	PID=$!
 
