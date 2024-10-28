@@ -67,6 +67,13 @@ create_zram_swap() {
 
 loadswap_func() { #w481 made into a function.
  echo "LOAD SWAP"
+ echo -n "Loading zram swap..." >/dev/console
+ create_zram_swap
+ ret=$?
+ status_func $ret
+ if [ $ret -eq 0 ] ; then
+   SWAPON="yes"
+ fi
  #load a swap partition...
  while read _ ONESWAP SWAPSIZEBYTES
  do
@@ -92,16 +99,7 @@ loadswap_func() { #w481 made into a function.
   if [ $ret -eq 0 ] ; then
     [ "$SWAPSIZEBYTES" ] && EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
     SWAPON="yes"
-    return
   fi
- fi
- # if we failed to find a swap partition or file, try zram
- echo -n "Loading zram swap..." >/dev/console
- create_zram_swap
- ret=$?
- status_func $ret
- if [ $ret -eq 0 ] ; then
-   SWAPON="yes"
  fi
 }
 

@@ -57,6 +57,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * The init script (/etc/rc.d/rc.sysinit) and the shutdown script (/etc/rc.d/rc.shutdown) are shorter and much faster.
 * SFSs can use [EROFS](https://docs.kernel.org/filesystems/erofs.html) instead of [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) and all built-in SFSs use the former.
 * Caching of SFSs in RAM (`pfix=ram|copy` or automatic) happens in the background while the boot process continues.
+* [zram](https://docs.kernel.org/admin-guide/blockdev/zram.html) swap is enabled even if a swap file is present. The former has higher priority: this should improve responsiveness and reduce writing to disk if swap usage tends to be low.
 * 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and chroot environments. Build times are much shorter than upstream's and woof-CE itself is more portable.
 * `save2flash` is much faster because it preallocates space when files grow and only copies appended or modified blocks when files change (see woof-code/rootfs-petbuilds/psnapcp).
 * The pup-advert-blocker ad blocking tool is reimplemented using a [NSS module](https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html) that checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line (see woof-code/rootfs-petbuilds/pup_advert_blocker).
