@@ -79,7 +79,7 @@ loadswap_func() { #w481 made into a function.
  do
   EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
   echo -n "Loading swap partition ${ONESWAP}..." >/dev/console #loading swap partition
-  chmod 0660 $ONESWAP
+  chmod 600 $ONESWAP
   swapon $ONESWAP
   status_func $?
   [ $? -eq 0 ] && SWAPON="yes"
@@ -94,7 +94,7 @@ loadswap_func() { #w481 made into a function.
  if [ "${SWAPFILE}" ] ; then
   SWAPSIZEBYTES=`stat -c %s ${SWAPFILE}` #bytes
   echo -n "Loading swap file ${SWAPFILE}..." >/dev/console
-  chmod 0660 $SWAPFILE
+  chmod 600 $SWAPFILE
   swapon ${SWAPFILE} ; ret=$? ; status_func $ret
   if [ $ret -eq 0 ] ; then
     [ "$SWAPSIZEBYTES" ] && EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))

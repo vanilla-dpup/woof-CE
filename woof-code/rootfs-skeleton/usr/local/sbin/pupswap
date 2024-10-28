@@ -17,6 +17,7 @@ create_swapfile() {
 	local outfile="$1" size=$2 #MB
 	dd if=/dev/zero of=${outfile} bs=1M count=$size
 	if [ $? -eq 0 ];then
+		chmod 600 ${outfile}
 		sync
 		mkswap ${outfile}
 		swapon ${outfile}
