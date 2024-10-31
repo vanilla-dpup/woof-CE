@@ -11,7 +11,7 @@ bar:
 
   left:
     - script:
-        path: /usr/bin/dwl-status
+        path: /usr/local/bin/dwl-status
         args: [/tmp/dwl.socket]
         anchors:
           - sel: &sel {foreground: 000000ff, deco: {background: { color: ffffffff }}}
@@ -86,7 +86,7 @@ bar:
                           - string: {text: "\uf027 {linear_volume}%"}
                           - string: {text: "\uf028 {linear_volume}%"}
     - script:
-        path: /usr/bin/batmon
+        path: /usr/local/bin/batmon
         content:
           map:
             on-click: batinfo
@@ -102,7 +102,7 @@ bar:
                     capacity >= 75 && capacity < 95: {string: {text: "\uf241 {capacity}%"}}
                     capacity >= 95: {string: {text: "\uf240 {capacity}%"}}
     - script:
-        path: /usr/bin/netmon
+        path: /usr/local/bin/netmon
         content:
           map:
             on-click: defaultconnect
