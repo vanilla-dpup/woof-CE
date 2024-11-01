@@ -25,13 +25,33 @@ int main(int argc, char *argv[])
 {
 	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/tmp/pkexecd.socket"};
 	size_t len;
-	int s, i;
+	int s, i = 1;
 
 	if (argc == 1 || argc > 30)
 		return EXIT_FAILURE;
 
+	do {
+		if (strcmp(argv[i], "--version") == 0) {
+			write(STDOUT_FILENO, "pkexec version 125\n", sizeof("pkexec version 125\n") - 1);
+			return EXIT_SUCCESS;
+		}
+
+		if ((strcmp(argv[i], "--user") == 0 || strcmp(argv[i], "-u") == 0) && i < argc -1)
+			i += 2;
+		else if (strncmp(argv[i], "--", 2) == 0)
+			++i;
+		else
+			break;
+	} while (i < argc);
+
+	if (i == argc)
+		return EXIT_FAILURE;
+
+	argv = &argv[i];
+	argc -= i;
+
 	if (getuid() == 0 && getgid() == 0) {
-		execvp(argv[1], &argv[1]);
+		execvp(argv[0], argv);
 		return EXIT_FAILURE;
 	}
 
@@ -42,7 +62,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	for (i = 1; i < argc; ++i) {
+	for (i = 0; i < argc; ++i) {
 		len = strlen(argv[i]);
 		if ((len > 0 && sendall(s, argv[i], len) < 0) || sendall(s, "\0", 1) < 0) {
 			close(s);
