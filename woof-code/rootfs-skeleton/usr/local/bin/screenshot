@@ -18,7 +18,7 @@ if [ $FULL -eq 0 ]; then
 	GEOM="`slurp`"
 	[ -z "$GEOM" ] && exit
 else
-	OUTPUTS="`wlr-randr | grep -m 2 -v '^ ' | cut -f 1 -d ' ' | sed 's/\n/ /g'`"
+	OUTPUTS="`wlr-randr | grep -m 2 -v '^ ' | cut -f 1 -d ' ' | tr '\n' ' ' | sed 's/ $//'`"
 	OUTPUT="${OUTPUTS%% *}"
 	[ -z "$OUTPUT" ] && exit
 	if [ "$OUTPUT" != "$OUTPUTS" ]; then
