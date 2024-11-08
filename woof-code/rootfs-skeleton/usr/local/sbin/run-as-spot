@@ -32,14 +32,6 @@ case "$PROG" in
 	;;
 esac
 
-# if spot-sandbox is present, run the shell inside a sandbox
-SANDBOX=
-case "$EXEC" in
-*.AppImage|flatpak|*/flatpak|/var/lib/flatpak/*) ;;
-*/dbus-daemon) ;; # Landlock breaks xdg-desktop-portal, which fails to open /proc/%u/root
-*) SANDBOX=`command -v spot-sandbox` ;;
-esac
-
 CWD=$PWD
 CMD=''
 while [ "$1" ]; do
@@ -119,7 +111,7 @@ case "'"$CURDIR"'" in
 	cd "'"$CURDIR"'"
 	;;
 esac
-exec '"${SANDBOX}"' '"$CMD"'
+exec '"$CMD"'
 '
 else
 	exec ash -c "exec $CMD"

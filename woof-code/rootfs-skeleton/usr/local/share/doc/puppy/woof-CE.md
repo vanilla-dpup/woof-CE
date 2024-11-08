@@ -7,7 +7,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
   * Boots to a lightweight desktop environment with a variety of applications
   * Supports non-persistent, fully persistent or "persistent-on-demand" sessions where the user can decide whether or not to save, and when
      * But with more efficient, fast saving that reduces writing to storage
-     * But with improved support for encryption and sandboxing for unprivileged applications
+     * But with improved support for encryption
      * But with easier and more flexible session management
   * Supports extra read-only layers (sfs_load)
      * But with flexible naming and control over the stacking order
@@ -67,8 +67,6 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 ### Security
 
 * Save folders support encryption, using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html).
-* A [Landlock](https://docs.kernel.org/userspace-api/landlock.html)-based sandbox restricts file system access for applications running as spot and prevents spot from reading or writing files under the save partition. The sandbox blocks access to /root even if permissions are 777 and blocks attempts to bypass it by accessing /initrd/mnt/dev_save/*save/upper/root instead. This reduces compatibility with Puppy, because spot can only run applications installed to / and can't run "portable" applications that reside on the save partition.
-* Most legacy X11 applications work thanks to [Xwayland](https://wayland.freedesktop.org/xserver.html), which is unprivileged and sandboxed.
 * Common sysfs hardening recommendations are applied out of the box.
 * firewall_ng blocks mDNS, SSDP and NAT-PMP (both incoming and outgoing) by default, to mitigate vulnerabilities that can be triggered remotely through service discovery or port forwarding, and prevent leak of device information.
 * The MAC address is randomized when a network interface is brought up for the first time, to reduce device and user fingerprintability but without breaking things like DHCP reservations.
@@ -114,7 +112,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
     * rootfs-skeleton/root/.profile starts the graphical desktop
   * woof-code/rootfs-petbuilds contains recipes for building Puppy-specific packages or packages with Puppy-specific customization, from source
     * woof-code/rootfs-petbuilds/init provides a simple init implementation that runs /etc/rc.d/rc.sysinit and a login shell
-    * woof-code/rootfs-petbuilds/spot-pkexec implements a sandbox for unprivileged applications
+    * woof-code/rootfs-petbuilds/spot-pkexec implements a privilege escalation mechanism
     * woof-code/rootfs-petbuilds/ram-saver changes the memory allocator settings to reduce RAM consumption
     * woof-code/rootfs-petbuilds/sfslock locks a file into the page cache to speed up reading from it
   * woof-code/rootfs-packages contains Puppy-specific tools
