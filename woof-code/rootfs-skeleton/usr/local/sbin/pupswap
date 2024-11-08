@@ -20,6 +20,7 @@ create_swapfile() {
 		chmod 600 ${outfile}
 		sync
 		mkswap ${outfile}
+		echo 3 > /proc/sys/vm/page-cluster
 		swapon ${outfile}
 	fi
 	if [ $? -ne 0 ];then
@@ -299,6 +300,7 @@ if [ $TOTALSWAP -eq 0 ] ; then
 		dialog --title "pupswap" --yes-label $(gettext 'Yes') --no-label $(gettext 'No') --yesno "$msg" 0 0
 	fi
 	[ $? -ne 0 ] && exit
+	echo 3 > /proc/sys/vm/page-cluster
 	swapon "${SWAP_PART}/pupswap.swp"
 	if [ $? -eq 0 ] ; then
 		msg="$(printf "$(gettext "'%s' successfully loaded!")" "${SWAP_PART}/pupswap.swp")"
