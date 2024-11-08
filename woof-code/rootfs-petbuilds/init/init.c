@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <pwd.h>
+#include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/ioctl.h>
@@ -47,7 +48,7 @@ static void fakelogin(void)
 	pid_t pid;
 	int ret, status;
 
-	if (prctl(PR_SET_NAME, "fakelogin") < 0 || !(user = getpwuid(geteuid()))) return;
+	if (prctl(PR_SET_NAME, "fakelogin") < 0 || !(user = getpwnam("spot")) || initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0) return;
 
 	clearenv();
 
@@ -56,14 +57,14 @@ static void fakelogin(void)
 	    (setenv("SHELL", user->pw_shell, 1) < 0) ||
 	    (setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1) < 0) ||
 	    (setenv("TERM", "linux", 1) < 0) ||
-	    (setenv("XDG_DATA_HOME", "/root/.local/share", 1) < 0) ||
-	    (setenv("XDG_CONFIG_HOME", "/root/.config", 1) < 0) ||
+	    (setenv("XDG_DATA_HOME", "/home/spot/.local/share", 1) < 0) ||
+	    (setenv("XDG_CONFIG_HOME", "/home/spot/.config", 1) < 0) ||
 	    (setenv("XDG_DATA_DIRS", "/usr/share:/usr/local/share", 1) < 0) ||
 	    (setenv("XDG_CONFIG_DIRS", "/etc/xdg", 1) < 0) ||
-	    (setenv("XDG_CACHE_HOME", "/root/.cache", 1) < 0) ||
-	    (setenv("XDG_RUNTIME_DIR", "/tmp/runtime-root", 1) < 0) ||
-	    (setenv("XDG_STATE_HOME", "/root/.local/state", 1) < 0) ||
-	    ((mkdir("/tmp/runtime-root", 0700) < 0 && errno != EEXIST) || (errno == EEXIST && chmod("/tmp/runtime-root", 0700) < 0)) ||
+	    (setenv("XDG_CACHE_HOME", "/home/spot/.cache", 1) < 0) ||
+	    (setenv("XDG_RUNTIME_DIR", "/tmp/runtime-spot", 1) < 0) ||
+	    (setenv("XDG_STATE_HOME", "/home/spot/.local/state", 1) < 0) ||
+	    ((mkdir("/tmp/runtime-spot", 0700) < 0 && errno != EEXIST) || (errno == EEXIST && chmod("/tmp/runtime-spot", 0700) < 0)) ||
 	    (chdir(user->pw_dir) < 0))
 		return;
 
@@ -78,7 +79,7 @@ static void fakelogin(void)
 		fclose(fp);
 	}
 
-	if (pam_start("fakelogin", "root", &conv, &pamh) != PAM_SUCCESS) return;
+	if (pam_start("fakelogin", "spot", &conv, &pamh) != PAM_SUCCESS) return;
 	if ((ret = pam_open_session(pamh, 0)) != PAM_SUCCESS) {
 		pam_end(pamh, ret);
 		return;
@@ -87,7 +88,7 @@ static void fakelogin(void)
 	cat("/etc/motd");
 
 	if ((pid = fork()) == 0) {
-		execlp(user->pw_shell, user->pw_shell, "-l", (char *)NULL);
+		execl(user->pw_shell, user->pw_shell, "-l", (char *)NULL);
 		exit(EXIT_FAILURE);
 	} else if (pid > 0) while (waitpid(pid, &status, 0) < 0 && errno == EINTR);
 

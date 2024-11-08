@@ -59,13 +59,11 @@ APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/a
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
 
-printf 'woofwoof\nwoofwoof\n' | chroot rootfs-complete passwd root
-
 cp -a ../rootfs-skeleton/* rootfs-complete/
 
 cp -a rootfs-complete/etc/skel/. rootfs-complete/root/
 
-chroot rootfs-complete adduser --disabled-password --disabled-login --no-create-home --comment "" spot
+printf 'woofwoof\nwoofwoof\n' | chroot rootfs-complete adduser --no-create-home --comment "" spot
 chroot rootfs-complete adduser spot video
 chroot rootfs-complete adduser spot render
 chroot rootfs-complete adduser spot audio

@@ -5,6 +5,7 @@ This is a fork of [woof-CE](https://github.com/puppylinux-woof-CE/woof-CE), the 
 The goal is to build something similar to [DebianDog](https://debiandog.github.io/doglinux/), a highly [Debian](https://www.debian.org/)-compatible, portable, modular, hackable and lightweight distro with core features of [Puppy Linux](https://puppylinux.com), a distro that -
 * Provides the best features of dpup (Debian-based Puppy), but with big improvements
   * Boots to a lightweight desktop environment with a variety of applications
+     * But without running the desktop as root
   * Supports non-persistent, fully persistent or "persistent-on-demand" sessions where the user can decide whether or not to save, and when
      * But with more efficient, fast saving that reduces writing to storage
      * But with improved support for encryption
@@ -66,6 +67,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 
 ### Security
 
+* Like Puppy, the operating system is designed for use by a single human user, but the desktop environment runs as an unprivileged user; applications that want to run as root ask for user's approval
 * Save folders support encryption, using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html).
 * Common sysfs hardening recommendations are applied out of the box.
 * firewall_ng blocks mDNS, SSDP and NAT-PMP (both incoming and outgoing) by default, to mitigate vulnerabilities that can be triggered remotely through service discovery or port forwarding, and prevent leak of device information.

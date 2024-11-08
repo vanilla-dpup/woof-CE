@@ -86,12 +86,6 @@ EOF
 		chown ${XUSER} ${XDG_RUNTIME_DIR}
 	fi
 
-	if [ -s /tmp/.spot-session-bus ]; then
-		. /tmp/.spot-session-bus
-		export DBUS_SESSION_BUS_ADDRESS
-		export DBUS_SESSION_BUS_PID
-	fi
-
 	# close all file descriptors except std{in,out,err}, in case one of
 	# them points to a file under /root
 	for FD in /proc/self/fd/*; do
