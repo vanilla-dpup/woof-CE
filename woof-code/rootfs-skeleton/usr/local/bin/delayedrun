@@ -2,8 +2,8 @@
 #(c) copyright 2007 Barry Kauler LGPL v2
 #launched from ~/.xinitrc, so X is running.
 
-if [ -d /root/Startup ];then
- for A in /root/Startup/* ; do
+if [ -d ~/Startup ];then
+ for A in ~/Startup/* ; do
   $A 2>/dev/null & 
  done
 fi
