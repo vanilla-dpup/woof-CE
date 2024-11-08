@@ -424,14 +424,14 @@ EOF
 	2)
 		mkdir -p ${SAVEMNT}${SAVEPFIX}/work
 		echo work > ${SAVEMNT}${SAVEPFIX}/.pfscrypt
-		for DIR in root home/spot ; do
+		for DIR in root home ; do
 			mkdir -p ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
 			chmod --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
 			chown --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
 			touch --reference=/initrd/pup_ro2/${DIR} ${SAVEMNT}${SAVEPFIX}/upper/${DIR}
 			echo "upper/${DIR}" >> ${SAVEMNT}${SAVEPFIX}/.pfscrypt
 		done
-		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}/upper/{root,home/spot} ${SAVEPFIX}/work
+		pfscrypt ${SAVEMNT} "${PASSPHRASE}" ${SAVEPFIX}/upper/{root,home} ${SAVEPFIX}/work
 		;;
 
 	3)
