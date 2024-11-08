@@ -7,7 +7,23 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <pwd.h>
+#include <grp.h>
+#include <fcntl.h>
 #include <sys/wait.h>
+
+#define REQUEST_MAX (2*1024*1024)
+
+#define ALLOW(X) {#X"=", sizeof(#X"=") - 1}
+static const struct {
+	const char *pfix;
+	size_t len;
+} allowed[] = {
+	ALLOW(LC_ALL),
+	ALLOW(LANG),
+	ALLOW(WAYLAND_DISPLAY),
+	ALLOW(XDG_RUNTIME_DIR),
+};
 
 static inline
 int pidfd_open(pid_t pid, unsigned int flags)
@@ -22,11 +38,11 @@ int pidfd_getfd(int pidfd, int targetfd, unsigned int flags)
 }
 
 static
-void exec_child(const pid_t pid, char *argv[])
+void exec_child(const struct ucred *cred, char *argv[], char *envp[])
 {
 	int fd, i, pid_fd;
 
-	if ((pid_fd = pidfd_open(pid, 0)) < 0) return;
+	if ((pid_fd = pidfd_open(cred->pid, 0)) < 0) return;
 
 	for (i = STDIN_FILENO; i <= STDERR_FILENO; ++i) {
 		if ((fd = pidfd_getfd(pid_fd, i, 0)) < 0) {
@@ -37,24 +53,56 @@ void exec_child(const pid_t pid, char *argv[])
 		close(fd);
 	}
 
+	for (i = 0; envp[i]; ++i) {
+		if (strncmp(envp[i], "PATH=", 5) == 0) {
+			if (setenv("PATH", &envp[i][5], 1) < 0) return;
+			break;
+		}
+	}
+
 	close(pid_fd);
 
-	execvp(argv[0], argv);
+	execvpe(argv[0], argv, envp);
 }
 
-void run_cmd(const pid_t pid, char *buf, const size_t len)
+void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 {
-	static char *argv[32] = {"/usr/local/sbin/pkexec-ask"};
+	static char *envp[128], *safe_envp[(sizeof(allowed) / sizeof(allowed[0])) + 1], *argv[32] = {"/usr/local/sbin/pkexec-ask"};
+	struct passwd *user;
 	pid_t ask, reaped;
-	int argc, status;
+	int envc, safe_envc = 0, argc, status, i, j;
 
-	for (argc = 2, argv[1] = buf; argc < 31; ++argc) {
+	if (!(user = getpwuid(cred->uid))) return;
+
+	for (envc = 1; envp[0] = buf, envc < 127; ++envc) {
+		if (!(envp[envc] = memchr(envp[envc - 1], '\0', len - (envp[envc] - buf)))) break;
+		if (envp[envc] >= &buf[len - 2]) return;
+		++(envp[envc]);
+		if (!strrchr(envp[envc], '=')) break;
+	}
+
+	if (envc == 0) return;
+
+	for (argc = 2, argv[1] = envp[envc]; argc < 31; ++argc) {
 		if (!(argv[argc] = memchr(argv[argc - 1], '\0', len - (argv[argc] - buf)))) break;
-		else if (argv[argc] < &buf[len - 2]) ++(argv[argc]);
+		if (argv[argc] < &buf[len - 2]) ++(argv[argc]);
 		else {
+			envp[envc] = NULL;
 			argv[argc] = NULL;
+
 			if ((ask = fork()) == 0) {
-				execv(argv[0], argv);
+				if (initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0) exit(EXIT_FAILURE);
+
+				for (i = 0; i < envc; ++i) {
+					for (j = 0; j < sizeof(allowed) / sizeof(allowed[0]) && safe_envc < (sizeof(safe_envp) / sizeof(safe_envp[0])) - 1; ++j) {
+						if (strncmp(envp[i], allowed[j].pfix, allowed[j].len) == 0) {
+							safe_envp[safe_envc++] = envp[i];
+							break;
+						}
+					}
+				}
+
+				execve(argv[0], argv, safe_envp);
 				exit(EXIT_FAILURE);
 			} else if (ask > 0) {
 				while ((reaped = waitpid(ask, &status, 0)) != ask) {
@@ -66,28 +114,28 @@ void run_cmd(const pid_t pid, char *buf, const size_t len)
 				if (!WIFEXITED(status) || (WEXITSTATUS(status) != EXIT_SUCCESS))
 					return;
 
-				exec_child(pid, &argv[1]);
+				exec_child(cred, &argv[1], envp);
 			}
+
 			break;
 		}
 	}
 }
 
 static
-void handle(const pid_t pid, const int fd)
+void handle(const struct ucred *cred, const int fd, char *buf, const size_t len)
 {
-	static char buf[1024];
 	ssize_t chunk, total;
 
-	for (total = 0; total < sizeof(buf);) {
-		if ((chunk = recv(fd, &buf[total], sizeof(buf) - total, 0)) < 0) {
+	for (total = 0; total < len;) {
+		if ((chunk = recv(fd, &buf[total], len - total, 0)) < 0) {
 			if (errno == EINTR) continue;
 			break;
 		}
 		else if (chunk == 0) break;
 		total += (size_t)chunk;
 		if (total > 2 && buf[total - 2] == '\0' && buf[total - 1] == '\0') {
-			run_cmd(pid, buf, total);
+			run_cmd(cred, buf, total);
 			break;
 		}
 	}
@@ -95,56 +143,56 @@ void handle(const pid_t pid, const int fd)
 
 int main(int argc, char *argv[])
 {
+	sigset_t set;
+	siginfo_t sig;
 	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/tmp/pkexecd.socket"};
 	struct ucred cred;
-	pid_t pid, reaped;
+	char *buf;
+	pid_t pid;
 	int s, c;
 	socklen_t len = sizeof(cred);
+
+	if (sigemptyset(&set) < 0 || sigaddset(&set, SIGIO) < 0 || sigaddset(&set, SIGCHLD) < 0 || sigaddset(&set, SIGTERM) < 0 || sigprocmask(SIG_SETMASK, &set, NULL) < 0) return EXIT_FAILURE;
+
+	if (!(buf = malloc(REQUEST_MAX))) return EXIT_FAILURE;
 
 	if ((s = socket(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC, 0)) < 0) return EXIT_FAILURE;
 	if (bind(s, (const struct sockaddr *)&sun, sizeof(sun)) < 0) {
 		if (errno != EADDRINUSE || (unlink(sun.sun_path) < 0 && errno != ENOENT) || bind(s, (const struct sockaddr *)&sun, sizeof(sun)) < 0) {
 			close(s);
+			free(buf);
 			return EXIT_FAILURE;
 		}
 	}
-	if (chmod(sun.sun_path, 0766) < 0 || listen(s, 5) < 0) {
+	if (chmod(sun.sun_path, 0766) < 0 || listen(s, 5) < 0 || daemon(1, 0) < 0 || chdir("/tmp") < 0 || fcntl(s, F_SETFL, O_RDWR | O_ASYNC) < 0 || fcntl(s, F_SETOWN, getpid()) < 0) {
 		close(s);
 		unlink(sun.sun_path);
+		free(buf);
 		return EXIT_FAILURE;
 	}
 
-	while (1) {
-		if ((c = accept4(s, NULL, NULL, SOCK_CLOEXEC)) < 0) continue;
-		if ((pid = fork()) == 0) {
-			close(s);
-
-			if (setsid() < 0) goto done;
-			if ((pid = fork()) > 0) {
-				close(c);
-				return EXIT_SUCCESS;
-			}
-			else if (pid < 0) goto done;
-
-			if (getsockopt(c, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0 || len != sizeof(cred)) goto done;
-
-			handle(cred.pid, c);
-
-done:
-			close(c);
-			return EXIT_FAILURE;
-		} else if (pid > 0) {
-			while ((reaped = waitpid(pid, NULL, 0)) != pid) {
-				if (reaped < 0) {
-					if (errno == EINTR) continue;
-					break;
-				}
-			}
-			close(c);
+	while (sigwaitinfo(&set, &sig) > 0) {
+		if (sig.si_signo == SIGCHLD) {
+			waitpid(sig.si_pid, NULL, WNOHANG);
+			continue;
 		}
+
+		if (sig.si_signo != SIGIO) break;
+
+		if ((c = accept4(s, NULL, NULL, 0)) < 0) continue;
+
+		if (getsockopt(c, SOL_SOCKET, SO_PEERCRED, &cred, &len) < 0 || len != sizeof(cred) || ((pid = fork()) > 0)) {
+			close(c);
+			continue;
+		}
+
+		handle(&cred, c, buf, REQUEST_MAX);
+		close(c);
+		return EXIT_SUCCESS;
 	}
 
 	close(s);
 	unlink(sun.sun_path);
+	free(buf);
 	return EXIT_FAILURE;
 }

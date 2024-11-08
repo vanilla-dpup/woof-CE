@@ -3,6 +3,7 @@
 if [ "$1" = "start" ]; then
 	[ -x /etc/init.d/rc.firewall ] && /etc/init.d/rc.firewall start
 	[ -x /etc/init.d/trim ] && /etc/init.d/trim start
+	[ -x /etc/init.d/pkexecd ] && /etc/init.d/pkexecd start
 fi
 
 for S in /etc/rc5.d/*

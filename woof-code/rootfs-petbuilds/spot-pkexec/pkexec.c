@@ -62,6 +62,14 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	for (i = 0; environ[i]; ++i) {
+		len = strlen(environ[i]);
+		if ((len > 0 && sendall(s, environ[i], len) < 0) || sendall(s, "\0", 1) < 0) {
+			close(s);
+			return EXIT_FAILURE;
+		}
+	}
+
 	for (i = 0; i < argc; ++i) {
 		len = strlen(argv[i]);
 		if ((len > 0 && sendall(s, argv[i], len) < 0) || sendall(s, "\0", 1) < 0) {
@@ -69,6 +77,7 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 	}
+
 	if (sendall(s, "\0", 1) < 0) {
 		close(s);
 		return EXIT_FAILURE;
