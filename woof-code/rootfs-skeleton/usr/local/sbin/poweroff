@@ -37,8 +37,6 @@ if [ -n "$DISPLAY" -o -n "$WAYLAND_DISPLAY" ] ; then
 	esac
 fi
 
-/etc/rc.d/rc.shutdown
-
 case $script in
 	poweroff) 
 	
