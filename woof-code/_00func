@@ -15,9 +15,7 @@ function clearenv() {
 		export XDG_DATA_HOME=/root/.local/share
 		export XDG_CONFIG_HOME=/root/.config
 		export HOME=/root
-		export WAYLAND_DISPLAY=
 		export XDG_CACHE_HOME=/root/.cache
-		export DISPLAY=
 		export XDG_STATE_HOME=/root/.local/state
 		export XDG_RUNTIME_DIR=/tmp/runtime-root
 		export LC_ALL=en_US.UTF-8
