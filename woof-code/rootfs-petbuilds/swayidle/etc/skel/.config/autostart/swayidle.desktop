@@ -1,7 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Name=swayidle
-Comment=swayidle
-Exec=swayidle -w
-Terminal=false
-Type=Application

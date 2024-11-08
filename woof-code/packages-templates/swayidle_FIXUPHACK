@@ -1,0 +1,50 @@
+cat << EOF > usr/local/bin/swayidle-config
+#!/bin/sh
+
+interval=\`head -n 1 ~/.config/swayidle/config  | awk '{print \$2}'\`
+if [ "\$interval" = 0 ]; then
+	interval=\`yad --title swayidle-config --window-icon=user-idle-symbolic --entry --entry-label="Idle interval (seconds)" --entry-text=\$interval --button=OK --button=Cancel\`
+else
+	interval=\`yad --title swayidle-config --window-icon=user-idle-symbolic --entry --entry-label="Idle interval (seconds)" --entry-text=\$interval --button=OK --button=Cancel --button=Disable\`
+fi
+case \$? in
+0) sed -i "s/^timeout [0-9]* /timeout \$interval /" ~/.config/swayidle/config ;;
+1) exit ;;
+2) sed -i "s/^timeout [0-9]* /timeout 0 /" ~/.config/swayidle/config ;;
+esac
+
+killall swayidle
+swayidle < /dev/null > /dev/null 2>&1 &
+EOF
+chmod 755 usr/local/bin/swayidle-config
+
+cat << EOF > usr/local/share/applications/swayidle-config.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=Screensaver Settings
+Icon=user-idle-symbolic
+Comment=Configure swayidle
+Exec=swayidle-config
+Terminal=false
+Type=Application
+Categories=Screensaver
+GenericName=swayidle-config
+EOF
+chmod 644 usr/local/share/applications/swayidle-config.desktop
+
+mkdir -p etc/skel/.config/swayidle
+cat << EOF > etc/skel/.config/swayidle/config
+timeout 600 'sh -c "chayang -d 7 && wlopm --off \*"' resume 'sh -c "wlopm --on \*"'
+EOF
+chmod 644 etc/skel/.config/swayidle/config
+
+cat << EOF > etc/skel/.config/autostart/swayidle.desktop
+[Desktop Entry]
+Version=1.0
+Name=swayidle
+Comment=swayidle
+Exec=swayidle -w
+Terminal=false
+Type=Application
+EOF
+chmod 644 etc/skel/.config/autostart/swayidle.desktop
