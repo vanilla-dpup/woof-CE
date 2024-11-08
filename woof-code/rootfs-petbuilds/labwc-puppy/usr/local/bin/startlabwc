@@ -30,8 +30,6 @@ run-as-spot pipewire > /dev/null 2>&1 &
 export PULSE_SERVER=unix:/tmp/runtime-spot/pulse/native
 export PULSE_COOKIE=/home/spot/.config/pulse/cookie
 
-export WLR_XWAYLAND=/usr/local/bin/Xwayland-spot
-
 # hack for virtual machines (see https://github.com/swaywm/sway/issues/5834, https://github.com/swaywm/sway/issues/3814, etc')
 if systemd-detect-virt -vq; then
 	export WLR_RENDERER_ALLOW_SOFTWARE=1

@@ -94,12 +94,10 @@ EOF
 
 	# close all file descriptors except std{in,out,err}, in case one of
 	# them points to a file under /root
-	if [ "$PROG" != "/usr/bin/Xwayland" ]; then
-		for FD in /proc/self/fd/*; do
-			FD="${FD##*/}"
-			[ $FD -gt 2 ] && eval "exec ${FD}<&-"
-		done
-	fi
+	for FD in /proc/self/fd/*; do
+		FD="${FD##*/}"
+		[ $FD -gt 2 ] && eval "exec ${FD}<&-"
+	done
 
 	exec setpriv --reuid=`id -u ${XUSER}` --regid=`id -g ${XUSER}` --init-groups -- /bin/ash -c '
 # try to switch to original directory, unless it is under /root
