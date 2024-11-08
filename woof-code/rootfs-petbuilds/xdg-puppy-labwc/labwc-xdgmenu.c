@@ -170,6 +170,20 @@ void process_entry(GMenuTreeEntry *entry)
                     break;
             }
         }
+        else if (cmd[i] == '@')
+        {
+            if (cmd[i+1] == '@') {
+                    cmd[i] = ' ';
+                    cmd[i+1] = ' ';
+                    i++;
+            }
+            else if (cmd[i+1] == '@' && cmd[i+2] == 'u') {
+                    cmd[i] = ' ';
+                    cmd[i+1] = ' ';
+                    cmd[i+2] = ' ';
+                    i+=2;
+            }
+        }
     }
 
     g_printf("  <item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)));
