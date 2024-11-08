@@ -1,5 +1,5 @@
-mkdir -p root/.config/autostart
-cat << EOF > root/.config/autostart/waybar.desktop
+mkdir -p etc/skel/.config/autostart
+cat << EOF > etc/skel/.config/autostart/waybar.desktop
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
@@ -7,11 +7,11 @@ NoDisplay=true
 Name=waybar
 Exec=waybar
 EOF
-chmod 644 root/.config/autostart/waybar.desktop
+chmod 644 etc/skel/.config/autostart/waybar.desktop
 
-mkdir -p root/.config/waybar/presets/{Horizontal,Vertical}
+mkdir -p etc/skel/.config/waybar/presets/{Horizontal,Vertical}
 
-cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
+cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 // -*- mode: jsonc -*-
 [{
 	"name": "bar1",
@@ -149,7 +149,7 @@ cat << EOF > root/.config/waybar/presets/Horizontal/config.jsonc
 }]
 EOF
 
-cat << EOF > root/.config/waybar/presets/Horizontal/style.css
+cat << EOF > etc/skel/.config/waybar/presets/Horizontal/style.css
 * {
 	font-family: FontAwesome, sans-serif;
 	font-size: 14px;
@@ -193,7 +193,7 @@ button:hover {
 }
 EOF
 
-cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
+cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 // -*- mode: jsonc -*-
 [{
 	"name": "bar1",
@@ -331,7 +331,7 @@ cat << EOF > root/.config/waybar/presets/Vertical/config.jsonc
 }]
 EOF
 
-cat << EOF > root/.config/waybar/presets/Vertical/style.css
+cat << EOF > etc/skel/.config/waybar/presets/Vertical/style.css
 * {
 	font-family: FontAwesome, sans-serif;
 	font-size: 14px;
@@ -400,8 +400,8 @@ done
 EOF
 chmod 755 usr/bin/waybar-config
 
-ln -s presets/Horizontal/config.jsonc root/.config/waybar/config.jsonc
-ln -s presets/Horizontal/style.css root/.config/waybar/style.css
+ln -s presets/Horizontal/config.jsonc etc/skel/.config/waybar/config.jsonc
+ln -s presets/Horizontal/style.css etc/skel/.config/waybar/style.css
 
 cat << EOF > usr/share/applications/waybar-config.desktop
 [Desktop Entry]

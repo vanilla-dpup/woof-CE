@@ -1,5 +1,5 @@
-mkdir -p root/.config/tofi
-cat << EOF > root/.config/tofi/config
+mkdir -p etc/skel/.config/tofi
+cat << EOF > etc/skel/.config/tofi/config
 anchor = top
 width = 100%
 height = 26

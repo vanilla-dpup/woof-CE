@@ -4,5 +4,5 @@ exec lxtask "\$@"' > usr/local/bin/defaultprocessmanager
 chmod 755 usr/local/bin/defaultprocessmanager
 
 echo '[General]
-show_other_tasks=1' > root/.config/lxtask.conf
+show_other_tasks=1' > etc/skel/.config/lxtask.conf
 EOF
