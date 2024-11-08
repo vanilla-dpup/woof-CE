@@ -188,7 +188,7 @@ void process_entry(GMenuTreeEntry *entry)
 
     g_printf("  <item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)));
 
-    escaped = g_markup_escape_text(g_file_test(g_strchomp(cmd), G_FILE_TEST_EXISTS) ? basename(cmd) : cmd, -1);
+    escaped = g_markup_escape_text(cmd, -1);
 
     if (g_desktop_app_info_get_boolean(app, G_KEY_FILE_DESKTOP_KEY_TERMINAL))
     {

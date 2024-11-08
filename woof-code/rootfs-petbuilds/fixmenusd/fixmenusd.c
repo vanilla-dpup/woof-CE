@@ -9,7 +9,6 @@
 #include <signal.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <stdio.h>
 
 static int
 sh(const char *cmd, const sigset_t *set)
@@ -34,30 +33,8 @@ sh(const char *cmd, const sigset_t *set)
 		return -1;
 }
 
-static void
-setup_spot(const int bin, const struct inotify_event *event, const sigset_t *set)
-{
-	static char orig[NAME_MAX + sizeof(".bin")];
-	struct stat stbuf;
-	size_t len;
-	char *cmd;
-
-	len = strlen(event->name);
-	memcpy(orig, event->name, len);
-	memcpy(orig + len, ".bin", sizeof(".bin"));
-
-	if ((fstatat(bin, orig, &stbuf, AT_SYMLINK_NOFOLLOW) == 0) ||
-	    (errno != ENOENT))
-		return;
-
-	if (asprintf(&cmd, "(setup-spot %s=true) &", event->name) < 0)
-		return;
-	sh(cmd, set);
-	free(cmd);
-}
-
 static int
-handle_events(const int fd, const int appwd, const int flatpakappwd, const int flatpakwd, const int flatpakbin, const sigset_t *set)
+handle_events(const int fd, const int appwd, const int flatpakappwd, const sigset_t *set)
 {
 	char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
 	const struct inotify_event *event;
@@ -76,9 +53,7 @@ handle_events(const int fd, const int appwd, const int flatpakappwd, const int f
 		for (event = (const struct inotify_event *)buf;
 		     (char *)event < (buf + out);
 		     event = (const struct inotify_event *)((char *)event + sizeof(*event) + event->len)) {
-			if (event->wd == flatpakwd)
-				setup_spot(flatpakbin, event, set);
-			else if ((event->wd != appwd) && (event->wd != flatpakappwd))
+			if ((event->wd != appwd) && (event->wd != flatpakappwd))
 				continue;
 
 			if (!(event->mask & (IN_DELETE | IN_CLOSE_WRITE | IN_MOVED_TO)))
@@ -100,7 +75,7 @@ int
 main(int argc, char* argv[])
 {
 	sigset_t set, oset;
-	int fd, appwd, flatpakappwd, flatpakwd, flatpakbin = -1, sig;
+	int fd, appwd, flatpakappwd, sig;
 
 	if (argc != 2)
 		return EXIT_FAILURE;
@@ -127,24 +102,9 @@ main(int argc, char* argv[])
 
 	flatpakappwd = inotify_add_watch(fd, "/var/lib/flatpak/exports/share/applications", IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_EXCL_UNLINK);
 
-	flatpakwd = inotify_add_watch(fd, "/var/lib/flatpak/exports/bin", IN_CREATE | IN_CREATE | IN_MOVED_TO | IN_EXCL_UNLINK);
-
-	if (flatpakwd != -1) {
-		flatpakbin = open("/var/lib/flatpak/exports/bin", O_DIRECTORY | O_RDONLY);
-		if (flatpakbin < 0) {
-			inotify_rm_watch(fd, flatpakwd);
-			inotify_rm_watch(fd, flatpakappwd);
-			inotify_rm_watch(fd, appwd);
-			close(fd);
-			return EXIT_FAILURE;
-		}
-	}
-
 	if ((fcntl(fd, F_SETFL, O_NONBLOCK | O_ASYNC) < 0) ||
 	    (fcntl(fd, F_SETSIG, SIGRTMIN) < 0) ||
 	    (fcntl(fd, F_SETOWN, getpid()) < 0)) {
-		close(flatpakbin);
-		inotify_rm_watch(fd, flatpakwd);
 		inotify_rm_watch(fd, flatpakappwd);
 		inotify_rm_watch(fd, appwd);
 		close(fd);
@@ -153,13 +113,11 @@ main(int argc, char* argv[])
 
 	while ((sigwait(&set, &sig) == 0) &&
 	       (((sig == SIGRTMIN) &&
-	         (handle_events(fd, appwd, flatpakappwd, flatpakwd, flatpakbin, &oset) == 0)) ||
+	         (handle_events(fd, appwd, flatpakappwd, &oset) == 0)) ||
 	        ((sig == SIGALRM) &&
 	         (sh(argv[1], &oset) == 0)) ||
 	        (sig == SIGCHLD)));
 
-	close(flatpakbin);
-	inotify_rm_watch(fd, flatpakwd);
 	inotify_rm_watch(fd, flatpakappwd);
 	inotify_rm_watch(fd, appwd);
 	close(fd);

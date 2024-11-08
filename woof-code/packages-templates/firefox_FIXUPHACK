@@ -74,8 +74,6 @@ pref("general.config.filename", "puppy.cfg");
 EOF
 
 (
-echo "[ -e usr/bin/firefox ] && chroot . setup-spot firefox=true"
-echo "[ -e usr/bin/firefox-esr ] && chroot . setup-spot firefox-esr=true"
 echo "echo MOZ_ENABLE_WAYLAND=1 >> etc/environment"
 echo 'echo "setting up Firefox"'
 ) > pinstall.sh

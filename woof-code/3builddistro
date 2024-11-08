@@ -56,7 +56,6 @@ cat << EOF >> rootfs-complete/etc/apt/apt.conf.d/00puppy
 # https://github.com/debuerreotype/debuerreotype/blob/6952be0a084e834bd25aa623c94f6ad342899b55/scripts/debuerreotype-minimizing-config#L88
 DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
 APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb || true"; };
-DPkg::Post-Invoke { "/usr/local/sbin/auto-setup-spot"; };
 EOF
 chmod 644 rootfs-complete/etc/apt/apt.conf.d/00puppy
 

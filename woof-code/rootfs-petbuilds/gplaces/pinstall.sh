@@ -1,1 +1,0 @@
-chroot . setup-spot gplaces=true
