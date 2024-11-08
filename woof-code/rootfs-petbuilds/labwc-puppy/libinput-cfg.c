@@ -18,14 +18,16 @@ static int left_handed = 0;
 __attribute__((constructor))
 static void init(void)
 {
-	static char line[256];
+	static char path[256], line[256];
+	const char *home;
 	FILE *fp;
-	int val;
+	int len, val;
 	float fval;
 
 	unsetenv("LD_PRELOAD");
 
-	if ((fp = fopen("/root/.libinputrc", "r"))) {
+	if (!(home = getenv("HOME"))) home = "/root";
+	if ((len = snprintf(path, sizeof(path), "%s/.libinputrc", home)) > 0 && len < sizeof(path) && (fp = fopen(path, "r"))) {
 		while (fgets(line, sizeof(line), fp)) {
 			if (sscanf(line, "LIBINPUT_DEFAULT_TAP=%d", &val) == 1) {
 				tap = val > 0 ? LIBINPUT_CONFIG_TAP_ENABLED : LIBINPUT_CONFIG_TAP_DISABLED;
