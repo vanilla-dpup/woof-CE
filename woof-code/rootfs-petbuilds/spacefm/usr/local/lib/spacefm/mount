@@ -2,6 +2,7 @@
 
 NAME="${1#/dev/}"
 [ -z "$NAME" ] && exit 1
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
 mkdir -p "/mnt/$NAME" || exit 1
 mount "$1" "/mnt/$NAME"
 if [ $? -ne 0 ]; then

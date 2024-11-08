@@ -2,5 +2,6 @@
 
 NAME="${1#/dev/}"
 test -n "$NAME"
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
 umount -l "/mnt/$NAME"
 rmdir "/mnt/$NAME"
