@@ -1,3 +1,0 @@
-#!/bin/ash
-
-exec swaylock -F -f -c "#000000"

@@ -120,7 +120,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 /* commands */
 static const char *termcmd[] = { "defaultterminal", NULL };
 static const char *runcmd[] = { "defaultrun", NULL };
-static const char *lockcmd[] = { "puplock", NULL };
+static const char *lockcmd[] = { "swaylock", NULL };
 static const char *menucmd[] = { "tofi-exec", NULL };
 static const char *brightnessupcmd[] = { "brightnessctl", "set", "+10%", NULL };
 static const char *brightnessdowncmd[] = { "brightnessctl", "set", "10%-", NULL };
