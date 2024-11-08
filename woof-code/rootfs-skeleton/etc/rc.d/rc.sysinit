@@ -72,6 +72,7 @@ loadswap_func() { #w481 made into a function.
  ret=$?
  status_func $ret
  if [ $ret -eq 0 ] ; then
+   echo 1 > /proc/sys/vm/page-cluster
    SWAPON="yes"
  fi
  #load a swap partition...
@@ -84,7 +85,10 @@ loadswap_func() { #w481 made into a function.
   status_func $?
   [ $? -eq 0 ] && SWAPON="yes"
  done < <(lsblk -bnro fstype,name,size | grep ^swap)
- [ "$SWAPON" = "yes" ] && return
+ if [ "$SWAPON" = "yes" ] ; then
+  echo 3 > /proc/sys/vm/page-cluster
+  return
+ fi
  #if no go, try for a swap file...
  if [ -f /initrd${PUP_HOME}/pupswap.swp ] ; then
    SWAPFILE="/initrd${PUP_HOME}/pupswap.swp"
@@ -98,6 +102,7 @@ loadswap_func() { #w481 made into a function.
   swapon ${SWAPFILE} ; ret=$? ; status_func $ret
   if [ $ret -eq 0 ] ; then
     [ "$SWAPSIZEBYTES" ] && EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
+    echo 3 > /proc/sys/vm/page-cluster
     SWAPON="yes"
   fi
  fi
