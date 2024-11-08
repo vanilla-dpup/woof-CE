@@ -1,0 +1,22 @@
+mkdir -p etc/skel/.config/swaylock
+cat << EOF > etc/skel/.config/swaylock/config
+show-failed-attempts
+daemonize
+color=#000000
+EOF
+chmod 644 etc/skel/.config/swaylock/config
+
+cat << EOF > usr/local/share/applications/swaylock.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=swaylock
+Icon=system-lock-screen-symbolic
+Comment=Lock screen
+Comment[fr]= Verrou d'écran
+Exec=swaylock
+Terminal=false
+Type=Application
+Categories=Security
+GenericName=Screen locker
+EOF
+chmod 644 usr/local/share/applications/swaylock.desktop

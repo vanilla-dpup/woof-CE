@@ -98,7 +98,7 @@ yes|scdoc|scdoc|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|seatd|seatd|exe,dev,doc,nls||deps:yes
 yes|slurp|slurp|exe,dev,doc,nls||deps:yes
 no|swayidle|swayidle|exe,dev,doc,nls||deps:yes # using swayidle petbuild without logind support
-no|swaylock|swaylock|exe,dev,doc,nls||deps: yes # using swaylock petbuild with root patch
+yes|swaylock|swaylock|exe,dev,doc,nls||deps:yes
 yes|wdisplays|wdisplays|exe,dev,doc,nls||deps:yes
 yes|wlopm|wlopm|exe,dev,doc,nls||deps:yes
 yes|wl-clipboard|wl-clipboard|exe,dev,doc,nls||deps:yes
