@@ -32,12 +32,12 @@ RETVAL=$?
 if [ "$xMAKE_ANSWER" != "" ]; then
   
  if [ $RETVAL -eq 0 ]; then
-  echo "RAMDISK_SAVE_SESSION=y" > /tmp/session_ramdisk_result
+  echo y > /tmp/session_ramdisk_result
  elif [ $RETVAL -eq 252 ]; then
   rm -f /tmp/session_ramdisk_result 2>/dev/null
   exit 255
  else
-  echo "RAMDISK_SAVE_SESSION=n" > /tmp/session_ramdisk_result
+  echo n > /tmp/session_ramdisk_result
  fi
  
 else

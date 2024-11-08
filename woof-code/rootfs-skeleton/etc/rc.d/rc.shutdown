@@ -96,10 +96,7 @@ case $PUPMODE in
  13)
   #read a file named /tmp/session_ramdisk_result, the answer file whether save the ramdisk session to savefile or not
   #It contains variable RAMDISK_SAVE_SESSION where the values are 'y' or 'n'
-  RAMDISK_SAVE_SESSION=
-  if [ -s /tmp/session_ramdisk_result ]; then
-   . /tmp/session_ramdisk_result
-  fi
+  RAMDISK_SAVE_SESSION="`cat /tmp/session_ramdisk_result 2>/dev/null`"
   if [ "$RAMDISK_SAVE_SESSION" == "" ]; then
    asktosave_session >/dev/console
    retval=$?
