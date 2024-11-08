@@ -2,6 +2,6 @@
 Version=1.0
 Name=yambar
 Comment=yambar
-Exec=yambar
+Exec=yambar -d none -s
 Terminal=false
 Type=Application
