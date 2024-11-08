@@ -15,11 +15,7 @@ case "$(awk '{print $2}' /proc/acpi/button/lid/LID*/state | head -n 1)" in
 #   suspend and let the screen locker take care of turning off the internal display while locked
 closed)
   if [ -n "`comm -12 <(grep -l '^connected$' /sys/class/drm/*/status | cut -f 5 -d / | sort) <(grep -l '^enabled$' /sys/class/drm/*/enabled | cut -f 5 -d / | sort) | grep -Fv -e eDP -e LVDS`" ]; then
-    if [ -n "$WAYLAND_DISPLAY" ]; then
-      wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
-    elif [ -n "$DISPLAY" ]; then
-      xrandr --output "`xrandr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
-    fi
+    WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
     touch /tmp/.lid-closed
     DISABLE_SUSPEND=y
   fi
@@ -29,12 +25,8 @@ closed)
 # (we must do this because we don't know if the laptop was supended while connected to an external monitor)
 open)
   if [ -f /tmp/.lid-closed ]; then
-    if [ -n "$WAYLAND_DISPLAY" ]; then
-      wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
-      killall -HUP kanshi
-    elif [ -n "$DISPLAY" ]; then
-      xrandr --output "`xrandr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --auto
-    fi
+    WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
+    killall -HUP kanshi
     rm -f /tmp/.lid-closed
   fi
   DISABLE_SUSPEND=y
@@ -78,19 +70,7 @@ sync
 [ "$DISTRO_TARGETARCH" = "x86" ] && rmmod ehci_hcd
 
 #suspend
-case "$DISABLE_LOCK" in
-y*|Y*|true|True|TRUE|1) echo -n mem > /sys/power/state ;;
-*)
-  if [ -n "$WAYLAND_DISPLAY" ]; then
-    puplock
-    echo mem > /sys/power/state
-  elif [ -n "$DISPLAY" -a -z "`pidof -s xlock`" ]; then
-    xlock -startCmd "echo mem > /sys/power/state"
-  else
-    echo -n mem > /sys/power/state
-  fi
-  ;;
-esac
+echo -n mem > /sys/power/state
 
 # process at recovery from suspend
 #restartwm
