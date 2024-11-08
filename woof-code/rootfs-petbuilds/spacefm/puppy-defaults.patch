@@ -285,7 +285,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.h 
  
  static const char* gsu_commands[] = // order and contents must match prefdlg.ui
  {
-+    "/usr/bin/pkexec",
++    "/usr/local/bin/pkexec",
      "/usr/bin/gksu",
      "/usr/bin/gksudo",
      "/usr/bin/gnomesu",
