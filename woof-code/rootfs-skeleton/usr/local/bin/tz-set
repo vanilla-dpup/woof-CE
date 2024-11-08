@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ -n "$1" ]; then
+	echo "$1" > /etc/timezone
+	ln -fs "/usr/share/zoneinfo/$1" /etc/localtime
+	exit
+fi
+
 TZ_CB=
 while read TZ; do
 	if [ -z "$TZ_CB" ]; then
@@ -12,5 +18,4 @@ done < <(ls -d /usr/share/zoneinfo/*/* | sort)
 TZ=`yad --title=tz-set --height=480 --width=240 --list --column=:TEXT --no-headers --separator= ${TZ_CB}`
 [ $? -ne 0 ] && exit
 
-echo ${TZ} > /etc/timezone
-ln -fs /usr/share/zoneinfo/${TZ} /etc/localtime
+exec pkexec "$0" "$TZ"

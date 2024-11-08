@@ -5,6 +5,8 @@ export TEXTDOMAIN=pupsave
 . /etc/DISTRO_SPECS
 . /etc/rc.d/PUPSTATE
 
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+
 PSAVEPARTUUID=
 PSUBDIR=
 for ARG in `cat /proc/cmdline`; do

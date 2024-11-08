@@ -65,9 +65,9 @@ Start blocking known advertisnig servers.')":LBL "" \
 Stop blocking known advertising servers.')":LBL "" \
       --field "$(gettext '<b>Update list</b>
 Download the latest list of known advertising servers.')":LBL "" \
-      --field \!gtk-yes:FBTN "$0 start" \
-      --field \!gtk-no:FBTN "$0 stop" \
-      --field \!gtk-refresh:FBTN "$0 update" \
+      --field \!gtk-yes:FBTN "pkexec $0 start" \
+      --field \!gtk-no:FBTN "pkexec $0 stop" \
+      --field \!gtk-refresh:FBTN "pkexec $0 update" \
       --button=gtk-help \
       --button=gtk-quit \
       --use-interp

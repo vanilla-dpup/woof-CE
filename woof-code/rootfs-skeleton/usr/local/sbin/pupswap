@@ -37,6 +37,8 @@ free_mb() {
 #                      MAIN
 #===============================================================
 
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+
 case $1 in
 	guihelp)
 		PUPSWAP_HELP_1="$(gettext "As well as the swap partition, Linux also supports a swap file that you can create, prepare, and mount in a fashion similar to that of a swap partition. The advantage of swap files is that you don't need to find an empty partition or repartition a disk to add additional swap space.")"

@@ -1,7 +1,12 @@
 #!/bin/sh
 
-HOSTNAME=`yad --title=hostname-set --entry`
+if [ -n "$1" ]; then
+	echo "$1" > /etc/hostname
+	hostname -F /etc/hostname
+	exit
+fi
+
+HOSTNAME=`yad --title=hostname-set --entry --entry-text=$(hostname)`
 [ -z "$HOSTNAME" ] && exit 1
 
-echo "$HOSTNAME" > /etc/hostname
-hostname -F /etc/hostname
+exec pkexec "$0" "$HOSTNAME"

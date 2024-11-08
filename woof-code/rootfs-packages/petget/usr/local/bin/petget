@@ -42,6 +42,8 @@ if [ "`head -c -32 "$1" | md5sum | cut -f 1 -d ' '`" != "`tail -c 32 "$1"`" ]; t
 	exit 1
 fi
 
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+
 yad --title petget --window-icon=gtk-preferences --button=gtk-yes --button=gtk-no --text="Install ${1##*/}?" || exit
 
 yad --image=package-x-generic-symbolic --layer=overlay --edge=top --text="Installing ${1##*/}" --no-buttons --no-focus &

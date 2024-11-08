@@ -33,6 +33,8 @@ do
 	shift
 done
 
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+
 # wait until other instances are done, otherwise we can't list files added by each SFS
 exec 9<>/run/sfs_load.lock
 flock 9

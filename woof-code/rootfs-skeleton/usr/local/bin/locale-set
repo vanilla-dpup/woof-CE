@@ -1,5 +1,20 @@
 #!/bin/bash
 
+if [ -n "$1" ]; then
+	yad --image=dialog-information --layer=overlay --edge=top --text="Setting locale to $1" --no-buttons --no-focus &
+	PID=$!
+
+	sed -i 's/^[^#]/# &/g' /etc/locale.gen
+	ELOCALE="${1/./\\.}"
+	sed -i "s~^# ${ELOCALE}\$~$1~" /etc/locale.gen
+	locale-gen
+	update-locale "LANG=${1% *}"
+
+	kill $PID
+
+	exit
+fi
+
 LOCALE_CB=
 while read LOCALE; do
 	LOCALE_CB="${LOCALE_CB} ${LOCALE}"
@@ -8,15 +23,4 @@ done < /usr/share/i18n/SUPPORTED
 LOCALE=`yad --title=locale-set --height=480 --width=240 --list --column=:TEXT --column=:TEXT --hide-column=2 --no-headers --separator=' ' ${LOCALE_CB}`
 [ $? -ne 0 ] && exit 1
 
-LOCALE="${LOCALE% }"
-
-yad --image=dialog-information --layer=overlay --edge=top --text="Setting locale to ${LOCALE}" --no-buttons --no-focus &
-PID=$!
-
-sed -i 's/^[^#]/# &/g' /etc/locale.gen
-ELOCALE="${LOCALE/./\\.}"
-sed -i "s~^# ${ELOCALE}\$~${LOCALE}~" /etc/locale.gen
-locale-gen
-update-locale "LANG=${LOCALE% *}"
-
-kill $PID
+exec pkexec "$0" "${LOCALE% }"

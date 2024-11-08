@@ -1,5 +1,7 @@
 #!/bin/bash
 
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+
 DIALOG="yad --title=services-config --height=360 --width=240 --list --column=Enabled:CHK --column=Name:TEXT --print-all"
 
 for SCRIPT in /etc/init.d/*; do
