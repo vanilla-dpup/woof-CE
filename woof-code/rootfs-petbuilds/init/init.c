@@ -177,7 +177,9 @@ int main(int argc, char *argv[])
 	siginfo_t sig = {.si_signo = SIGUSR2};
 	int status, ret, login = 1;
 
-	if (getpid() != 1) return EXIT_FAILURE;
+	if (argc == 2 && strcmp(argv[1], "reboot") == 0) return kill(1, SIGTERM) < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
+	else if (argc == 2 && strcmp(argv[1], "poweroff") == 0) return kill(1, SIGUSR2) < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
+	else if (argc != 1 || getpid() != 1) return EXIT_FAILURE;
 
 	write(STDOUT_FILENO, CLEAR_TTY, sizeof(CLEAR_TTY) - 1);
 

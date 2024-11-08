@@ -43,16 +43,16 @@ case $script in
 	poweroff) 
 	
 	 if [ $can_shutdown -eq 1 ]; then
-	  /bin/busybox poweroff
+	  /usr/local/sbin/init poweroff
 	 else
 	  clear > /dev/console
 	  dialog --ok-label "Restart" --msgbox "IT'S NOW SAFE TO TURN OFF YOUR COMPUTER" 5 43
-	  /bin/busybox reboot
+	  /usr/local/sbin/init reboot
 	 fi
 	
 	;;
 	
-	reboot) /bin/busybox reboot ;;
+	reboot) /usr/local/sbin/init reboot ;;
 esac
 
 ### END ###
