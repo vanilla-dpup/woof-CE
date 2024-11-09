@@ -9,6 +9,6 @@ esac
 
 sed -e 's/^# BackgroundScanning =.*/BackgroundScanning = false/' \
     -e 's/^# FallbackTimeservers =.*/FallbackTimeservers = pool.ntp.org/' \
-    -e 's/^# EnableOnlineCheck =.*/EnableOnlineCheck = false/' \
+    -e 's/^# OnlineCheckMode =.*/OnlineCheckMode = none/' \
     -e 's/^# AllowHostnameUpdates =.*/AllowHostnameUpdates = false/' \
     -i etc/connman/main.conf
