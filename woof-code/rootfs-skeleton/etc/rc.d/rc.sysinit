@@ -82,13 +82,13 @@ loadswap_func() { #w481 made into a function.
   echo -n "Loading swap partition ${ONESWAP}..." >/dev/console #loading swap partition
   chmod 600 $ONESWAP
   swapon $ONESWAP
-  status_func $?
-  [ $? -eq 0 ] && SWAPON="yes"
- done < <(lsblk -bnro fstype,name,size | grep ^swap)
- if [ "$SWAPON" = "yes" ] ; then
+  ret=$?
+  status_func $ret
+  [ $ret -eq 0 ] || continue
   echo 3 > /proc/sys/vm/page-cluster
+  SWAPON="yes"
   return
- fi
+ done < <(lsblk -bnro fstype,name,size | grep ^swap)
  #if no go, try for a swap file...
  if [ -f /initrd${PUP_HOME}/pupswap.swp ] ; then
    SWAPFILE="/initrd${PUP_HOME}/pupswap.swp"
