@@ -113,15 +113,6 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
      set->line = g_strdup( "#gui-pan" );
  
      set = xset_set( "main_focus_panel", "lbl", _("F_ocus") );
-@@ -11581,7 +11579,7 @@ void xset_defaults()
-     set->menu_style = XSET_MENU_SUBMENU;
- 
-     set = xset_get( "root_bar" );  // in Preferences
--    set->b = XSET_B_TRUE;
-+    set->b = XSET_B_FALSE;
- 
-     set = xset_set( "view_thumb", "lbl", _("_Thumbnails (global)") );  // in View|Panel View|Style
-     set->menu_style = XSET_MENU_CHECK;
 @@ -12591,7 +12589,6 @@ void xset_defaults()
  
          set = xset_set_panel( p, "list_detailed", "lbl", _("_Detailed") );
