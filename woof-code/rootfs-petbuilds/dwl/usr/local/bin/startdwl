@@ -1,23 +1,9 @@
 #!/bin/ash
 
+[ -z "$DBUS_SESSION_BUS_ADDRESS" ] && exec dbus-run-session "$0" "$@"
+
 export TEXTDOMAIN=xwin
 export OUTPUT_CHARSET=UTF-8
-
-cleanup() {
-	. /tmp/.session-bus
-	kill $DBUS_SESSION_BUS_PID 2>/dev/null
-}
-trap cleanup EXIT
-
-(
-	read DBUS_SESSION_BUS_ADDRESS
-	read DBUS_SESSION_BUS_PID
-	echo "DBUS_SESSION_BUS_PID=$DBUS_SESSION_BUS_PID
-DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS" > /tmp/.session-bus
-) < <(dbus-daemon --fork --print-address 1 --print-pid 1 --session)
-
-. /tmp/.session-bus
-export DBUS_SESSION_BUS_ADDRESS DBUS_SESSION_BUS_PID
 
 # TODO: check why they don't terminate after the session bus is terminated
 killall pipewire pipewire-pulse wireplumber 2>/dev/null
