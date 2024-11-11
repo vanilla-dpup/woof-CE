@@ -1,6 +1,8 @@
 #!/bin/bash
 # requires /usr/sbin/pdsk
 
+[ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+
 export TEXTDOMAIN=bootflash
 export OUTPUT_CHARSET=UTF-8
 

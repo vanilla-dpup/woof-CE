@@ -17,8 +17,8 @@ exec yad \
     --columns=2 \
     --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN "kill \$YAD_PID; wmreboot" \
     --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN "kill \$YAD_PID; wmpoweroff" \
-    --field "$(gettext 'Save changes')"\!document-save-symbolic:FBTN "kill \$YAD_PID; pkexec save2flash" \
-    --field "$(gettext 'Install Puppy')"\!media-flash-symbolic:FBTN "kill \$YAD_PID; pkexec bootflash" \
+    --field "$(gettext 'Save changes')"\!document-save-symbolic:FBTN "kill \$YAD_PID; save2flash" \
+    --field "$(gettext 'Install Puppy')"\!media-flash-symbolic:FBTN "kill \$YAD_PID; bootflash" \
     --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN "kill \$YAD_PID; restartwm" \
     --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN "kill \$YAD_PID; wmexit" \
     --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "kill \$YAD_PID; fixmenus; killall -HUP labwc" \
