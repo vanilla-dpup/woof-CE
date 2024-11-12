@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <pwd.h>
 #include <grp.h>
+#include <linux/prctl.h>
+#include <sys/prctl.h>
 #include <fcntl.h>
 #include <sys/wait.h>
 
@@ -91,7 +93,7 @@ void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 			argv[argc] = NULL;
 
 			if ((ask = fork()) == 0) {
-				if (initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0) exit(EXIT_FAILURE);
+				if (initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0 || prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) exit(EXIT_FAILURE);
 
 				for (i = 0; i < envc; ++i) {
 					for (j = 0; j < sizeof(allowed) / sizeof(allowed[0]) && safe_envc < (sizeof(safe_envp) / sizeof(safe_envp[0])) - 1; ++j) {
