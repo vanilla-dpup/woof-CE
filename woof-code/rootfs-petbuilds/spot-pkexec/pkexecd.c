@@ -40,20 +40,36 @@ int pidfd_getfd(int pidfd, int targetfd, unsigned int flags)
 }
 
 static
-void exec_child(const struct ucred *cred, char *argv[], char *envp[])
+int borrow_pipes(const pid_t pid)
 {
 	int fd, i, pid_fd;
 
-	if ((pid_fd = pidfd_open(cred->pid, 0)) < 0) return;
+	if ((pid_fd = pidfd_open(pid, 0)) < 0) return -1;
 
 	for (i = STDIN_FILENO; i <= STDERR_FILENO; ++i) {
 		if ((fd = pidfd_getfd(pid_fd, i, 0)) < 0) {
-			if (errno != ESRCH) return;
+			if (errno != ESRCH) {
+				close(pid_fd);
+				return -1;
+			}
 			continue;
 		}
-		if (dup2(fd, i) != i) return;
+		if (dup2(fd, i) != i) {
+			close(fd);
+			close(pid_fd);
+			return -1;
+		}
 		close(fd);
 	}
+
+	close(pid_fd);
+	return 0;
+}
+
+static
+void exec_child(const struct ucred *cred, char *argv[], char *envp[])
+{
+	int i;
 
 	for (i = 0; envp[i]; ++i) {
 		if (strncmp(envp[i], "PATH=", 5) == 0) {
@@ -62,8 +78,6 @@ void exec_child(const struct ucred *cred, char *argv[], char *envp[])
 		}
 	}
 
-	close(pid_fd);
-
 	execvpe(argv[0], argv, envp);
 }
 
@@ -71,6 +85,7 @@ void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 {
 	static char *envp[128], *safe_envp[(sizeof(allowed) / sizeof(allowed[0])) + 1], *argv[32] = {"/usr/local/sbin/pkexec-ask"};
 	struct passwd *user;
+	char c;
 	pid_t ask, reaped;
 	int envc, safe_envc = 0, argc, status, i, j;
 
@@ -91,6 +106,21 @@ void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 		else {
 			envp[envc] = NULL;
 			argv[argc] = NULL;
+
+			if (borrow_pipes(cred->pid) < 0) return;
+
+			if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO)) {
+				write(STDOUT_FILENO, "Run ", 4);
+				write(STDOUT_FILENO, argv[1], strlen(argv[1]));
+				for (i = 2; i < argc; ++i) {
+					write(STDOUT_FILENO, " ", 1);
+					write(STDOUT_FILENO, argv[i], strlen(argv[i]));
+				}
+				write(STDOUT_FILENO, " as root? (y/n) ", 16);
+				if (read(STDIN_FILENO, &c, 1) < 1) return;
+				if (c == 'y' || c == 'Y') exec_child(cred, &argv[1], envp);
+				return;
+			}
 
 			if ((ask = fork()) == 0) {
 				if (initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0 || prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) exit(EXIT_FAILURE);
