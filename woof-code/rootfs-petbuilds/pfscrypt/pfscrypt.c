@@ -6,6 +6,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+#include <sys/mman.h>
 
 #include <linux/fscrypt.h>
 
@@ -18,24 +19,40 @@
 #define KEY_SIZE 32
 
 #define HIDE_KEY "\e[33m\e[43m"
-#define RESET_TTY "\e[0m"
+#define RESET_TTY "\e[0m\e[K"
 
 static int read_pwd(unsigned char key[KEY_SIZE])
 {
-    unsigned char buf[32];
+    long page;
+    char *buf;
     size_t len;
 
-    for (len = 0; len < sizeof(buf); ++len) {
-        if (read(STDIN_FILENO, &buf[len], sizeof(buf[len]) ) != 1)
+    if ((page = sysconf(_SC_PAGESIZE)) <= 1 || (buf = mmap(NULL, page, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)) == MAP_FAILED) return 0;
+
+    if (mlock(buf, page) < 0) {
+        munmap(buf, page);
+        return 0;
+    }
+
+    for (len = 0; len < page; ++len) {
+        if (read(STDIN_FILENO, &buf[len], sizeof(buf[len])) != 1) {
+            explicit_bzero(buf, len);
+            munmap(buf, page);
             return 0;
+        }
 
         if (buf[len] == '\n')
             break;
     }
 
-    if (argon2i_hash_raw(T_COST, M_COST, THREADS, buf, len, SALT, sizeof(SALT) - 1, key, KEY_SIZE) != ARGON2_OK)
+    if (argon2i_hash_raw(T_COST, M_COST, THREADS, buf, len, SALT, sizeof(SALT) - 1, key, KEY_SIZE) != ARGON2_OK) {
+        explicit_bzero(buf, len);
+        munmap(buf, page);
         return 0;
+    }
 
+    explicit_bzero(buf, len);
+    munmap(buf, page);
     return 1;
 }
 
@@ -130,7 +147,7 @@ int main(int argc, char *argv[])
         more = 0;
         for (i = 3; i < argc; ++i) {
             if (unlocked & (1 << (i - 3)))
-		continue;
+                continue;
 
             res = set_policy(root, argv[i], &policy);
             if (res == EEXIST) {

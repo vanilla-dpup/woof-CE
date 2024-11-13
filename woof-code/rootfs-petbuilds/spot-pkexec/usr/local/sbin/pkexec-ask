@@ -1,2 +1,10 @@
 #!/bin/bash
-exec yad --layer=overlay --text-info --width=360 --height=120 --wrap --title pkexec --window-icon=dialog-password --image=dialog-password --text "Run command as root?" --button="gtk-no:1" --button="gtk-yes:0" --response=1 <<< "$@"
+CMD="$@"
+
+if [ -t 0 -a -t 1 ]; then
+	echo "Run $CMD as root?"
+	pkexec-auth
+	exit $?
+fi
+
+exec x-terminal-emulator --title pkexec -e sh -c "echo \"Run $CMD as root?\"; pkexec-auth"

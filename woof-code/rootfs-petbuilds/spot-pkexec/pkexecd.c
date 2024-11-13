@@ -85,7 +85,6 @@ void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 {
 	static char *envp[128], *safe_envp[(sizeof(allowed) / sizeof(allowed[0])) + 1], *argv[32] = {"/usr/local/sbin/pkexec-ask"};
 	struct passwd *user;
-	char c;
 	pid_t ask, reaped;
 	int envc, safe_envc = 0, argc, status, i, j;
 
@@ -108,19 +107,6 @@ void run_cmd(const struct ucred *cred, char *buf, const size_t len)
 			argv[argc] = NULL;
 
 			if (borrow_pipes(cred->pid) < 0) return;
-
-			if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO)) {
-				write(STDOUT_FILENO, "Run ", 4);
-				write(STDOUT_FILENO, argv[1], strlen(argv[1]));
-				for (i = 2; i < argc; ++i) {
-					write(STDOUT_FILENO, " ", 1);
-					write(STDOUT_FILENO, argv[i], strlen(argv[i]));
-				}
-				write(STDOUT_FILENO, " as root? (y/n) ", 16);
-				if (read(STDIN_FILENO, &c, 1) < 1) return;
-				if (c == 'y' || c == 'Y') exec_child(cred, &argv[1], envp);
-				return;
-			}
 
 			if ((ask = fork()) == 0) {
 				if (initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0 || prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) < 0) exit(EXIT_FAILURE);
