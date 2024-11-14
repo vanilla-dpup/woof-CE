@@ -91,6 +91,7 @@ fi
 
 PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|brightnessctl|brightnessctl|exe,dev,doc,nls||deps:yes
+yes|foot|foot|exe,dev,doc,nls||deps:yes
 yes|grim|grim|exe,dev,doc,nls||deps:yes
 yes|gsimplecal|gsimplecal|exe,dev,doc,nls||deps:yes
 yes|kanshi|kanshi|exe,dev,doc,nls||deps:yes
@@ -110,7 +111,6 @@ yes|xwayland|xwayland,xauth|exe,dev>exe,doc,nls||deps:yes
 
 if [ "$DISTRO_VARIANT" = "dwl" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|foot|foot|exe,dev,doc,nls||deps:yes
 yes|tofi|tofi|exe,dev,doc,nls||deps:yes
 yes|wlroots|libwlroots-dev|exe,dev,doc,nls||deps:yes
 yes|yambar|yambar,fonts-font-awesome|exe,dev,doc,nls||deps:yes
@@ -120,7 +120,6 @@ else
 yes|labwc|labwc|exe,dev,doc,nls||deps:yes
 yes|libgnome-menu|libgnome-menu-3-dev|exe,dev,doc,nls||deps:yes # dependency of xdg-puppy-labwc
 yes|libinput-dev|libinput-dev|exe,dev,doc,nls||deps:yes # dependency of labwc-puppy
-yes|lxterminal|lxterminal|exe,dev,doc,nls||deps:yes
 yes|swaybg|swaybg|exe,dev,doc,nls||deps:yes
 yes|waybar|waybar,fonts-font-awesome|exe,dev,doc,nls||deps:yes
 "

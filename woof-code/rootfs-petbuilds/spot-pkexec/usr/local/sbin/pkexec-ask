@@ -7,4 +7,4 @@ if [ -t 0 -a -t 1 ]; then
 	exit $?
 fi
 
-exec x-terminal-emulator --title pkexec -e sh -c "echo \"Run $CMD as root?\"; pkexec-auth"
+exec foot --title pkexec -e sh -c "echo \"Run $CMD as root?\"; pkexec-auth"
