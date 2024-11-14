@@ -1,5 +1,0 @@
-cat << EOF > pinstall.sh
-echo '#!/bin/sh
-exec transmission-gtk "\$@"' > usr/local/bin/defaulttorrent
-chmod 755 usr/local/bin/defaulttorrent
-EOF

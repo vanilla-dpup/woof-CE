@@ -90,13 +90,13 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 		"format": "\uf07b",
 		"tooltip-format": "File manager",
 		"interval": "once",
-		"on-click": "defaultfilemanager"
+		"on-click": "spacefm"
 	},
 	"custom/browser": {
 		"format": "\uf0ac",
 		"tooltip-format": "Web browser",
 		"interval": "once",
-		"on-click": "defaultbrowser"
+		"on-click": "x-www-browser"
 	},
 	"custom/terminal": {
 		"format": "\uf120",
@@ -108,31 +108,31 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 		"format": "\uf085",
 		"tooltip-format": "Task manager",
 		"interval": "once",
-		"on-click": "defaultprocessmanager"
+		"on-click": "lxtask"
 	},
 	"custom/texteditor": {
 		"format": "\uf044",
 		"tooltip-format": "Text editor",
 		"interval": "once",
-		"on-click": "defaulttexteditor"
+		"on-click": "geany"
 	},
 	"custom/imageeditor": {
 		"format": "\uf1fc",
 		"tooltip-format": "Image editor",
 		"interval": "once",
-		"on-click": "defaultimageeditor"
+		"on-click": "mtpaint"
 	},
 	"custom/wordprocessor": {
 		"format": "\uf15c",
 		"tooltip-format": "Word processor",
 		"interval": "once",
-		"on-click": "defaultwordprocessor"
+		"on-click": "abiword"
 	},
 	"custom/spreadsheet": {
 		"format": "\uf0ce",
 		"tooltip-format": "Spreadsheet",
 		"interval": "once",
-		"on-click": "defaultspreadsheet"
+		"on-click": "gnumeric"
 	},
 	"custom/help": {
 		"format": "\uf1cd",
@@ -272,13 +272,13 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 		"format": "\uf07b",
 		"tooltip-format": "File manager",
 		"interval": "once",
-		"on-click": "defaultfilemanager"
+		"on-click": "spacefm"
 	},
 	"custom/browser": {
 		"format": "\uf0ac",
 		"tooltip-format": "Web browser",
 		"interval": "once",
-		"on-click": "defaultbrowser"
+		"on-click": "x-www-browser"
 	},
 	"custom/terminal": {
 		"format": "\uf120",
@@ -290,31 +290,31 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 		"format": "\uf085",
 		"tooltip-format": "Task manager",
 		"interval": "once",
-		"on-click": "defaultprocessmanager"
+		"on-click": "lxtask"
 	},
 	"custom/texteditor": {
 		"format": "\uf044",
 		"tooltip-format": "Text editor",
 		"interval": "once",
-		"on-click": "defaulttexteditor"
+		"on-click": "geany"
 	},
 	"custom/imageeditor": {
 		"format": "\uf1fc",
 		"tooltip-format": "Image editor",
 		"interval": "once",
-		"on-click": "defaultimageeditor"
+		"on-click": "mtpaint"
 	},
 	"custom/wordprocessor": {
 		"format": "\uf15c",
 		"tooltip-format": "Word processor",
 		"interval": "once",
-		"on-click": "defaultwordprocessor"
+		"on-click": "abiword"
 	},
 	"custom/spreadsheet": {
 		"format": "\uf0ce",
 		"tooltip-format": "Spreadsheet",
 		"interval": "once",
-		"on-click": "defaultspreadsheet"
+		"on-click": "gnumeric"
 	},
 	"custom/help": {
 		"format": "\uf1cd",

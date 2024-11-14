@@ -79,7 +79,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * Only Wayland is supported: support for X.Org and tools that modify xorg.conf is gone.
 * Only [PipeWire](https://pipewire.org/) is supported: support for plain ALSA and [PulseAudio](https://www.freedesktop.org/wiki/Software/PulseAudio/) is gone.
 * Screenshots, cropped screenshots and screen recording are supported out of the box, with key bindings.
-* Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils. /usr/local/bin/default* are provided for backward compatibility with Puppy.
+* Support for ROX-Filer is gone, and the "source of truth" regarding file associations and default applications is xdg-utils.
 * usrmerge is mandatory: support for the deprecated file system layout with separate /lib and /usr/lib, is gone.
 * Only [overlay](https://docs.kernel.org/filesystems/overlayfs.html) is supported: support for aufs is gone.
 * PPM is gone: packages in the build come from the upstream distro, rootfs-packages or rootfs-petbuilds (built from source).

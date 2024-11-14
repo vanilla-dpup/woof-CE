@@ -236,7 +236,7 @@ if [ $# -ne 0 ]; then
 			mount -r -t erofs,squashfs -o loop,noatime "$SFS" "$MNT" || continue
 		fi
 
-		defaultfilemanager "$MNT" &
+		xdg-open "$MNT" &
 	done
 
 	exit 0

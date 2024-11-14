@@ -119,7 +119,7 @@ static const enum libinput_config_tap_button_map button_map = LIBINPUT_CONFIG_TA
 
 /* commands */
 static const char *termcmd[] = { "footclient", NULL };
-static const char *runcmd[] = { "defaultrun", NULL };
+static const char *runcmd[] = { "gexec", NULL };
 static const char *lockcmd[] = { "swaylock", NULL };
 static const char *menucmd[] = { "tofi-exec", NULL };
 static const char *brightnessupcmd[] = { "brightnessctl", "set", "+10%", NULL };
@@ -127,9 +127,9 @@ static const char *brightnessdowncmd[] = { "brightnessctl", "set", "10%-", NULL 
 static const char *volumeupcmd[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "1%+", NULL };
 static const char *volumedowncmd[] = { "wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "1%-", NULL };
 static const char *mutecmd[] = { "wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "toggle", NULL };
-static const char *screenshotcmd[] = { "defaultscreenshot", NULL };
+static const char *screenshotcmd[] = { "screenshot", "full", NULL };
 static const char *regionscreenshotcmd[] = { "screenshot", "region", NULL };
-static const char *browsercmd[] = { "defaultbrowser", NULL };
+static const char *browsercmd[] = { "x-www-browser", NULL };
 
 static const Key keys[] = {
 	/* Note that Shift changes certain key codes: c -> C, 2 -> at, etc. */

@@ -1,12 +1,4 @@
 cat << EOF > pinstall.sh
-echo '#!/bin/sh
-exec x-terminal-emulator -e weechat' > usr/local/bin/weechat-shell
-chmod 755 usr/local/bin/weechat-shell
-
-echo '#!/bin/sh
-exec weechat-shell' > usr/local/bin/defaultchat
-chmod 755 usr/local/bin/defaultchat
-
 chroot . run-as-spot weechat-headless -r '/set irc.server_default.msg_part \"\";/set irc.server_default.msg_quit \"\";/quit'
 chroot . run-as-spot weechat-headless -r '/set irc.ctcp.clientinfo \"\";/set irc.ctcp.finger \"\";/set irc.ctcp.source \"\";/set irc.ctcp.time \"\";/set irc.ctcp.userinfo \"\";/set irc.ctcp.version \"\";/quit'
 chroot . run-as-spot weechat-headless -r '/server add libera irc.libera.chat/6697 -autoconnect -ssl;/set irc.server.libera.autojoin #puppylinux;/quit'
@@ -14,20 +6,4 @@ chroot . run-as-spot weechat-headless -r '/server add libera irc.libera.chat/669
 rm -rf home/spot/.cache/weechat home/spot/.local/share/weechat home/spot/.local/state/weechat
 chown -R root:root home/spot/.config/weechat
 mv home/spot/.config/weechat etc/skel/.config/
-
-if [ ! -e usr/share/applications/weechat.desktop ]; then
-	cat << EOF2 > usr/share/applications/weechat.desktop
-[Desktop Entry]
-Name=WeeChat
-GenericName=Chat client
-Comment=Extensible chat client
-Exec=weechat %u
-Terminal=true
-Icon=weechat
-Type=Application
-Categories=Network;Chat;IRCClient;ConsoleOnly;
-MimeType=x-scheme-handler/irc;x-scheme-handler/ircs;
-EOF2
-	chmod 644 usr/share/applications/weechat.desktop
-fi
 EOF
