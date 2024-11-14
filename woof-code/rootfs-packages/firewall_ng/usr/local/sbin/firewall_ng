@@ -495,9 +495,6 @@ fi
 [ "$MAIN" = "false" -a "$CONFIG_SSH" = "false" -a "$CONFIG_CUPS" = "false" -a "$CONFIG_SAMBA" = "false" -a "$CONFIG_DLNA" = "false" -a "$CONFIG_NTP" = "false" -a "$CONFIG_FTP" = "false" -a "$CONFIG_HTTP" = "false" -a "$CONFIG_DNS" = "false" -a "$CONFIG_DHCP" = "false" -a "$CONFIG_NFS" = "false" -a "$CONFIG_MDNS" = "false" -a "$CONFIG_SSDP" = "false" -a "$CONFIG_NATPMP" = "false" ] && exit
 
 # run it!
-urxvt -bg yellow -fg black -geometry 60X10+1+1 --hold -e /etc/init.d/rc.firewall start &
-p=$!
-sleep 6
-kill -9 $p 2>/dev/null
+x-terminal-emulator --hold -e /etc/init.d/rc.firewall start &
 
 # end

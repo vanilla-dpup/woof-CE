@@ -110,7 +110,7 @@
     </keybind>
 
     <keybind key="C-A-t">
-      <action name="Execute"><command>defaultterminal</command></action>
+      <action name="Execute"><command>footclient</command></action>
     </keybind>
 
     <keybind key="C-A-Delete">

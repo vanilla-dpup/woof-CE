@@ -1,6 +1,6 @@
 cat << EOF > pinstall.sh
 echo '#!/bin/sh
-exec defaultterminal -e weechat' > usr/local/bin/weechat-shell
+exec x-terminal-emulator -e weechat' > usr/local/bin/weechat-shell
 chmod 755 usr/local/bin/weechat-shell
 
 echo '#!/bin/sh

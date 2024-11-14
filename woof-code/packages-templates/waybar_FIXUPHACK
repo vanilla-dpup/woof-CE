@@ -102,7 +102,7 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 		"format": "\uf120",
 		"tooltip-format": "Terminal",
 		"interval": "once",
-		"on-click": "defaultterminal"
+		"on-click": "footclient"
 	},
 	"custom/taskmanager": {
 		"format": "\uf085",
@@ -284,7 +284,7 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 		"format": "\uf120",
 		"tooltip-format": "Terminal",
 		"interval": "once",
-		"on-click": "defaultterminal"
+		"on-click": "footclient"
 	},
 	"custom/taskmanager": {
 		"format": "\uf085",

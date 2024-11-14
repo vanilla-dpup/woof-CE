@@ -192,7 +192,7 @@ void process_entry(GMenuTreeEntry *entry)
 
     if (g_desktop_app_info_get_boolean(app, G_KEY_FILE_DESKTOP_KEY_TERMINAL))
     {
-        tmp = g_strdup_printf("defaultterminal -e sh -c '%s'", escaped);
+        tmp = g_strdup_printf("footclient -e sh -c '%s'", escaped);
         g_free(cmd);
         cmd = tmp;
         g_printf("    <action name=\"Execute\"><command>%s</command></action>\n", cmd);

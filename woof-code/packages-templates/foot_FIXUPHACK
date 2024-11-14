@@ -1,3 +1,14 @@
+cat << EOF > etc/skel/.config/autostart/foot-server.desktop
+[Desktop Entry]
+Type=Application
+Name=Foot server
+NoDisplay=true
+Exec=foot -s
+EOF
+chmod 644 etc/skel/.config/autostart/foot-server.desktop
+
+mkdir -p etc/skel/.config/foot
+cat << EOF > etc/skel/.config/foot/foot.ini
 [main]
 initial-window-size-chars = 80x24
 font=monospace:size=10
@@ -21,3 +32,5 @@ bright4 = bbc0ff
 bright5 = ffa5df
 bright6 = 3cdbff
 bright7 = ffffff
+EOF
+chmod 644 etc/skel/.config/foot/foot.ini

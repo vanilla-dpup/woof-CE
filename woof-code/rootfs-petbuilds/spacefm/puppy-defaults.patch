@@ -132,14 +132,6 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
 diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.h spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/settings.h
 --- spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.h	2023-06-14 16:41:14.503322416 +0300
 +++ spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/settings.h	2023-06-14 16:59:31.026783813 +0300
-@@ -330,6 +330,7 @@ extern GList* xset_cmd_history;
- 
- static const char* terminal_programs[] =  //for pref-dialog.c
- {
-+    "defaultterminal",
-     "roxterm",
-     "terminal",
-     "xfce4-terminal",
 @@ -359,6 +360,7 @@ static const char* su_commands[] = // or
  
  static const char* gsu_commands[] = // order and contents must match prefdlg.ui
