@@ -3,6 +3,6 @@ cat << EOF > usr/local/bin/connman-gtk
 
 gsettings set net.connman.gtk launch-to-tray false
 
-exec /usr/bin/connman-gtk "\\\$@"
+exec /usr/bin/connman-gtk "\$@"
 EOF
 chmod 755 usr/local/bin/connman-gtk
