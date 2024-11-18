@@ -15,8 +15,6 @@ pipewire > /dev/null 2>&1 &
 	pipewire-pulse > /dev/null 2>&1 &
 	wireplumber > /dev/null 2>&1 &
 ) &
-export PULSE_SERVER=unix:/tmp/runtime-spot/pulse/native
-export PULSE_COOKIE=/tmp/runtime-spot/pulse/cookie
 
 # hack for virtual machines (see https://github.com/swaywm/sway/issues/5834, https://github.com/swaywm/sway/issues/3814, etc')
 if systemd-detect-virt -vq; then
