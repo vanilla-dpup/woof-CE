@@ -39,7 +39,7 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 ### Compatibility
 
 * coreutils, util-linux, etc' are not replaced with symlinks to busybox, because this breaks compatibility with the upstream distro.
-* Core Puppy scripts are moved to /usr/local and tools that override upstream distro files (like setup-spot) use /usr/local/{,s}bin and rely on the order of PATH. Essentially, Puppy becomes a thin layer on top of the upstream distro that mostly resides in /usr/local. This makes upstream distro package updates safe, because they no longer remove Puppy's hooks.
+* Core Puppy scripts that override upstream distro files (like `poweroff`) are moved to /usr/local/{,s}bin and rely on the order of PATH. Essentially, Puppy becomes a thin layer on top of the upstream distro that mostly resides in /usr/local. This makes upstream distro package updates safe, because they no longer remove Puppy's hooks.
 * The Puppy way of doing things is replaced with the upstream distro way of doing things. For example, rc.country is gone, and so is the hack of exporting LANG in /etc/profile. Instead, one should use /etc/default/locale, /etc/locale.gen, locale-gen, etc'.
 * Themes are supported, but not included by default: [themes break applications](https://stopthemingmy.app/), they're hard to maintain and non-native widgets in modern browsers or Flatpak applications make theming consistency nearly impossible.
 * petget provides limited support for .pet packages.
