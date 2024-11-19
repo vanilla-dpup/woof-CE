@@ -8,10 +8,10 @@ export OUTPUT_CHARSET=UTF-8
 # TODO: check why they don't terminate after the session bus is terminated
 killall pipewire pipewire-pulse wireplumber 2>/dev/null
 
-rm -f /tmp/runtime-spot/pipewire-0
+rm -f $XDG_RUNTIME_DIR/pipewire-0
 pipewire > /dev/null 2>&1 &
 (
-	while [ ! -e /tmp/runtime-spot/pipewire-0 ]; do sleep 0.1; done
+	while [ ! -e $XDG_RUNTIME_DIR/pipewire-0 ]; do sleep 0.1; done
 	pipewire-pulse > /dev/null 2>&1 &
 	wireplumber > /dev/null 2>&1 &
 ) &
