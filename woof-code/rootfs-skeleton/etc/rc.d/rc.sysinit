@@ -62,6 +62,7 @@ create_zram_swap() {
   RAM=`awk '/MemTotal/{print $2}' /proc/meminfo`
   SIZE=$(($RAM * 512))
   [ $SIZE -gt 4294967296 ] && SIZE=4294967296
+  echo lz4 > /sys/block/zram0/comp_algorithm
   echo ${SIZE} > /sys/block/zram0/disksize || return 1
   mkswap /dev/zram0 || return 1
   swapon /dev/zram0
@@ -74,7 +75,7 @@ loadswap_func() { #w481 made into a function.
  ret=$?
  status_func $ret
  if [ $ret -eq 0 ] ; then
-   echo 1 > /proc/sys/vm/page-cluster
+   echo 0 > /proc/sys/vm/page-cluster
    SWAPON="yes"
  fi
  #load a swap partition...
