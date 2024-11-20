@@ -13,4 +13,4 @@ dbus-update-activation-environment WAYLAND_DISPLAY DISPLAY
 xdg_autostart.sh
 delayedrun &
 
-exec dwl-send /tmp/dwl.socket
+exec dwl-send /run/runtime/dwl.socket

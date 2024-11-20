@@ -14,4 +14,5 @@ Boot codes can change DISTRO_NAME's behavior, speed up the boot process, make th
 * `pfix=scrub`: free disk space and improve responsiveness by searching for files copied from SFSs to the save layer and deleting them **immediately**. If unspecified, this cleanup is performed automatically on update.
 * `pfix=rdsh`: drops to a rescue shell at the end of the early boot process.
 * `pfix=nox`: disables automatic start of the graphical desktop.
+* `puser=name`: set the user to log in as. If unspecified, the default is `spot`.
 * `loglevel=number`: specifies the verbosity level, using a printk log level: the default is 3 (KERN_ERR) and 7 (KERN_DEBUG) makes {/initrd,}/tmp/bootinit.log extra verbose.

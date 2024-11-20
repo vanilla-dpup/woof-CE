@@ -14,9 +14,11 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/prctl.h>
+#include <stdarg.h>
 #include <security/pam_appl.h>
 #include <security/pam_misc.h>
 
+#define DEFAULT_USER "spot"
 #define CLEAR_TTY "\033[2J\033[H"
 #define RESPAWN_DELAY 1
 
@@ -37,7 +39,20 @@ static void cat(const char *path)
 	while ((len = read(fd, buf, sizeof(buf))) > 0 && write(STDOUT_FILENO, buf, len) == len);
 }
 
-static void fakelogin(void)
+__attribute__((format(printf, 2, 3)))
+static int setenvf(const char *name, const char *fmt, ...)
+{
+	static char value[512];
+	va_list args;
+
+	va_start(args, fmt);
+	vsnprintf(value, sizeof(value), fmt, args);
+	va_end(args);
+
+	return setenv(name, value, 1);
+}
+
+static void fakelogin(const char *username)
 {
 	static char buf[512];
 	static struct pam_conv conv = {misc_conv, NULL};
@@ -48,24 +63,30 @@ static void fakelogin(void)
 	pid_t pid;
 	int ret, status;
 
-	if (prctl(PR_SET_NAME, "fakelogin") < 0 || !(user = getpwnam("spot")) || initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0) return;
+	if (prctl(PR_SET_NAME, "fakelogin") < 0 || !(user = getpwnam(username))) return;
+
+	if ((mkdir("/run/runtime", 0700) < 0 && errno != EEXIST) ||
+	    chown("/run/runtime", user->pw_uid, user->pw_gid) < 0 ||
+	    chmod("/run/runtime", 0700) < 0)
+		return;
+
+	if (initgroups(user->pw_name, user->pw_gid) < 0 || setgid(user->pw_gid) < 0 || setuid(user->pw_uid) < 0) return;
 
 	clearenv();
 
-	if ((setenv("USER", user->pw_name, 1) < 0) ||
-	    (setenv("HOME", user->pw_dir, 1) < 0) ||
-	    (setenv("SHELL", user->pw_shell, 1) < 0) ||
-	    (setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1) < 0) ||
-	    (setenv("TERM", "linux", 1) < 0) ||
-	    (setenv("XDG_DATA_HOME", "/home/spot/.local/share", 1) < 0) ||
-	    (setenv("XDG_CONFIG_HOME", "/home/spot/.config", 1) < 0) ||
-	    (setenv("XDG_DATA_DIRS", "/usr/share:/usr/local/share", 1) < 0) ||
-	    (setenv("XDG_CONFIG_DIRS", "/etc/xdg", 1) < 0) ||
-	    (setenv("XDG_CACHE_HOME", "/home/spot/.cache", 1) < 0) ||
-	    (setenv("XDG_RUNTIME_DIR", "/tmp/runtime-spot", 1) < 0) ||
-	    (setenv("XDG_STATE_HOME", "/home/spot/.local/state", 1) < 0) ||
-	    ((mkdir("/tmp/runtime-spot", 0700) < 0 && errno != EEXIST) || (errno == EEXIST && chmod("/tmp/runtime-spot", 0700) < 0)) ||
-	    (chdir(user->pw_dir) < 0))
+	if (setenv("USER", user->pw_name, 1) < 0 ||
+	    setenv("HOME", user->pw_dir, 1) < 0 ||
+	    setenv("SHELL", user->pw_shell, 1) < 0 ||
+	    setenv("PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin", 1) < 0 ||
+	    setenv("TERM", "linux", 1) < 0 ||
+	    setenvf("XDG_DATA_HOME", "%s/.local/share", user->pw_dir) < 0 ||
+	    setenvf("XDG_CONFIG_HOME", "%s/.config", user->pw_dir) < 0 ||
+	    setenv("XDG_DATA_DIRS", "/usr/share:/usr/local/share", 1) < 0 ||
+	    setenv("XDG_CONFIG_DIRS", "/etc/xdg", 1) < 0 ||
+	    setenvf("XDG_CACHE_HOME", "%s/.cache", user->pw_dir) < 0 ||
+	    setenv("XDG_RUNTIME_DIR", "/run/runtime", 1) < 0 ||
+	    setenvf("XDG_STATE_HOME", "%s/.local/state", user->pw_dir) < 0 ||
+	    chdir(user->pw_dir) < 0)
 		return;
 
 	if ((fp = fopen("/etc/environment", "r"))) {
@@ -79,7 +100,7 @@ static void fakelogin(void)
 		fclose(fp);
 	}
 
-	if (pam_start("fakelogin", "spot", &conv, &pamh) != PAM_SUCCESS) return;
+	if (pam_start("fakelogin", username, &conv, &pamh) != PAM_SUCCESS) return;
 	if ((ret = pam_open_session(pamh, 0)) != PAM_SUCCESS) {
 		pam_end(pamh, ret);
 		return;
@@ -95,7 +116,7 @@ static void fakelogin(void)
 	pam_end(pamh, pam_close_session(pamh, 0));
 }
 
-static void do_cttyhack(const int first)
+static void do_cttyhack(const char *username, const int first)
 {
 	autoclose int fd = -1;
 
@@ -113,7 +134,7 @@ static void do_cttyhack(const int first)
 	fd = -1;
 
 	if (first) cat("/etc/issue");
-	fakelogin();
+	fakelogin(username);
 }
 
 static void delay(const time_t sec)
@@ -123,7 +144,7 @@ static void delay(const time_t sec)
 	while (nanosleep(&req, &rem) < 0 && errno == EINTR) memcpy(&req, &rem, sizeof(struct timespec));
 }
 
-static pid_t cttyhack(const int first)
+static pid_t cttyhack(const char *username, const int first)
 {
 	pid_t pid;
 	sigset_t mask;
@@ -136,7 +157,7 @@ static pid_t cttyhack(const int first)
 		if (!first)
 			delay(RESPAWN_DELAY);
 
-		do_cttyhack(first);
+		do_cttyhack(username, first);
 		exit(EXIT_FAILURE);
 	}
 
@@ -176,6 +197,7 @@ int main(int argc, char *argv[])
 	sigset_t mask;
 	pid_t pid, reaped;
 	siginfo_t sig = {.si_signo = SIGUSR2};
+	const char *username;
 	int status, ret, login = 1;
 
 	if (argc == 2 && strcmp(argv[1], "reboot") == 0) return kill(1, SIGTERM) < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
@@ -196,7 +218,9 @@ int main(int argc, char *argv[])
 
 	write(STDOUT_FILENO, CLEAR_TTY, sizeof(CLEAR_TTY) - 1);
 
-	if ((pid = cttyhack(1)) < 0) goto shutdown;
+	if (!(username = getenv("puser")) || !*username) username = DEFAULT_USER;
+
+	if ((pid = cttyhack(username, 1)) < 0) goto shutdown;
 
 	while (1) {
 		if (sigwaitinfo(&mask, &sig) < 0) {
@@ -213,7 +237,7 @@ int main(int argc, char *argv[])
 
 		while ((reaped = waitpid(-1, &status, WNOHANG)) > 0) {
 			if (!WIFEXITED(status) && !WIFSIGNALED(status)) continue;
-			if (login && reaped == pid && (pid = cttyhack(0)) < 0) break;
+			if (login && reaped == pid && (pid = cttyhack(username, 0)) < 0) break;
 		}
 	}
 

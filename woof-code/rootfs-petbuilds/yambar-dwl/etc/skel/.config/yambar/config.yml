@@ -12,7 +12,7 @@ bar:
   left:
     - script:
         path: /usr/local/bin/dwl-status
-        args: [/tmp/dwl.socket]
+        args: [/run/runtime/dwl.socket]
         anchors:
           - sel: &sel {foreground: 000000ff, deco: {background: { color: ffffffff }}}
           - occ: &occ {deco: {underline: { size: 3, color: ffffffff }}}
