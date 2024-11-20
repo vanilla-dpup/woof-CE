@@ -23,7 +23,7 @@ int sendall(const int s, const char *buf, const size_t len)
 
 int main(int argc, char *argv[])
 {
-	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/tmp/pkexecd.socket"};
+	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/run/pkexecd.socket"};
 	size_t len;
 	int s, i = 1;
 

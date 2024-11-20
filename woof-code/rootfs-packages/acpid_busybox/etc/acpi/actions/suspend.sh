@@ -16,7 +16,7 @@ case "$(awk '{print $2}' /proc/acpi/button/lid/LID*/state | head -n 1)" in
 closed)
   if [ -n "`comm -12 <(grep -l '^connected$' /sys/class/drm/*/status | cut -f 5 -d / | sort) <(grep -l '^enabled$' /sys/class/drm/*/enabled | cut -f 5 -d / | sort) | grep -Fv -e eDP -e LVDS`" ]; then
     WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
-    touch /tmp/.lid-closed
+    touch /run/lid-closed
     DISABLE_SUSPEND=y
   fi
   ;;
@@ -24,10 +24,10 @@ closed)
 #  turn on the previously disabled internal display
 # (we must do this because we don't know if the laptop was supended while connected to an external monitor)
 open)
-  if [ -f /tmp/.lid-closed ]; then
+  if [ -f /run/lid-closed ]; then
     WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
     killall -HUP kanshi
-    rm -f /tmp/.lid-closed
+    rm -f /run/lid-closed
   fi
   DISABLE_SUSPEND=y
   ;;

@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 {
 	sigset_t set;
 	siginfo_t sig;
-	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/tmp/pkexecd.socket"};
+	struct sockaddr_un sun = {.sun_family = AF_UNIX, .sun_path = "/run/pkexecd.socket"};
 	struct ucred cred;
 	char *buf;
 	pid_t pid;
