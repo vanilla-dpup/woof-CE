@@ -81,7 +81,7 @@ loadswap_func() { #w481 made into a function.
  #load a swap partition...
  while read _ ONESWAP SWAPSIZEBYTES
  do
-  EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
+  case $ONESWAP in zram*) continue ;; esac
   echo -n "Loading swap partition ${ONESWAP}..." >/dev/console #loading swap partition
   chmod 600 $ONESWAP
   swapon $ONESWAP
@@ -90,6 +90,7 @@ loadswap_func() { #w481 made into a function.
   [ $ret -eq 0 ] || continue
   echo 3 > /proc/sys/vm/page-cluster
   SWAPON="yes"
+  EXTRAALLOCK=$(($EXTRAALLOCK + $SWAPSIZEBYTES))
   return
  done < <(lsblk -bnro fstype,name,size | grep ^swap)
  #if no go, try for a swap file...
