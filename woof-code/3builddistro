@@ -149,6 +149,9 @@ chroot rootfs-complete chown -R spot:spot /home/spot
 chmod 700 rootfs-complete/root rootfs-complete/home/spot
 chroot rootfs-complete chown -R root:root /root /etc/skel
 
+chroot rootfs-complete install -D -m 644 /home/spot/.config/mimeapps.list /root/.config/mimeapps.list
+chroot rootfs-complete install -D -m 644 /home/spot/.config/mimeapps.list /etc/skel/.config/mimeapps.list
+
 chroot rootfs-complete /etc/rc.d/rc.update w
 
 rm -rf build
