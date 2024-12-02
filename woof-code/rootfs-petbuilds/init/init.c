@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
 	pid_t pid, reaped;
 	siginfo_t sig = {.si_signo = SIGUSR2};
 	const char *username;
-	int status, ret, login = 1;
+	int status, ret;
 
 	if (argc == 2 && strcmp(argv[1], "reboot") == 0) return kill(1, SIGTERM) < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
 	else if (argc == 2 && strcmp(argv[1], "poweroff") == 0) return kill(1, SIGUSR2) < 0 ? EXIT_FAILURE : EXIT_SUCCESS;
@@ -209,7 +209,6 @@ int main(int argc, char *argv[])
 	if ((sigemptyset(&mask) < 0) ||
 	    (sigaddset(&mask, SIGCHLD) < 0) ||
 	    (sigaddset(&mask, SIGTERM) < 0) ||
-	    (sigaddset(&mask, SIGUSR1) < 0) ||
 	    (sigaddset(&mask, SIGUSR2) < 0) ||
 	    (sigprocmask(SIG_SETMASK, &mask, NULL) < 0))
 		goto shutdown;
@@ -228,16 +227,11 @@ int main(int argc, char *argv[])
 			break;
 		}
 
-		if (sig.si_signo == SIGUSR1) {
-			login = 0;
-			continue;
-		}
-
 		if (sig.si_signo != SIGCHLD) break;
 
 		while ((reaped = waitpid(-1, &status, WNOHANG)) > 0) {
 			if (!WIFEXITED(status) && !WIFSIGNALED(status)) continue;
-			if (login && reaped == pid && (pid = cttyhack(username, 0)) < 0) break;
+			if (reaped == pid && (pid = cttyhack(username, 0)) < 0) break;
 		}
 	}
 
