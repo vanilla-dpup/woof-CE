@@ -1,1 +1,1 @@
-fixmenusd uses inotify to watch /usr/share/applications and runs argv[1] on change.
+fixmenusd uses inotify to watch /usr/share/applications and runs fixmenus on change.

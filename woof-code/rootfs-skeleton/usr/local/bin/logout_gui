@@ -21,7 +21,7 @@ exec yad \
     --field "$(gettext 'Install Puppy')"\!media-flash-symbolic:FBTN "kill \$YAD_PID; bootflash" \
     --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN "kill \$YAD_PID; restartwm" \
     --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN "kill \$YAD_PID; wmexit" \
-    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "kill \$YAD_PID; fixmenus; killall -HUP labwc" \
+    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "kill \$YAD_PID; fixmenus" \
     --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN "kill \$YAD_PID; swaylock" \
     --no-buttons \
     --use-interp

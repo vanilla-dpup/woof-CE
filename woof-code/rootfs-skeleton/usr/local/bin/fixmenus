@@ -12,18 +12,10 @@
 #120209 this script now called from /usr/sbin/quicksetup, whenever locale is changed.
 #120216 sss translation file now uses simple sed expressions.
 
-[ ! "$HOME" ] && HOME='/root'
-[ "$HOME" = "/" ] && HOME='/root'
-export HOME
-
-LANG1="${LANG%_*}" #120207 ex: de
-
 for ONESRC in `ls /etc/xdg/templates/_* 2>/dev/null` #ex: _root_.jwmrc
 do
 	ONEDEST=${ONESRC##*/}    # basename: _root_.jwmrc
-	if [ "$HOME" != "/root" ] ; then
-		ONEDEST=${ONEDEST//_root/$HOME} # _root.jwmrc -> /home/finn_.jwmrc
-	fi
+	ONEDEST=${ONEDEST//_root/$HOME} # _root.jwmrc -> /home/finn_.jwmrc
 	ONEDEST=${ONEDEST//_/\/} # _root_.jwmrc -> /root/.jwmrc
 	echo "Generating $ONEDEST..."
  
@@ -43,5 +35,7 @@ do
 
 	mv -f ${TMPDEST} ${ONEDEST}
 done
+
+labwc -r
 
 ###END###

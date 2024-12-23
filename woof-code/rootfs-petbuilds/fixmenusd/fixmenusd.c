@@ -11,14 +11,14 @@
 #include <fcntl.h>
 
 static int
-sh(const char *cmd, const sigset_t *set)
+fixmenus(const sigset_t *set)
 {
 	pid_t pid, reaped;
 
 	pid = fork();
 	if (pid == 0) {
 		if (sigprocmask(SIG_SETMASK, set, NULL) == 0)
-			execl("/bin/sh", "/bin/sh", "-c", cmd, (char *)NULL);
+			execlp("fixmenus", "fixmenus", (char *)NULL);
 
 		exit(EXIT_FAILURE);
 	}
@@ -77,7 +77,7 @@ main(int argc, char* argv[])
 	sigset_t set, oset;
 	int fd, appwd, flatpakappwd, sig;
 
-	if (argc != 2)
+	if (argc != 1)
 		return EXIT_FAILURE;
 
 	if ((sigemptyset(&set) < 0) ||
@@ -115,7 +115,7 @@ main(int argc, char* argv[])
 	       (((sig == SIGRTMIN) &&
 	         (handle_events(fd, appwd, flatpakappwd, &oset) == 0)) ||
 	        ((sig == SIGALRM) &&
-	         (sh(argv[1], &oset) == 0)) ||
+	         (fixmenus(&oset) == 0)) ||
 	        (sig == SIGCHLD)));
 
 	inotify_rm_watch(fd, flatpakappwd);

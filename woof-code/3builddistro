@@ -153,6 +153,7 @@ chroot rootfs-complete install -D -m 644 /home/spot/.config/mimeapps.list /root/
 chroot rootfs-complete install -D -m 644 /home/spot/.config/mimeapps.list /etc/skel/.config/mimeapps.list
 
 chroot rootfs-complete /etc/rc.d/rc.update w
+chroot rootfs-complete run-as-spot fixmenus
 
 rm -rf build
 mkdir build
