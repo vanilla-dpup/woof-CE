@@ -1,0 +1,1 @@
+sed 's/^#force_color_prompt=yes/force_color_prompt=yes/' -i etc/skel/.bashrc
