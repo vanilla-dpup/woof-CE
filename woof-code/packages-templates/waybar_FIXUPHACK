@@ -403,7 +403,7 @@ chmod 755 usr/bin/waybar-config
 ln -s presets/Horizontal/config.jsonc etc/skel/.config/waybar/config.jsonc
 ln -s presets/Horizontal/style.css etc/skel/.config/waybar/style.css
 
-cat << EOF > usr/share/applications/waybar-config.desktop
+cat << EOF > usr/local/share/applications/waybar-config.desktop
 [Desktop Entry]
 Encoding=UTF-8
 Name=Panel Settings
