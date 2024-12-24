@@ -7,3 +7,19 @@ rm -rf home/spot/.cache/weechat home/spot/.local/share/weechat home/spot/.local/
 chown -R root:root home/spot/.config/weechat
 mv home/spot/.config/weechat etc/skel/.config/
 EOF
+
+if [ ! -e usr/share/applications/weechat.desktop ]; then
+	cat << EOF2 > usr/local/share/applications/weechat.desktop
+[Desktop Entry]
+Name=WeeChat
+GenericName=Chat client
+Comment=Extensible chat client
+Exec=weechat %u
+Terminal=true
+Icon=weechat
+Type=Application
+Categories=Network;Chat;IRCClient;ConsoleOnly;
+MimeType=x-scheme-handler/irc;x-scheme-handler/ircs;
+EOF2
+	chmod 644 usr/local/share/applications/weechat.desktop
+fi
