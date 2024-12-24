@@ -4,109 +4,42 @@
 # License: GPL version 3 or later
 #
 
-#set -x
-
 XUSER=spot
-
-case $0 in *run-as|*run-as-user)
-	if ! [ "$1" ] ; then
-		echo "$0: Specify user"
-		exit 1
-	fi
-	XUSER=$1
-	shift
-esac
-
-PROG="$1"
 
 case $0 in
 run-as-spot|*/run-as-spot) ;;
-*) PROG="$0" ;;
-esac
-
-case "$PROG" in
-*/*) EXEC="$PROG" ;;
 *)
-	EXEC=`command -v "$PROG"`
-	[ -z "$EXEC" ] && EXEC="$PROG"
+	XUSER=$1
+	shift
 	;;
 esac
 
-CWD=$PWD
-CMD=''
-while [ "$1" ]; do
-	CMD="$CMD \"$1\""
-	shift
+if [ ! -d /run/runtime ] ; then
+	mkdir /run/runtime
+	chmod 0700 /run/runtime
+	chown ${XUSER}:${XUSER} /run/runtime
+fi
+
+# close all file descriptors except std{in,out,err}, in case one of
+# them points to a file under /root
+for FD in /proc/self/fd/*; do
+	FD="${FD##*/}"
+	[ $FD -gt 2 ] && eval "exec ${FD}<&-"
 done
 
-[ "$CMD" ] || exit
-
-USER_HOME=$(awk -F: '$1=="'"${XUSER}"'" {print $6}' /etc/passwd)
-if ! [ "${USER_HOME}" ] ; then
-	echo "$0 ERROR: could not HOME dir for user $XUSER"
-	exit 1
-fi
-CURDIR=$PWD
-
-if [ $(id -u) -eq 0 ]; then
-	[ $XAUTHORITY ] && cp $XAUTHORITY ${USER_HOME}/.Xauthority 2>/dev/null
-	touch ${USER_HOME}/.Xauthority
-	export XAUTHORITY=${USER_HOME}/.Xauthority
-
-	# replace all occurences of /root in XDG_* with /home/spot, because we don't
-	# run a login shell and source /etc/profile.d/*
-	OLD_HOME="$HOME"
-	while IFS='=' read NAME VAL; do
-		case "$NAME" in
-		XDG_*) export $NAME="`echo "$VAL" | sed -e s~^$OLD_HOME~$USER_HOME~ -e s~:$OLD_HOME~:$USER_HOME~g`" ;;
-		esac
-	done << EOF # hack for old busybox, which doesn't understand <() and <<<
-`env`
-EOF
-
-	export USER=${XUSER}
-	export HOME=${USER_HOME}
-	export XDG_CONFIG_HOME=${USER_HOME}/.config
-	export XDG_CACHE_HOME=${USER_HOME}/.cache
-	export XDG_DATA_HOME=${USER_HOME}/.local/share
-	export XDG_STATE_HOME=${USER_HOME}/.local/state
-
-	for i in ${XDG_CONFIG_HOME} ${XDG_CACHE_HOME} ${XDG_DATA_HOME} ${XDG_STATE_HOME}
-	do
-		if ! [ -d $i ] ; then
-			mkdir -p $i
-			chown ${XUSER} $i
-		fi
-	done
-
-	export XDG_RUNTIME_DIR=/tmp/runtime-${XUSER}
-	if [ ! -d ${XDG_RUNTIME_DIR} ] ; then
-		mkdir -p ${XDG_RUNTIME_DIR}
-		chmod 0700 ${XDG_RUNTIME_DIR}
-		chown ${XUSER} ${XDG_RUNTIME_DIR}
-	fi
-
-	# close all file descriptors except std{in,out,err}, in case one of
-	# them points to a file under /root
-	for FD in /proc/self/fd/*; do
-		FD="${FD##*/}"
-		[ $FD -gt 2 ] && eval "exec ${FD}<&-"
-	done
-
-	exec setpriv --reuid=`id -u ${XUSER}` --regid=`id -g ${XUSER}` --init-groups -- /bin/ash -c '
-# try to switch to original directory, unless it is under /root
-case "'"$CURDIR"'" in
-/root|/root/*)
-	cd "'"$USER_HOME"'"
-	;;
-*)
-	cd "'"$CURDIR"'"
-	;;
-esac
-exec '"$CMD"'
-'
-else
-	exec ash -c "exec $CMD"
-fi
+exec env -i \
+	USER=${XUSER} \
+	HOME=/home/${XUSER} \
+	SHELL=/bin/bash \
+	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+	TERM=linux \
+	XDG_DATA_HOME=/home/${XUSER}/.local/share \
+	XDG_CONFIG_HOME=/home/${XUSER}/.config \
+	XDG_DATA_DIRS=/usr/share:/usr/local/share \
+	XDG_CONFIG_DIRS=/etc/xdg \
+	XDG_CACHE_HOME=/home/${XUSER}/.cache \
+	XDG_RUNTIME_DIR=/run/runtime \
+	XDG_STATE_HOME=/home/${XUSER}/.local/state \
+	setpriv --reuid=`id -u ${XUSER}` --regid=`id -g ${XUSER}` --init-groups -- "$@"
 
 ### END ###
