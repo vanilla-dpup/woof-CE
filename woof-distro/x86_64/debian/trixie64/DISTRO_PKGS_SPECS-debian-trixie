@@ -136,6 +136,7 @@ yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev
 yes|epdfview-deps|libpoppler-glib-dev|exe,dev,doc,nls||deps:yes
 yes|efibootmgr|efibootmgr|exe,dev,doc,nls||deps:yes
 yes|ExpenseTracker-deps|libsqlite3-dev|exe,dev,doc,nls||deps:yes
+yes|fastfetch|fastfetch|exe,dev,doc,nls||deps:yes
 yes|firefox-esr|firefox-esr,firefox-esr-l10n-all|exe,dev,doc,nls||deps:yes
 yes|flatpak|flatpak|exe,dev,doc,nls||deps:yes
 yes|fonts-liberation|fonts-liberation|exe,dev,doc,nls||deps:yes
@@ -146,7 +147,6 @@ yes|gdmap|gdmap|exe,dev,doc,nls||deps:yes
 yes|geany|geany|exe,dev,doc,nls||deps:yes
 yes|gparted|gparted|exe,dev,doc,nls||deps:yes
 yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
-yes|hardinfo-deps|libjson-glib-dev|exe,dev,doc,nls||deps:yes
 yes|libcurl4-gnutls-dev|libcurl4-gnutls-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
 yes|libfuse2t64|libfuse2t64|exe,dev,doc,nls||deps:yes # used by AppImages
 yes|libglib2.0-dev-bin|libglib2.0-dev-bin|exe,dev,doc,nls||deps:yes # dependency of notification-daemon-stub
@@ -190,7 +190,6 @@ yes|bison|bison|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|bpftool|bpftool|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|ccache|ccache|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|clang|clang|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|cmake|cmake|exe>dev,dev,doc>dev,nls>dev||deps:yes # build-time dependency of hardinfo
 yes|dwarves|dwarves|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 yes|flex|flex|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|g++|g++|exe>dev,dev,doc>dev,nls>dev||deps:yes
