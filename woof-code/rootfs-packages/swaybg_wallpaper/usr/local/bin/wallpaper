@@ -1,8 +1,13 @@
 #!/bin/ash
 
-BACKGROUNDS=`ls /usr/local/share/backgrounds/*.svg /usr/local/share/backgrounds/*.png /usr/local/share/backgrounds/*.jpg 2>/dev/null | sed s~.*/~~g`
+BACKGROUNDS=""
+for BACKGROUND in `ls /usr/local/share/backgrounds/*.svg /usr/local/share/backgrounds/*.png /usr/local/share/backgrounds/*.jpg ~/.local/share/backgrounds/*.svg ~/.local/share/backgrounds/*.png ~/.local/share/backgrounds/*.jpg 2>/dev/null`; do
+	BACKGROUNDS="${BACKGROUNDS} ${BACKGROUND##*/} ${BACKGROUND}"
+done
+
 while :; do
-	CHOICE=`yad --title "Wallpaper setter" --window-icon=gtk-preferences --height=300 --list --no-headers --column=theme --print-column=1 --separator= -- "Solid color" $BACKGROUNDS`
+	CHOICE=`yad --title "Wallpaper setter" --window-icon=gtk-preferences --height=300 --button=Browse\!inode-directory:2 --button=gtk-cancel:1 --button=gtk-ok:0  --list --no-headers  --column=name --column=path --print-column=2 --hide-column=2 --separator= -- "Solid color" "Solid color" $BACKGROUNDS`
+	[ $? -eq 2 ] && exec xdg-open ~/.local/share/backgrounds
 	[ -z "$CHOICE" ] && break
 
 	if [ "$CHOICE" = "Solid color" ]; then
@@ -10,7 +15,7 @@ while :; do
 		[ -z "$CHOICE" ] && break
 		sed -i "s~^Exec=.*~Exec=swaybg -c \"${CHOICE}\"~" ~/.config/autostart/swaybg.desktop
 	else
-		sed -i "s~^Exec=.*~Exec=swaybg -i \"/usr/local/share/backgrounds/${CHOICE}\" -m stretch~" ~/.config/autostart/swaybg.desktop
+		sed -i "s~^Exec=.*~Exec=swaybg -i \"${CHOICE}\" -m stretch~" ~/.config/autostart/swaybg.desktop
 	fi
 	set_bg
 done
