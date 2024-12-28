@@ -17,6 +17,8 @@ make mrproper
 find . \( -name '*.orig' -o -name '*.rej' -o -name '*~' \) -delete
 
 ./scripts/kconfig/merge_config.sh /boot/config-* ../debian-diffconfigs/${DISTRO_COMPAT_VERSION}
+# this prints the actual diff, useful for troubleshooting
+./scripts/diffconfig -m /boot/config-* .config
 
 make olddefconfig
 if [ $? -ne 0 ] ; then
