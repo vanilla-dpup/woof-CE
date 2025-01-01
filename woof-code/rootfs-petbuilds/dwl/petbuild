@@ -1,11 +1,14 @@
 download() {
-    [ -f dwl-1002ea04fa45fba46755478044bc4828f8e19b20.tar.gz ] || curl --fail --retry 3 --max-time 60 -o dwl-1002ea04fa45fba46755478044bc4828f8e19b20.tar.gz https://codeberg.org/dwl/dwl/archive/1002ea04fa45fba46755478044bc4828f8e19b20.tar.gz
+    [ -f dwl-cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz ] || curl --fail --retry 3 --max-time 60 -o dwl-cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz https://codeberg.org/dwl/dwl/archive/cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz
 }
 
 build() {
-    tar -xzf dwl-1002ea04fa45fba46755478044bc4828f8e19b20.tar.gz
+    tar -xzf dwl-cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz
     cd dwl
-    patch -p1 < ../patches.patch
+    patch -p1 < ../en-keycodes.patch
+    patch -p1 < ../snail.patch
+    patch -p1 < ../envcfg.patch
+    patch -p1 < ../center.patch
     sed -e s/^#XWAYLAND/XWAYLAND/ -e s/^#XLIBS/XLIBS/ -i config.mk
     cp -f ../config.h .
     make install

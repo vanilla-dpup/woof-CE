@@ -1,0 +1,250 @@
+From 832c6097b5e38ec7bfe1bae8c55c8873ab9914df Mon Sep 17 00:00:00 2001
+From: Dima Krasner <dima@dimakrasner.com>
+Date: Wed, 1 Jan 2025 09:10:58 +0200
+Subject: [PATCH 2/4] add the snail layout
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This layout is a scalable alternative to the "tile" and "spiral" layouts, optimized for wide monitors. Both the master area and the stack are "spirals", but windows in the master area are split horizontally as long as the master area has enough horizontal space, and the first window in the stack is split vertically unless the stack is wide.
+
+With one window in the master area and mfact = 0.5, it behaves like the spiral layout:
+
+┌───────────────┬────────────────┐
+│               │                │
+│               │                │
+│               │                │
+│               │                │
+│               ├───┬───┬────────┤
+│               │   │   │        │
+│               ├───┴───┤        │
+│               │       │        │
+│               │       │        │
+└───────────────┴───────┴────────┘
+
+With 2 windows in the master area and 2 in the stack:
+
+┌───────────────┬────────────────┐
+│               │                │
+│               │                │
+│               │                │
+│               │                │
+├───────────────┼────────────────┤
+│               │                │
+│               │                │
+│               │                │
+│               │                │
+└───────────────┴────────────────┘
+
+With 3 windows in the master area and 2 in the stack:
+
+┌───────────────┬────────────────┐
+│               │                │
+│               │                │
+│               │                │
+│               │                │
+├───────┬───────┼────────────────┤
+│       │       │                │
+│       │       │                │
+│       │       │                │
+│       │       │                │
+└───────┴───────┴────────────────┘
+
+With many windows in both areas:
+
+┌───────────────┬────────────────┐
+│               │                │
+│               │                │
+│               │                │
+│               │                │
+├───┬───┬───────┼───┬───┬────────┤
+│   │   │       │   │   │        │
+├───┴───┤       ├───┴───┤        │
+│       │       │       │        │
+│       │       │       │        │
+└───────┴───────┴───────┴────────┘
+
+With 2 windows in the master area, many windows in the stack and high mfact:
+
+┌──────────┬──────────┬──────────┐
+│          │          │          │
+│          │          │          │
+│          │          │          │
+│          │          │          │
+│        master       ├──┬stack──┤
+│          │          │  │  │    │
+│          │          ├──┴──┤    │
+│          │          │     │    │
+│          │          │     │    │
+└──────────┴──────────┴─────┴────┘
+
+With 2 windows in the master area, many windows in the stack and low mfact:
+
+┌──────────┬──────────┬──────────┐
+│          │          │          │
+│          │          │          │
+│          │          │          │
+│          │          │          │
+├──master──┤        stack┬──┬────┤
+│          │          │  │  │    │
+│          │          ├──┴──┤    │
+│          │          │     │    │
+│          │          │     │    │
+└──────────┴──────────┴─────┴────┘
+---
+ config.def.h |   4 +-
+ dwl.c        | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 105 insertions(+), 1 deletion(-)
+
+diff --git a/config.def.h b/config.def.h
+index 22d2171..abf9644 100644
+--- a/config.def.h
++++ b/config.def.h
+@@ -34,6 +34,7 @@ static const Layout layouts[] = {
+ 	{ "[]=",      tile },
+ 	{ "><>",      NULL },    /* no layout function means floating behavior */
+ 	{ "[M]",      monocle },
++	{ "@|@",      snail },
+ };
+ 
+ /* monitors */
+@@ -48,7 +49,7 @@ static const MonitorRule monrules[] = {
+ 	{ "eDP-1",    0.5f,  1,      2,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+ 	*/
+ 	/* defaults */
+-	{ NULL,       0.55f, 1,      1,    &layouts[0], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
++	{ NULL,       0.64f, 1,      1,    &layouts[3], WL_OUTPUT_TRANSFORM_NORMAL,   -1,  -1 },
+ };
+ 
+ /* keyboard */
+@@ -139,6 +140,7 @@ static const Key keys[] = {
+ 	{ MODKEY,                    XKB_KEY_t,          setlayout,      {.v = &layouts[0]} },
+ 	{ MODKEY,                    XKB_KEY_f,          setlayout,      {.v = &layouts[1]} },
+ 	{ MODKEY,                    XKB_KEY_m,          setlayout,      {.v = &layouts[2]} },
++	{ MODKEY,                    XKB_KEY_s,          setlayout,      {.v = &layouts[3]} },
+ 	{ MODKEY,                    XKB_KEY_space,      setlayout,      {0} },
+ 	{ MODKEY|WLR_MODIFIER_SHIFT, XKB_KEY_space,      togglefloating, {0} },
+ 	{ MODKEY,                    XKB_KEY_e,         togglefullscreen, {0} },
+diff --git a/dwl.c b/dwl.c
+index b988c7b..29a227f 100644
+--- a/dwl.c
++++ b/dwl.c
+@@ -333,6 +333,7 @@ static void setmon(Client *c, Monitor *m, uint32_t newtags);
+ static void setpsel(struct wl_listener *listener, void *data);
+ static void setsel(struct wl_listener *listener, void *data);
+ static void setup(void);
++static void snail(Monitor *m);
+ static void spawn(const Arg *arg);
+ static void startdrag(struct wl_listener *listener, void *data);
+ static void tag(const Arg *arg);
+@@ -2666,6 +2667,107 @@ setup(void)
+ #endif
+ }
+ 
++void
++snail(Monitor *m)
++{
++	int i = 0, n = 0;
++	unsigned int mw = m->w.width;
++	Client *c, *prev;
++	enum wlr_direction dir = WLR_DIRECTION_RIGHT;
++
++	wl_list_for_each(c, &clients, link)
++		if (VISIBLEON(c, m) && !c->isfloating && !c->isfullscreen)
++			n++;
++	if (n == 0)
++		return;
++
++	if (n > m->nmaster)
++		mw = m->nmaster ? (int)round(m->w.width * m->mfact) : 0;
++
++	wl_list_for_each(c, &clients, link) {
++		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
++			continue;
++
++		/*
++		 * If the master area exists and this is the first window, fill the
++		 * master area with this window
++		 */
++		if (mw > 0 && i == 0) {
++			c->geom = (struct wlr_box){.x = m->w.x, .y = m->w.y,
++				.width = mw, .height = m->w.height};
++			/*
++			 * If the first window in the master area is wide, split it
++			 * horizontally and put next one on its right; otherwise, split it
++			 * vertically and put the next one below it
++			 */
++			dir = c->geom.width > m->w.height ? WLR_DIRECTION_RIGHT : WLR_DIRECTION_DOWN;
++		/*
++		 * If the master area is full or doesn't exist, fill the stack with the
++		 * m->nmaster-th window
++		 */
++		} else if (i == m->nmaster) {
++			c->geom = (struct wlr_box){.x = m->w.x + mw, .y = m->w.y,
++				.width = m->w.width - mw, .height = m->w.height};
++			/*
++			 * If the first window in the stack is wide, split it horizontally
++			 * and put next one on its right; otherwise, split it vertically and
++			 * put the next one below it
++			 */
++			dir = c->geom.width > m->w.height ? WLR_DIRECTION_RIGHT : WLR_DIRECTION_DOWN;
++		/*
++		 * Split the previous horizontally and put the current window on the right
++		 */
++		} else if (dir == WLR_DIRECTION_RIGHT) {
++			c->geom = (struct wlr_box){.x = prev->geom.x + prev->geom.width / 2, .y = prev->geom.y,
++				.width = prev->geom.width / 2, .height = prev->geom.height};
++			prev->geom = (struct wlr_box){.x = prev->geom.x, .y = prev->geom.y,
++				.width = prev->geom.width / 2, .height = prev->geom.height};
++			/*
++			 * If it's a stack window or the first narrow window in the master
++			 * area, put the next one below it
++			 */
++			if (i >= m->nmaster || c->geom.width < m->w.height)
++				dir = WLR_DIRECTION_DOWN;
++		/*
++		 * Split the previous vertically and put the current window below it
++		 */
++		} else if (dir == WLR_DIRECTION_DOWN) {
++			c->geom = (struct wlr_box){.x = prev->geom.x, .y = prev->geom.y + prev->geom.height / 2,
++				.width = prev->geom.width, .height = prev->geom.height / 2};
++			prev->geom = (struct wlr_box){.x = prev->geom.x, .y = prev->geom.y,
++				.width = prev->geom.width, .height = prev->geom.height / 2};
++			dir = WLR_DIRECTION_LEFT;
++		/*
++		 * Split the previous horizontally and put the current window on the left
++		 */
++		} else if (dir == WLR_DIRECTION_LEFT) {
++			c->geom = (struct wlr_box){.x = prev->geom.x, .y = prev->geom.y,
++				.width = prev->geom.width / 2, .height = prev->geom.height};
++			prev->geom = (struct wlr_box){.x = prev->geom.x + prev->geom.width / 2, .y = prev->geom.y,
++				.width = prev->geom.width / 2, .height = prev->geom.height};
++			dir = WLR_DIRECTION_UP;
++		/*
++		 * Split the previous vertically and put the current window above it
++		 */
++		} else {
++			c->geom = (struct wlr_box){.x = prev->geom.x, .y = prev->geom.y,
++				.width = prev->geom.width, .height = prev->geom.height / 2};
++			prev->geom = (struct wlr_box){.x = prev->geom.x, .y = prev->geom.y + prev->geom.height / 2,
++				.width = prev->geom.width, .height = prev->geom.height / 2};
++			dir = WLR_DIRECTION_RIGHT;
++		}
++		i++;
++		prev = c;
++	}
++
++	wl_list_for_each(c, &clients, link) {
++		if (!VISIBLEON(c, m) || c->isfloating || c->isfullscreen)
++			continue;
++
++		resize(c, c->geom, 0);
++	}
++}
++
+ void
+ spawn(const Arg *arg)
+ {
+-- 
+2.45.2
+
