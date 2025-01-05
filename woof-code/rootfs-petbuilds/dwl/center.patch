@@ -23,7 +23,7 @@ index e049e7f..10721f2 100644
  			}
  		}
  	}
-+	if (c->isfloating) {
++	if (c->isfloating && c->scene) {
 +		mon = xytomon(cursor->x, cursor->y);
 +		center(c, &mon->w);
 +	}
