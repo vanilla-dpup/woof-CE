@@ -61,15 +61,15 @@
       <action name="GoToDesktop" to="3" />
     </keybind>
 
-    <keybind key="XF86_AudioLowerVolume">
+    <keybind key="XF86_AudioLowerVolume" allowWhenLocked="yes">
       <action name="Execute" command="wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-" />
     </keybind>
 
-    <keybind key="XF86_AudioRaiseVolume">
+    <keybind key="XF86_AudioRaiseVolume" allowWhenLocked="yes">
       <action name="Execute" command="wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%+" />
     </keybind>
 
-    <keybind key="XF86_AudioMute">
+    <keybind key="XF86_AudioMute" allowWhenLocked="yes">
       <action name="Execute" command="wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle" />
     </keybind>
 
