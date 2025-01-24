@@ -1,6 +1,10 @@
 border.width: 3
-titlebar.height: 19
-padding.height: 0
+menu.border.width: 0
+window.label.text.justify: Left
+window.titlebar.padding.width: 5
+window.button.height: 11
+window.button.width: 11
+window.button.spacing: 12
 window.active.border.color: #e2e2de
 window.inactive.border.color: #999999
 window.active.title.bg.color: #e2e2de
