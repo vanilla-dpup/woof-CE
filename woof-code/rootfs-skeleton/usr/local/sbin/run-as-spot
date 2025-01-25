@@ -31,7 +31,7 @@ exec env -i \
 	USER=${XUSER} \
 	HOME=/home/${XUSER} \
 	SHELL=/bin/bash \
-	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+	PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games \
 	TERM=linux \
 	XDG_DATA_HOME=/home/${XUSER}/.local/share \
 	XDG_CONFIG_HOME=/home/${XUSER}/.config \
