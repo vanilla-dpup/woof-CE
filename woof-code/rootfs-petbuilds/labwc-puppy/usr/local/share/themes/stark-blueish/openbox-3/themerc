@@ -11,3 +11,4 @@ window.active.title.bg.color: #F1F8FE
 window.inactive.title.bg.color: #FCFEFF
 menu.items.bg.color: #FFFFFF
 menu.items.active.bg.color: #C1E0FA
+menu.items.padding.x: 4
