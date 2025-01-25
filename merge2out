@@ -171,10 +171,6 @@ chown -R root:root ../${WOOF_OUT}
 echo -e "\nUndoing VCS-friendly stuff..."
 find ../${WOOF_OUT} -type f -name .gitignore -delete
 
-#record target architecture in DISTRO_SPECS (will end up in /etc/ in Puppy build)...
-sed -i '/DISTRO_TARGETARCH=/d' ../${WOOF_OUT}/DISTRO_SPECS
-echo "DISTRO_TARGETARCH='${TARGETARCH}'" >> ../${WOOF_OUT}/DISTRO_SPECS
-
 #record the woof state we build from
 tar -C .. -c ${WOOF_OUT} | xz -9 > ../${WOOF_OUT}.tar.xz
 mkdir -p ../${WOOF_OUT}/rootfs-skeleton/usr/local/share/woof-CE

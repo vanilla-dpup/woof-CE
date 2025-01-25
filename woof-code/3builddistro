@@ -15,12 +15,6 @@ arm64) ARCH=arm64 ;;
 *) exit 1 ;;
 esac
 
-BDRVSFS="bdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-PUPPYSFS="puppy_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-ZDRVSFS="zdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-FDRVSFS="fdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-ADRVSFS="adrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
-YDRVSFS="ydrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 DOCXSFS="docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 NLSXSFS="nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 
@@ -201,15 +195,6 @@ mv rootfs-complete/usr/share/{doc,man,help} docx/usr/share/
 mkdir rootfs-complete/usr/share/doc
 mv docx/usr/share/doc/puppylogo*.png rootfs-complete/usr/share/doc/
 
-cat << EOF >> rootfs-complete/etc/DISTRO_SPECS
-DISTRO_BDRVSFS='${BDRVSFS}'
-DISTRO_PUPPYSFS='${PUPPYSFS}'
-DISTRO_ZDRVSFS='${ZDRVSFS}'
-DISTRO_FDRVSFS='${FDRVSFS}'
-DISTRO_ADRVSFS='${ADRVSFS}'
-DISTRO_YDRVSFS='${YDRVSFS}'
-EOF
-
 cp -a ../initrd-progs rootfs-complete/
 chroot rootfs-complete sh -c "cd /initrd-progs && ./build.sh" || exit 1
 mv -f rootfs-complete/initrd-progs/initrd.zst build/
@@ -217,14 +202,14 @@ rm -rf rootfs-complete/initrd-progs
 
 cp -f ../kernel-kit/output/vmlinuz-* build/vmlinuz
 cp -f ../kernel-kit/output/kbuild-*.sfs build/
-cp -f ../kernel-kit/output/kernel-modules-*.sfs build/${ZDRVSFS}
+cp -f ../kernel-kit/output/kernel-modules-*.sfs build/${DISTRO_ZDRVSFS}
 
 mkdir -p rootfs/sandbox3
 mount --bind . rootfs/sandbox3
-chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${FDRVSFS} fdrv"
+chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${DISTRO_FDRVSFS} fdrv"
 chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${NLSXSFS} nlsx"
 chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${DOCXSFS} docx"
-chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${PUPPYSFS} rootfs-complete"
+chroot rootfs sh -c "cd /sandbox3 && mkfs.erofs ${SFSCOMP} build/${DISTRO_PUPPYSFS} rootfs-complete"
 umount -l rootfs/sandbox3
 rmdir rootfs/sandbox3
 
