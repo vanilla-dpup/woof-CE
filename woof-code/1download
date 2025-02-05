@@ -18,7 +18,6 @@ esac
 case "$DISTRO_BINARY_COMPAT" in
 debian) MIRROR=http://deb.debian.org/debian ;;
 devuan) MIRROR=http://deb.devuan.org/merged ;;
-ubuntu) MIRROR=http://archive.ubuntu.com/ubuntu ;;
 *) exit 1 ;;
 esac
 
@@ -46,15 +45,27 @@ case "$DISTRO_BINARY_COMPAT" in
 debian)
 	case "$DISTRO_COMPAT_VERSION" in
 	sid)
-		cat << EOF > rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
+		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+Types: deb
+URIs: ${MIRROR}
+Suites: ${DISTRO_COMPAT_VERSION}
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
 EOF
 		;;
 	*)
-		cat << EOF > rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free non-free-firmware
-deb ${MIRROR}-security ${DISTRO_COMPAT_VERSION}-security main contrib non-free non-free-firmware
+		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+Types: deb
+URIs: ${MIRROR}
+Suites: ${DISTRO_COMPAT_VERSION} ${DISTRO_COMPAT_VERSION}-updates
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
+
+Types: deb
+URIs: ${MIRROR}-security
+Suites: ${DISTRO_COMPAT_VERSION}-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
 EOF
 		;;
 	esac
@@ -63,32 +74,30 @@ EOF
 devuan)
 	case "$DISTRO_COMPAT_VERSION" in
 	ceres)
-		cat << EOF > rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
+		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+Types: deb
+URIs: ${MIRROR}
+Suites: ${DISTRO_COMPAT_VERSION}
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
 EOF
 		;;
 	*)
-		cat << EOF > rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main contrib non-free non-free-firmware
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main contrib non-free non-free-firmware
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-security main contrib non-free non-free-firmware
+		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+Types: deb
+URIs: ${MIRROR}
+Suites: ${DISTRO_COMPAT_VERSION} ${DISTRO_COMPAT_VERSION}-updates
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
+
+Types: deb
+URIs: ${MIRROR}-security
+Suites: ${DISTRO_COMPAT_VERSION}-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
 EOF
 		;;
 	esac
-	;;
-
-ubuntu)
-	echo "deb ${MIRROR} ${DISTRO_COMPAT_VERSION} main universe multiverse restricted" > rootfs/etc/apt/sources.list
-
-	if [ "$DISTRO_COMPAT_VERSION" != "devel" ]; then
-		cat << EOF >> rootfs/etc/apt/sources.list
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-updates main universe multiverse restricted
-deb ${MIRROR} ${DISTRO_COMPAT_VERSION}-security main universe multiverse restricted
-EOF
-	fi
-
-	# the x86 repo is small, contains popular packages like Steam and won't make apt update 2x slower
-	[ "$ARCH" != "amd64" ] || chroot rootfs dpkg --add-architecture i386
 	;;
 esac
 cat << EOF > rootfs/etc/apt/apt.conf.d/00puppy
