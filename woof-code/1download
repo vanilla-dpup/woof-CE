@@ -100,6 +100,7 @@ EOF
 	esac
 	;;
 esac
+rm -f rootfs/etc/apt/sources.list
 cat << EOF > rootfs/etc/apt/apt.conf.d/00puppy
 APT::Install-Recommends "false";
 APT::Install-Suggests "false";
