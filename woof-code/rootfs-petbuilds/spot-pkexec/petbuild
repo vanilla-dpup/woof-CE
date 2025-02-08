@@ -6,5 +6,4 @@ build() {
     $CC $CFLAGS -D_GNU_SOURCE pkexec.c $LDFLAGS -o /usr/local/bin/pkexec
     $CC $CFLAGS -D_GNU_SOURCE pkexecd.c $LDFLAGS -o /usr/local/bin/pkexecd
     $CC $CFLAGS auth.c $LDFLAGS -lcrypt -o /usr/local/bin/pkexec-auth
-    chmod 4755 /usr/local/bin/pkexec-auth
 }
