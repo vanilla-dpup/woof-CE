@@ -15,7 +15,7 @@ case "$(awk '{print $2}' /proc/acpi/button/lid/LID*/state | head -n 1)" in
 #   suspend and let the screen locker take care of turning off the internal display while locked
 closed)
   if [ -n "`comm -12 <(grep -l '^connected$' /sys/class/drm/*/status | cut -f 5 -d / | sort) <(grep -l '^enabled$' /sys/class/drm/*/enabled | cut -f 5 -d / | sort) | grep -Fv -e eDP -e LVDS`" ]; then
-    WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
+    XDG_RUNTIME_DIR=/run/runtime WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`XDG_RUNTIME_DIR=/run/runtime WAYLAND_DISPLAY=wayland-0 wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --off
     touch /run/lid-closed
     DISABLE_SUSPEND=y
   fi
@@ -25,7 +25,7 @@ closed)
 # (we must do this because we don't know if the laptop was supended while connected to an external monitor)
 open)
   if [ -f /run/lid-closed ]; then
-    WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
+    XDG_RUNTIME_DIR=/run/runtime WAYLAND_DISPLAY=wayland-0 wlr-randr --output "`XDG_RUNTIME_DIR=/run/runtime WAYLAND_DISPLAY=wayland-0 wlr-randr | grep -e ^eDP -e ^LVDS | head -n 1 | awk '{print $1}'`" --on
     killall -HUP kanshi
     rm -f /run/lid-closed
   fi
