@@ -61,6 +61,7 @@ chroot rootfs-complete adduser spot video
 chroot rootfs-complete adduser spot render
 chroot rootfs-complete adduser spot audio
 chroot rootfs-complete adduser spot input
+chroot rootfs-complete adduser spot lpadmin
 
 chroot rootfs-complete chown -R spot:spot /home/spot
 chmod 700 rootfs-complete/root rootfs-complete/home/spot
