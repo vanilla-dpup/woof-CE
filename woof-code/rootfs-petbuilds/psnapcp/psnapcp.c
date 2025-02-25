@@ -112,7 +112,7 @@ meta:
 	if ((dststat.st_uid != srcstat.st_uid || dststat.st_gid != srcstat.st_gid) && fchown(dst, srcstat.st_uid, srcstat.st_gid) < 0)
 		fprintf(stderr, "Failed to sync ownership: %s\n", strerror(errno));
 
-	if (dststat.st_mode != srcstat.st_mode && fchmod(dst, srcstat.st_mode & ~S_IFMT) < 0)
+	if ((dststat.st_mode != srcstat.st_mode || ((dststat.st_uid != srcstat.st_uid || dststat.st_gid != srcstat.st_gid) && (srcstat.st_mode & (S_ISUID | S_ISGID)))) && fchmod(dst, srcstat.st_mode & ~S_IFMT) < 0)
 		fprintf(stderr, "Failed to sync permissions: %s\n", strerror(errno));
 
 	if (dststat.st_mtime != srcstat.st_mtime)
