@@ -19,6 +19,8 @@
   <theme><name>Gradient-grey</name></theme>
 
   <theme>
+    <icon>Adwaita</icon>
+    <fallbackAppIcon>application-x-executable-symbolic</fallbackAppIcon>
     <cornerRadius>0</cornerRadius>
   </theme>
 

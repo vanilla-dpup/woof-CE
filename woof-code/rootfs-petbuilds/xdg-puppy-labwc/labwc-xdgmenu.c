@@ -153,6 +153,7 @@ void process_entry(GMenuTreeEntry *entry)
     gchar *cmd = g_strdup (g_app_info_get_commandline(G_APP_INFO(app)));
     gchar *tmp;
     gchar *escaped;
+    gchar *icon;
     int i;
 
     for (i = 0; i < strlen(cmd) - 1; i++) {
@@ -186,7 +187,7 @@ void process_entry(GMenuTreeEntry *entry)
         }
     }
 
-    g_printf("  <item label=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)));
+    g_printf("  <item label=\"%s\" icon=\"%s\">\n", g_strjoinv("&amp;", g_strsplit(name,"&",0)), (icon = g_desktop_app_info_get_string(app, G_KEY_FILE_DESKTOP_KEY_ICON)) ? icon : "application-x-executable-symbolic");
 
     escaped = g_markup_escape_text(cmd, -1);
 
@@ -204,6 +205,7 @@ void process_entry(GMenuTreeEntry *entry)
 
     g_printf("  </item>\n");
 
+    g_free(icon);
     g_free(escaped);
     g_free(name);
     g_free(cmd);
