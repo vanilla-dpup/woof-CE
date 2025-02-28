@@ -169,7 +169,7 @@ for NAME in $PKGS; do
 
     if [ -f rootfs-complete/pinstall.sh ]; then
         cd rootfs-complete
-        bash pinstall.sh
+        bash -x pinstall.sh
         rm -f pinstall.sh
         cd ..
     fi

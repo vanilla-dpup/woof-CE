@@ -74,7 +74,7 @@ for TEMPLATE in ../../packages-templates/*; do
 	echo "Applying ${TEMPLATE}"
 	bash -c ". ../../DISTRO_SPECS; . ${TEMPLATE}"
 	if [ -f pinstall.sh ]; then
-		bash pinstall.sh
+		bash -x pinstall.sh
 		rm -f pinstall.sh
 	fi
 done
@@ -89,7 +89,7 @@ for NAME in $ROOTFS_PACKAGES; do
 
 	if [ -f rootfs-complete/pinstall.sh ]; then
 		cd rootfs-complete
-		bash pinstall.sh
+		bash -x pinstall.sh
 		rm -f pinstall.sh
 		cd ..
 	fi
