@@ -71,7 +71,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: ${{ github.workflow }}-${{ github.event.inputs.arch }}-${{ github.event.inputs.compat-distro }}-${{ github.event.inputs.compat-distro-version }}-${{ github.run_number }}
           path: .
@@ -80,7 +80,7 @@ jobs:
           find . -type f -name '*.sfs' -exec sha512sum {} \; > SHA512checksums.txt
           find . -type f -name '*.iso' -exec sha512sum {} \; >> SHA512checksums.txt
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: ${{ github.event.inputs.prefix }}-${{ github.event.inputs.version }}${{ github.event.inputs.suffix }}
           tag_name: ${{ github.event.inputs.prefix }}-${{ github.event.inputs.version }}${{ github.event.inputs.suffix }}

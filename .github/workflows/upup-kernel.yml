@@ -15,7 +15,7 @@ jobs:
       matrix:
         release: [jammy]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: |
           apt-get update -qq
@@ -50,7 +50,7 @@ jobs:
           mkdir small-output
           mv `ls output/kernel_sources-*.sfs* output/kbuild-*.sfs* output/*.tar* 2>/dev/null` small-output
       - name: Upload kernel
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kernel-kit-output-usrmerge-ubuntu-${{ matrix.release }}-x86_64
           path: kernel-kit/small-output
