@@ -109,6 +109,10 @@ EOF
 chroot rootfs apt-get update
 chroot rootfs apt-get upgrade -y
 
+chroot rootfs apt-get install -y extrepo
+chroot rootfs extrepo enable librewolf
+chroot rootfs apt-get update
+
 # install all packages
 PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n'`
 chroot rootfs apt-get install -y $PKGS
