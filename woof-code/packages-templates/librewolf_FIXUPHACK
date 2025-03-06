@@ -1,6 +1,5 @@
-cat << EOF > usr/share/librewolf/puppy.cfg
-//
-
+mkdir -p etc/skel/.librewolf
+cat << EOF > etc/skel/.librewolf/librewolf.overrides.cfg
 // use less vertical space
 defaultPref("browser.compactmode.show", true);
 defaultPref("browser.uidensity", 1);
@@ -16,11 +15,6 @@ defaultPref("dom.ipc.processCount", 4);
 
 // use an external PDF viewer
 defaultPref("pdfjs.disabled", true);
-EOF
-
-cat << EOF > usr/share/librewolf/defaults/pref/puppy-settings.js
-pref("general.config.obscure_value", 0);
-pref("general.config.filename", "puppy.cfg");
 EOF
 
 cat << EOF > pinstall.sh
