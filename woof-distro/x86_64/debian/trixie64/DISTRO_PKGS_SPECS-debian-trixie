@@ -42,6 +42,7 @@ yes|desktop-file-utils|desktop-file-utils|exe,dev,doc,nls||deps:yes
 yes|dialog|dialog|exe,dev>null,doc,nls||deps:yes
 no|dkms|dkms|exe,dev>exe,doc,nls||deps:yes
 yes|dosfstools|dosfstools|exe,dev>null,doc,nls||deps:yes
+yes|e2fsprogs|e2fsprogs|exe,dev,doc,nls||deps:yes
 yes|erofs-utils|erofs-utils|exe,dev,doc,nls||deps:yes
 yes|exfatprogs|exfatprogs|exe,dev,doc,nls||deps:yes
 yes|f2fs-tools|f2fs-tools|exe,dev,doc,nls||deps:yes
