@@ -1,9 +1,9 @@
 download() {
-    [ -f dwl-cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz ] || curl --fail --retry 3 --max-time 60 -o dwl-cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz https://codeberg.org/dwl/dwl/archive/cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz
+    [ -f dwl-2783d91611a027cfecc43a39689b6e589578a88b.tar.gz ] || curl --fail --retry 3 --max-time 60 -o dwl-2783d91611a027cfecc43a39689b6e589578a88b.tar.gz https://codeberg.org/dwl/dwl/archive/2783d91611a027cfecc43a39689b6e589578a88b.tar.gz
 }
 
 build() {
-    tar -xzf dwl-cfc80c8f44ef47b8da903687f075382a1432ae04.tar.gz
+    tar -xzf dwl-2783d91611a027cfecc43a39689b6e589578a88b.tar.gz
     cd dwl
     patch -p1 < ../en-keycodes.patch
     patch -p1 < ../snail.patch
