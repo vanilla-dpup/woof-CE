@@ -168,7 +168,6 @@ yes|viewnior|viewnior|exe,dev,doc,nls||deps:yes
 yes|weechat|weechat,weechat-curses,weechat-headless|exe,dev,doc,nls||deps:yes
 yes|wf-recorder|wf-recorder|exe,dev,doc,nls||deps:yes
 yes|xarchiver|xarchiver|exe,dev,doc,nls||deps:yes
-yes|xournalpp|xournalpp|exe,dev,doc,nls||deps:yes
 "
 fi
 
