@@ -1,6 +1,6 @@
 cat << EOF > pinstall.sh
 for T in \`grep ^MimeType= usr/share/applications/geany.desktop | sed -e s/^MimeType=//g -e 's/;/ /g'\`; do
-	[ "\$T" = "text/plain" ] && continue
+	[ "\$T" = "text/plain" -o "\$T" = "text/html" ] && continue
 	chroot . xdg-mime default geany.desktop \$T
 	chroot . run-as-spot xdg-mime default geany.desktop \$T
 done
