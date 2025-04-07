@@ -134,7 +134,6 @@ yes|blueman|blueman|exe,dev,doc,nls||deps:yes
 yes|command-not-found|command-not-found|exe,dev,doc,nls||deps:yes
 yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
 yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev,libfaad-dev|exe,dev,doc,nls||deps:yes
-yes|epdfview-deps|libpoppler-glib-dev|exe,dev,doc,nls||deps:yes
 yes|efibootmgr|efibootmgr|exe,dev,doc,nls||deps:yes
 yes|ExpenseTracker-deps|libsqlite3-dev|exe,dev,doc,nls||deps:yes
 yes|fastfetch|fastfetch|exe,dev,doc,nls||deps:yes
