@@ -131,8 +131,9 @@ STATUS=0
 
 echo -n "Making the filesystem usable..." >/dev/console
 
-mount -t tmpfs -onosuid,noexec,size=10%,mode=755 tmpfs /run
-mount -t tmpfs -onodev,noexec,nosuid,size=20%,mode=1777 /run/lock
+mount -t tmpfs -onodev,noexec,nosuid,size=10%,mode=755 tmpfs /run
+mkdir /run/lock
+mount -t tmpfs -onodev,noexec,nosuid,size=20%,mode=1777 tmpfs /run/lock
 mount -t proc -onodev,noexec,nosuid proc /proc
 mount -t sysfs -onodev,noexec,nosuid sysfs /sys
 mount -t debugfs -onodev,noexec,nosuid none /sys/kernel/debug

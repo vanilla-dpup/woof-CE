@@ -795,13 +795,13 @@ fi
 mkdir -p /pup_new/initrd/mnt/tmpfs/tmp
 if [ -d /pup_new/initrd/mnt/tmpfs/tmp ];then #extra paranoid precaution
  chmod 1777 /pup_new/initrd/mnt/tmpfs/tmp
- mount --bind /pup_new/initrd/mnt/tmpfs/tmp /pup_new/tmp #for after switch
+ mount -t tmpfs -onodev,nosuid tmpfs /pup_new/tmp #for after switch
 fi
 
 #---
 
 #PNOX is a boot param. /etc/profile prevents X from starting if this file exists...
-[ "$PNOX" = "yes" ] && touch /pup_new/initrd/mnt/tmpfs/tmp/bootcnt.txt
+[ "$PNOX" = "yes" ] && touch /pup_new/tmp/bootcnt.txt
 
 cp -a /DISTRO_SPECS /pup_new/initrd/
 [ ! -f /pup_new/etc/DISTRO_SPECS ] && cp -a /DISTRO_SPECS /pup_new/etc/
