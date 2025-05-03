@@ -1,6 +1,7 @@
 # Key Bindings
 
 * Alt+F4: close window
+* Alt+Shift: next keyboard layout
 * Alt+Tab: next window
 * Super+Up: maximize or unmaximize window
 * Super+Down: minimize window

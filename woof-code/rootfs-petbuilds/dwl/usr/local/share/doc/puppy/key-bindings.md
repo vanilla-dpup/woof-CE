@@ -27,6 +27,7 @@
 * Super+Ctrl+Shift+[1-9]: toggle tag for window
 * Super+w: web browser
 * Ctrl+Alt+t: terminal
+* Alt+Shift: next keyboard layout
 * Alt+Tab: next window
 * Alt+F2: launcher
 * Alt+F4: close window
