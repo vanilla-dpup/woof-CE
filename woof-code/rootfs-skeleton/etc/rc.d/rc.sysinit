@@ -326,13 +326,7 @@ echo -e "\\033[64G\\033[1;33m[backgrounded]\\033[0;39m" >/dev/console #column 62
 ###################PERSONAL BOOT SCRIPT######################
 echo "PERSONAL BOOT SCRIPT"
 #personal boot script here...
-if [ ! -f /etc/rc.d/rc.local ];then
- echo '#this file called from rc.sysinit' > /etc/rc.d/rc.local
- echo '#you can edit this file' >> /etc/rc.d/rc.local
- echo '#When firewall is installed, will append lines to this file...' >> /etc/rc.d/rc.local
-else
- . /etc/rc.d/rc.local
-fi
+. /etc/rc.d/rc.local
 
 #that's it. next stop is /etc/profile...
 ###END###
