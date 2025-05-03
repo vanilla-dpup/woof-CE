@@ -22,6 +22,9 @@ if systemd-detect-virt -vq; then
 	export WLR_NO_HARDWARE_CURSORS=1
 fi
 
+# hack to prevent libseat from trying logind
+export LIBSEAT_BACKEND=seatd
+
 while :
 do
 	unset XKB_DEFAULT_LAYOUT
