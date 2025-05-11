@@ -3,5 +3,9 @@
 NAME="${1#/dev/}"
 test -n "$NAME"
 [ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
+for FILE in "/mnt/$NAME"/*; do
+	sync -f "$FILE"
+	break
+done
 umount -l "/mnt/$NAME"
 rmdir "/mnt/$NAME"
