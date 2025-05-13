@@ -102,7 +102,7 @@ sync -f "$BASE/"
 # DIRECTORIES
 # =============================================================================
 
-find . -mount -type d | tail +2 | sed -e 's/\.\///' |
+find . -mount -type d -not -path './initrd/*' | tail +2 | sed -e 's/\.\///' |
 while read -r N
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
