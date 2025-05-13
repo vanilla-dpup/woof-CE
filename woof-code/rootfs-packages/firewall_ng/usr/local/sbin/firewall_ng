@@ -96,15 +96,15 @@ process_ports() {
 
 }
 
+ENABLED=false
+[ -x /etc/init.d/rc.firewall ] && ENABLED=true
+
 # setup
 [ -d "$CONFDIR" ] || mkdir -p "$CONFDIR"
 if [ -f "$CONF" ];then
 	. "$CONF"
-	CB_MAINTXT="$(gettext "Your firewall is configured. Change it to open ports if you have added extra services.")"
 else
-	CB_MAINTXT="$(gettext "The default setting is that all ports are blocked. Uncheck to allow you to check some ports.")"
 	LOGGING=false
-	MAIN=false
 	CONFIG_SSH=false
 	CONFIG_CUPS=false
 	CONFIG_SAMBA=false
@@ -132,11 +132,10 @@ else
 		--height=320 \
 		--form \
 		--scroll \
-		--field="$CB_MAINTXT":CHK $MAIN \
-		--field="$(gettext 'Check this box to enable logging.')":CHK $LOGGING \
+		--field="$(gettext 'Enable firewall')":CHK $ENABLED \
+		--field="$(gettext 'Log dropped packets')":CHK $LOGGING \
 		--field=:LBL "" \
-		--field="<b>$(gettext 'Choose which connections to allow through your firewall.')</b>
-$(gettext 'Check your required remote connections or leave the default.')":LBL "" \
+		--field="$(gettext 'Exceptions:')":LBL "" \
 		--field="SSH - $(gettext 'Remote secure shell access')":CHK $CONFIG_SSH \
 		--field="CUPS - $(gettext 'Printer server')":CHK $CONFIG_CUPS \
 		--field="Samba - $(gettext 'Share files with Windows')":CHK $CONFIG_SAMBA \
@@ -164,9 +163,8 @@ $(gettext 'Or:')
 	EXIT=$?
 fi
 case "$EXIT" in
-	0)IFS='|' read -r MAIN LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS CONFIG_MDNS CONFIG_SSDP CONFIG_NATPMP _ _ CONFIG_EXTRAS _ <<< "$RETVALS"
+	0)IFS='|' read -r ENABLED LOGGING _ _ CONFIG_SSH CONFIG_CUPS CONFIG_SAMBA CONFIG_DLNA CONFIG_NTP CONFIG_FTP CONFIG_HTTP CONFIG_DNS CONFIG_DHCP CONFIG_NFS CONFIG_MDNS CONFIG_SSDP CONFIG_NATPMP _ _ CONFIG_EXTRAS _ <<< "$RETVALS"
 	echo "LOGGING=$LOGGING
-MAIN=$MAIN
 CONFIG_SSH=$CONFIG_SSH
 CONFIG_CUPS=$CONFIG_CUPS
 CONFIG_SAMBA=$CONFIG_SAMBA
@@ -480,21 +478,15 @@ if [ "\$LOGGING" = "true" ];then
 fi
 EOF_REST
 
-if [ -f "$TMPFW" ];then
-	[ "$1" != "enable" ] && sh /etc/init.d/rc.firewall stop && sleep 1
-	echo "copying firewall"
-	cp -af "$TMPFW" /etc/init.d/rc.firewall
-	[ "$MAIN" = "true" -o "$CONFIG_SSH" = "true" -o "$CONFIG_CUPS" = "true" -o "$CONFIG_SAMBA" = "true" -o "$CONFIG_DLNA" = "true" -o "$CONFIG_NTP" = "true" -o "$CONFIG_FTP" = "true" -o "$CONFIG_HTTP" = "true" -o "$CONFIG_DNS" = "true" -o "$CONFIG_DHCP" = "true" -o "$CONFIG_NFS" = "true" -o "$CONFIG_MDNS" = "true" -o "$CONFIG_SSDP" = "true" -o "$CONFIG_NATPMP" = "true" ] && chmod 755 /etc/init.d/rc.firewall || chmod 644 /etc/init.d/rc.firewall
-	rm -f "$TMPFW"
-else
-	echo "Something went wrong"
-	exit
-fi
+[ "$1" != "enable" ] && sh /etc/init.d/rc.firewall stop
+echo "copying firewall"
+cp -af "$TMPFW" /etc/init.d/rc.firewall
+[ "$ENABLED" = "true" -o "$1" = "enable" ] && chmod 755 /etc/init.d/rc.firewall || chmod 644 /etc/init.d/rc.firewall
+rm -f "$TMPFW"
 
 [ "$1" = "enable" ] && exit
-[ "$MAIN" = "false" -a "$CONFIG_SSH" = "false" -a "$CONFIG_CUPS" = "false" -a "$CONFIG_SAMBA" = "false" -a "$CONFIG_DLNA" = "false" -a "$CONFIG_NTP" = "false" -a "$CONFIG_FTP" = "false" -a "$CONFIG_HTTP" = "false" -a "$CONFIG_DNS" = "false" -a "$CONFIG_DHCP" = "false" -a "$CONFIG_NFS" = "false" -a "$CONFIG_MDNS" = "false" -a "$CONFIG_SSDP" = "false" -a "$CONFIG_NATPMP" = "false" ] && exit
 
 # run it!
-x-terminal-emulator --hold -e /etc/init.d/rc.firewall start &
+[ "$ENABLED" = "true" ] && x-terminal-emulator --hold -e /etc/init.d/rc.firewall start &
 
 # end
