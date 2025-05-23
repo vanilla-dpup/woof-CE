@@ -1,5 +1,5 @@
 download() {
-    [ -f grsync-1.3.0.tar.gz ] || wget -t 3 -T 60 https://www.opbyte.it/release/grsync-1.3.0.tar.gz
+    [ -f grsync-1.3.0.tar.gz ] || wget -t 3 -T 60 https://phoenixnap.dl.sourceforge.net/project/grsync/grsync-1.3.0.tar.gz
 }
 
 build() {
