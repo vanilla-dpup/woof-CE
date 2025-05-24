@@ -13,6 +13,8 @@ jobs:
     strategy:
       matrix:
         include:
+          - release: bookworm
+            arch: x86_64
           - release: trixie
             arch: x86_64
           - release: sid
