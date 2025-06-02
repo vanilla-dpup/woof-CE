@@ -9,6 +9,7 @@
 #include <signal.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 static int
 fixmenus(const sigset_t *set)
@@ -34,7 +35,7 @@ fixmenus(const sigset_t *set)
 }
 
 static int
-handle_events(const int fd, const int appwd, const int flatpakappwd, const sigset_t *set)
+handle_events(const int fd, const sigset_t *set)
 {
 	char buf[sizeof(struct inotify_event) + NAME_MAX + 1];
 	const struct inotify_event *event;
@@ -53,9 +54,6 @@ handle_events(const int fd, const int appwd, const int flatpakappwd, const sigse
 		for (event = (const struct inotify_event *)buf;
 		     (char *)event < (buf + out);
 		     event = (const struct inotify_event *)((char *)event + sizeof(*event) + event->len)) {
-			if ((event->wd != appwd) && (event->wd != flatpakappwd))
-				continue;
-
 			if (!(event->mask & (IN_DELETE | IN_CLOSE_WRITE | IN_MOVED_TO)))
 				continue;
 
@@ -74,10 +72,16 @@ handle_events(const int fd, const int appwd, const int flatpakappwd, const sigse
 int
 main(int argc, char* argv[])
 {
+	static char path[PATH_MAX];
+	const char *datadirs, *share;
+	char *copy, *pos;
 	sigset_t set, oset;
-	int fd, appwd, flatpakappwd, sig;
+	int fd,  sig;
 
 	if (argc != 1)
+		return EXIT_FAILURE;
+
+	if (!(datadirs = getenv("XDG_DATA_DIRS")) || !*datadirs || !(copy = strdup(datadirs)))
 		return EXIT_FAILURE;
 
 	if ((sigemptyset(&set) < 0) ||
@@ -87,39 +91,40 @@ main(int argc, char* argv[])
 	    (sigaddset(&set, SIGTERM) < 0) ||
 	    (sigaddset(&set, SIGHUP) < 0) ||
 	    (sigaddset(&set, SIGCHLD) < 0) ||
-	    (sigprocmask(SIG_BLOCK, &set, &oset) < 0))
-		return EXIT_FAILURE;
-
-	fd = inotify_init1(O_CLOEXEC);
-	if (fd < 0)
-		return EXIT_FAILURE;
-
-	appwd = inotify_add_watch(fd, "/usr/share/applications", IN_CLOSE_WRITE | IN_DELETE | IN_MOVED_TO | IN_EXCL_UNLINK);
-	if (appwd < 0) {
-		close(fd);
+	    (sigprocmask(SIG_BLOCK, &set, &oset) < 0)) {
+		free(copy);
 		return EXIT_FAILURE;
 	}
 
-	flatpakappwd = inotify_add_watch(fd, "/var/lib/flatpak/exports/share/applications", IN_CREATE | IN_DELETE | IN_MOVED_TO | IN_EXCL_UNLINK);
+	fd = inotify_init1(O_CLOEXEC);
+	if (fd < 0) {
+		free(copy);
+		return EXIT_FAILURE;
+	}
+
+	share = strtok_r(copy, ":", &pos);
+	while (share) {
+		snprintf(path, sizeof(path), "%s/applications", share);
+		path[sizeof(path) - 1] = '\0';
+		inotify_add_watch(fd, path, IN_CLOSE_WRITE | IN_DELETE | IN_MOVED_TO | IN_EXCL_UNLINK);
+		share = strtok_r(NULL, ":", &pos);
+	}
+	free(copy);
 
 	if ((fcntl(fd, F_SETFL, O_NONBLOCK | O_ASYNC) < 0) ||
 	    (fcntl(fd, F_SETSIG, SIGRTMIN) < 0) ||
 	    (fcntl(fd, F_SETOWN, getpid()) < 0)) {
-		inotify_rm_watch(fd, flatpakappwd);
-		inotify_rm_watch(fd, appwd);
 		close(fd);
 		return EXIT_FAILURE;
 	}
 
 	while ((sigwait(&set, &sig) == 0) &&
 	       (((sig == SIGRTMIN) &&
-	         (handle_events(fd, appwd, flatpakappwd, &oset) == 0)) ||
+	         (handle_events(fd, &oset) == 0)) ||
 	        ((sig == SIGALRM) &&
 	         (fixmenus(&oset) == 0)) ||
 	        (sig == SIGCHLD)));
 
-	inotify_rm_watch(fd, flatpakappwd);
-	inotify_rm_watch(fd, appwd);
 	close(fd);
 	return EXIT_FAILURE;
 }
