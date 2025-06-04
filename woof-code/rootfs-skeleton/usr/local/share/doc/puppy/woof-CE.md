@@ -111,12 +111,12 @@ The goal is to build something similar to [DebianDog](https://debiandog.github.i
 * initrd-progs/ contains the initramfs skeleton
     * 0initrd/init is the early init script: it sets up an `overlay` file system and `switch_root`s into it
 * kernel-kit/ contains a tool that builds the kernel
-* woof-distro/x86_64/debian/trixie64/ contains configuration files
+* woof-distro/x86_64/debian/testing64/ contains configuration files
     * A [Debian](https://www.debian.org/) 13 based distro, featuring
         * [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar), or
         * [dwl](https://codeberg.org/dwl/dwl) with the [snail layout](https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/snail) and [yambar](https://codeberg.org/dnkl/yambar)
     * DISTRO_SPECS contains the distro name and version
-    * DISTRO_PKGS_SPECS-debian-trixie contains a list of binary packages to include
+    * DISTRO_PKGS_SPECS-debian-testing contains a list of binary packages to include
     * _00build.conf contains a list of packages to build from source (`PETBUILDS`) and other settings
 * woof-code/rootfs-skeleton contains the root file system skeleton
 * woof-code/rootfs-packages contains optional additions to rootfs-skeleton
@@ -139,7 +139,7 @@ Or:
 
 Then:
 
-    ./merge2out woof-distro/x86_64/debian/trixie64
+    ./merge2out woof-distro/x86_64/debian/testing64
     cd ../woof-out_*
     ./1download
     ./2buildkernel

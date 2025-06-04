@@ -9,15 +9,15 @@ jobs:
   build:
     if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-11.0.x')
     runs-on: ubuntu-24.04
-    continue-on-error: ${{ matrix.release == 'sid' }}
+    continue-on-error: ${{ matrix.release == 'unstable' }}
     strategy:
       matrix:
         include:
           - release: bookworm
             arch: x86_64
-          - release: trixie
+          - release: testing
             arch: x86_64
-          - release: sid
+          - release: unstable
             arch: x86_64
     steps:
       - uses: actions/checkout@v4

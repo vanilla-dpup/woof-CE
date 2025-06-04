@@ -44,7 +44,7 @@ cat /etc/resolv.conf > rootfs/etc/resolv.conf
 case "$DISTRO_BINARY_COMPAT" in
 debian)
 	case "$DISTRO_COMPAT_VERSION" in
-	sid)
+	unstable|sid)
 		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
 Types: deb
 URIs: ${MIRROR}
@@ -73,7 +73,7 @@ EOF
 
 devuan)
 	case "$DISTRO_COMPAT_VERSION" in
-	ceres)
+	unstable|ceres)
 		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
 Types: deb
 URIs: ${MIRROR}
