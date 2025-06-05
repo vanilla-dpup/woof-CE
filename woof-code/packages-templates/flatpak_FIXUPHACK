@@ -1,2 +1,0 @@
-mkdir -p home/spot/.local/share/flatpak/exports/share/applications home/spot/.local/share/flatpak/exports/bin
-mkdir -p var/lib/flatpak/exports/share/applications var/lib/flatpak/exports/bin
