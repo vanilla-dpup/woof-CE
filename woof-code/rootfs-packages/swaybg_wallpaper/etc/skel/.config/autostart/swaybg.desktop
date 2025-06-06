@@ -1,7 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Name=swaybg
-Comment=swaybg
-Exec=swaybg -c "#04475C"
-Terminal=false
-Type=Application
