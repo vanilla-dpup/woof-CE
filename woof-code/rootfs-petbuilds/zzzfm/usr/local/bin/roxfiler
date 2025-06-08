@@ -3,7 +3,7 @@
 # some legacy scripts run "rox", expecting it to open a directory using a file manager, or open a file using the default handler
 
 if [ $# -eq 0 ]; then
-	spacefm &
+	zzzfm &
 else
 	xdg-open "$@" &
 fi

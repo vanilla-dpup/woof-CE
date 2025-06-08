@@ -8,11 +8,12 @@ Subject: [PATCH] avoid X-specific calls under Wayland
  src/desktop/working-area.c |  5 +++++
  src/main-window.c          |  4 ++++
  src/main.c                 | 21 ++++++++++++++++-----
- src/vfs/vfs-execute.c      | 28 +++++++++++++++++++++++++---
- 5 files changed, 57 insertions(+), 10 deletions(-)
+ src/vfs/vfs-execute.c      | 15 ++++++++++++++-
+ src/vfs/vfs-execute.h      |  2 ++
+ 6 files changed, 48 insertions(+), 8 deletions(-)
 
 diff --git a/src/desktop/desktop.c b/src/desktop/desktop.c
-index 29a1be3..4bcf58d 100644
+index 2a15012..a7655fd 100644
 --- a/src/desktop/desktop.c
 +++ b/src/desktop/desktop.c
 @@ -27,6 +27,7 @@
@@ -23,7 +24,7 @@ index 29a1be3..4bcf58d 100644
  //#include "fm-desktop.h"
  
  #include "vfs-file-info.h"
-@@ -74,6 +75,12 @@ void fm_turn_on_desktop_icons(gboolean transparent)
+@@ -73,6 +74,12 @@ void fm_turn_on_desktop_icons(gboolean transparent) {
      gint i;
      int big = 0;
  
@@ -36,28 +37,19 @@ index 29a1be3..4bcf58d 100644
      if( ! group )
          group = gtk_window_group_new();
  
-@@ -82,8 +89,6 @@ void fm_turn_on_desktop_icons(gboolean transparent)
- 
-     vfs_mime_type_get_icon_size( &big, NULL );
- 
--    gdpy = gdk_display_get_default();
--
-     n_screens = gdk_display_get_n_screens( gdpy );
-     desktops = g_new( GtkWidget *, n_screens );
-     for ( i = 0; i < n_screens; i++ )
 diff --git a/src/desktop/working-area.c b/src/desktop/working-area.c
-index c0b7631..3050ad9 100644
+index bcd756c..d3dc766 100644
 --- a/src/desktop/working-area.c
 +++ b/src/desktop/working-area.c
-@@ -22,6 +22,7 @@
-   This piece of code detecting working area is got from Guifications, a plug-in for Gaim.
- */
+@@ -17,6 +17,7 @@
+  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+  */
  
 +# include <gtk/gtk.h>
  # include <gdk/gdk.h>
  # include <gdk/gdkx.h>
  # include <X11/Xlib.h>
-@@ -43,7 +44,11 @@ gf_display_get_workarea(GdkScreen* g_screen, GdkRectangle *rect) {
+@@ -37,7 +38,11 @@ gboolean  gf_display_get_workarea(GdkScreen* g_screen, GdkRectangle *rect) {
  
  	/* get the gdk display */
  	g_display = gdk_display_get_default();
@@ -70,11 +62,11 @@ index c0b7631..3050ad9 100644
  
  	/* get the x display from the gdk display */
 diff --git a/src/main-window.c b/src/main-window.c
-index 574a75f..f3a37fe 100644
+index d49b63a..fe156b6 100644
 --- a/src/main-window.c
 +++ b/src/main-window.c
-@@ -4175,7 +4175,11 @@ static long get_desktop_index( GtkWindow* win )
-     {
+@@ -3263,7 +3263,11 @@ static long get_desktop_index( GtkWindow* win ) {
+     } else {
          // get current desktop
          display = gdk_display_get_default();
 +#if GTK_CHECK_VERSION (3, 0, 0)
@@ -82,17 +74,17 @@ index 574a75f..f3a37fe 100644
 +#else
          if ( display )
 +#endif
-             window = gdk_x11_window_lookup_for_display( display,
-                                     gdk_x11_get_default_root_xwindow() );
+             window = gdk_x11_window_lookup_for_display( display, gdk_x11_get_default_root_xwindow() );
      }
+ 
 diff --git a/src/main.c b/src/main.c
-index 27f5614..267555e 100644
+index 63a24f0..6f4eae4 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -329,12 +329,23 @@ gboolean on_socket_event( GIOChannel* ioc, GIOCondition cond, gpointer data )
+@@ -311,12 +311,23 @@ gboolean on_socket_event( GIOChannel* ioc, GIOCondition cond, gpointer data ) {
+ }
  
- void get_socket_name_nogdk( char* buf, int len )
- {
+ void get_socket_name_nogdk( char* buf, int len ) {
 -    char* dpy = g_strdup( g_getenv( "DISPLAY" ) );
 -    if ( dpy && !strcmp( dpy, ":0.0" ) )
 +    char* dpy;
@@ -116,41 +108,13 @@ index 27f5614..267555e 100644
 +            dpy = g_strdup( ":0" );
 +        }
      }
-     g_snprintf( buf, len, "%s/.spacefm-socket%s-%s", xset_get_tmp_dir(),
-                                                      dpy,
+     g_snprintf( buf, len, "%s/.zzzfm-socket%s-%s", xset_get_tmp_dir(), dpy, g_get_user_name() );
+     g_free( dpy );
 diff --git a/src/vfs/vfs-execute.c b/src/vfs/vfs-execute.c
-index 55571c1..3402cef 100644
+index d2eb4fa..0e59286 100644
 --- a/src/vfs/vfs-execute.c
 +++ b/src/vfs/vfs-execute.c
-@@ -12,13 +12,13 @@
- 
- #include "vfs-execute.h"
- 
-+#include <gtk/gtk.h>
-+#include <gdk/gdkx.h>
- #ifdef HAVE_SN
- /* FIXME: Startup notification may cause problems */
- #define SN_API_NOT_YET_FROZEN
- #include <libsn/sn-launcher.h>
- #include <X11/Xatom.h>
--#include <gtk/gtk.h>
--#include <gdk/gdkx.h>
- #include <time.h>
- #endif
- 
-@@ -63,6 +63,11 @@ tvsn_get_active_workspace_number ( GdkScreen *screen )
-     gint format_ret;
-     gint ws_num = 0;
- 
-+# if GTK_CHECK_VERSION (3, 0, 0)
-+    if ( ! GDK_IS_X11_SCREEN ( screen ) )
-+        return ws_num;
-+# endif
-+
-     gdk_error_trap_push ();
- 
-     root = gdk_screen_get_root_window ( screen );
-@@ -131,7 +136,11 @@ gboolean vfs_exec_on_screen( GdkScreen* screen,
+@@ -33,7 +33,11 @@ gboolean vfs_exec_on_screen( GdkScreen* screen, const char* work_dir, char** arg
      for ( i = 0; i < n_env; ++i )
      {
          /* g_debug( "old envp[%d] = \"%s\"" , i, envp[i]); */
@@ -162,21 +126,9 @@ index 55571c1..3402cef 100644
              display_index = i;
          else
          {
-@@ -142,7 +151,11 @@ gboolean vfs_exec_on_screen( GdkScreen* screen,
-     }
+@@ -45,7 +49,16 @@ gboolean vfs_exec_on_screen( GdkScreen* screen, const char* work_dir, char** arg
  
- #ifdef HAVE_SN
-+# if GTK_CHECK_VERSION (3, 0, 0)
-+    if ( use_startup_notify && GDK_IS_X11_SCREEN ( screen ) )
-+# else
-     if ( use_startup_notify )
-+# endif
-         display = sn_display_new ( GDK_SCREEN_XDISPLAY ( screen ),
-                                ( SnDisplayErrorTrapPush ) gdk_error_trap_push,
-                                ( SnDisplayErrorTrapPush ) gdk_error_trap_pop );
-@@ -182,7 +195,16 @@ gboolean vfs_exec_on_screen( GdkScreen* screen,
- 
-     /* This is taken from gdk_spawn_on_screen */
+     //  This is taken from gdk_spawn_on_screen
      display_name = gdk_screen_make_display_name ( screen );
 -    if ( display_index >= 0 )
 +
@@ -192,6 +144,20 @@ index 55571c1..3402cef 100644
          new_env[ display_index ] = g_strconcat( "DISPLAY=", display_name, NULL );
      else
          new_env[ i++ ] = g_strconcat( "DISPLAY=", display_name, NULL );
+diff --git a/src/vfs/vfs-execute.h b/src/vfs/vfs-execute.h
+index 6bf7bfc..5daec3e 100644
+--- a/src/vfs/vfs-execute.h
++++ b/src/vfs/vfs-execute.h
+@@ -8,7 +8,9 @@
+ #define _VFS_EXECUTE_H_
+ 
+ #include <glib.h>
++#include <gtk/gtk.h>
+ #include <gdk/gdk.h>
++#include <gdk/gdkx.h>
+ 
+ G_BEGIN_DECLS
+ 
 -- 
-2.35.1
+2.47.2
 

@@ -104,7 +104,7 @@
     </keybind>
 
     <keybind key="W-e">
-      <action name="Execute"><command>spacefm</command></action>
+      <action name="Execute"><command>zzzfm</command></action>
     </keybind>
 
     <keybind key="W-w">

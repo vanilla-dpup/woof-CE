@@ -90,7 +90,7 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 		"format": "\uf07b",
 		"tooltip-format": "File manager",
 		"interval": "once",
-		"on-click": "spacefm"
+		"on-click": "zzzfm"
 	},
 	"custom/browser": {
 		"format": "\uf0ac",
@@ -272,7 +272,7 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 		"format": "\uf07b",
 		"tooltip-format": "File manager",
 		"interval": "once",
-		"on-click": "spacefm"
+		"on-click": "zzzfm"
 	},
 	"custom/browser": {
 		"format": "\uf0ac",

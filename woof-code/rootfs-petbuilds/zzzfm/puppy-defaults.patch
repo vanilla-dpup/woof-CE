@@ -1,49 +1,43 @@
-diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/ptk/ptk-location-view.c spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/ptk/ptk-location-view.c
---- spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/ptk/ptk-location-view.c	2023-06-14 16:41:14.503322416 +0300
-+++ spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/ptk/ptk-location-view.c	2023-06-14 16:59:31.022783816 +0300
-@@ -3361,6 +3361,9 @@ gboolean volume_is_visible( VFSVolume* v
+diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c	2025-06-08 21:22:12.648137352 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c	2025-06-08 21:22:16.748184807 +0300
+@@ -2954,6 +2954,9 @@ gboolean volume_is_visible( VFSVolume* v
      if ( vol->device_type == DEVICE_TYPE_OTHER )
          return xset_get_b( "dev_show_file" );
-     
+ 
 +    if ( g_str_has_prefix( vol->device_file, "/dev/zram" ) )
 +        return FALSE;
-+    
++
      // loop
      if ( g_str_has_prefix( vol->device_file, "/dev/loop" ) )
      {
-@@ -3368,7 +3371,7 @@ gboolean volume_is_visible( VFSVolume* v
+@@ -2961,7 +2964,7 @@ gboolean volume_is_visible( VFSVolume* v
              return TRUE;
          if ( !vol->is_mountable && !vol->is_mounted )
              return FALSE;
 -        // fall through
 +        return xset_get_b( "dev_show_file" );
      }
-     
-     // ramfs CONFIG_BLK_DEV_RAM causes multiple entries of /dev/ram*
-diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/settings.c
---- spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c	2023-06-14 16:41:14.503322416 +0300
-+++ spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/settings.c	2023-06-14 16:59:51.210768859 +0300
-@@ -61,8 +61,8 @@ const int big_icon_size_default = 48;
- const int max_icon_size = 512;
- const int small_icon_size_default = 22;
- const int tool_icon_size_default = 0;
--const gboolean single_click_default = FALSE;
--const gboolean no_single_hover_default = FALSE;
-+const gboolean single_click_default = TRUE;
-+const gboolean no_single_hover_default = TRUE;
  
- /* FIXME: temporarily disable trash since it's not finished */
- const gboolean use_trash_can_default = FALSE;
-@@ -84,14 +84,14 @@ const gboolean show_wm_menu_default = FA
- const gboolean desk_single_click_default = FALSE;
- const gboolean desk_no_single_hover_default = FALSE;
- const gboolean desk_open_mime_default = FALSE;
--const int margin_top_default = 12;
-+const int margin_top_default = 6;
+     // ramfs CONFIG_BLK_DEV_RAM causes multiple entries of /dev/ram*
+diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.c
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c	2025-06-08 21:22:12.648137352 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.c	2025-06-08 21:22:36.884417910 +0300
+@@ -55,7 +55,7 @@ const int big_icon_size_default = 48;
+ const int max_icon_size = 96;         // howdy     WAS   512!    // // also change max listed in prefdlg.ui prefdlg2.ui
+ const int small_icon_size_default = 22;    //   howdy       consider changing this to 16
+ const int tool_icon_size_default = 0;      // zero indicates "defer to whatever is specified by the user's gtk theme"
+-const gboolean single_click_default = FALSE;
++const gboolean single_click_default = TRUE;
+ const gboolean no_single_hover_default = TRUE;   // howdy
+ 
+ //const int open_bookmark_method_default = 1;
+@@ -79,11 +79,11 @@ const gboolean desk_open_mime_default =
+ const int margin_top_default = 12;
  const int margin_left_default = 6;
  const int margin_right_default = 6;
--const int margin_bottom_default = 12;
-+const int margin_bottom_default = 6;
+-const int margin_bottom_default = 12;    // howdy  apparently this specifies nim values, which take precedence of er any gtk themes settinss
++const int margin_bottom_default = 6;    // howdy  apparently this specifies nim values, which take precedence of er any gtk themes settinss
  const int margin_pad_default = 6;
  
  /* Default values of interface settings */
@@ -52,16 +46,22 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
  const gboolean hide_close_tab_buttons_default = FALSE;
  const gboolean hide_side_pane_buttons_default = FALSE;
  //const gboolean hide_folder_content_border_default = FALSE;
-@@ -366,7 +366,7 @@ static void parse_window_state( char* li
+@@ -341,12 +341,12 @@ static void parse_window_state( char* li
+     if ( 0 == strcmp( name, "width" ) )
+     {
+         v = atoi( value );
+-        app_settings.width = ( v > 0 ? v : 780 );
++        app_settings.width = ( v > 0 ? v : 640 );
+     }
      if ( 0 == strcmp( name, "height" ) )
      {
          v = atoi( value );
--        app_settings.height = ( v > 0 ? v : 480 );
+-        app_settings.height = ( v > 0 ? v : 580 );
 +        app_settings.height = ( v > 0 ? v : 301 );
      }
      if ( 0 == strcmp( name, "maximized" ) )
      {
-@@ -637,6 +637,8 @@ void load_settings( char* config_dir )
+@@ -604,6 +604,8 @@ void load_settings( char* config_dir ) {
      app_settings.desktop_sort_by = desktop_sort_by_default;
      app_settings.desktop_sort_type = desktop_sort_type_default;
      app_settings.show_wm_menu = show_wm_menu_default;
@@ -70,25 +70,18 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
      app_settings.desk_single_click = desk_single_click_default;
      app_settings.desk_no_single_hover = desk_no_single_hover_default;
      app_settings.desk_open_mime = desk_open_mime_default;
-@@ -663,7 +665,7 @@ void load_settings( char* config_dir )
-     app_settings.use_si_prefix = use_si_prefix_default;
-     //app_settings.show_location_bar = show_location_bar_default;
-     //app_settings.home_folder = NULL;   //MOD
--    app_settings.no_execute = TRUE;   //MOD
-+    app_settings.no_execute = FALSE;   //MOD
-     app_settings.no_confirm = FALSE;   //MOD
-     app_settings.date_format = NULL;   //MOD
-     
-@@ -676,7 +678,7 @@ void load_settings( char* config_dir )
+@@ -641,8 +643,8 @@ void load_settings( char* config_dir ) {
+ 
      /* Window State */
      //app_settings.splitter_pos = 160;
-     app_settings.width = 640;
--    app_settings.height = 480;
+-    app_settings.width = 780;
+-    app_settings.height = 580;
++    app_settings.width = 640;
 +    app_settings.height = 301;
  
-     // MOD extra settings
+     //  extra settings
      xset_defaults();
-@@ -10932,7 +10934,6 @@ void xset_defaults()
+@@ -8083,7 +8085,6 @@ void xset_defaults() {
          set = xset_set( "dev_show_file", "lbl", _("Mounted _Other") );
          set->menu_style = XSET_MENU_CHECK;
          set->line = g_strdup( "#devices-settings-files" );
@@ -96,7 +89,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
  
          set = xset_set( "dev_show_hide_volumes", "lbl", _("_Volumes...") );
          xset_set_set( set, "title", _("Show/Hide Volumes") );
-@@ -10958,12 +10959,12 @@ void xset_defaults()
+@@ -8109,12 +8110,12 @@ void xset_defaults() {
      set->line = g_strdup( "#devices-settings-optical" );
  
          set = xset_set( "dev_automount_optical", "lbl", _("Mount _Optical") );
@@ -111,7 +104,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
          set->menu_style = XSET_MENU_CHECK;
          set->line = g_strdup( "#devices-settings-remove" );
  
-@@ -11353,7 +11354,7 @@ void xset_defaults()
+@@ -8505,7 +8506,7 @@ void xset_defaults() {
  
      set = xset_set( "main_save_tabs", "lbl", _("Save Ta_bs") );
      set->menu_style = XSET_MENU_CHECK;
@@ -120,7 +113,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
  
      set = xset_set( "main_exit", "lbl", _("E_xit") );
      xset_set_set( set, "icn", "gtk-quit" );
-@@ -11405,7 +11406,6 @@ void xset_defaults()
+@@ -8557,7 +8558,6 @@ void xset_defaults() {
  
      set = xset_set( "main_pbar", "lbl", _("Panel _Bar") );
      set->menu_style = XSET_MENU_CHECK;
@@ -128,7 +121,7 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
      set->line = g_strdup( "#gui-pan" );
  
      set = xset_set( "main_focus_panel", "lbl", _("F_ocus") );
-@@ -12591,7 +12591,6 @@ void xset_defaults()
+@@ -9694,12 +9694,12 @@ void xset_defaults() {
  
          set = xset_set_panel( p, "list_detailed", "lbl", _("_Detailed") );
          set->menu_style = XSET_MENU_RADIO;
@@ -136,22 +129,20 @@ diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.c 
          if ( p != 1 )
              xset_set_set( set, "shared_key", "panel1_list_detailed" );
  
-@@ -12602,6 +12601,7 @@ void xset_defaults()
- 
          set = xset_set_panel( p, "list_compact", "lbl", _("_Compact") );
          set->menu_style = XSET_MENU_RADIO;
 +        set->b = XSET_B_TRUE;
          if ( p != 1 )
              xset_set_set( set, "shared_key", "panel1_list_compact" );
  
-diff -rupN spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.h spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/settings.h
---- spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8-orig/src/settings.h	2023-06-14 16:41:14.503322416 +0300
-+++ spacefm-e6f291858067e73db44fb57c90e4efb97b088ac8/src/settings.h	2023-06-14 16:59:31.026783813 +0300
-@@ -359,6 +359,7 @@ static const char* su_commands[] = // or
+diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.h zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.h
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.h	2025-06-08 21:22:12.648137352 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.h	2025-06-08 21:22:16.752184853 +0300
+@@ -334,6 +334,7 @@ static const char* su_commands[] = // or
  
  static const char* gsu_commands[] = // order and contents must match prefdlg.ui
  {
 +    "/usr/local/bin/pkexec",
      "/usr/bin/gksu",
-     "/usr/bin/gksudo",
-     "/usr/bin/gnomesu",
+     "/bin/su",
+     "/usr/bin/sudo"
