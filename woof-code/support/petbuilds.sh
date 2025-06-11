@@ -135,6 +135,11 @@ EOF
         find ../petbuild-output/${NAME}-${HASH} -name '*.a' -delete
         find ../petbuild-output/${NAME}-${HASH} -name '*.la' -delete
 
+        if [ -d ../petbuild-output/${NAME}-${HASH}/usr/local/share/pixmaps ]; then
+            mkdir -p ../petbuild-output/${NAME}-${HASH}/usr/share/pixmaps
+            mv -f ../petbuild-output/${NAME}-${HASH}/usr/local/share/pixmaps/* ../petbuild-output/${NAME}-${HASH}/usr/share/pixmaps/ 2>/dev/null
+        fi
+
         rmdir ../petbuild-output/${NAME}-${HASH}/usr/local/share/* 2>/dev/null
         rmdir ../petbuild-output/${NAME}-${HASH}/usr/local/* 2>/dev/null
         rmdir ../petbuild-output/${NAME}-${HASH}/usr/* 2>/dev/null
