@@ -4,6 +4,8 @@ This is a heavily modified and cleaned up fork of [woof-CE](https://github.com/p
 
 The goal is to build something similar to [DebianDog](https://debiandog.github.io/doglinux/), a highly [Debian](https://www.debian.org/)-compatible, portable, modular, hackable and lightweight distro with core features of [Puppy Linux](https://puppylinux.com).
 
+The history of this fork and the relationship with other projects is documented [here](family-tree.md).
+
 # Major Changes in This Fork
 
 ## Build System
