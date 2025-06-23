@@ -487,6 +487,6 @@ rm -f "$TMPFW"
 [ "$1" = "enable" ] && exit
 
 # run it!
-[ "$ENABLED" = "true" ] && x-terminal-emulator --hold -e /etc/init.d/rc.firewall start &
+[ "$ENABLED" = "true" ] && /etc/init.d/rc.firewall start
 
 # end
