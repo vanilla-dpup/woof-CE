@@ -126,13 +126,13 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 		"format": "\uf15c",
 		"tooltip-format": "Word processor",
 		"interval": "once",
-		"on-click": "abiword"
+		"on-click": "libreoffice --writer"
 	},
 	"custom/spreadsheet": {
 		"format": "\uf0ce",
 		"tooltip-format": "Spreadsheet",
 		"interval": "once",
-		"on-click": "gnumeric"
+		"on-click": "libreoffice --calc"
 	},
 	"custom/help": {
 		"format": "\uf1cd",
@@ -308,13 +308,13 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 		"format": "\uf15c",
 		"tooltip-format": "Word processor",
 		"interval": "once",
-		"on-click": "abiword"
+		"on-click": "libreoffice --writer"
 	},
 	"custom/spreadsheet": {
 		"format": "\uf0ce",
 		"tooltip-format": "Spreadsheet",
 		"interval": "once",
-		"on-click": "gnumeric"
+		"on-click": "libreoffice --calc"
 	},
 	"custom/help": {
 		"format": "\uf1cd",

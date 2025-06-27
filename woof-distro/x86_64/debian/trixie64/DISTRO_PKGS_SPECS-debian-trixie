@@ -172,9 +172,8 @@ fi
 
 if [ "$DISTRO_VARIANT" != "dwl" -a "$DISTRO_VARIANT" != "barebones" ]; then
 PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|abiword|abiword|exe,dev,doc,nls||deps:yes
 yes|gnome-mahjongg|gnome-mahjongg|exe,dev,doc,nls||deps:yes
-yes|gnumeric|gnumeric|exe,dev,doc,nls||deps:yes
+yes|libreoffice|libreoffice-writer,libreoffice-calc,libreoffice-impress,libreoffice-gtk3|exe,dev,doc,nls||deps:yes
 yes|nethack-console|nethack-console|exe,dev,doc,nls||deps:yes
 "
 fi
