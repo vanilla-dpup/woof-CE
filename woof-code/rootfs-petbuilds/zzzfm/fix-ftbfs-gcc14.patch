@@ -1,7 +1,7 @@
 From 98efb1f43e6339b3ceddb9f65ee85e26790fefdf Mon Sep 17 00:00:00 2001
 From: Brahmajit Das <brahmajit.xyz@gmail.com>
 Date: Mon, 22 Apr 2024 02:09:09 +0530
-Subject: [PATCH] [PATCH] Fix build issues with GCC 14
+Subject: [PATCH] Fix build issues with GCC 14
 
 GCC 14 enables -Wincompatible-pointer-types by default thus resulting in
 build error such as:
@@ -44,7 +44,7 @@ index faf3dee..7760522 100644
      g_object_unref (G_OBJECT (new_event->key.window));
 -    new_event->key.window = g_object_ref (G_OBJECT (gtk_widget_get_window (GTK_WIDGET(icon_view->priv->search_entry))));
 +    new_event->key.window = gtk_widget_get_window (GTK_WIDGET(icon_view->priv->search_entry));
-+    g_object_ref (G_OBJECT (gtk_widget_get_window (GTK_WIDGET(new_event->key.window))));
++    g_object_ref (G_OBJECT (gtk_widget_get_window (GTK_WIDGET(icon_view->priv->search_entry))));
  
      /* send the event to the search entry. If the "preedit-changed" signal is
     * emitted during this event, priv->search_imcontext_changed will be set.
@@ -53,7 +53,7 @@ index faf3dee..7760522 100644
          hadj = gtk_adjustment_new (0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
  
 -    icon_view->priv->hadjustment = g_object_ref_sink (G_OBJECT (hadj));
-+    icon_view->priv->hadjustment = hadj; 
++    icon_view->priv->hadjustment = hadj;
 +    g_object_ref_sink (G_OBJECT (icon_view->priv->hadjustment));
  
      g_signal_connect (icon_view->priv->hadjustment, "value-changed", G_CALLBACK (exo_icon_view_adjustment_changed), icon_view);
