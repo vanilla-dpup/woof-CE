@@ -29,9 +29,9 @@ This configures auto-start of swayidle, which turns off the screen after 600 sec
 
 You can disable swayidle by deleting this file, or change the interval via ~/.config/swayidle/config.
 
-## ~/.config/autostart/swaybg.desktop
+## ~/.config/autostart/zzzfm.desktop
 
-This configures auto-start of swaybg and defines the background color or image to display.
+This configures auto-start of the zzzfm desktop.
 
 ## /etc/init.d/trim
 

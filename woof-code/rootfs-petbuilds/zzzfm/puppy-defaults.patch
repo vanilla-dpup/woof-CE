@@ -1,6 +1,6 @@
 diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c
---- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c	2025-06-08 21:22:12.648137352 +0300
-+++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c	2025-06-08 21:22:16.748184807 +0300
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c	2025-06-28 17:39:00.618373400 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c	2025-06-28 17:39:04.074407083 +0300
 @@ -2954,6 +2954,9 @@ gboolean volume_is_visible( VFSVolume* v
      if ( vol->device_type == DEVICE_TYPE_OTHER )
          return xset_get_b( "dev_show_file" );
@@ -21,8 +21,8 @@ diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-locat
  
      // ramfs CONFIG_BLK_DEV_RAM causes multiple entries of /dev/ram*
 diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.c
---- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c	2025-06-08 21:22:12.648137352 +0300
-+++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.c	2025-06-08 21:22:36.884417910 +0300
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c	2025-06-28 17:39:00.618373400 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.c	2025-06-28 17:39:14.154507991 +0300
 @@ -55,7 +55,7 @@ const int big_icon_size_default = 48;
  const int max_icon_size = 96;         // howdy     WAS   512!    // // also change max listed in prefdlg.ui prefdlg2.ui
  const int small_icon_size_default = 22;    //   howdy       consider changing this to 16
@@ -32,8 +32,26 @@ diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zz
  const gboolean no_single_hover_default = TRUE;   // howdy
  
  //const int open_bookmark_method_default = 1;
-@@ -79,11 +79,11 @@ const gboolean desk_open_mime_default =
- const int margin_top_default = 12;
+@@ -66,24 +66,24 @@ const int sort_type_default = GTK_SORT_A
+ //gboolean show_desktop_default = FALSE;
+ const gboolean show_wallpaper_default = FALSE;
+ const WallpaperMode wallpaper_mode_default=WPM_STRETCH;
+-const GdkColor desktop_bg1_default={0, 4656, 4125, 12014};
++const GdkColor desktop_bg1_default={0, 1027, 18246, 23644};
+ const GdkColor desktop_bg2_default={0};   // unused?
+ const GdkColor desktop_text_default={0, 65535, 65535, 65535};
+ const GdkColor desktop_shadow_default={0, 11822, 13364, 13878};
+ const int desktop_sort_by_default = DW_SORT_CUSTOM;
+ const int desktop_sort_type_default = GTK_SORT_ASCENDING;
+-const gboolean show_wm_menu_default = FALSE;
+-const gboolean desk_single_click_default = FALSE;
+-const gboolean desk_no_single_hover_default = FALSE;
++const gboolean show_wm_menu_default = TRUE;
++const gboolean desk_single_click_default = TRUE;
++const gboolean desk_no_single_hover_default = TRUE;
+ const gboolean desk_open_mime_default = FALSE;    // howdy    recheck the significance of this
+-const int margin_top_default = 12;
++const int margin_top_default = 24;
  const int margin_left_default = 6;
  const int margin_right_default = 6;
 -const int margin_bottom_default = 12;    // howdy  apparently this specifies nim values, which take precedence of er any gtk themes settinss
@@ -136,8 +154,8 @@ diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zz
              xset_set_set( set, "shared_key", "panel1_list_compact" );
  
 diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.h zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.h
---- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.h	2025-06-08 21:22:12.648137352 +0300
-+++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.h	2025-06-08 21:22:16.752184853 +0300
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.h	2025-06-28 17:39:00.618373400 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/settings.h	2025-06-28 17:39:04.078407122 +0300
 @@ -334,6 +334,7 @@ static const char* su_commands[] = // or
  
  static const char* gsu_commands[] = // order and contents must match prefdlg.ui

@@ -9,7 +9,8 @@ build() {
     patch -p1 < ../wayland.patch
     patch -p1 < ../mount.patch
     patch -p1 < ../puppy-defaults.patch
-    ./autogen.sh --disable-desktop-integration --disable-video-thumbnails --with-gtk3
+    patch -p1 < ../layer-shell.patch
+    ./autogen.sh --disable-video-thumbnails --with-gtk3 --with-layer-shell
     make install
     rm -rf /usr/local/share/applications/{zzzfm-find,zzzfm-folder-handler}.desktop
     sed -e 's/^Categories=.*/Categories=FileManager/' -i /usr/local/share/applications/zzzfm.desktop

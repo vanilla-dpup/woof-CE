@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Name=zzzfm
+Comment=zzzfm
+Exec=zzzfm --desktop
+Terminal=false
+Type=Application

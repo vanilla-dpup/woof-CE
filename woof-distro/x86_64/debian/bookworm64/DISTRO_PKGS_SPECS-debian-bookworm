@@ -112,7 +112,6 @@ yes|xwayland|xwayland,xauth|exe,dev>exe,doc,nls||deps:yes
 PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|libgnome-menu|libgnome-menu-3-dev|exe,dev,doc,nls||deps:yes # dependency of xdg-puppy-labwc
 yes|libinput-dev|libinput-dev|exe,dev,doc,nls||deps:yes # dependency of labwc-puppy
-yes|swaybg|swaybg|exe,dev,doc,nls||deps:yes
 yes|waybar|waybar,fonts-font-awesome|exe,dev,doc,nls||deps:yes
 yes|wlroots|libwlroots-dev|exe,dev,doc,nls||deps:yes
 "

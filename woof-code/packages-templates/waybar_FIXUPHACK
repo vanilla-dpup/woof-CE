@@ -67,85 +67,6 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 		"tooltip-format-wifi": "{essid}",
 		"on-click": "connman-gtk"
 	}
-},{
-	"name": "bar2",
-	"layer": "bottom",
-	"position": "top",
-	"margin-top": 16,
-	"exclusive": false,
-	"spacing": 8,
-	"modules-center": [
-		"custom/files",
-		"custom/browser",
-		"custom/terminal",
-		"custom/taskmanager",
-		"custom/texteditor",
-		"custom/imageeditor",
-		"custom/wordprocessor",
-		"custom/spreadsheet",
-		"custom/help",
-		"custom/exit"
-	],
-	"custom/files": {
-		"format": "\uf07b",
-		"tooltip-format": "File manager",
-		"interval": "once",
-		"on-click": "zzzfm"
-	},
-	"custom/browser": {
-		"format": "\uf0ac",
-		"tooltip-format": "Web browser",
-		"interval": "once",
-		"on-click": "x-www-browser"
-	},
-	"custom/terminal": {
-		"format": "\uf120",
-		"tooltip-format": "Terminal",
-		"interval": "once",
-		"on-click": "footclient"
-	},
-	"custom/taskmanager": {
-		"format": "\uf085",
-		"tooltip-format": "Task manager",
-		"interval": "once",
-		"on-click": "lxtask"
-	},
-	"custom/texteditor": {
-		"format": "\uf044",
-		"tooltip-format": "Text editor",
-		"interval": "once",
-		"on-click": "geany"
-	},
-	"custom/imageeditor": {
-		"format": "\uf1fc",
-		"tooltip-format": "Image editor",
-		"interval": "once",
-		"on-click": "mtpaint"
-	},
-	"custom/wordprocessor": {
-		"format": "\uf15c",
-		"tooltip-format": "Word processor",
-		"interval": "once",
-		"on-click": "libreoffice --writer"
-	},
-	"custom/spreadsheet": {
-		"format": "\uf0ce",
-		"tooltip-format": "Spreadsheet",
-		"interval": "once",
-		"on-click": "libreoffice --calc"
-	},
-	"custom/help": {
-		"format": "\uf1cd",
-		"tooltip-format": "Help",
-		"interval": "once",
-		"on-click": "puppyhelp"
-	},
-	"custom/exit": {
-		"format": "\uf011",
-		"tooltip-format": "Exit",
-		"interval": "once",
-		"on-click": "logout_gui"
-	}
 }]
 EOF
 
@@ -159,15 +80,6 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/style.css
 	background-color: #F6F5F4;
 	color: #000000;
 	border-top: 1px solid #DEDDDC;
-}
-
-.bar2 {
-	background: none;
-	color: #F6F5F4;
-}
-
-.bar2 * {
-	font-size: 32px;
 }
 
 button {
@@ -249,85 +161,6 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 		"tooltip-format-wifi": "{essid}",
 		"on-click": "connman-gtk"
 	}
-},{
-	"name": "bar2",
-	"layer": "bottom",
-	"position": "right",
-	"margin-right": 16,
-	"exclusive": false,
-	"spacing": 8,
-	"modules-center": [
-		"custom/files",
-		"custom/browser",
-		"custom/terminal",
-		"custom/taskmanager",
-		"custom/texteditor",
-		"custom/imageeditor",
-		"custom/wordprocessor",
-		"custom/spreadsheet",
-		"custom/help",
-		"custom/exit"
-	],
-	"custom/files": {
-		"format": "\uf07b",
-		"tooltip-format": "File manager",
-		"interval": "once",
-		"on-click": "zzzfm"
-	},
-	"custom/browser": {
-		"format": "\uf0ac",
-		"tooltip-format": "Web browser",
-		"interval": "once",
-		"on-click": "x-www-browser"
-	},
-	"custom/terminal": {
-		"format": "\uf120",
-		"tooltip-format": "Terminal",
-		"interval": "once",
-		"on-click": "footclient"
-	},
-	"custom/taskmanager": {
-		"format": "\uf085",
-		"tooltip-format": "Task manager",
-		"interval": "once",
-		"on-click": "lxtask"
-	},
-	"custom/texteditor": {
-		"format": "\uf044",
-		"tooltip-format": "Text editor",
-		"interval": "once",
-		"on-click": "geany"
-	},
-	"custom/imageeditor": {
-		"format": "\uf1fc",
-		"tooltip-format": "Image editor",
-		"interval": "once",
-		"on-click": "mtpaint"
-	},
-	"custom/wordprocessor": {
-		"format": "\uf15c",
-		"tooltip-format": "Word processor",
-		"interval": "once",
-		"on-click": "libreoffice --writer"
-	},
-	"custom/spreadsheet": {
-		"format": "\uf0ce",
-		"tooltip-format": "Spreadsheet",
-		"interval": "once",
-		"on-click": "libreoffice --calc"
-	},
-	"custom/help": {
-		"format": "\uf1cd",
-		"tooltip-format": "Help",
-		"interval": "once",
-		"on-click": "puppyhelp"
-	},
-	"custom/exit": {
-		"format": "\uf011",
-		"tooltip-format": "Exit",
-		"interval": "once",
-		"on-click": "logout_gui"
-	}
 }]
 EOF
 
@@ -341,15 +174,6 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/style.css
 	background-color: #F6F5F4;
 	color: #000000;
 	border-right: 1px solid #DEDDDC;
-}
-
-.bar2 {
-	background: none;
-	color: #F6F5F4;
-}
-
-.bar2 * {
-	font-size: 32px;
 }
 
 button {

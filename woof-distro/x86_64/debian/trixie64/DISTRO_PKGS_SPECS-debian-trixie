@@ -121,7 +121,6 @@ else
 yes|labwc|labwc|exe,dev,doc,nls||deps:yes
 yes|libgnome-menu|libgnome-menu-3-dev|exe,dev,doc,nls||deps:yes # dependency of xdg-puppy-labwc
 yes|libinput-dev|libinput-dev|exe,dev,doc,nls||deps:yes # dependency of labwc-puppy
-yes|swaybg|swaybg|exe,dev,doc,nls||deps:yes
 yes|waybar|waybar,fonts-font-awesome|exe,dev,doc,nls||deps:yes
 "
 fi
