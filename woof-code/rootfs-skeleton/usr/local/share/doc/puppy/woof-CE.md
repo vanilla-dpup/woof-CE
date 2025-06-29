@@ -32,6 +32,7 @@ The history of this fork and the relationship with other projects is documented 
 
 * Upstream distro package updates are safe because scripts that override upstream distro files (like `poweroff`) are moved to /usr/local/{,s}bin
 * Puppy's configuration wizards are replaced with simple [yad](https://github.com/step-/yad)-based tools that do one thing: for example, a hostname changer and a locale changer
+* A [kanshi](https://gitlab.freedesktop.org/emersion/kanshi) profile generator makes display settings set by [wdisplays](https://github.com/artizirk/wdisplays) persist
 * Screenshot tool, with key bindings
     * Whole monitor screenshot
     * Cropped screenshot
@@ -115,8 +116,8 @@ The history of this fork and the relationship with other projects is documented 
 * kernel-kit/ contains a tool that builds the kernel
 * woof-distro/x86_64/debian/trixie64/ contains configuration files
     * A [Debian](https://www.debian.org/) 13 based distro, featuring
-        * [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar), or
-        * [dwl](https://codeberg.org/dwl/dwl) with the [snail layout](https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/snail) and [yambar](https://codeberg.org/dnkl/yambar)
+        * [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar) and [zzzfm](https://gitlab.com/antix-contribs/zzzfm) (patched with `wlr-layer-shell` support), or
+        * [dwl](https://codeberg.org/dwl/dwl) with the [snail layout](https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/snail), [yambar](https://codeberg.org/dnkl/yambar) and [zzzfm](https://gitlab.com/antix-contribs/zzzfm)
     * DISTRO_SPECS contains the distro name and version
     * DISTRO_PKGS_SPECS-debian-testing contains a list of binary packages to include
     * _00build.conf contains a list of packages to build from source (`PETBUILDS`) and other settings

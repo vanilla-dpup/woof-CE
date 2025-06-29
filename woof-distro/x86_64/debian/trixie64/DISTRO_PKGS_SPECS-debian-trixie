@@ -63,7 +63,7 @@ yes|libgtk-layer-shell|libgtk-layer-shell-dev|exe,dev,doc,nls||deps:yes
 yes|libjpeg62-turbo-dev|libjpeg62-turbo-dev|exe,dev,doc,nls||deps:yes
 yes|libnss-myhostname|libnss-myhostname|exe,dev,doc,nls||deps:yes
 yes|libpam|libpam0g-dev|exe,dev,doc,nls||deps:yes
-yes|librsvg2-bin|librsvg2-bin|exe,dev,doc,nls||deps:yes
+yes|librsvg2|librsvg2-bin,librsvg2-common|exe,dev,doc,nls||deps:yes
 yes|libssl-dev|libssl-dev|exe,dev,doc,nls||deps:yes
 yes|libxxhash-dev|libxxhash-dev|exe,dev,doc,nls||deps:yes # needed by pup_advert_blocker
 yes|nftables|nftables|exe,dev,doc,nls||deps:yes # needed by firewall_ng

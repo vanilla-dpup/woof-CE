@@ -95,6 +95,22 @@ void show_help()
     g_printf ("  labwc-xdgmenu \"/etc/xdg/menus/applications.menu\"\n\n");
 }
 
+static gchar *get_icon_path(GIcon *icon)
+{
+  if (G_IS_THEMED_ICON(icon))
+  {
+    const gchar* const* names = g_themed_icon_get_names(G_THEMED_ICON(icon));
+    return names ? g_strdup(names[0]) : NULL;
+  }
+
+  if (G_IS_FILE_ICON(icon))
+  {
+    return g_file_get_path(g_file_icon_get_file(G_FILE_ICON(icon)));
+  }
+
+  return NULL;
+}
+
 /*=============================================================================
  * This function processes a directory entry and all it's child nodes
  */
@@ -105,10 +121,14 @@ void process_directory(GMenuTreeDirectory *directory, GHashTable *history, int r
 
    if (root)
    {
+      const gchar *name = gmenu_tree_directory_get_name(directory);
+      gchar *icon = get_icon_path(gmenu_tree_directory_get_icon(directory));
       g_printf(
-   		  "<menu id=\"xdg-menu-%s\" label=\"%s\">\n",
-   		  gmenu_tree_directory_get_name(directory),
-   		  gmenu_tree_directory_get_name(directory));
+   		  "<menu id=\"xdg-menu-%s\" label=\"%s\" icon=\"%s\">\n",
+   		  name,
+   		  name,
+   		  icon ? icon : "open-menu-symbolic");
+      g_free(icon);
    }
 
     GMenuTreeEntry *entry;

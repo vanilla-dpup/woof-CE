@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Name=Desktop Preferences
+Categories=X-Desktop-settings
+Exec=zzzfm --desktop-pref
+Icon=user-desktop-symbolic
+StartupNotify=true
+Type=Application
+Terminal=false

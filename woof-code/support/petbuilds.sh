@@ -167,17 +167,16 @@ for NAME in $PKGS; do
 
     for EXTRAFILE in ../rootfs-petbuilds/${NAME}/*; do
         case "${EXTRAFILE##*/}" in
-        petbuild|*.patch|sha256.sum|*-*|DOTconfig|*.c|*.h|README.md|Makefile) ;;
+        petbuild|*.patch|sha256.sum|*-*|DOTconfig|*.c|*.h|README.md|Makefile|pinstall.sh) ;;
         *) cp -a $EXTRAFILE rootfs-complete/
         esac
     done
-
-    if [ -f rootfs-complete/pinstall.sh ]; then
-        cd rootfs-complete
-        bash -x pinstall.sh
-        rm -f pinstall.sh
-        cd ..
-    fi
 done
+
+cd rootfs-complete
+for NAME in $PKGS; do
+    [ -f ../../rootfs-petbuilds/${NAME}/pinstall.sh ] && bash -x ../../rootfs-petbuilds/${NAME}/pinstall.sh
+done
+cd ..
 
 echo

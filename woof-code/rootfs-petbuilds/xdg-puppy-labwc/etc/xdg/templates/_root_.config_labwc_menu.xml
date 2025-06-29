@@ -28,10 +28,10 @@
   <menu id="xdg-menu-Multimedia" />
   <menu id="xdg-menu-Fun" />
   <separator />
-  <item label="Help">
+  <item label="Help" icon="/usr/share/pixmaps/puppy/help.svg">
     <action name="Execute"><command>puppyhelp</command></action>
   </item>
-  <item label="Leave">
+  <item label="Leave" icon="/usr/share/pixmaps/puppy/shutdown.svg">
     <action name="Execute"><command>logout_gui</command></action>
   </item>
 </menu>
