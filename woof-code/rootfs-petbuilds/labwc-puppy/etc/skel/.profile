@@ -5,15 +5,28 @@ if [ $PUPMODE -eq 13 -a ! -s ~/Desktop/save2flash.desktop ]; then
 	cat << EOF > ~/Desktop/save2flash.desktop
 [Desktop Entry]
 Encoding=UTF-8
-Name=Save
+Name=Save Everything
 Icon=/usr/share/pixmaps/puppy/save.svg
 Exec=save2flash
 Terminal=false
 Type=Application
 EOF
 	chmod 644 ~/Desktop/save2flash.desktop
+
+	if [ -d /initrd/pup_ro1/$HOME ]; then
+		cat << EOF > ~/Desktop/save2flash-home.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=Save Home
+Icon=/usr/share/pixmaps/puppy/save.svg
+Exec=save2flash --home
+Terminal=false
+Type=Application
+EOF
+		chmod 644 ~/Desktop/save2flash-home.desktop
+	fi
 elif [ $PUPMODE -ne 13 ]; then
-	rm -f ~/Desktop/save2flash.desktop
+	rm -f ~/Desktop/save2flash.desktop ~/Desktop/save2flash-home.desktop
 fi
 
 export PATH="$PATH:/usr/local/games:/usr/games"

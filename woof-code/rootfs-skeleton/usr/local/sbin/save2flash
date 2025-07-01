@@ -7,6 +7,11 @@ if [ $PUPMODE -ne 13 ] ; then
 	exit 1
 fi
 
+if [ "$1" = "--home" ]; then
+	nice -n 19 -- ionice -c 2 -n 7 -- flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy /initrd/pup_ro1/$HOME /initrd/pup_rw/$HOME
+	exit 0
+fi
+
 [ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
 
 nice -n 19 -- ionice -c 2 -n 7 -- flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy

@@ -50,7 +50,8 @@ WD="`pwd`"
 COLS="`tput cols`"
 
  # all the action takes places inside $SNAP
-SNAP="/initrd/pup_rw"
+SNAP="$2"
+[ -n "$SNAP" ] || SNAP="/initrd/pup_rw"
 cd $SNAP || exit 1
 
 YAFPID=""
@@ -129,7 +130,7 @@ sync -f "$BASE/"
 # FILES
 # =============================================================================
 
-rm -f /tmp/snapmergepuppy-error   #140102 SFR
+rm -f /tmp/snapmergepuppy-$$-error   #140102 SFR
 
 #Copy Files... v409 remove '^var'. 100222 shinobar: more exclusions. 100422 added ^root/ftpd. 100429 modify 'trash' exclusion. 100820 added var/tmp 120103 rerwin: add .XLOADED # SFR: added dev/snd # SFR: added .crdownload
 # SFR: move as much as possible into 'find' itself
@@ -160,21 +161,23 @@ do
 		esac
 		[ "`readlink "$BASE/$N" 2>/dev/null`" = "$NDST" ] && continue
 		rm -rf "$BASE/$N"	# SFR: in case if folder has been replaced with a symlink (cp won't overwrite a dir with a symlink)
-		cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
+		cp -af "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-$$-error
 	elif [ -L "$BASE/$N" ] || [ -e "$BASE/$N" -a ! -f "$BASE/$N" ];then
-		rm -rf "$BASE/$N" 2>>/tmp/snapmergepuppy-error
-		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
+		rm -rf "$BASE/$N" 2>>/tmp/snapmergepuppy-$$-error
+		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-$$-error
 	else
-		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-error
+		psnapcp "$N" "$BASE/$N" 2>>/tmp/snapmergepuppy-$$-error
 	fi
 done
 echo -e "\\033[0G\\033[KDone"
 
 # make sure DISTRO_SPECS, PUPSTATE and BOOTCONFIG are saved: these files are modified by initrd, before NTP, and timestamps can be in the future
-mkdir -p "$BASE/initrd" "$BASE/etc/rc.d"
-psnapcp /initrd/DISTRO_SPECS "$BASE/initrd/DISTRO_SPECS"
-psnapcp /etc/rc.d/PUPSTATE "$BASE/etc/rc.d/PUPSTATE"
-psnapcp /etc/rc.d/BOOTCONFIG "$BASE/etc/rc.d/BOOTCONFIG"
+if [ "$BASE" = "/initrd/pup_ro1" -a "$SNAP" = "/initrd/pup_rw" ]; then
+	mkdir -p "$BASE/initrd" "$BASE/etc/rc.d"
+	psnapcp /initrd/DISTRO_SPECS "$BASE/initrd/DISTRO_SPECS"
+	psnapcp /etc/rc.d/PUPSTATE "$BASE/etc/rc.d/PUPSTATE"
+	psnapcp /etc/rc.d/BOOTCONFIG "$BASE/etc/rc.d/BOOTCONFIG"
+fi
 
 # =============================================================================
 
@@ -184,11 +187,11 @@ cd "$WD"
 
 [ -n "$YAFPID" ] && kill $YAFPID
 
-if [ -s /tmp/snapmergepuppy-error ]; then	#140102 SFR
+if [ -s /tmp/snapmergepuppy-$$-error ]; then	#140102 SFR
 	ERRMSG="$(gettext 'Saving did not complete without any errors.')"
 	if [ -n "$WAYLAND_DISPLAY" ];then
 		yad --image=dialog-warning --layer=overlay --edge=top --text="$ERRMSG" --button=Details --button=gtk-close --no-focus
-		[ $? -eq 0 ] && yad --title=save2flash --width=640 --height=480 --text-info --filename=/tmp/snapmergepuppy-error --button=gtk-ok &
+		[ $? -eq 0 ] && yad --title=save2flash --width=640 --height=480 --text-info --filename=/tmp/snapmergepuppy-$$-error --button=gtk-ok &
 	else
 		echo "$ERRMSG"
 	fi
