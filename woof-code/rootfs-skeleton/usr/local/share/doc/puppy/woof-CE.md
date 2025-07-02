@@ -74,7 +74,6 @@ The history of this fork and the relationship with other projects is documented 
 * `save2flash` is much faster and writes less (see woof-code/rootfs-petbuilds/psnapcp)
     * Preallocates space when files grow
     * Only copies appended or modified blocks when files change
-    * Allows the user to save only the home directory using `saveflash --home`
 
 ## SFSs
 
