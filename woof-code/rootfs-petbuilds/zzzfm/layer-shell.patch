@@ -1,15 +1,15 @@
-From fe78800f321c94e2f548a97be433969698bab29b Mon Sep 17 00:00:00 2001
+From 96f8c1ed1a98234dfd186362c5fedd9f0e1a9b78 Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Tue, 1 Jul 2025 20:15:20 +0300
+Date: Wed, 2 Jul 2025 18:45:57 +0300
 Subject: [PATCH] add layer-shell support
 
 ---
  configure.ac                 |  14 +++
  src/Makefile.am              |   2 +
- src/desktop/desktop-window.c | 175 +++++++++++++++++++++++++++++------
+ src/desktop/desktop-window.c | 206 ++++++++++++++++++++++++++++-------
  src/desktop/desktop.c        |   2 +-
- src/pref-dialog.c            |   6 ++
- 5 files changed, 170 insertions(+), 29 deletions(-)
+ src/pref-dialog.c            |   6 +
+ 5 files changed, 191 insertions(+), 39 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
 index 508fa45..8840211 100644
@@ -64,7 +64,7 @@ index da5deab..84167c9 100644
      @FAM_LIBS@ \
      @LIBUDEV_LIBS@ \
 diff --git a/src/desktop/desktop-window.c b/src/desktop/desktop-window.c
-index 0c20943..480dde5 100644
+index 0c20943..654fbc0 100644
 --- a/src/desktop/desktop-window.c
 +++ b/src/desktop/desktop-window.c
 @@ -48,6 +48,10 @@
@@ -96,7 +96,7 @@ index 0c20943..480dde5 100644
  
      text_uri_list_atom = gdk_atom_intern_static_string( drag_targets[DRAG_TARGET_URI_LIST].target );
      desktop_icon_atom = gdk_atom_intern_static_string( drag_targets[DRAG_TARGET_DESKTOP_ICON].target );
-@@ -402,7 +413,10 @@ static void desktop_window_init(DesktopWindow *self) {
+@@ -402,7 +413,22 @@ static void desktop_window_init(DesktopWindow *self) {
  
      root = gdk_screen_get_root_window( gtk_widget_get_screen( (GtkWidget*)self ) );
      gdk_window_set_events( root, gdk_window_get_events( root )  | GDK_PROPERTY_CHANGE_MASK );
@@ -104,11 +104,23 @@ index 0c20943..480dde5 100644
 +    if( GDK_IS_X11_DISPLAY( gdk_display_get_default()) )
 +    {
 +        gdk_window_add_filter( root, on_rootwin_event, self );
++#if HAVE_LAYER_SHELL
++    } else {
++        gtk_layer_init_for_window( GTK_WINDOW( self ) );
++        gtk_layer_set_keyboard_mode( GTK_WINDOW( self ), GTK_LAYER_SHELL_KEYBOARD_MODE_NONE );
++        gtk_layer_set_namespace( GTK_WINDOW( self ), "desktop" );
++        gtk_layer_set_layer( GTK_WINDOW( self ), GTK_LAYER_SHELL_LAYER_BACKGROUND );
++        gtk_layer_set_anchor( GTK_WINDOW( self ), GTK_LAYER_SHELL_EDGE_LEFT, TRUE );
++        gtk_layer_set_anchor( GTK_WINDOW( self ), GTK_LAYER_SHELL_EDGE_RIGHT, TRUE );
++        gtk_layer_set_anchor( GTK_WINDOW( self ), GTK_LAYER_SHELL_EDGE_TOP, TRUE );
++        gtk_layer_set_anchor( GTK_WINDOW( self ), GTK_LAYER_SHELL_EDGE_BOTTOM, TRUE );
++        gtk_layer_set_exclusive_zone( GTK_WINDOW( self ), -1 );
++#endif
 +    }
  
      //g_signal_connect( G_OBJECT( self ), "task-notify",  G_CALLBACK( ptk_file_task_notify_handler ), NULL );
  }
-@@ -433,7 +447,16 @@ void desktop_item_free( DesktopItem* item ) {
+@@ -433,7 +459,16 @@ void desktop_item_free( DesktopItem* item ) {
  
  void desktop_window_finalize(GObject *object) {
      DesktopWindow *self = (DesktopWindow*)object;
@@ -126,15 +138,58 @@ index 0c20943..480dde5 100644
  
      g_return_if_fail(object != NULL);
      g_return_if_fail(IS_DESKTOP_WINDOW(object));
-@@ -441,6 +464,7 @@ void desktop_window_finalize(GObject *object) {
-     gdk_window_remove_filter( gdk_screen_get_root_window( gtk_widget_get_screen( (GtkWidget*)object) ), on_rootwin_event, self );
- 
- #if GTK_CHECK_VERSION (3, 0, 0)
-+nox:
+@@ -444,6 +479,7 @@ void desktop_window_finalize(GObject *object) {
      if( self->background )
          XFreePixmap ( xdisplay, self->background );
  
-@@ -511,17 +535,31 @@ gboolean on_expose( GtkWidget* w, GdkEventExpose* evt )
++nox:
+     if( self->surface )
+         cairo_surface_destroy ( self->surface );
+ #else
+@@ -468,6 +504,32 @@ void desktop_window_finalize(GObject *object) {
+         (* G_OBJECT_CLASS(parent_class)->finalize)(object);
+ }
+ 
++
++static void set_monitor( GtkWidget* w ) {
++#if GTK_CHECK_VERSION (3, 0, 0)
++    GdkDisplay *gdpy = gdk_display_get_default();
++
++    if ( GDK_IS_X11_DISPLAY( gdpy ))
++        return;
++
++    GdkMonitor *left = NULL;
++    int min_x = -1;
++    for (guint i = 0; i < gdk_display_get_n_monitors( gdpy ); ++i) {
++        GdkMonitor *monitor = gdk_display_get_monitor( gdpy, i );
++        if ( !monitor )
++            continue;
++        GdkRectangle geom;
++        gdk_monitor_get_geometry( monitor, &geom );
++        if ( min_x == -1 || geom.x < min_x ) {
++            min_x = geom.x;
++            left = monitor;
++        }
++    }
++    if ( left )
++        gtk_layer_set_monitor( GTK_WINDOW( w ), left );
++#endif
++}
++
+ /*--------------- Signal handlers --------------*/
+ 
+ #if GTK_CHECK_VERSION (3, 0, 0)
+@@ -479,6 +541,9 @@ gboolean on_expose( GtkWidget* w, GdkEventExpose* evt )
+     DesktopWindow* self = (DesktopWindow*)w;
+     GList* l;
+     GdkRectangle intersect;
++
++    set_monitor( w );
++
+ #if GTK_CHECK_VERSION (3, 0, 0)
+     GtkAllocation allocation;
+     gtk_widget_get_allocation (w, &allocation);
+@@ -511,17 +576,31 @@ gboolean on_expose( GtkWidget* w, GdkEventExpose* evt )
      if( self->rubber_bending )
          paint_rubber_banding_rect( self );
  
@@ -168,7 +223,7 @@ index 0c20943..480dde5 100644
      return TRUE;
  }
  
-@@ -592,7 +630,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -592,7 +671,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
  #else
      GdkPixmap* pixmap = NULL;
  #endif
@@ -177,7 +232,7 @@ index 0c20943..480dde5 100644
      Pixmap xpixmap = 0;
      Visual *xvisual;
      Window xroot;
-@@ -601,9 +639,19 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -601,13 +680,23 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
      unsigned int udummy, depth;
  
      /* set root map here */
@@ -193,11 +248,17 @@ index 0c20943..480dde5 100644
      xdisplay = GDK_DISPLAY_XDISPLAY( gtk_widget_get_display( (GtkWidget*)win) );
      XGetGeometry (xdisplay, GDK_WINDOW_XID( gtk_widget_get_window( (GtkWidget*)win ) ),
                    &xroot, &dummy, &dummy, &dummy, &dummy, &udummy, &depth);
+-    if( win->transparent )
 +#endif
-     if( win->transparent )
++    if( xdisplay && win->transparent )
      {
          xvisual = GDK_VISUAL_XVISUAL (gdk_screen_get_rgba_visual ( gtk_widget_get_screen ( (GtkWidget*)win) ) );
-@@ -624,9 +672,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+-    } else {
++    } else if( xdisplay ) {
+         xvisual = GDK_VISUAL_XVISUAL (gdk_screen_get_system_visual ( gtk_widget_get_screen ( (GtkWidget*)win) ) );
+     }
+ 
+@@ -624,9 +713,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
          if( type == DW_BG_TILE )
          {
  #if GTK_CHECK_VERSION (3, 0, 0)
@@ -215,7 +276,7 @@ index 0c20943..480dde5 100644
  #else
              pixmap = gdk_pixmap_new( gtk_widget_get_window( ((GtkWidget*)win) ), src_w, src_h, -1 );
              cr = gdk_cairo_create ( pixmap );
-@@ -639,9 +692,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -639,9 +733,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
              int w = 0, h = 0;
  
  #if GTK_CHECK_VERSION (3, 0, 0)
@@ -233,7 +294,7 @@ index 0c20943..480dde5 100644
  #else
              pixmap = gdk_pixmap_new( gtk_widget_get_window( ((GtkWidget*)win) ), dest_w, dest_h, -1 );
              cr = gdk_cairo_create ( pixmap );
-@@ -709,7 +767,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -709,7 +808,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
                  cairo_move_to ( cr, src_x, src_y );
                  cairo_paint ( cr );
                  g_object_unref( scaled );
@@ -242,7 +303,7 @@ index 0c20943..480dde5 100644
  #if GTK_CHECK_VERSION (3, 0, 0)
                  XFreePixmap ( xdisplay, pixmap );
                  pixmap = 0;
-@@ -719,7 +777,11 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -719,7 +818,11 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
  #endif
              }
          }
@@ -255,7 +316,7 @@ index 0c20943..480dde5 100644
      }
  
  #if GTK_CHECK_VERSION (3, 0, 0)
-@@ -737,14 +799,16 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -737,14 +840,16 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
      win->background = pixmap;
  
  
@@ -274,7 +335,7 @@ index 0c20943..480dde5 100644
          gdk_window_set_back_pixmap( gtk_widget_get_window( ((GtkWidget*)win) ), pixmap, FALSE );
  #endif
      }
-@@ -766,6 +830,9 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -766,6 +871,9 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
  #endif
      gtk_widget_queue_draw( (GtkWidget*)win );
  
@@ -284,7 +345,7 @@ index 0c20943..480dde5 100644
      if ( !win->transparent )
      {
          XGrabServer (xdisplay);
-@@ -981,7 +1048,6 @@ static void colorize_pixbuf( GdkPixbuf* pix, GdkColor* clr, guint alpha ) {
+@@ -981,7 +1089,6 @@ static void colorize_pixbuf( GdkPixbuf* pix, GdkColor* clr, guint alpha ) {
  void paint_rubber_banding_rect( DesktopWindow* self ) {
      int x1, x2, y1, y2, w, h, pattern_w, pattern_h;
      GdkRectangle rect;
@@ -292,7 +353,7 @@ index 0c20943..480dde5 100644
      guchar alpha;
      GdkPixbuf* pix;
      cairo_t *cr;
-@@ -995,7 +1061,6 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
+@@ -995,7 +1102,6 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
  */
  
      cr = gdk_cairo_create ( gtk_widget_get_window( ((GtkWidget*)self) ) );
@@ -300,7 +361,7 @@ index 0c20943..480dde5 100644
      alpha = 64;  /* FIXME: should be themable in the future */
  
      pix = NULL;
-@@ -1019,7 +1084,7 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
+@@ -1019,7 +1125,7 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
  
      if( pix )
      {
@@ -309,7 +370,7 @@ index 0c20943..480dde5 100644
          if( self->bg_type == DW_BG_TILE ) /* this is currently unreachable */
          {
              /*GdkPixmap* pattern;*/
-@@ -1045,20 +1110,19 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
+@@ -1045,20 +1151,19 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
      {
          GdkColor clr2 = self->bg;
          clr2.pixel = 0;
@@ -334,49 +395,13 @@ index 0c20943..480dde5 100644
      cairo_destroy( cr );
  }
  
-@@ -2447,6 +2511,49 @@ void on_realize( GtkWidget* w ) {
+@@ -2447,6 +2552,13 @@ void on_realize( GtkWidget* w ) {
  
      GTK_WIDGET_CLASS(parent_class)->realize( w );
  
 +#if GTK_CHECK_VERSION (3, 0, 0)
-+    GdkDisplay *gdpy = gdk_display_get_default ();
-+
-+    if ( !GDK_IS_X11_DISPLAY( gdpy ))
++    if ( !GDK_IS_X11_DISPLAY( gdk_display_get_default () ))
 +    {
-+        gtk_window_set_decorated( GTK_WINDOW(w), FALSE );
-+        gtk_window_set_keep_below( GTK_WINDOW(w), TRUE );
-+        gtk_window_set_skip_pager_hint( GTK_WINDOW(w), TRUE );
-+        gtk_window_set_skip_taskbar_hint( GTK_WINDOW(w), TRUE );
-+        gtk_window_set_resizable( (GtkWindow*)w, FALSE );
-+
-+#if HAVE_LAYER_SHELL
-+        gtk_layer_init_for_window( GTK_WINDOW(w) );
-+        gtk_layer_set_keyboard_mode( GTK_WINDOW(w), GTK_LAYER_SHELL_KEYBOARD_MODE_NONE );
-+
-+        gtk_layer_set_namespace( GTK_WINDOW(w), "desktop" );
-+        GdkMonitor *left = NULL;
-+        int min_x = -1;
-+        for (guint i = 0; i < gdk_display_get_n_monitors ( gdpy ); ++i) {
-+            GdkMonitor *monitor = gdk_display_get_monitor( gdpy, i );
-+            if ( !monitor )
-+                continue;
-+            GdkRectangle geom;
-+            gdk_monitor_get_geometry ( monitor, &geom );
-+            if ( min_x == -1 || geom.x < min_x ) {
-+                min_x = geom.x;
-+                left = monitor;
-+            }
-+        }
-+        if ( left )
-+            gtk_layer_set_monitor ( GTK_WINDOW(w), left );
-+
-+        gtk_layer_set_layer( GTK_WINDOW(w), GTK_LAYER_SHELL_LAYER_BACKGROUND );
-+        gtk_layer_set_anchor( GTK_WINDOW(w), GTK_LAYER_SHELL_EDGE_LEFT, TRUE );
-+        gtk_layer_set_anchor( GTK_WINDOW(w), GTK_LAYER_SHELL_EDGE_RIGHT, TRUE );
-+        gtk_layer_set_anchor( GTK_WINDOW(w), GTK_LAYER_SHELL_EDGE_TOP, TRUE );
-+        gtk_layer_set_anchor( GTK_WINDOW(w), GTK_LAYER_SHELL_EDGE_BOTTOM, TRUE );
-+        gtk_layer_set_exclusive_zone( GTK_WINDOW(w), -1 );
-+#endif
 +        return;
 +    }
 +#endif
@@ -384,7 +409,7 @@ index 0c20943..480dde5 100644
      const char *wmname = gdk_x11_screen_get_window_manager_name( gtk_widget_get_screen( w ) );
      if ( self->transparent && !g_strcmp0( wmname, "Compiz" ) )
      {
-@@ -2505,7 +2612,14 @@ gboolean on_focus_out( GtkWidget* w, GdkEventFocus* evt ) {
+@@ -2505,7 +2617,14 @@ gboolean on_focus_out( GtkWidget* w, GdkEventFocus* evt ) {
  gboolean on_scroll( GtkWidget *w, GdkEventScroll *evt ) {
      if ( ((DesktopWindow*)w)->transparent )
      {
@@ -400,7 +425,41 @@ index 0c20943..480dde5 100644
          if ( !g_strcmp0( wmname, "Compiz" ) )
          {
              /* For Compiz transparent desktop, scroll events get passed back to
-@@ -3334,9 +3448,9 @@ void paint_item( DesktopWindow* self, DesktopItem* item, GdkRectangle* expose_ar
+@@ -2776,19 +2895,25 @@ start_layout:
+             // right side reached - remove empties and redo layout (custom sort)
+             gboolean list_changed = FALSE;
+             // scan down below box_count and remove all empties
+-            for ( ll = g_list_nth( self->items, self->box_count ); ll;
+-                                                            ll = ll->next )
++            gboolean empty_removed = TRUE;
++            while ( empty_removed &&  g_list_length( self->items ) > self->box_count )
+             {
+-                if ( !((DesktopItem*)ll->data)->fi )
++                empty_removed = FALSE;
++                for ( ll = g_list_nth( self->items, self->box_count ); ll;  ll = ll->next )
+                 {
+-                    desktop_item_free( (DesktopItem*)ll->data );
+-                    self->items = g_list_remove( self->items, ll->data );
+-                    if ( !list_changed )
+-                        list_changed = TRUE;
++                    if ( !((DesktopItem*)ll->data)->fi )
++                    {
++                        desktop_item_free( (DesktopItem*)ll->data );
++                        self->items = g_list_remove( self->items, ll->data );
++                        if ( !list_changed )
++                            list_changed = TRUE;
++                        empty_removed = TRUE;
++                        break;
++                    }
+                 }
+             }
+             // scan up above box_count and remove empties until all items fit
+-            gboolean empty_removed = TRUE;
++            empty_removed = TRUE;
+             while ( empty_removed &&  g_list_length( self->items ) > self->box_count )
+             {
+                 empty_removed = FALSE;
+@@ -3334,9 +3459,9 @@ void paint_item( DesktopWindow* self, DesktopItem* item, GdkRectangle* expose_ar
  
          if( gdk_rectangle_intersect( expose_area, &item->text_rect, &intersect ) )
          {
@@ -412,7 +471,7 @@ index 0c20943..480dde5 100644
          }
      } else {
          /* Do the drop shadow stuff...  This is a little bit dirty... */
-@@ -4044,6 +4158,11 @@ static GdkFilterReturn on_rootwin_event ( GdkXEvent *xevent, GdkEvent *event, gp
+@@ -4044,6 +4169,11 @@ static GdkFilterReturn on_rootwin_event ( GdkXEvent *xevent, GdkEvent *event, gp
  
  /* This function is taken from xfdesktop */
  void forward_event_to_rootwin( GdkScreen *gscreen, GdkEvent *event ) {
