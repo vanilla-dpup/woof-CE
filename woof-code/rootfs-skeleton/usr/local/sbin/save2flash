@@ -8,7 +8,7 @@ if [ $PUPMODE -ne 13 ] ; then
 fi
 
 if [ "$1" = "--home" ]; then
-	nice -n 19 -- ionice -c 2 -n 7 -- flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy /initrd/pup_ro1/home /initrd/pup_rw/home
+	nice -n 19 -- ionice -c 2 -n 7 -- flock -Fx /tmp/snapmergepuppy.lock snapmergepuppy /initrd/pup_ro1/$HOME /initrd/pup_rw/$HOME
 	exit 0
 fi
 

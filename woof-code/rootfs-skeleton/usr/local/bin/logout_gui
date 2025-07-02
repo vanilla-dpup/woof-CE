@@ -17,11 +17,11 @@ exec yad \
     --columns=2 \
     --field "$(gettext Reboot)"\!system-reboot-symbolic:FBTN "kill \$YAD_PID; wmreboot" \
     --field "$(gettext 'Shut Down')"\!system-shutdown-symbolic:FBTN "kill \$YAD_PID; wmpoweroff" \
-    --field "$(gettext 'Save home')"\!user-home-symbolic:FBTN "kill \$YAD_PID; save2flash" \
-    --field "$(gettext 'Save everything')"\!document-save-symbolic:FBTN "kill \$YAD_PID; save2flash" \
+    --field "$(gettext 'Save changes')"\!document-save-symbolic:FBTN "kill \$YAD_PID; save2flash" \
+    --field "$(gettext 'Install Puppy')"\!media-flash-symbolic:FBTN "kill \$YAD_PID; bootflash" \
     --field "$(gettext 'Restart graphical server')"\!view-refresh-symbolic:FBTN "kill \$YAD_PID; restartwm" \
     --field "$(gettext 'Exit to Prompt')"\!application-exit-symbolic:FBTN "kill \$YAD_PID; wmexit" \
+    --field "$(gettext 'Rebuild Menu')"\!open-menu-symbolic:FBTN "kill \$YAD_PID; fixmenus" \
     --field "$(gettext 'Lock screen')"\!system-lock-screen-symbolic:FBTN "kill \$YAD_PID; swaylock" \
-    --field "$(gettext 'Install Puppy')"\!media-flash-symbolic:FBTN "kill \$YAD_PID; bootflash" \
     --no-buttons \
     --use-interp

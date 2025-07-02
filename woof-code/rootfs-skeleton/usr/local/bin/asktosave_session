@@ -23,9 +23,9 @@ if [ "$(pidof -s $(cat /etc/windowmanager))" != "" ]; then
  [ "$DISPLAY" == "" ] && export DISPLAY=:0
  [ "$WAYLAND_DISPLAY" == "" ] && export WAYLAND_DISPLAY=wayland-0
  [ "$XDG_RUNTIME_DIR" == "" ] && export XDG_RUNTIME_DIR=/tmp/runtime-root
- yad --timeout=60 --timeout-indicator=bottom --text="$MSG" --button=gtk-yes --button="Home only"\!gtk-home:3 --button=gtk-no:1
+ yad --timeout=60 --timeout-indicator=bottom --text="$MSG" --button=gtk-yes --button=gtk-no
 else
- dialog --timeout 60 --extra-button --extra-label "Home only" --yesno "$MSG" 0 0
+ dialog --timeout 60 --yesno "$MSG" 0 0
 fi
 RETVAL=$?
 
@@ -33,8 +33,6 @@ if [ "$xMAKE_ANSWER" != "" ]; then
   
  if [ $RETVAL -eq 0 ]; then
   echo y > /tmp/session_ramdisk_result
- elif [ $RETVAL -eq 3 ]; then
-  echo home > /tmp/session_ramdisk_result
  elif [ $RETVAL -eq 252 ]; then
   rm -f /tmp/session_ramdisk_result 2>/dev/null
   exit 255

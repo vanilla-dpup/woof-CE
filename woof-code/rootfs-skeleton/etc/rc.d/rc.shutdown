@@ -100,16 +100,10 @@ case $PUPMODE in
    [ $retval -ne 0 ] && echo "$(gettext "Session not saved")" >/dev/console
   elif [ "$RAMDISK_SAVE_SESSION" == "y" ]; then
    retval=0
-  elif [ "$RAMDISK_SAVE_SESSION" == "home" ]; then
-   retval=3
   else
    retval=1
   fi
-  if [ $retval -eq 3 ]; then
-    echo "$(printf "$(gettext 'Saving home to %s (%s)...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
-    rm -f /tmp/wmexitmode.txt
-    /usr/local/sbin/snapmergepuppy /initrd/pup_ro1/home /initrd/pup_rw/home >/dev/console 2>&1
-  elif [ $retval -eq 0 ]; then
+  if [ $retval -eq 0 ]; then 
     echo "$(printf "$(gettext 'Saving session to %s (%s)...')" "${SAVEFILE}" "${SAVEPART}")" >/dev/console
     rm -f /tmp/wmexitmode.txt
     /usr/local/sbin/snapmergepuppy >/dev/console 2>&1
