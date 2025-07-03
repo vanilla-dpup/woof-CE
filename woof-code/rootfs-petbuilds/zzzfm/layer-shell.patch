@@ -1,15 +1,15 @@
-From 53e2973c92094fcc8ed33ce0a055c26f46b38b65 Mon Sep 17 00:00:00 2001
+From 44d830977e965e55124e08f98a7005135c3508aa Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Thu, 3 Jul 2025 22:22:36 +0300
+Date: Fri, 4 Jul 2025 00:12:29 +0300
 Subject: [PATCH] add layer-shell support
 
 ---
  configure.ac                 |  14 +++
  src/Makefile.am              |   2 +
- src/desktop/desktop-window.c | 177 +++++++++++++++++++++++++++--------
- src/desktop/desktop.c        |  74 +++++++++++++--
- src/pref-dialog.c            |   6 ++
- 5 files changed, 227 insertions(+), 46 deletions(-)
+ src/desktop/desktop-window.c | 222 ++++++++++++++++++++++++++++-------
+ src/desktop/desktop.c        |  85 ++++++++++++--
+ src/pref-dialog.c            |   6 +
+ 5 files changed, 280 insertions(+), 49 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
 index 508fa45..8840211 100644
@@ -64,7 +64,7 @@ index da5deab..84167c9 100644
      @FAM_LIBS@ \
      @LIBUDEV_LIBS@ \
 diff --git a/src/desktop/desktop-window.c b/src/desktop/desktop-window.c
-index 0c20943..537dd59 100644
+index 0c20943..48dbe9c 100644
 --- a/src/desktop/desktop-window.c
 +++ b/src/desktop/desktop-window.c
 @@ -48,6 +48,10 @@
@@ -180,7 +180,45 @@ index 0c20943..537dd59 100644
      return TRUE;
  }
  
-@@ -592,7 +642,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -578,6 +628,37 @@ void desktop_window_set_text_color( DesktopWindow* win, GdkColor* clr, GdkColor*
+     }
+ }
+ 
++#ifdef HAVE_LAYER_SHELL
++static void get_display_dimensions( GdkDisplay *gdpy, int *width, int *height )
++{
++    int min_x = -1, min_y = -1, max_x = -1, max_y = -1;
++
++    for (guint i = 0; i < gdk_display_get_n_monitors( gdpy ); ++i) {
++        GdkMonitor *monitor = gdk_display_get_monitor( gdpy, i );
++        if ( !monitor )
++            continue;
++
++        GdkRectangle geom;
++        gdk_monitor_get_geometry( monitor, &geom );
++
++        if ( min_x == -1 || geom.x < min_x )
++            min_x = geom.x;
++
++        if ( min_y == -1 || geom.y < min_y )
++            min_y = geom.y;
++
++        if ( max_x == -1 || geom.x + geom.width > max_x )
++            max_x = geom.x + geom.width;
++
++        if ( max_y == -1 || geom.y + geom.height > max_y )
++            max_y = geom.y + geom.height;
++    }
++
++    *width = max_x - min_x;
++    *height = max_y - min_y;
++}
++#endif
++
+ /*
+  *  Set background of the desktop window.
+  *  src_pix is the source pixbuf in original size (no scaling)
+@@ -592,7 +673,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
  #else
      GdkPixmap* pixmap = NULL;
  #endif
@@ -189,7 +227,7 @@ index 0c20943..537dd59 100644
      Pixmap xpixmap = 0;
      Visual *xvisual;
      Window xroot;
-@@ -601,13 +651,23 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -601,13 +682,23 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
      unsigned int udummy, depth;
  
      /* set root map here */
@@ -215,7 +253,26 @@ index 0c20943..537dd59 100644
          xvisual = GDK_VISUAL_XVISUAL (gdk_screen_get_system_visual ( gtk_widget_get_screen ( (GtkWidget*)win) ) );
      }
  
-@@ -624,9 +684,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -617,16 +708,31 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+     {
+         int src_w = gdk_pixbuf_get_width(src_pix);
+         int src_h = gdk_pixbuf_get_height(src_pix);
+-        int dest_w = gdk_screen_get_width( gtk_widget_get_screen((GtkWidget*)win) );
+-        int dest_h = gdk_screen_get_height( gtk_widget_get_screen((GtkWidget*)win) );
++        int dest_w, dest_h;
++#ifdef HAVE_LAYER_SHELL
++        if( !GDK_IS_X11_DISPLAY (display) )
++        {
++            get_display_dimensions ( display, &dest_w, &dest_h );
++        } else {
++#else
++        if ( TRUE ) {
++#endif
++            dest_w = gdk_screen_get_width( gtk_widget_get_screen((GtkWidget*)win) );
++            dest_h = gdk_screen_get_height( gtk_widget_get_screen((GtkWidget*)win) );
++        }
+         GdkPixbuf* scaled = NULL;
+ 
          if( type == DW_BG_TILE )
          {
  #if GTK_CHECK_VERSION (3, 0, 0)
@@ -233,7 +290,7 @@ index 0c20943..537dd59 100644
  #else
              pixmap = gdk_pixmap_new( gtk_widget_get_window( ((GtkWidget*)win) ), src_w, src_h, -1 );
              cr = gdk_cairo_create ( pixmap );
-@@ -639,9 +704,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -639,9 +745,14 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
              int w = 0, h = 0;
  
  #if GTK_CHECK_VERSION (3, 0, 0)
@@ -251,7 +308,7 @@ index 0c20943..537dd59 100644
  #else
              pixmap = gdk_pixmap_new( gtk_widget_get_window( ((GtkWidget*)win) ), dest_w, dest_h, -1 );
              cr = gdk_cairo_create ( pixmap );
-@@ -709,7 +779,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -709,7 +820,7 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
                  cairo_move_to ( cr, src_x, src_y );
                  cairo_paint ( cr );
                  g_object_unref( scaled );
@@ -260,7 +317,7 @@ index 0c20943..537dd59 100644
  #if GTK_CHECK_VERSION (3, 0, 0)
                  XFreePixmap ( xdisplay, pixmap );
                  pixmap = 0;
-@@ -719,7 +789,11 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -719,7 +830,11 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
  #endif
              }
          }
@@ -273,7 +330,7 @@ index 0c20943..537dd59 100644
      }
  
  #if GTK_CHECK_VERSION (3, 0, 0)
-@@ -737,14 +811,16 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -737,14 +852,16 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
      win->background = pixmap;
  
  
@@ -292,7 +349,7 @@ index 0c20943..537dd59 100644
          gdk_window_set_back_pixmap( gtk_widget_get_window( ((GtkWidget*)win) ), pixmap, FALSE );
  #endif
      }
-@@ -766,6 +842,9 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
+@@ -766,6 +883,9 @@ void desktop_window_set_background( DesktopWindow* win, GdkPixbuf* src_pix, DWBg
  #endif
      gtk_widget_queue_draw( (GtkWidget*)win );
  
@@ -302,7 +359,7 @@ index 0c20943..537dd59 100644
      if ( !win->transparent )
      {
          XGrabServer (xdisplay);
-@@ -981,7 +1060,6 @@ static void colorize_pixbuf( GdkPixbuf* pix, GdkColor* clr, guint alpha ) {
+@@ -981,7 +1101,6 @@ static void colorize_pixbuf( GdkPixbuf* pix, GdkColor* clr, guint alpha ) {
  void paint_rubber_banding_rect( DesktopWindow* self ) {
      int x1, x2, y1, y2, w, h, pattern_w, pattern_h;
      GdkRectangle rect;
@@ -310,7 +367,7 @@ index 0c20943..537dd59 100644
      guchar alpha;
      GdkPixbuf* pix;
      cairo_t *cr;
-@@ -995,7 +1073,6 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
+@@ -995,7 +1114,6 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
  */
  
      cr = gdk_cairo_create ( gtk_widget_get_window( ((GtkWidget*)self) ) );
@@ -318,7 +375,7 @@ index 0c20943..537dd59 100644
      alpha = 64;  /* FIXME: should be themable in the future */
  
      pix = NULL;
-@@ -1019,7 +1096,7 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
+@@ -1019,7 +1137,7 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
  
      if( pix )
      {
@@ -327,7 +384,7 @@ index 0c20943..537dd59 100644
          if( self->bg_type == DW_BG_TILE ) /* this is currently unreachable */
          {
              /*GdkPixmap* pattern;*/
-@@ -1045,20 +1122,19 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
+@@ -1045,20 +1163,19 @@ void paint_rubber_banding_rect( DesktopWindow* self ) {
      {
          GdkColor clr2 = self->bg;
          clr2.pixel = 0;
@@ -352,7 +409,7 @@ index 0c20943..537dd59 100644
      cairo_destroy( cr );
  }
  
-@@ -2447,6 +2523,13 @@ void on_realize( GtkWidget* w ) {
+@@ -2447,6 +2564,13 @@ void on_realize( GtkWidget* w ) {
  
      GTK_WIDGET_CLASS(parent_class)->realize( w );
  
@@ -366,7 +423,7 @@ index 0c20943..537dd59 100644
      const char *wmname = gdk_x11_screen_get_window_manager_name( gtk_widget_get_screen( w ) );
      if ( self->transparent && !g_strcmp0( wmname, "Compiz" ) )
      {
-@@ -2505,7 +2588,14 @@ gboolean on_focus_out( GtkWidget* w, GdkEventFocus* evt ) {
+@@ -2505,7 +2629,14 @@ gboolean on_focus_out( GtkWidget* w, GdkEventFocus* evt ) {
  gboolean on_scroll( GtkWidget *w, GdkEventScroll *evt ) {
      if ( ((DesktopWindow*)w)->transparent )
      {
@@ -382,7 +439,7 @@ index 0c20943..537dd59 100644
          if ( !g_strcmp0( wmname, "Compiz" ) )
          {
              /* For Compiz transparent desktop, scroll events get passed back to
-@@ -2776,19 +2866,25 @@ start_layout:
+@@ -2776,19 +2907,25 @@ start_layout:
              // right side reached - remove empties and redo layout (custom sort)
              gboolean list_changed = FALSE;
              // scan down below box_count and remove all empties
@@ -416,7 +473,7 @@ index 0c20943..537dd59 100644
              while ( empty_removed &&  g_list_length( self->items ) > self->box_count )
              {
                  empty_removed = FALSE;
-@@ -3334,9 +3430,9 @@ void paint_item( DesktopWindow* self, DesktopItem* item, GdkRectangle* expose_ar
+@@ -3334,9 +3471,9 @@ void paint_item( DesktopWindow* self, DesktopItem* item, GdkRectangle* expose_ar
  
          if( gdk_rectangle_intersect( expose_area, &item->text_rect, &intersect ) )
          {
@@ -428,7 +485,7 @@ index 0c20943..537dd59 100644
          }
      } else {
          /* Do the drop shadow stuff...  This is a little bit dirty... */
-@@ -4044,6 +4140,11 @@ static GdkFilterReturn on_rootwin_event ( GdkXEvent *xevent, GdkEvent *event, gp
+@@ -4044,6 +4181,11 @@ static GdkFilterReturn on_rootwin_event ( GdkXEvent *xevent, GdkEvent *event, gp
  
  /* This function is taken from xfdesktop */
  void forward_event_to_rootwin( GdkScreen *gscreen, GdkEvent *event ) {
@@ -441,7 +498,7 @@ index 0c20943..537dd59 100644
      Display *dpy = GDK_DISPLAY_XDISPLAY( gdk_screen_get_display( gscreen ) );
  
 diff --git a/src/desktop/desktop.c b/src/desktop/desktop.c
-index d583f1c..58e3ea9 100644
+index d583f1c..43dd93a 100644
 --- a/src/desktop/desktop.c
 +++ b/src/desktop/desktop.c
 @@ -30,6 +30,10 @@
@@ -455,25 +512,18 @@ index d583f1c..58e3ea9 100644
  #include "vfs-file-info.h"
  #include "vfs-mime-type.h"
  //#include "vfs-app-desktop.h"
-@@ -59,14 +63,68 @@ static void on_icon_theme_changed( GtkIconTheme* theme, gpointer data ) {
+@@ -59,14 +63,70 @@ static void on_icon_theme_changed( GtkIconTheme* theme, gpointer data ) {
          desktop_window_reload_icons( (DesktopWindow*)desktops[ i ] );
  }
  
 -/*
 -#include <glib-object.h>   // for g_signal_connect
-+#if GTK_CHECK_VERSION (3, 0, 0) && HAVE_LAYER_SHELL
- void on_size_changed( GdkScreen *screen, GtkWidget* w )
+-void on_size_changed( GdkScreen *screen, GtkWidget* w )
++#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
++static void set_monitor( GdkDisplay *gdpy, GtkWidget* w )
  {
 -    printf( "screen size changed  %d, %d\n", gdk_screen_get_width( screen ),
 -                                             gdk_screen_get_height( screen ) );
-+    DWBgType type;
-+    GdkPixbuf* pix;
-+    int i;
-+    GdkDisplay *gdpy = gdk_screen_get_display( screen );
-+
-+    if ( GDK_IS_X11_DISPLAY( gdpy ))
-+        return;
-+
 +    GdkMonitor *left = NULL;
 +    int min_x = -1;
 +    for (guint i = 0; i < gdk_display_get_n_monitors( gdpy ); ++i) {
@@ -489,6 +539,16 @@ index d583f1c..58e3ea9 100644
 +    }
 +    if ( left )
 +        gtk_layer_set_monitor( GTK_WINDOW( w ), left );
++}
++
++
++static void on_size_changed( GdkScreen *screen, GtkWidget* w )
++{
++    DWBgType type;
++    GdkPixbuf* pix;
++    int i;
++
++    set_monitor ( gdk_screen_get_display( screen ), w );
 +
 +    if( app_settings.show_wallpaper && app_settings.wallpaper )
 +    {
@@ -529,22 +589,36 @@ index d583f1c..58e3ea9 100644
  
  
  void fm_turn_on_desktop_icons(gboolean transparent) {
-@@ -75,7 +133,7 @@ void fm_turn_on_desktop_icons(gboolean transparent) {
+@@ -75,7 +135,7 @@ void fm_turn_on_desktop_icons(gboolean transparent) {
      int big = 0;
  
      gdpy = gdk_display_get_default();
 -#if GTK_CHECK_VERSION (3, 0, 0)
-+#if GTK_CHECK_VERSION (3, 0, 0) && !HAVE_LAYER_SHELL
++#if GTK_CHECK_VERSION (3, 0, 0) && !defined(HAVE_LAYER_SHELL)
      if( ! GDK_IS_X11_DISPLAY( gdpy ) )
          return;
  #endif
-@@ -114,12 +172,12 @@ void fm_turn_on_desktop_icons(gboolean transparent) {
+@@ -94,6 +154,10 @@ void fm_turn_on_desktop_icons(gboolean transparent) {
+     for ( i = 0; i < n_screens; i++ )
+     {
+         desktops[ i ] = desktop_window_new(transparent);
++#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
++        if( ! GDK_IS_X11_DISPLAY( gdpy ) )
++            set_monitor ( gdpy, desktops[ i ] );
++#endif
+         //printf("added desktop window %p to screen %d on display %p (%s)\n",
+         //                  desktops[ i ], i, gdpy, g_getenv( "DISPLAY" ) );
+         ((DesktopWindow*)desktops[ i ])->screen_index = i;
+@@ -114,12 +178,15 @@ void fm_turn_on_desktop_icons(gboolean transparent) {
  
          gtk_window_group_add_window( GTK_WINDOW_GROUP(group), GTK_WINDOW( desktops[i] ) );
  
 -        /*   this doesn't work when size is changed via xrandr?
          // temp detect screen size change
-+#if GTK_CHECK_VERSION (3, 0, 0) && HAVE_LAYER_SHELL
++#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
++        if( GDK_IS_X11_DISPLAY( gdpy ) )
++            continue;
++
          g_signal_connect( gtk_widget_get_screen( GTK_WIDGET( desktops[ i ] ) ),
                              "size-changed", G_CALLBACK( on_size_changed ),
                              desktops[ i ] );
