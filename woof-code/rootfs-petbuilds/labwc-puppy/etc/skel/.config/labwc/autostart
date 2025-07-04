@@ -1,5 +1,7 @@
 #!/bin/ash
 
+touch /tmp/bootcnt.txt
+
 gsettings set org.gnome.desktop.interface enable-animations false
 
 # show all buttons in Firefox CSD

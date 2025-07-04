@@ -1,5 +1,7 @@
 #!/bin/ash
 
+touch /tmp/bootcnt.txt
+
 gsettings set org.gnome.desktop.interface enable-animations false
 
 gsettings set org.gnome.desktop.wm.preferences button-layout "appmenu"

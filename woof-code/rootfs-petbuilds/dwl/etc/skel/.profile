@@ -21,8 +21,11 @@ export PATH="$PATH:/usr/local/games:/usr/games"
 [ -d /var/lib/flatpak/exports/bin ] && export PATH="$PATH:/var/lib/flatpak/exports/bin"
 
 if [ ! -f /tmp/bootcnt.txt ] ; then
-	touch /tmp/bootcnt.txt
-	startdwl
+	for i in 1 2 3 4 5; do
+		startdwl
+		[ -f /tmp/bootcnt.txt ] && break
+		sleep 1
+	done
 else
 	pm13 cli
 fi
