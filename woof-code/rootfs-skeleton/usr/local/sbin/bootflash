@@ -29,8 +29,16 @@ if [ "$USBDRV" = "" ];then
 
 	while read _ _ ONEUSB SIZE VENDOR MODEL
 	do
-		echo "$ONEUSB \"${VENDOR} ${MODEL}, ${SIZE}\""
-	done < <(lsblk -dno type,rm,name,size,vendor,model | grep '^disk 1') > /tmp/xselections$$
+		if [ -n "$VENDOR" -a -n "$MODEL" ]; then
+			echo "$ONEUSB \"${VENDOR} ${MODEL}, ${SIZE}\""
+		elif [ -n "$VENDOR" ]; then
+			echo "$ONEUSB \"${VENDOR}, ${SIZE}\""
+		elif [ -n "$MODEL" ]; then
+			echo "$ONEUSB \"${MODEL}, ${SIZE}\""
+		else
+			echo "$ONEUSB \"?, ${SIZE}\""
+		fi
+	done < <(lsblk -dno type,tran,name,size,vendor,model | grep -E '^disk (usb|nvme|sata|ata|mmc) ') > /tmp/xselections$$
 	xSELECTIONS="`cat /tmp/xselections$$ | tr '\n' ' ' | tr -s ' '`"
 	if [ -z "$xSELECTIONS" ] ; then
 		yad --title=Bootflash --window-icon=dialog-error --image=dialog-error --text="$(gettext 'No USB drive plugged in')" --button=gtk-ok
