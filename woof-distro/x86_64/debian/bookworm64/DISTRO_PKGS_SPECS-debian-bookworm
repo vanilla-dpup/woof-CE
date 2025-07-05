@@ -131,6 +131,7 @@ yes|fonts-noto|fonts-noto-core,fonts-noto-mono,fonts-noto-cjk,fonts-noto-color-e
 yes|galculator|galculator|exe,dev>null,doc,nls||deps:yes
 yes|gdmap|gdmap|exe,dev,doc,nls||deps:yes
 yes|geany|geany|exe,dev,doc,nls||deps:yes
+yes|gimp|gimp|exe,dev,doc,nls||deps:yes
 yes|gparted|gparted|exe,dev,doc,nls||deps:yes
 yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
 yes|libcurl4-gnutls-dev|libcurl4-gnutls-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces

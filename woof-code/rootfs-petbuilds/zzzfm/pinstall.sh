@@ -8,7 +8,7 @@ install -m 644 usr/share/applications/foot.desktop etc/skel/Desktop/foot.desktop
 install -m 644 usr/share/applications/geany.desktop etc/skel/Desktop/geany.desktop 2>/dev/null
 install -m 644 usr/share/applications/librewolf.desktop etc/skel/Desktop/librewolf.desktop 2>/dev/null
 install -m 644 usr/share/applications/libreoffice-startcenter.desktop etc/skel/Desktop/libreoffice-startcenter.desktop 2>/dev/null
-install -m 644 usr/local/share/applications/mtpaint.desktop etc/skel/Desktop/mtpaint.desktop 2>/dev/null
+install -m 644 usr/share/applications/gimp.desktop etc/skel/Desktop/gimp.desktop 2>/dev/null
 install -m 644 usr/share/applications/synaptic.desktop etc/skel/Desktop/synaptic.desktop 2>/dev/null
 install -m 644 usr/local/share/applications/xpad.desktop etc/skel/Desktop/xpad.desktop 2>/dev/null
 
