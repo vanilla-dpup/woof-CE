@@ -127,19 +127,32 @@ fi
 
 if [ "$DISTRO_VARIANT" != "barebones" ]; then
 	PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|alsa-utils|alsa-utils|exe,dev,doc,nls||deps:yes
 yes|bash-completion|bash-completion|exe,dev>null,doc,nls||deps:yes
 yes|blueman|blueman|exe,dev,doc,nls||deps:yes
 yes|command-not-found|command-not-found|exe,dev,doc,nls||deps:yes
-yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
-yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev,libfaad-dev|exe,dev,doc,nls||deps:yes
-yes|efibootmgr|efibootmgr|exe,dev,doc,nls||deps:yes
-yes|ExpenseTracker-deps|libsqlite3-dev|exe,dev,doc,nls||deps:yes
-yes|fastfetch|fastfetch|exe,dev,doc,nls||deps:yes
 yes|fonts-liberation|fonts-liberation|exe,dev,doc,nls||deps:yes
 yes|fonts-noto|fonts-noto-core,fonts-noto-mono,fonts-noto-cjk,fonts-noto-color-emoji|exe,dev,doc,nls||deps:yes
-yes|fsearch|fsearch|exe,dev,doc,nls||deps:yes
 yes|galculator|galculator|exe,dev>null,doc,nls||deps:yes
+yes|libglib2.0-dev-bin|libglib2.0-dev-bin|exe,dev,doc,nls||deps:yes # dependency of notification-daemon-stub
+yes|librewolf|librewolf|exe,dev,doc,nls||deps:yes
+yes|libva|vainfo,va-driver-all|exe,dev,doc,nls||deps:yes
+yes|lxtask|lxtask|exe,dev,doc,nls||deps:yes
+yes|man-db|man-db|exe,dev,doc,nls||deps:yes
+yes|mesa-vulkan-drivers|mesa-vulkan-drivers|exe,dev,doc,nls||deps:yes
+yes|nscd|unscd|exe||deps:yes
+yes|synaptic|synaptic|exe,dev,doc,nls||deps:yes
+yes|viewnior|viewnior|exe,dev,doc,nls||deps:yes
+yes|xarchiver|xarchiver|exe,dev,doc,nls||deps:yes
+"
+fi
+
+if [ "$DISTRO_VARIANT" != "mini" -a "$DISTRO_VARIANT" != "barebones" ]; then
+	PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
+yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
+yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev,libfaad-dev|exe,dev,doc,nls||deps:yes
+yes|ExpenseTracker-deps|libsqlite3-dev|exe,dev,doc,nls||deps:yes
+yes|fastfetch|fastfetch|exe,dev,doc,nls||deps:yes
+yes|fsearch|fsearch|exe,dev,doc,nls||deps:yes
 yes|gdmap|gdmap|exe,dev,doc,nls||deps:yes
 yes|geany|geany|exe,dev,doc,nls||deps:yes
 yes|gimp|gimp|exe,dev,doc,nls||deps:yes
@@ -147,30 +160,20 @@ yes|gparted|gparted|exe,dev,doc,nls||deps:yes
 yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
 yes|libcurl4-gnutls-dev|libcurl4-gnutls-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
 yes|libfuse2t64|libfuse2t64|exe,dev,doc,nls||deps:yes # used by AppImages
-yes|libglib2.0-dev-bin|libglib2.0-dev-bin|exe,dev,doc,nls||deps:yes # dependency of notification-daemon-stub
 yes|libidn2-dev|libidn2-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
-yes|librewolf|librewolf|exe,dev,doc,nls||deps:yes
-yes|libva|vainfo,va-driver-all|exe,dev,doc,nls||deps:yes
 yes|libmagic-dev|libmagic-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
 yes|libxml2-dev|libxml2-dev|exe,dev,doc,nls||deps:yes # dependency of fpm2
-yes|lxtask|lxtask|exe,dev,doc,nls||deps:yes
-yes|man-db|man-db|exe,dev,doc,nls||deps:yes
-yes|mesa-vulkan-drivers|mesa-vulkan-drivers|exe,dev,doc,nls||deps:yes
 yes|mpv|mpv|exe,dev,doc,nls||deps:yes
 yes|netpbm|netpbm|exe,dev,doc,nls||deps:yes # dependency of wl_colpick
 yes|nettle-dev|nettle-dev|exe,dev,doc,nls||deps:yes # dependency of fpm2
-yes|nscd|unscd|exe||deps:yes
 yes|putty|putty|exe,dev,doc,nls||deps:yes
-yes|synaptic|synaptic|exe,dev,doc,nls||deps:yes
 yes|transmission-gtk|transmission-gtk|exe,dev,doc,nls||deps:yes
-yes|viewnior|viewnior|exe,dev,doc,nls||deps:yes
 yes|weechat|weechat,weechat-curses,weechat-headless|exe,dev,doc,nls||deps:yes
 yes|wf-recorder|wf-recorder|exe,dev,doc,nls||deps:yes
-yes|xarchiver|xarchiver|exe,dev,doc,nls||deps:yes
 "
 fi
 
-if [ "$DISTRO_VARIANT" != "dwl" -a "$DISTRO_VARIANT" != "barebones" ]; then
+if [ "$DISTRO_VARIANT" != "dwl" -a "$DISTRO_VARIANT" != "mini" -a "$DISTRO_VARIANT" != "barebones" ]; then
 PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|gnome-mahjongg|gnome-mahjongg|exe,dev,doc,nls||deps:yes
 yes|libreoffice|libreoffice-writer,libreoffice-calc,libreoffice-impress,libreoffice-gtk3|exe,dev,doc,nls||deps:yes
