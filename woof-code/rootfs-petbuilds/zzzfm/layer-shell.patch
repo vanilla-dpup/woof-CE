@@ -1,15 +1,15 @@
-From 44d830977e965e55124e08f98a7005135c3508aa Mon Sep 17 00:00:00 2001
+From a81b262b1129c6bc7e9041ab50a0e65d14215b03 Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Fri, 4 Jul 2025 00:12:29 +0300
+Date: Wed, 9 Jul 2025 09:53:31 +0300
 Subject: [PATCH] add layer-shell support
 
 ---
  configure.ac                 |  14 +++
  src/Makefile.am              |   2 +
- src/desktop/desktop-window.c | 222 ++++++++++++++++++++++++++++-------
- src/desktop/desktop.c        |  85 ++++++++++++--
+ src/desktop/desktop-window.c | 228 ++++++++++++++++++++++++++++-------
+ src/desktop/desktop.c        |  85 +++++++++++--
  src/pref-dialog.c            |   6 +
- 5 files changed, 280 insertions(+), 49 deletions(-)
+ 5 files changed, 283 insertions(+), 52 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
 index 508fa45..8840211 100644
@@ -64,7 +64,7 @@ index da5deab..84167c9 100644
      @FAM_LIBS@ \
      @LIBUDEV_LIBS@ \
 diff --git a/src/desktop/desktop-window.c b/src/desktop/desktop-window.c
-index 0c20943..48dbe9c 100644
+index 0c20943..65c0f50 100644
 --- a/src/desktop/desktop-window.c
 +++ b/src/desktop/desktop-window.c
 @@ -48,6 +48,10 @@
@@ -409,6 +409,22 @@ index 0c20943..48dbe9c 100644
      cairo_destroy( cr );
  }
  
+@@ -1424,12 +1541,12 @@ gboolean on_mouse_move( GtkWidget* w, GdkEventMotion* evt ) {
+         self->dragging = FALSE;
+     }
+ 
+-    if( self->dragging )
++    if( self->rubber_bending )
+     {
++        update_rubberbanding( self, evt->x, evt->y, !!(evt->state & GDK_CONTROL_MASK) );
+     }
+-    else if( self->rubber_bending )
++    else if( self->dragging )
+     {
+-        update_rubberbanding( self, evt->x, evt->y, !!(evt->state & GDK_CONTROL_MASK) );
+     } else {     // howdy     we will enforce a minimum, in case  gtk-dnd-drag-threshold is unset
+                  //
+                  //    xref     exo_icon_view_maybe_begin_drag()
 @@ -2447,6 +2564,13 @@ void on_realize( GtkWidget* w ) {
  
      GTK_WIDGET_CLASS(parent_class)->realize( w );
