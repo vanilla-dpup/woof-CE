@@ -396,7 +396,7 @@ button:hover {
 EOF
 
 
-cat << EOF > usr/bin/waybar-config
+cat << EOF > usr/local/bin/waybar-config
 #!/bin/sh
 
 PRESETS=
@@ -415,7 +415,7 @@ while :; do
 	waybar &
 done
 EOF
-chmod 755 usr/bin/waybar-config
+chmod 755 usr/local/bin/waybar-config
 
 ln -s presets/Bottom/config.jsonc etc/skel/.config/waybar/config.jsonc
 ln -s presets/Bottom/style.css etc/skel/.config/waybar/style.css
