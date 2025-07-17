@@ -9,9 +9,103 @@ Exec=waybar
 EOF
 chmod 644 etc/skel/.config/autostart/waybar.desktop
 
-mkdir -p etc/skel/.config/waybar/presets/{Horizontal,Vertical}
+mkdir -p etc/skel/.config/waybar/presets/{Top,Bottom,Left,Right}
 
-cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
+cat << EOF > etc/skel/.config/waybar/presets/Top/config.jsonc
+// -*- mode: jsonc -*-
+[{
+	"name": "bar1",
+	"layer": "bottom",
+	"position": "top",
+	"height": 36,
+	"margin-left": 42,
+	"margin-right": 42,
+	"spacing": 4,
+	"modules-left": [
+		"wlr/taskbar"
+	],
+	"modules-right": [
+		"wireplumber",
+		"battery",
+		"network",
+		"clock"
+	],
+	"wlr/taskbar": {
+		"format": "{icon}",
+		"icon-size": 24,
+		"tooltip-format": "{title}",
+		"on-click": "activate",
+		"on-click-middle": "close"
+	},
+	"clock": {
+		"format": "{:%H:%M}",
+		"tooltip-format": "{:%Y-%m-%d}",
+		"on-click": "gsimplecal"
+	},
+	"wireplumber": {
+		"format": "\uf028 {volume}%",
+		"format-muted": "\uf026 {volume}%",
+		"on-click": "pavucontrol"
+	},
+	"battery": {
+		"states": {
+			"good": 90,
+			"warning": 30,
+			"critical": 10
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "\uf0e7 {capacity}%",
+		"format-plugged": "\uf1e6 {capacity}%",
+		"format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+		"on-click": "batinfo"
+	},
+	"network": {
+		"format-wifi": "\uf1eb {signalStrength}%",
+		"format-ethernet": "\uf0c1 wired",
+		"format": "\uf127 offline",
+		"tooltip-format": "{ifname}",
+		"tooltip-format-wifi": "{essid}",
+		"on-click": "connman-gtk"
+	}
+}]
+EOF
+
+cat << EOF > etc/skel/.config/waybar/presets/Top/style.css
+* {
+	font-family: FontAwesome, sans-serif;
+	font-size: 14px;
+}
+
+.bar1 {
+	background-color: #F6F5F4;
+	color: #000000;
+	border-bottom: 1px solid #DEDDDC;
+}
+
+button {
+	background-color: #E1DEDB;
+	border: none;
+	border-radius: 0;
+	border-top: 4px solid #E1DEDB;
+	box-shadow: none;
+}
+
+button:hover {
+	background: #EDEBE9;
+	border-top: 4px solid #CDC7C2;
+}
+
+#taskbar button.active {
+	background: #E1DEDB;
+	border-top: 4px solid #3584E4;
+}
+
+#clock {
+	padding: 4px;
+}
+EOF
+
+cat << EOF > etc/skel/.config/waybar/presets/Bottom/config.jsonc
 // -*- mode: jsonc -*-
 [{
 	"name": "bar1",
@@ -70,7 +164,7 @@ cat << EOF > etc/skel/.config/waybar/presets/Horizontal/config.jsonc
 }]
 EOF
 
-cat << EOF > etc/skel/.config/waybar/presets/Horizontal/style.css
+cat << EOF > etc/skel/.config/waybar/presets/Bottom/style.css
 * {
 	font-family: FontAwesome, sans-serif;
 	font-size: 14px;
@@ -105,7 +199,7 @@ button:hover {
 }
 EOF
 
-cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
+cat << EOF > etc/skel/.config/waybar/presets/Left/config.jsonc
 // -*- mode: jsonc -*-
 [{
 	"name": "bar1",
@@ -164,7 +258,7 @@ cat << EOF > etc/skel/.config/waybar/presets/Vertical/config.jsonc
 }]
 EOF
 
-cat << EOF > etc/skel/.config/waybar/presets/Vertical/style.css
+cat << EOF > etc/skel/.config/waybar/presets/Left/style.css
 * {
 	font-family: FontAwesome, sans-serif;
 	font-size: 14px;
@@ -203,6 +297,105 @@ button:hover {
 }
 EOF
 
+cat << EOF > etc/skel/.config/waybar/presets/Right/config.jsonc
+// -*- mode: jsonc -*-
+[{
+	"name": "bar1",
+	"layer": "bottom",
+	"position": "right",
+	"width": 60,
+	"margin-top": 40,
+	"margin-bottom": 40,
+	"spacing": 4,
+	"modules-left": [
+		"wlr/taskbar"
+	],
+	"modules-right": [
+		"wireplumber",
+		"battery",
+		"network",
+		"clock"
+	],
+	"wlr/taskbar": {
+		"format": "{icon}",
+		"icon-size": 32,
+		"tooltip-format": "{title}",
+		"on-click": "activate",
+		"on-click-middle": "close"
+	},
+	"clock": {
+		"format": "{:%H:%M}",
+		"tooltip-format": "{:%Y-%m-%d}",
+		"on-click": "gsimplecal"
+	},
+	"wireplumber": {
+		"format": "\uf028 {volume}%",
+		"format-muted": "\uf026 {volume}%",
+		"on-click": "pavucontrol"
+	},
+	"battery": {
+		"states": {
+			"good": 90,
+			"warning": 30,
+			"critical": 10
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "\uf0e7 {capacity}%",
+		"format-plugged": "\uf1e6 {capacity}%",
+		"format-icons": ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"],
+		"on-click": "batinfo"
+	},
+	"network": {
+		"format-wifi": "\uf1eb {signalStrength}%",
+		"format-ethernet": "\uf0c1 wired",
+		"format": "\uf127 offline",
+		"tooltip-format": "{ifname}",
+		"tooltip-format-wifi": "{essid}",
+		"on-click": "connman-gtk"
+	}
+}]
+EOF
+
+cat << EOF > etc/skel/.config/waybar/presets/Right/style.css
+* {
+	font-family: FontAwesome, sans-serif;
+	font-size: 14px;
+}
+
+.bar1 {
+	background-color: #F6F5F4;
+	color: #000000;
+	border-left: 1px solid #DEDDDC;
+}
+
+button {
+	background-color: #E1DEDB;
+	border: none;
+	border-radius: 0;
+	border-right: 4px solid #E1DEDB;
+	box-shadow: none;
+}
+
+button:hover {
+	background: #EDEBE9;
+	border-right: 4px solid #CDC7C2;
+}
+
+#taskbar button.active {
+	background: #E1DEDB;
+	border-right: 4px solid #3584E4;
+}
+
+#wireplumber, #battery, #network {
+	font-size: 12px;
+}
+
+#clock {
+	padding: 4px;
+}
+EOF
+
+
 cat << EOF > usr/bin/waybar-config
 #!/bin/sh
 
@@ -212,7 +405,7 @@ for PRESET in ~/.config/waybar/presets/*; do
 done
 
 while :; do
-	CHOICE=\`yad --title waybar-config --window-icon=gtk-preferences --width=240 --list --no-headers --column=theme --print-column=1 --separator= -- \$PRESETS\`
+	CHOICE=\`yad --title waybar-config --window-icon=gtk-preferences --width=240 --height=240 --list --no-headers --column=theme --print-column=1 --separator= -- \$PRESETS\`
 	[ -z "\$CHOICE" ] && break
 
 	ln -sf presets/\${CHOICE}/config.jsonc ~/.config/waybar/config.jsonc
@@ -224,8 +417,8 @@ done
 EOF
 chmod 755 usr/bin/waybar-config
 
-ln -s presets/Horizontal/config.jsonc etc/skel/.config/waybar/config.jsonc
-ln -s presets/Horizontal/style.css etc/skel/.config/waybar/style.css
+ln -s presets/Bottom/config.jsonc etc/skel/.config/waybar/config.jsonc
+ln -s presets/Bottom/style.css etc/skel/.config/waybar/style.css
 
 cat << EOF > usr/local/share/applications/waybar-config.desktop
 [Desktop Entry]
