@@ -12,7 +12,7 @@ mkdir -p etc/skel/.config/kanshi
 echo 'include ~/.config/kanshi/*.profile' > etc/skel/.config/kanshi/config
 chmod 644 etc/skel/.config/kanshi/config
 
-cat << EOF > usr/bin/kanshi-gen
+cat << EOF > usr/local/bin/kanshi-gen
 #!/bin/bash
 
 echo "profile {" > /tmp/kanshi-profile
@@ -116,7 +116,7 @@ else
 	rm -f /tmp/kanshi-profile
 fi
 EOF
-chmod 755 usr/bin/kanshi-gen
+chmod 755 usr/local/bin/kanshi-gen
 
 cat << EOF > pinstall.sh
 if [ -e usr/bin/wdisplays ]; then

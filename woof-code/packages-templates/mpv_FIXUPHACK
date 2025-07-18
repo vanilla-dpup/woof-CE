@@ -1,9 +1,9 @@
-cat << EOF > usr/bin/mpv-webcam
+cat << EOF > usr/local/bin/mpv-webcam
 #!/bin/sh
 
 exec mpv av://v4l2:/dev/video0 --profile=low-latency --untimed
 EOF
-chmod 755 usr/bin/mpv-webcam
+chmod 755 usr/local/bin/mpv-webcam
 
 cat << EOF > usr/local/share/applications/mpv-webcam.desktop
 [Desktop Entry]
