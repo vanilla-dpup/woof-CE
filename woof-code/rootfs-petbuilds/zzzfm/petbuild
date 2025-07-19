@@ -12,6 +12,5 @@ build() {
     patch -p1 < ../layer-shell.patch
     ./autogen.sh --disable-video-thumbnails --with-gtk3 --with-layer-shell
     make install
-    rm -rf /usr/local/share/applications/{zzzfm-find,zzzfm-folder-handler}.desktop
     sed -e 's/^Categories=.*/Categories=FileManager/' -i /usr/local/share/applications/zzzfm.desktop
 }
