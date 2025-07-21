@@ -10,9 +10,7 @@ window.inactive.border.color: #858585
 window.active.title.bg.color: #222222
 window.active.label.text.color: #EEEEEE
 window.active.button.unpressed.image.color: #EEEEEE
-window.inactive.title.bg: Gradient Vertical
-window.inactive.title.bg.color: #999999
-window.inactive.title.bg.colorTo: #757575
+window.inactive.title.bg.color: #858585
 window.inactive.label.text.color: #CCCCCC
 window.inactive.button.unpressed.image.color: #CCCCCC
 menu.items.bg.color: #FFFEF9
