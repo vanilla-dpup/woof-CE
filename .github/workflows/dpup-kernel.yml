@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-11.0.x')
+    if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-12.0.x')
     runs-on: ubuntu-24.04
     continue-on-error: ${{ matrix.release == 'unstable' }}
     strategy:
