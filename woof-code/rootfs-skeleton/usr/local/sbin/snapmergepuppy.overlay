@@ -68,7 +68,7 @@ fi
 
 SFSPoints="`grep -m1 ^unionfs /proc/mounts | sed -E 's~.*lowerdir=([^,]+).*~\1~' | sed -e s~^~/initrd~ -e 's~:~\n/initrd~g' | grep -v '^/initrd/pup_ro1$' | tac`"
 
-find . -type c | sed -e 's/\.\///' |
+stdbuf -oL find . -type c | stdbuf -oL sed -e 's/\.\///' |
 while read -r N
 do
 	DN="${N%/*}"
@@ -102,7 +102,7 @@ sync -f "$BASE/"
 # DIRECTORIES
 # =============================================================================
 
-find . -mount -type d -not -path './initrd/*' | tail +2 | sed -e 's/\.\///' |
+stdbuf -oL find . -mount -type d -not -path './initrd/*' | stdbuf -oL tail +2 | stdbuf -oL sed -e 's/\.\///' |
 while read -r N
 do
 	#v4.01 graceful exit if shutdown X (see /usr/X11R7/bin/restartwm,wmreboot,wmpoweroff)...
@@ -134,7 +134,7 @@ rm -f /tmp/snapmergepuppy-error   #140102 SFR
 #Copy Files... v409 remove '^var'. 100222 shinobar: more exclusions. 100422 added ^root/ftpd. 100429 modify 'trash' exclusion. 100820 added var/tmp 120103 rerwin: add .XLOADED # SFR: added dev/snd # SFR: added .crdownload
 # SFR: move as much as possible into 'find' itself
 # Limitation - files with newline (\n) in its name are processed wrong (but this is not a new issue)
-find . -mount \
+stdbuf -oL find . -mount \
 	   -not -path . \
 	   -not -type d \
 	   -not -type c \
