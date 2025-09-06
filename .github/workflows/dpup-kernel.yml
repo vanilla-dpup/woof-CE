@@ -24,7 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Free space
-        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet # increase free space, we don't need these
+        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
       - name: Install dependencies
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap
       - name: merge2out
