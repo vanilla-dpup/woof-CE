@@ -1,3 +1,15 @@
+diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/data/ui/appchooserdlg.ui zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/data/ui/appchooserdlg.ui
+--- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/data/ui/appchooserdlg.ui	2025-09-13 17:02:01.412487061 +0300
++++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/data/ui/appchooserdlg.ui	2025-09-13 17:02:10.693755549 +0300
+@@ -243,7 +243,7 @@
+ 
+             <child>
+               <object class="GtkCheckButton" id="set_extra_drp">
+-                <property name="visible">True</property>
++                <property name="visible">False</property>
+                 <property name="can_focus">True</property>
+                 <property name="label" translatable="no">extra option (placeholder for future zzzfm version)</property>
+                 <property name="use_underline">True</property>
 diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c
 --- zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/ptk/ptk-location-view.c	2025-07-01 20:16:20.497728264 +0300
 +++ zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58/src/ptk/ptk-location-view.c	2025-07-01 20:16:24.557810038 +0300
