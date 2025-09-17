@@ -95,8 +95,12 @@ case $PUPMODE in
   #It contains variable RAMDISK_SAVE_SESSION where the values are 'y' or 'n'
   RAMDISK_SAVE_SESSION="`cat /tmp/session_ramdisk_result 2>/dev/null`"
   if [ "$RAMDISK_SAVE_SESSION" == "" ]; then
-   asktosave_session >/dev/console
-   retval=$?
+   retval=1
+   . /etc/eventmanager
+   if [ "$ASKTOSAVE" == "true" ]; then
+    asktosave_session >/dev/console
+    retval=$?
+   fi
    [ $retval -ne 0 ] && echo "$(gettext "Session not saved")" >/dev/console
   elif [ "$RAMDISK_SAVE_SESSION" == "y" ]; then
    retval=0
