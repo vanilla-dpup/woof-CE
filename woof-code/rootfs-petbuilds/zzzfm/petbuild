@@ -1,10 +1,10 @@
 download() {
-    [ -f zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58.zip ] || curl --fail --retry 3 --max-time 60 -o zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58.zip https://gitlab.com/antix-contribs/zzzfm/-/archive/bc7473cebcf3b4f932d82d82c044c68b8c78de58/zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58.zip
+    [ -f zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045.zip ] || curl --fail --retry 3 --max-time 60 -o zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045.zip https://gitlab.com/antiX-Linux/zzzfm-antix/-/archive/74aee828ead20d5f109bd395d84330b287846045/zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045.zip
 }
 
 build() {
-    unzip -q zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58.zip
-    cd zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58
+    unzip -q zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045.zip
+    cd zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045
     patch -p1 < ../fix-ftbfs-gcc14.patch
     patch -p1 < ../wayland.patch
     patch -p1 < ../mount.patch
