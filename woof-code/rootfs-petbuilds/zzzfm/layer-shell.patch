@@ -1,16 +1,17 @@
-From ddfd0f19760fde6395f9d4bb26e931980eecbfc9 Mon Sep 17 00:00:00 2001
+From 3591bf97a4e60c345c2768739725f52d0fb32aef Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Mon, 21 Jul 2025 09:01:48 +0300
+Date: Tue, 29 Jul 2025 22:44:41 +0300
 Subject: [PATCH] add layer-shell support
 
 ---
  configure.ac                 |  14 +++
  src/Makefile.am              |   2 +
  src/desktop/desktop-window.c | 238 +++++++++++++++++++++++++++++------
- src/desktop/desktop.c        |  30 ++++-
- src/main.c                   |  14 ++-
- src/pref-dialog.c            |  19 ++-
- 6 files changed, 273 insertions(+), 44 deletions(-)
+ src/desktop/desktop.c        |  36 +++++-
+ src/desktop/desktop.h        |   1 +
+ src/main.c                   |  13 +-
+ src/pref-dialog.c            |  18 ++-
+ 7 files changed, 278 insertions(+), 44 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
 index 508fa45..8840211 100644
@@ -523,7 +524,7 @@ index 0c20943..31e7710 100644
      Display *dpy = GDK_DISPLAY_XDISPLAY( gdk_screen_get_display( gscreen ) );
  
 diff --git a/src/desktop/desktop.c b/src/desktop/desktop.c
-index d583f1c..c285328 100644
+index d583f1c..bb88f5b 100644
 --- a/src/desktop/desktop.c
 +++ b/src/desktop/desktop.c
 @@ -30,6 +30,10 @@
@@ -584,25 +585,56 @@ index d583f1c..c285328 100644
          //printf("added desktop window %p to screen %d on display %p (%s)\n",
          //                  desktops[ i ], i, gdpy, g_getenv( "DISPLAY" ) );
          ((DesktopWindow*)desktops[ i ])->screen_index = i;
+@@ -148,6 +176,11 @@ void fm_turn_off_desktop_icons() {
+     group = NULL;
+ }
+ 
++void fm_restart_desktop_icons() {
++    fm_turn_off_desktop_icons();
++    fm_turn_on_desktop_icons( app_settings.show_wallpaper == 1 && app_settings.wallpaper_mode == WPM_TRANSPARENT );
++}
++
+ void fm_desktop_update_thumbnails() {
+     /* FIXME: thumbnail on desktop cannot be turned off. */
+ }
+@@ -234,6 +267,7 @@ void fm_desktop_set_single_click( gboolean single_click ) {
+ /* dummy implementations */
+ void fm_turn_on_desktop_icons( gboolean transparent ) { }
+ void fm_turn_off_desktop_icons() { }
++void fm_restart_desktop_icons() { }
+ void fm_desktop_update_thumbnails() { }
+ void fm_desktop_update_wallpaper( gboolean transparency_changed ) { }
+ void fm_desktop_update_colors() { }
+diff --git a/src/desktop/desktop.h b/src/desktop/desktop.h
+index eae2cd2..b741353 100644
+--- a/src/desktop/desktop.h
++++ b/src/desktop/desktop.h
+@@ -34,6 +34,7 @@ G_BEGIN_DECLS
+ 
+ void fm_turn_on_desktop_icons( gboolean transparent );
+ void fm_turn_off_desktop_icons();
++void fm_restart_desktop_icons();
+ void fm_desktop_update_thumbnails();
+ void fm_desktop_update_wallpaper( gboolean transparency_changed );
+ void fm_desktop_update_colors();
 diff --git a/src/main.c b/src/main.c
-index 6f4eae4..64fb00d 100644
+index 6f4eae4..956fcc1 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -909,6 +909,13 @@ gboolean delayed_popup( GtkWidget* popup ) {
+@@ -909,6 +909,12 @@ gboolean delayed_popup( GtkWidget* popup ) {
      return FALSE;
  }
  
 +#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
 +static void on_monitors_changed( GdkScreen *screen, gpointer data ) {
-+    fm_turn_off_desktop_icons();
-+    fm_turn_on_desktop_icons( app_settings.show_wallpaper == 1 &&   app_settings.wallpaper_mode == WPM_TRANSPARENT );
++    fm_restart_desktop_icons();
 +}
 +#endif
 +
  static void init_desktop_or_daemon() {
      init_folder();
  
-@@ -917,8 +924,13 @@ static void init_desktop_or_daemon() {
+@@ -917,8 +923,13 @@ static void init_desktop_or_daemon() {
      signal( SIGINT, (void*)gtk_main_quit );
      signal( SIGTERM, (void*)gtk_main_quit );
  
@@ -618,7 +650,7 @@ index 6f4eae4..64fb00d 100644
  }
  
 diff --git a/src/pref-dialog.c b/src/pref-dialog.c
-index 78c478f..65f1cb9 100644
+index 78c478f..8522033 100644
 --- a/src/pref-dialog.c
 +++ b/src/pref-dialog.c
 @@ -25,6 +25,8 @@
@@ -659,7 +691,7 @@ index 78c478f..65f1cb9 100644
              {
                  xset_msg_dialog( GTK_WIDGET( dlg ), 0, _("Transparency Requirements"),
                          NULL, 0, _("General Note: For desktop transparency to "
-@@ -419,6 +426,16 @@ static void on_response( GtkDialog* dlg, int response, FMPrefDlg* user_data )
+@@ -419,6 +426,15 @@ static void on_response( GtkDialog* dlg, int response, FMPrefDlg* user_data )
              }
          }
  
@@ -668,8 +700,7 @@ index 78c478f..65f1cb9 100644
 +            app_settings.show_wm_menu = show_wm_menu;
 +            if ( ! GDK_IS_X11_DISPLAY( gdk_display_get_default ()) )
 +            {
-+                fm_turn_off_desktop_icons();
-+                fm_turn_on_desktop_icons( app_settings.show_wallpaper == 1 && app_settings.wallpaper_mode == WPM_TRANSPARENT );
++                fm_restart_desktop_icons();
 +            }
 +        }
 +
