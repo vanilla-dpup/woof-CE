@@ -1,10 +1,10 @@
 download() {
-    [ -f fpm2-0.90.tar.xz ] || curl --fail --retry 3 --max-time 60 -o fpm2-0.90.tar.xz https://als.regnet.cz/fpm2/download/fpm2-0.90.tar.xz
+    [ -f fpm2-0.90.1.tar.xz ] || curl --fail --retry 3 --max-time 60 -o fpm2-0.90.1.tar.xz https://als.regnet.cz/fpm2/download/fpm2-0.90.1.tar.xz
 }
 
 build() {
-    tar -xJf fpm2-0.90.tar.xz
-    cd fpm2-0.90
+    tar -xJf fpm2-0.90.1.tar.xz
+    cd fpm2-0.90.1
     ./configure
     make install
     sed -i 's/^Categories=.*/Categories=X-Personal;/' /usr/local/share/applications/fpm2.desktop
