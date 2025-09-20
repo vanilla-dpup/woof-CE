@@ -1,0 +1,26 @@
+diff -rupN mdview-bfc04d27b4-orig/egg-markdown.c mdview-bfc04d27b4/egg-markdown.c
+--- mdview-bfc04d27b4-orig/egg-markdown.c	2025-09-20 13:32:57.093033620 +0300
++++ mdview-bfc04d27b4/egg-markdown.c	2025-09-20 13:34:36.745262685 +0300
+@@ -2756,7 +2756,7 @@ out:
+  * If @prtid is not NULL return the resolved reference id.
+  **/
+ static gchar *
+-_resolve_ref (const EggMarkdown *self, const gchar *text, GRegex *get_regex(), gchar *get_ref(), gint *ptrid)
++_resolve_ref (const EggMarkdown *self, const gchar *text, GRegex *get_regex(const EggMarkdown *), gchar *get_ref(const EggMarkdown *, gint), gint *ptrid)
+ {
+ 	GMatchInfo *info = NULL;
+ 	gchar *ret = NULL, *match = NULL;
+diff -rupN mdview-bfc04d27b4-orig/Makefile mdview-bfc04d27b4/Makefile
+--- mdview-bfc04d27b4-orig/Makefile	2025-09-20 13:32:57.092735444 +0300
++++ mdview-bfc04d27b4/Makefile	2025-09-20 13:33:39.475711554 +0300
+@@ -5,7 +5,9 @@ GTK_CFLAGS=$(shell pkg-config --cflags g
+ GTK_LIBS=$(shell pkg-config --libs gtk+-$(GTK).0)
+ 
+ DEBUG=-O0 -g
+-CFLAGS=$(GTK_CFLAGS) $(DEBUG)
++CFLAGS?=$(DEBUG)
++CFLAGS+=-Wno-error=incompatible-pointer-types
++CFLAGS+=$(GTK_CFLAGS)
+ LIBS=$(GTK_LIBS)
+ 
+ # Disable GTypeDebugFlags and GTimeVal deprecations, might be overkill.
