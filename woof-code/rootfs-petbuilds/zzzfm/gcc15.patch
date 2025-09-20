@@ -1,0 +1,171 @@
+From 6ccf41dca6d211858327a01d8ed45e69ac2f1823 Mon Sep 17 00:00:00 2001
+From: Dima Krasner <dima@dimakrasner.com>
+Date: Sat, 20 Sep 2025 12:37:59 +0300
+Subject: [PATCH] fix build failure with GCC 15
+
+---
+ configure.ac                |  1 +
+ src/main-window.c           | 24 ++++++++++++------------
+ src/ptk/ptk-dir-tree-view.c |  2 +-
+ src/ptk/ptk-file-misc.c     |  2 +-
+ src/settings.c              |  6 +++---
+ 5 files changed, 18 insertions(+), 17 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 8840211..135ae17 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -97,6 +97,7 @@ AC_SUBST([GTK_LIBS])
+ # Default make options
+ # disable deprecated warnings for now due to GTK2/GTK3 build compat
+ CPPFLAGS="$CPPFLAGS -Wno-deprecated-declarations -Wformat -Wformat-security -Wreturn-type -Wunused-value"
++CFLAGS="$CFLAGS -Wno-error=incompatible-pointer-types"
+ 
+ dnl linker optimizations
+ AC_MSG_CHECKING([whether $LD accepts --as-needed])
+diff --git a/src/main-window.c b/src/main-window.c
+index fe156b6..c41708c 100644
+--- a/src/main-window.c
++++ b/src/main-window.c
+@@ -5129,7 +5129,7 @@ GtkWidget* main_task_view_new( FMMainWindow* main_window ) {
+ 
+ // ============== socket commands
+ 
+-gboolean bool( const char* value ) {
++gboolean to_bool( const char* value ) {
+     return ( !( value && value[0] ) || !strcmp( value, "1") ||
+                  !strcmp( value, "true") || !strcmp( value, "True") || !strcmp( value, "TRUE") ||
+                  !strcmp( value, "yes")  || !strcmp( value, "Yes")  || !strcmp( value, "YES") );
+@@ -5299,14 +5299,14 @@ _missing_arg:
+         }
+         else if ( !strcmp( argv[i], "window_maximized" ) )
+         {
+-            if ( bool( argv[i+1] ) )
++            if ( to_bool( argv[i+1] ) )
+                 gtk_window_maximize( GTK_WINDOW( main_window ) );
+             else
+                 gtk_window_unmaximize( GTK_WINDOW( main_window ) );
+         }
+         else if ( !strcmp( argv[i], "window_fullscreen" ) )
+         {
+-            xset_set_b( "main_full", bool( argv[i+1] ) );
++            xset_set_b( "main_full", to_bool( argv[i+1] ) );
+             on_fullscreen_activate( NULL, main_window );
+         }
+         else if ( !strcmp( argv[i], "screen_size" ) )
+@@ -5446,7 +5446,7 @@ _missing_arg:
+                     *reply = g_strdup_printf( _("zzzfm: invalid property %s\n"), argv[i] );
+                     return 2;
+                 }
+-                xset_set_b_panel( j, "show", bool( argv[i+1] ) );
++                xset_set_b_panel( j, "show", to_bool( argv[i+1] ) );
+                 show_panels_all_windows( NULL, main_window );
+                 return 0;
+             }
+@@ -5455,9 +5455,9 @@ _missing_arg:
+             if ( !str )
+                 goto _invalid_set;
+             if ( use_mode )
+-                xset_set_b_panel_mode( panel, str, main_window->panel_context[panel-1], bool( argv[i+1] ) );
++                xset_set_b_panel_mode( panel, str, main_window->panel_context[panel-1], to_bool( argv[i+1] ) );
+             else
+-                xset_set_b_panel( panel, str, bool( argv[i+1] ) );
++                xset_set_b_panel( panel, str, to_bool( argv[i+1] ) );
+             update_views_all_windows( NULL, file_browser );
+         }
+         else if ( !strcmp( argv[i], "panel_hslider_top" ) ||  !strcmp( argv[i], "panel_hslider_bottom" ) ||  !strcmp( argv[i], "panel_vslider" ) )
+@@ -5552,22 +5552,22 @@ _missing_arg:
+         {
+             if ( !strcmp( argv[i] + 5, "ascend" ) )
+             {
+-                ptk_file_browser_set_sort_type( file_browser, bool( argv[i+1] ) ?  GTK_SORT_ASCENDING : GTK_SORT_DESCENDING );
++                ptk_file_browser_set_sort_type( file_browser, to_bool( argv[i+1] ) ?  GTK_SORT_ASCENDING : GTK_SORT_DESCENDING );
+                 return 0;
+             }
+             else if ( !strcmp( argv[i] + 5, "natural" ) )
+             {
+                 str = "sortx_natural";
+-                xset_set_b( str, bool( argv[i+1] ) );
++                xset_set_b( str, to_bool( argv[i+1] ) );
+             }
+             else if ( !strcmp( argv[i] + 5, "case" ) )
+             {
+                 str = "sortx_case";
+-                xset_set_b( str, bool( argv[i+1] ) );
++                xset_set_b( str, to_bool( argv[i+1] ) );
+             }
+             else if ( !strcmp( argv[i] + 5, "hidden_first" ) )
+             {
+-                str = bool( argv[i+1] ) ? "sortx_hidfirst" : "sortx_hidlast";
++                str = to_bool( argv[i+1] ) ? "sortx_hidfirst" : "sortx_hidlast";
+                 xset_set_b( str, TRUE );
+             }
+             else if ( !strcmp( argv[i] + 5, "first" ) )
+@@ -5590,11 +5590,11 @@ _missing_arg:
+         }
+         else if ( !strcmp( argv[i], "show_thumbnails" ) )
+         {
+-            if ( app_settings.show_thumbnail != bool( argv[i+1] ) )
++            if ( app_settings.show_thumbnail != to_bool( argv[i+1] ) )
+                 main_window_toggle_thumbnails_all_windows();
+         }
+         else if ( !strcmp( argv[i], "large_icons" ) ) {
+-            xset_set_b_panel_mode( panel, "list_large", main_window->panel_context[panel-1], bool( argv[i+1] ) );
++            xset_set_b_panel_mode( panel, "list_large", main_window->panel_context[panel-1], to_bool( argv[i+1] ) );
+             update_views_all_windows( NULL, file_browser );
+ 
+         }
+diff --git a/src/ptk/ptk-dir-tree-view.c b/src/ptk/ptk-dir-tree-view.c
+index a0c6ec5..3c3f70a 100644
+--- a/src/ptk/ptk-dir-tree-view.c
++++ b/src/ptk/ptk-dir-tree-view.c
+@@ -285,7 +285,7 @@ GtkTreeModel* get_dir_tree_model() {
+ 
+     if ( G_UNLIKELY( ! dir_tree_model ) )
+     {
+-        dir_tree_model = ptk_dir_tree_new( TRUE );
++        dir_tree_model = ptk_dir_tree_new();
+         g_object_add_weak_pointer( G_OBJECT( dir_tree_model ), ( gpointer * ) (GtkWidget *) & dir_tree_model );
+     } else {
+         g_object_ref( G_OBJECT( dir_tree_model ) );
+diff --git a/src/ptk/ptk-file-misc.c b/src/ptk/ptk-file-misc.c
+index 6a3a2b3..d14e5da 100644
+--- a/src/ptk/ptk-file-misc.c
++++ b/src/ptk/ptk-file-misc.c
+@@ -1222,7 +1222,7 @@ void on_opt_toggled( GtkMenuItem* item, MoveSet* mset )
+ void on_toggled( GtkMenuItem* item, MoveSet* mset )
+ {
+     //int (*show) () = NULL;
+-    void (*show) () = NULL;
++    void (*show) ( GtkWidget* ) = NULL;
+     gboolean someone_is_visible = FALSE;
+     gboolean opts_visible = FALSE;
+ 
+diff --git a/src/settings.c b/src/settings.c
+index 487148a..b70d3eb 100644
+--- a/src/settings.c
++++ b/src/settings.c
+@@ -1834,9 +1834,9 @@ gboolean xset_get_bool( const char* name, const char* var ) {
+ 
+ gboolean xset_get_bool_panel( int panel, const char* name, const char* var ) {
+     char* fullname = g_strdup_printf( "panel%d_%s", panel, name );
+-    gboolean bool = xset_get_bool( fullname, var );
++    gboolean b = xset_get_bool( fullname, var );
+     g_free( fullname );
+-    return bool;
++    return b;
+ }
+ 
+ int xset_get_int_set( XSet* set, const char* var ) {
+@@ -6016,7 +6016,7 @@ gboolean xset_menu_keypress( GtkWidget* widget, GdkEventKey* event, gpointer use
+ 
+ void xset_menu_cb( GtkWidget* item, XSet* set ) {
+     GtkWidget* parent;
+-    void (*cb_func) () = NULL;
++    void (*cb_func) ( GtkWidget*, gpointer ) = NULL;
+     gpointer cb_data = NULL;
+     char* title;
+     XSet* mset;  // mirror set or set
+-- 
+2.51.0
+
