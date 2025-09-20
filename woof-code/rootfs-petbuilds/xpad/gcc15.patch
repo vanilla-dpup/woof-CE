@@ -1,0 +1,12 @@
+diff -rupN xpad-4.3.1-orig/src/xpad-tray.c xpad-4.3.1/src/xpad-tray.c
+--- xpad-4.3.1-orig/src/xpad-tray.c	2025-09-20 14:12:05.577036857 +0300
++++ xpad-4.3.1/src/xpad-tray.c	2025-09-20 14:12:31.426695376 +0300
+@@ -98,7 +98,7 @@ static void xpad_tray_close ()
+ void xpad_tray_dispose (XpadSettings *settings) {
+ 	if (settings)
+ 		g_signal_handlers_disconnect_by_func (settings, xpad_tray_toggle, NULL);
+-	xpad_tray_close (settings);
++	xpad_tray_close ();
+ }
+ 
+ gboolean

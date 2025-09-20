@@ -8,6 +8,7 @@ build() {
     patch -p1 < ../no-x.patch
     patch -p1 < ../no-help.patch
     patch -p1 < ../gcc14.patch
+    patch -p1 < ../gcc15.patch
     ./configure --without-x
     make install
     sed -i 's/^Categories=.*/Categories=X-Personal;/' /usr/local/share/applications/xpad.desktop
