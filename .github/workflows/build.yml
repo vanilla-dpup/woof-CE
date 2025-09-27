@@ -43,6 +43,8 @@ jobs:
   build:
     runs-on: ${{ inputs.runner }}
     steps:
+    - name: Free space
+      run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
     - name: Checkout code
       uses: actions/checkout@v4
       with:
