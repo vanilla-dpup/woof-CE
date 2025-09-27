@@ -1,11 +1,11 @@
-#!/bin/ash -e
+#!/bin/bash -e
 
 NAME="${1#/dev/}"
 test -n "$NAME"
 [ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
-for FILE in "/mnt/$NAME"/*; do
+while read FILE; do
 	sync -f "$FILE"
 	break
-done
+done < <(ls "/mnt/$NAME"/* 2>/dev/null)
 umount -l "/mnt/$NAME"
 rmdir "/mnt/$NAME"
