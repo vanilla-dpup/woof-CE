@@ -1,0 +1,7 @@
+[Desktop Entry]
+Version=1.0
+Name=particonsd
+Comment=particons daemon
+Exec=particonsd
+Terminal=false
+Type=Application

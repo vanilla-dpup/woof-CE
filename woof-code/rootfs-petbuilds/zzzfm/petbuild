@@ -11,7 +11,9 @@ build() {
     patch -p1 < ../puppy-defaults.patch
     patch -p1 < ../layer-shell.patch
     patch -p1 < ../gcc15.patch
+    patch -p1 < ../unmount-crash.patch
     ./autogen.sh --disable-video-thumbnails --with-gtk3 --with-layer-shell
     make install
     sed -e 's/^Categories=.*/Categories=FileManager/' -i /usr/local/share/applications/zzzfm.desktop
+    $CC $CFLAGS `pkg-config --cflags libudev` ../particonsd.c $LDFLAGS `pkg-config --libs libudev` -o /usr/local/bin/particonsd
 }
