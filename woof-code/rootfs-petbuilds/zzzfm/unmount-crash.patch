@@ -1,0 +1,18 @@
+diff -rupN zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045-orig/src/vfs/vfs-file-monitor.c zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045/src/vfs/vfs-file-monitor.c
+--- zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045-orig/src/vfs/vfs-file-monitor.c	2025-09-27 14:22:05.544343870 +0300
++++ zzzfm-antix-74aee828ead20d5f109bd395d84330b287846045/src/vfs/vfs-file-monitor.c	2025-09-27 14:23:03.030414608 +0300
+@@ -364,11 +364,13 @@ static void dispatch_event( VFSFileMonit
+     VFSFileMonitorCallbackEntry * cb;
+     VFSFileMonitorCallback func;
+     int i;
++    guint len;
+     /* Call the callback functions */
+     if ( monitor->callbacks && monitor->callbacks->len )
+     {
++        len = monitor->callbacks->len;
+         cb = ( VFSFileMonitorCallbackEntry* ) monitor->callbacks->data;
+-        for ( i = 0; i < monitor->callbacks->len; ++i )
++        for ( i = 0; i < len; ++i )
+         {
+             func = cb[ i ].callback;
+             func( monitor, evt, file_name, cb[ i ].user_data );

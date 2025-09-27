@@ -1,0 +1,52 @@
+#!/bin/bash
+
+trap "rm -f /tmp/particon.desktop" EXIT
+
+OLD=""
+while read LINE; do
+	LINE="${LINE##*/}"
+	LINE="${LINE#particon-}"
+	OLD="${OLD} ${LINE%.desktop}"
+done < <(ls ~/Desktop/particon-*.desktop 2>/dev/null)
+
+ICON=""
+NEW=""
+while read TYPE NAME F3 _; do
+	if [ "$TYPE" = "disk" ]; then
+		case "$NAME" in
+		sr*)
+			ICON="/usr/share/pixmaps/puppy/cdrom.svg"
+			;;
+		mmc*)
+			ICON="/usr/share/pixmaps/puppy/flashcard.svg"
+			;;
+		*)
+			if [ "$F3" = "usb" ]; then
+				ICON="/usr/share/pixmaps/puppy/plug_usb.svg"
+			else
+				ICON="/usr/share/pixmaps/puppy/harddisk.svg"
+			fi
+			;;
+		esac
+	elif [ "$TYPE" = "part" -a -n "$ICON" -a "$F3" != "swap" ]; then
+		cat << EOF > /tmp/particon.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Name=${NAME}
+Icon=${ICON}
+Exec=zzzfm /dev/${NAME}
+Terminal=false
+Type=Application
+EOF
+		cmp -s ~/Desktop/particon-${NAME}.desktop /tmp/particon.desktop || (
+			cp -f /tmp/particon.desktop ~/Desktop/particon-${NAME}.desktop
+			chmod 644 ~/Desktop/particon-${NAME}.desktop
+		)
+
+		NEW="${NEW} ${NAME}"
+	fi
+done < <(lsblk -rno type,name,fstype,tran | grep -E '^(disk|part) ')
+
+while read NAME; do
+	rm -f ~/Desktop/particon-${NAME}.desktop
+done < <(comm -23 <(echo "${OLD# }" | tr ' ' '\n' | sort) <(echo "${NEW# }" | tr ' ' '\n' | sort))
