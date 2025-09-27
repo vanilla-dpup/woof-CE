@@ -120,6 +120,15 @@ diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zz
  
      //  extra settings
      xset_defaults();
+@@ -8063,7 +8065,7 @@ void xset_defaults() {
+ 
+         set = xset_set( "dev_show_internal_drives", "lbl", _("_Internal Drives") );
+         set->menu_style = XSET_MENU_CHECK;
+-        set->b = geteuid() == 0 ? XSET_B_TRUE : XSET_B_FALSE;
++        set->b = XSET_B_TRUE;
+         set->line = g_strdup( "#devices-settings-internal" );
+ 
+         set = xset_set( "dev_show_empty", "lbl", _("_Empty Drives") );
 @@ -8083,7 +8085,6 @@ void xset_defaults() {
          set = xset_set( "dev_show_file", "lbl", _("Mounted _Other") );
          set->menu_style = XSET_MENU_CHECK;
