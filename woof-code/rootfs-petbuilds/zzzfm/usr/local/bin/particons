@@ -29,7 +29,7 @@ while read TYPE NAME F3 _; do
 	elif [ "$TYPE" = "part" -a -n "$ICON" -a "$F3" != "swap" ]; then
 		if [ -e ~/Desktop/.particon-${NAME}.desktop ]; then
 			mv -f ~/Desktop/{.,}particon-${NAME}.desktop
-		else
+		elif [ ! -e ~/Desktop/particon-${NAME}.desktop -a ! -L ~/Desktop/particon-${NAME}.desktop ]; then
 			cat << EOF > ~/Desktop/particon-${NAME}.desktop
 [Desktop Entry]
 Encoding=UTF-8
