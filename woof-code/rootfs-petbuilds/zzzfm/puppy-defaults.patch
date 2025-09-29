@@ -169,15 +169,6 @@ diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zz
      set->line = g_strdup( "#gui-pan" );
  
      set = xset_set( "main_focus_panel", "lbl", _("F_ocus") );
-@@ -9670,7 +9670,7 @@ void xset_defaults() {
- 
-         set = xset_set_panel( p, "show_devmon", "lbl", _("_Devices") );
-         set->menu_style = XSET_MENU_CHECK;
--        set->b = XSET_B_UNSET;
-+        set->b = p == 1 ? XSET_B_TRUE : XSET_B_UNSET;
-         if ( p != 1 )
-             xset_set_set( set, "shared_key", "panel1_show_devmon" );
- 
 @@ -9694,12 +9694,12 @@ void xset_defaults() {
  
          set = xset_set_panel( p, "list_detailed", "lbl", _("_Detailed") );
