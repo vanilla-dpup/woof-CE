@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  forky:
     if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-12.0.x')
     runs-on: ubuntu-24.04
     container:
