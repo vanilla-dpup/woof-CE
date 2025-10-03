@@ -18,7 +18,7 @@ The history of this fork and the relationship with other projects is documented 
     * Only Wayland, [PipeWire](https://pipewire.org/) and [overlay](https://docs.kernel.org/filesystems/overlayfs.html)
     * The "source of truth" regarding file associations and default applications is xdg-utils: support for ROX-Filer is gone
 * Simplified kernel-kit
-    * It rebuilds the [Debian](https://www.debian.org/) kernel with minimal customization (see kernel-kit/debian-diffconfigs)
+    * It rebuilds the [Debian](https://www.debian.org/) kernel with minimal customization (see kernel-kit/debian-diffconfig)
     * The firmware picker is gone: fdrv is built from [Debian](https://www.debian.org/) firmware packages
     * The kernel is built inside a chroot environment created by `1download`
         * The kernel and third party drivers installed by the user are all built using the same compiler
