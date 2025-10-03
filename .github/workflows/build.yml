@@ -50,6 +50,18 @@ jobs:
       with:
         repository: ${{ inputs.repo }}
         ref: ${{ inputs.ref }}
+    - name: Set name
+      if: ${{ inputs.name != '' }}
+      run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' DISTRO_SPECS
+    - name: Set version
+      if: ${{ inputs.version != '' }}
+      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ DISTRO_SPECS
+    - name: Set file name prefix
+      if: ${{ inputs.prefix != '' }}
+      run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
+    - name: Set variant
+      if: ${{ inputs.variant != '' }}
+      run: echo "DISTRO_VARIANT=${{ inputs.variant }}" >> $GITHUB_ENV
     - name: Prepare build environment
       timeout-minutes: 5
       run: |
@@ -72,18 +84,6 @@ jobs:
         restore-keys: |
           local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
           local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: Set name
-      if: ${{ inputs.name != '' }}
-      run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' DISTRO_SPECS
-    - name: Set version
-      if: ${{ inputs.version != '' }}
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ DISTRO_SPECS
-    - name: Set file name prefix
-      if: ${{ inputs.prefix != '' }}
-      run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
-    - name: Set variant
-      if: ${{ inputs.variant != '' }}
-      run: echo "DISTRO_VARIANT=${{ inputs.variant }}" >> $GITHUB_ENV
     - name: Install dependencies
       run: |
         sudo apt-get update -qq
@@ -92,7 +92,7 @@ jobs:
     - name: 1download
       timeout-minutes: 120
       run: |
-        sudo chown -R root:root local-repositories
+        sudo chown -R root:root .
         sudo -E ./1download
     - name: Get cached kernel-kit output
       uses: dawidd6/action-download-artifact@v6
