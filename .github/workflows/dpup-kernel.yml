@@ -9,6 +9,10 @@ jobs:
   build:
     if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-12.0.x')
     runs-on: ubuntu-24.04
+    container:
+      image: debian:trixie-slim
+      volumes:
+        - /usr:/hostusr
     continue-on-error: ${{ matrix.release == 'unstable' }}
     strategy:
       matrix:
@@ -16,17 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Free space
-        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
+        run: rm -rf /hostusr/local/lib/android /hostusr/share/dotnet /hostusr/local/.ghcup /hostusr/share/swift # increase free space, we don't need these
       - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap
+        run: apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
       - name: Configure
-        run: sudo sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ DISTRO_SPECS
+        run: sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ DISTRO_SPECS
       - name: 1download
-        run: sudo -E ./1download
+        run: ./1download
       - name: 2buildkernel
-        run: sudo -E ./2buildkernel
+        run: ./2buildkernel
       - name: Move build output
-        run: sudo mv kernel-kit/output $GITHUB_WORKSPACE/
+        run: mv kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
@@ -37,23 +41,27 @@ jobs:
   trixie:
     if: github.event_name != 'schedule' || (github.repository == 'vanilla-dpup/woof-CE' && github.ref == 'refs/heads/vanilladpup-12.0.x')
     runs-on: ubuntu-24.04
+    container:
+      image: debian:trixie-slim
+      volumes:
+        - /usr:/hostusr
     steps:
       - uses: actions/checkout@v4
         with:
           ref: vanilladpup-11.0.x
       - name: Free space
-        run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
+        run: rm -rf /hostusr/local/lib/android /hostusr/share/dotnet /hostusr/local/.ghcup /hostusr/share/swift # increase free space, we don't need these
       - name: Install dependencies
-        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap
+        run: apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
       - name: merge2out
         timeout-minutes: 5
-        run: sudo -E ./merge2out woof-distro/x86_64/debian/trixie64
+        run: ./merge2out woof-distro/x86_64/debian/trixie64
       - name: 1download
-        run: cd ../woof-out_* && sudo -E ./1download
+        run: cd ../woof-out_* && ./1download
       - name: 2buildkernel
-        run: cd ../woof-out_* && sudo -E ./2buildkernel
+        run: cd ../woof-out_* && ./2buildkernel
       - name: Move build output
-        run: sudo mv ../woof-out_*/kernel-kit/output $GITHUB_WORKSPACE/
+        run: mv ../woof-out_*/kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
