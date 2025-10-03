@@ -96,9 +96,9 @@ jobs:
         workflow: ${{ startsWith(inputs.kernel, 'debian-') && 'dpup-kernel.yml' || (startsWith(inputs.kernel, 'ubuntu-') && 'upup-kernel.yml' || 'kernel-kit.yml') }}
         workflow_conclusion: success
         name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
-        path: output
+        path: ../output
     - name: Move cached kernel-kit output
-      run: sudo mv output kernel-kit/
+      run: sudo mv ../output kernel-kit/
     - name: Get cached petbuild-output
       uses: actions/cache@v4
       with:
