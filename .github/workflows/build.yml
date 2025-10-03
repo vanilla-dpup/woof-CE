@@ -46,6 +46,7 @@ jobs:
       image: debian:trixie-slim
       volumes:
         - /usr:/hostusr
+        - /dev:/dev
       options: --privileged
     steps:
     - name: Free space
