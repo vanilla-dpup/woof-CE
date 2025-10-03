@@ -86,7 +86,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update -qq
-        apt-get install -y --no-install-recommends debootstrap
+        apt-get install -y --no-install-recommends xz debootstrap
     - name: 1download
       timeout-minutes: 120
       run: |
