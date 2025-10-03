@@ -46,6 +46,7 @@ jobs:
       image: debian:trixie-slim
       volumes:
         - /usr:/hostusr
+      options: --privileged
     steps:
     - name: Free space
       run: rm -rf /hostusr/local/lib/android /hostusr/share/dotnet /hostusr/local/.ghcup /hostusr/share/swift # increase free space, we don't need these

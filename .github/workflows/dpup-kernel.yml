@@ -13,6 +13,7 @@ jobs:
       image: debian:trixie-slim
       volumes:
         - /usr:/hostusr
+      options: --privileged
     continue-on-error: ${{ matrix.release == 'unstable' }}
     strategy:
       matrix:
@@ -45,6 +46,7 @@ jobs:
       image: debian:trixie-slim
       volumes:
         - /usr:/hostusr
+      options: --privileged
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,6 +78,7 @@ jobs:
       image: debian:bookworm-slim
       volumes:
         - /usr:/hostusr
+      options: --privileged
     strategy:
       matrix:
         include:
