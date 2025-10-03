@@ -50,15 +50,8 @@ jobs:
       with:
         repository: ${{ inputs.repo }}
         ref: ${{ inputs.ref }}
-    - name: Set name
-      if: ${{ inputs.name != '' }}
-      run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' DISTRO_SPECS
-    - name: Set version
-      if: ${{ inputs.version != '' }}
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ DISTRO_SPECS
-    - name: Set file name prefix
-      if: ${{ inputs.prefix != '' }}
-      run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
+    - name: Configure
+      run: sudo sed -i -e s/^DISTRO_BINARY_COMPAT=.*/DISTRO_BINARY_COMPAT=${{ input.compat-distro }}/ -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ input.compat-distro-version }}/ -e 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' -e s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ -e s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
     - name: Set variant
       if: ${{ inputs.variant != '' }}
       run: echo "DISTRO_VARIANT=${{ inputs.variant }}" >> $GITHUB_ENV

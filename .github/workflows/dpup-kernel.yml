@@ -13,10 +13,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - release: bookworm
-            arch: x86_64
-          - release: trixie
-            arch: x86_64
           - release: testing
             arch: x86_64
           - release: unstable
@@ -27,6 +23,8 @@ jobs:
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
       - name: Install dependencies
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap
+      - name: Configure
+        run: sudo sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ DISTRO_SPECS
       - name: 1download
         run: sudo -E ./1download
       - name: 2buildkernel
