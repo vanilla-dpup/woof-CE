@@ -70,71 +70,27 @@ jobs:
       timeout-minutes: 5
       run: |
         find -type f -name .gitignore -delete
-        chown -R root:root .
         mkdir -p ../buildenv
         cp -a . ../buildenv/woof-CE
         rm -rf ../buildenv/woof-CE/.git
         mkdir -p $GITHUB_WORKSPACE/rootfs-skeleton/usr/local/share/woof-CE
         sh -c "tar -C ../buildenv -c woof-CE | xz -9 > $GITHUB_WORKSPACE/rootfs-skeleton/usr/local/share/woof-CE/woof-CE.tar.xz"
         cp -a rootfs-skeleton/usr/local/share/woof-CE ../buildenv/woof-CE/rootfs-skeleton/usr/local/share/
-    - name: Create cache directories
-      run: mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
-    - name: Get cached local-repositories
-      uses: actions/cache@v4
-      with:
-        path: local-repositories
-        key: local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
     - name: 1download
       timeout-minutes: 120
-      run: |
-        chown -R root:root .
-        ./1download
+      run: ./1download
     - name: Get cached kernel-kit output
       uses: dawidd6/action-download-artifact@v6
       with:
         repo: vanilla-dpup/woof-CE
         branch: nomerge2out
-        workflow: ${{ startsWith(inputs.kernel, 'debian-') && 'dpup-kernel.yml' || (startsWith(inputs.kernel, 'ubuntu-') && 'upup-kernel.yml' || 'kernel-kit.yml') }}
+        workflow: 'dpup-kernel.yml'
         workflow_conclusion: success
         name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
-        path: ../output
-    - name: Move cached kernel-kit output
-      run: mv ../output kernel-kit/
-    - name: Get cached petbuild-output
-      uses: actions/cache@v4
-      with:
-        path: petbuild-output
-        key: petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: Get cached petbuild-cache
-      uses: actions/cache@v4
-      with:
-        path: petbuild-cache
-        key: petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: Get cached petbuild-sources
-      uses: actions/cache@v4
-      with:
-        path: petbuild-sources
-        key: petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-
-          petbuild-sources-${{ inputs.arch }}-
-          petbuild-sources-
+        path: kernel-kit/output
     - name: 3builddistro
       timeout-minutes: 180
-      run: |
-        chown -R root:root kernel-kit/output petbuild-{sources,cache,output}
-        ./3builddistro release
+      run: ./3builddistro release
     - name: Build woof-CE.tar.gz
       run: |
         mv petbuild-sources local-repositories ../buildenv/woof-CE/
@@ -144,8 +100,6 @@ jobs:
       run: |
         for i in `ls woof-output-*/*.img 2>/dev/null`; do gzip -1 $i; done
         for i in `ls woof-output-*/*.{img.gz,iso} 2>/dev/null`; do mv -f $i .; done
-    - name: Set cache ownership
-      run: chown -R --reference ~ local-repositories petbuild-{sources,cache,output}
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
