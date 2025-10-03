@@ -65,7 +65,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update -qq
-        apt-get install -y --no-install-recommends xz-utils debootstrap
+        apt-get install -y --no-install-recommends xz-utils curl debootstrap
     - name: Prepare build environment
       timeout-minutes: 5
       run: |
