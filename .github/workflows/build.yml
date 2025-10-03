@@ -61,22 +61,26 @@ jobs:
         restore-keys: |
           local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
           local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: merge2out
+    - name: Prepare build environment
       timeout-minutes: 5
       run: |
-        yes "" | sudo -E ./merge2out woof-distro/${{ inputs.arch }}/${{ inputs.compat-distro }}/${{ inputs.compat-distro-version }}
-        sudo chown -R root:root ../woof-out_*
-        sudo mkdir ../buildenv
-        sudo cp -a ../woof-out_* ../buildenv/
+        find -type f -name .gitignore -delete
+        sudo chown -R root:root .
+        sudo mkdir -p ../buildenv
+        sudo cp -a . ../buildenv/woof-CE
+        sudo rm -rf ../buildenv/woof-CE/.git
+        sudo mkdir -p $GITHUB_WORKSPACE/rootfs-skeleton/usr/local/share/woof-CE
+        sudo sh -c "tar -C ../buildenv -c woof-CE | xz -9 > $GITHUB_WORKSPACE/rootfs-skeleton/usr/local/share/woof-CE/woof-CE.tar.xz"
+        sudo cp -a rootfs-skeleton/usr/local/share/woof-CE ../buildenv/woof-CE/rootfs-skeleton/usr/local/share/
     - name: Set name
       if: ${{ inputs.name != '' }}
-      run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' ../woof-out_*/DISTRO_SPECS
+      run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' DISTRO_SPECS
     - name: Set version
       if: ${{ inputs.version != '' }}
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ ../woof-out_*/DISTRO_SPECS
+      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ DISTRO_SPECS
     - name: Set file name prefix
       if: ${{ inputs.prefix != '' }}
-      run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ ../woof-out_*/DISTRO_SPECS
+      run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
     - name: Set variant
       if: ${{ inputs.variant != '' }}
       run: echo "DISTRO_VARIANT=${{ inputs.variant }}" >> $GITHUB_ENV
@@ -89,8 +93,6 @@ jobs:
       timeout-minutes: 120
       run: |
         sudo chown -R root:root local-repositories
-        sudo mv local-repositories ../woof-out_*/
-        cd ../woof-out_*
         sudo -E ./1download
     - name: Get cached kernel-kit output
       uses: dawidd6/action-download-artifact@v6
@@ -100,9 +102,7 @@ jobs:
         workflow: ${{ startsWith(inputs.kernel, 'debian-') && 'dpup-kernel.yml' || (startsWith(inputs.kernel, 'ubuntu-') && 'upup-kernel.yml' || 'kernel-kit.yml') }}
         workflow_conclusion: success
         name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
-        path: output
-    - name: Move cached kernel-kit output
-      run: sudo mv output ../woof-out_*/kernel-kit/
+        path: kernel-kit/output
     - name: Get cached petbuild-output
       uses: actions/cache@v4
       with:
@@ -134,23 +134,18 @@ jobs:
       timeout-minutes: 180
       run: |
         sudo chown -R root:root petbuild-{sources,cache,output}
-        sudo mv petbuild-{sources,cache,output} ../woof-out_*/
-        cd ../woof-out_*
         sudo -E ./3builddistro release
     - name: Build woof-CE.tar.gz
       run: |
-        cd ../buildenv
-        sudo mv ../woof-out_*/petbuild-sources ../woof-out_*/local-repositories woof-out_*/
-        sudo tar -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-out_*
-        sudo mv woof-out_*/petbuild-sources woof-out_*/local-repositories $GITHUB_WORKSPACE/
+        sudo mv petbuild-sources local-repositories ../buildenv/woof-CE/
+        sudo tar -C ../buildenv -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-CE
+        sudo mv ../buildenv/woof-CE/petbuild-sources ../buildenv/woof-CE/local-repositories .
     - name: Move build output
       run: |
-        for i in `ls ../woof-out_*/woof-output-*/*.img 2>/dev/null`; do sudo gzip -1 $i; done
-        for i in `ls ../woof-out_*/woof-output-*/*.{img.gz,iso} 2>/dev/null`; do sudo mv -f $i .; done
-    - name: Move cache
-      run: |
-        sudo mv ../woof-out_*/petbuild-{cache,output} $GITHUB_WORKSPACE/
-        sudo chown -R --reference ~ local-repositories petbuild-{sources,cache,output}
+        for i in `ls woof-output-*/*.img 2>/dev/null`; do sudo gzip -1 $i; done
+        for i in `ls woof-output-*/*.{img.gz,iso} 2>/dev/null`; do sudo mv -f $i .; done
+    - name: Set cache ownership
+      run: sudo chown -R --reference ~ local-repositories petbuild-{sources,cache,output}
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:

@@ -12,6 +12,7 @@ The history of this fork and the relationship with other projects is documented 
 
 * Narrow focus
     * Builds must be [Debian](https://www.debian.org/) or [Devuan](https://www.devuan.org/) based
+    * merge2out is gone
     * 1download and 3builddistro are reimplemented using [debootstrap](https://wiki.debian.org/Debootstrap) and this is the only dependency of woof-CE
     * usrmerge is mandatory
     * Only Wayland, [PipeWire](https://pipewire.org/) and [overlay](https://docs.kernel.org/filesystems/overlayfs.html)
@@ -52,7 +53,7 @@ The history of this fork and the relationship with other projects is documented 
 * It's much faster and simpler
     * initrd iz zstd-compressed, making it faster to decompress
     * The init and shutdown scripts (/etc/rc.d/rc.{sysinit,shutdown}) are shorter and much faster
-    * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a single process (see woof-code/rootfs-petbuilds/init)
+    * busybox init, /etc/inittab, plogin, autologin, etc' are replaced with a single process (see rootfs-petbuilds/init)
 * Fewer boot codes and configuration files
     * `pdrv` is gone: the partition containing Puppy files can be specified only using `pupsfs=$UUID`
     * SAVEMARK and SAVESPEC are gone: the partition containing the save file/folder can be specified only using `psave=$UUID`
@@ -71,7 +72,7 @@ The history of this fork and the relationship with other projects is documented 
     * Both save files and folders support encryption, using [fscrypt](https://www.kernel.org/doc/html/latest/filesystems/fscrypt.html)
         * Encryption can be enabled only for specific directories (like the user's home directory)
     * The "first shutdown" prompt that offers the user to save is gone, to make non-persistent installations less annoying to use
-* `save2flash` is much faster and writes less (see woof-code/rootfs-petbuilds/psnapcp)
+* `save2flash` is much faster and writes less (see rootfs-petbuilds/psnapcp)
     * Preallocates space when files grow
     * Only copies appended or modified blocks when files change
 
@@ -84,7 +85,7 @@ The history of this fork and the relationship with other projects is documented 
         * The user controls the stacking order
         * The stacking order of the traditional *drv SFS is retained, for backward compatibility with Puppy
 * Copying to RAM → locking in page cache
-    * Copying of SFSs to a ramdisk (`pfix=ram|copy` or automatic) is gone and SFSs are locked in page cache instead (see woof-code/rootfs-petbuilds/sfslock)
+    * Copying of SFSs to a ramdisk (`pfix=ram|copy` or automatic) is gone and SFSs are locked in page cache instead (see rootfs-petbuilds/sfslock)
         * This increases free ramdisk space under PUPMODE 13
         * The RAM occupied by cached SFSs is freed automatically (using [PSI](https://docs.kernel.org/accounting/psi.html) or OOM score adjustment) if needed
     * Copying is enabled automatically only if Puppy files reside on storage that doesn't support TRIM and assumed to be a slow device, like a flash drive
@@ -100,7 +101,7 @@ The history of this fork and the relationship with other projects is documented 
     * Applications that want to run as root ask for user's approval
 * Common sysfs hardening recommendations are applied out of the box
 * The pup-advert-blocker ad blocking tool is reimplemented using a [NSS module](https://www.gnu.org/software/libc/manual/html_node/Name-Service-Switch.html)
-    * It checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line (see woof-code/rootfs-petbuilds/pup_advert_blocker)
+    * It checks whether or not a domain should be blocked using binary search on a sorted array of [xxHash](https://github.com/Cyan4973/xxHash) hashes, instead of appending MBs of text to /etc/hosts and later scanning it line by line (see rootfs-petbuilds/pup_advert_blocker)
 * Improved firewall_ng
     * Enabled by default
     * Ported to [nftables](https://netfilter.org/projects/nftables)
@@ -114,36 +115,19 @@ The history of this fork and the relationship with other projects is documented 
 * initrd-progs/ contains the initramfs skeleton
     * 0initrd/init is the early init script: it sets up an `overlay` file system and `switch_root`s into it
 * kernel-kit/ contains a tool that builds the kernel
-* woof-distro/x86_64/debian/trixie64/ contains configuration files
-    * A [Debian](https://www.debian.org/) 13 based distro, featuring
-        * [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar) and [zzzfm](https://gitlab.com/antix-contribs/zzzfm) (patched with `wlr-layer-shell` support), or
-        * [dwl](https://codeberg.org/dwl/dwl) with the [snail layout](https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/snail), [yambar](https://codeberg.org/dnkl/yambar) and [zzzfm](https://gitlab.com/antix-contribs/zzzfm)
-    * DISTRO_SPECS contains the distro name and version
-    * DISTRO_PKGS_SPECS-debian-testing contains a list of binary packages to include
-    * _00build.conf contains a list of packages to build from source (`PETBUILDS`) and other settings
-* woof-code/rootfs-skeleton contains the root file system skeleton
-* woof-code/rootfs-packages contains optional additions to rootfs-skeleton
-* woof-code/rootfs-petbuilds contains recipes for building packages from source
-* woof-code/1download prepares a build environment
-* woof-code/2buildkernel builds the kernel
-* woof-code/3builddistro builds the packages specified in `PETBUILDS`, then packs everything together and builds bootable images
+* DISTRO_SPECS contains the distro name and version
+* DISTRO_PKGS_SPECS contains a list of binary packages to include
+* _00build.conf contains a list of packages to build from source (`PETBUILDS`) and other settings
+* rootfs-skeleton contains the root file system skeleton
+* rootfs-packages contains optional additions to rootfs-skeleton
+* rootfs-petbuilds contains recipes for building packages from source
+* 1download prepares a build environment
+* 2buildkernel builds the kernel
+* 3builddistro builds the packages specified in `PETBUILDS`, then packs everything together and builds bootable images
 
 # Usage
 
     sudo apt-get install -y --no-install-recommends debootstrap
-
-Then:
-
-    export DISTRO_VARIANT=labwc
-
-Or:
-
-    export DISTRO_VARIANT=dwl
-
-Then:
-
-    ./merge2out woof-distro/x86_64/debian/trixie64
-    cd ../woof-out_*
     ./1download
     ./2buildkernel
     ./3builddistro

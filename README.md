@@ -1,1 +1,1 @@
-woof-code/rootfs-skeleton/usr/local/share/doc/puppy/woof-CE.md
+rootfs-skeleton/usr/local/share/doc/puppy/woof-CE.md

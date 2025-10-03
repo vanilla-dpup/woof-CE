@@ -27,15 +27,12 @@ jobs:
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
       - name: Install dependencies
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends debootstrap
-      - name: merge2out
-        timeout-minutes: 5
-        run: sudo -E ./merge2out woof-distro/${{ matrix.arch }}/debian/${{ matrix.release }}64
       - name: 1download
-        run: cd ../woof-out_* && sudo -E ./1download
+        run: sudo -E ./1download
       - name: 2buildkernel
-        run: cd ../woof-out_* && sudo -E ./2buildkernel
+        run: sudo -E ./2buildkernel
       - name: Move build output
-        run: sudo mv ../woof-out_*/kernel-kit/output $GITHUB_WORKSPACE/
+        run: sudo mv kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
