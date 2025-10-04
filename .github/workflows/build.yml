@@ -100,7 +100,7 @@ jobs:
     - name: Move build output
       run: |
         for i in `ls woof-output-*/*.img 2>/dev/null`; do gzip -1 $i; done
-        for i in `ls woof-output-*/*.{img.gz,iso} 2>/dev/null`; do mv -f $i .; done
+        for i in `ls woof-output-*/*.img.gz 2>/dev/null`; do mv -f $i .; done
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
