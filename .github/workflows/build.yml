@@ -42,115 +42,65 @@ on:
 jobs:
   build:
     runs-on: ${{ inputs.runner }}
+    container:
+      image: debian:trixie-slim
+      volumes:
+        - /usr:/hostusr
+        - /dev:/dev
+      options: --privileged
     steps:
     - name: Free space
-      run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
+      run: rm -rf /hostusr/local/lib/android /hostusr/share/dotnet /hostusr/local/.ghcup /hostusr/share/swift # increase free space, we don't need these
     - name: Checkout code
       uses: actions/checkout@v4
       with:
         repository: ${{ inputs.repo }}
         ref: ${{ inputs.ref }}
-    - name: Create cache directories
+    - name: Configure
       run: |
-        mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
-    - name: Get cached local-repositories
-      uses: actions/cache@v4
-      with:
-        path: local-repositories
-        key: local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: merge2out
-      timeout-minutes: 5
-      run: |
-        yes "" | sudo -E ./merge2out woof-distro/${{ inputs.arch }}/${{ inputs.compat-distro }}/${{ inputs.compat-distro-version }}
-        sudo chown -R root:root ../woof-out_*
-        sudo mkdir ../buildenv
-        sudo cp -a ../woof-out_* ../buildenv/
-    - name: Set name
-      if: ${{ inputs.name != '' }}
-      run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' ../woof-out_*/DISTRO_SPECS
-    - name: Set version
-      if: ${{ inputs.version != '' }}
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ ../woof-out_*/DISTRO_SPECS
-    - name: Set file name prefix
-      if: ${{ inputs.prefix != '' }}
-      run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ ../woof-out_*/DISTRO_SPECS
+        DISTRO_COMPAT_VERSION=${{ inputs.compat-distro-version }}
+        sed -i -e s/^DISTRO_BINARY_COMPAT=.*/DISTRO_BINARY_COMPAT=${{ inputs.compat-distro }}/ -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${DISTRO_COMPAT_VERSION%64}/ -e s/^DISTRO_TARGETARCH=.*/DISTRO_TARGETARCH=${{ inputs.arch }}/ -e 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' -e s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ -e s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
     - name: Set variant
       if: ${{ inputs.variant != '' }}
       run: echo "DISTRO_VARIANT=${{ inputs.variant }}" >> $GITHUB_ENV
     - name: Install dependencies
       run: |
-        sudo apt-get update -qq
-        sudo apt-get install -y --no-install-recommends debootstrap
-        [ ${{ inputs.compat-distro }} != devuan ] || curl https://git.devuan.org/devuan/debootstrap/raw/branch/master/scripts/ceres | sudo tee /usr/share/debootstrap/scripts/`echo ${{ inputs.compat-distro-version }} | sed s/64$//`
+        apt-get update -qq
+        apt-get install -y --no-install-recommends xz-utils curl ca-certificates debootstrap git
+    - name: Prepare build environment
+      timeout-minutes: 5
+      run: |
+        find -type f -name .gitignore -delete
+        mkdir -p ../buildenv
+        cp -a . ../buildenv/woof-CE
+        rm -rf ../buildenv/woof-CE/.git
+        mkdir -p $GITHUB_WORKSPACE/rootfs-skeleton/usr/local/share/woof-CE
+        sh -c "tar -C ../buildenv -c woof-CE | xz -9 > $GITHUB_WORKSPACE/rootfs-skeleton/usr/local/share/woof-CE/woof-CE.tar.xz"
+        cp -a rootfs-skeleton/usr/local/share/woof-CE ../buildenv/woof-CE/rootfs-skeleton/usr/local/share/
     - name: 1download
       timeout-minutes: 120
-      run: |
-        sudo chown -R root:root local-repositories
-        sudo mv local-repositories ../woof-out_*/
-        cd ../woof-out_*
-        sudo -E ./1download
+      run: ./1download
     - name: Get cached kernel-kit output
       uses: dawidd6/action-download-artifact@v6
       with:
         repo: vanilla-dpup/woof-CE
         branch: vanilladpup-12.0.x
-        workflow: ${{ startsWith(inputs.kernel, 'debian-') && 'dpup-kernel.yml' || (startsWith(inputs.kernel, 'ubuntu-') && 'upup-kernel.yml' || 'kernel-kit.yml') }}
+        workflow: 'dpup-kernel.yml'
         workflow_conclusion: success
         name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
-        path: output
-    - name: Move cached kernel-kit output
-      run: sudo mv output ../woof-out_*/kernel-kit/
-    - name: Get cached petbuild-output
-      uses: actions/cache@v4
-      with:
-        path: petbuild-output
-        key: petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: Get cached petbuild-cache
-      uses: actions/cache@v4
-      with:
-        path: petbuild-cache
-        key: petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-    - name: Get cached petbuild-sources
-      uses: actions/cache@v4
-      with:
-        path: petbuild-sources
-        key: petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
-        restore-keys: |
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-
-          petbuild-sources-${{ inputs.arch }}-
-          petbuild-sources-
+        path: kernel-kit/output
     - name: 3builddistro
       timeout-minutes: 180
-      run: |
-        sudo chown -R root:root petbuild-{sources,cache,output}
-        sudo mv petbuild-{sources,cache,output} ../woof-out_*/
-        cd ../woof-out_*
-        sudo -E ./3builddistro release
+      run: ./3builddistro release
     - name: Build woof-CE.tar.gz
       run: |
-        cd ../buildenv
-        sudo mv ../woof-out_*/petbuild-sources ../woof-out_*/local-repositories woof-out_*/
-        sudo tar -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-out_*
-        sudo mv woof-out_*/petbuild-sources woof-out_*/local-repositories $GITHUB_WORKSPACE/
+        mv petbuild-sources local-repositories ../buildenv/woof-CE/
+        tar -C ../buildenv -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-CE
+        mv ../buildenv/woof-CE/petbuild-sources ../buildenv/woof-CE/local-repositories .
     - name: Move build output
       run: |
-        for i in `ls ../woof-out_*/woof-output-*/*.img 2>/dev/null`; do sudo gzip -1 $i; done
-        for i in `ls ../woof-out_*/woof-output-*/*.{img.gz,iso} 2>/dev/null`; do sudo mv -f $i .; done
-    - name: Move cache
-      run: |
-        sudo mv ../woof-out_*/petbuild-{cache,output} $GITHUB_WORKSPACE/
-        sudo chown -R --reference ~ local-repositories petbuild-{sources,cache,output}
+        for i in `ls woof-output-*/*.img 2>/dev/null`; do gzip -1 $i; done
+        for i in `ls woof-output-*/*.img.gz 2>/dev/null`; do mv -f $i .; done
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
