@@ -84,7 +84,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v6
       with:
         repo: vanilla-dpup/woof-CE
-        branch: nomerge2out
+        branch: vanilladpup-12.0.x
         workflow: 'dpup-kernel.yml'
         workflow_conclusion: success
         name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
