@@ -119,7 +119,7 @@ jobs:
       uses: dawidd6/action-download-artifact@v6
       with:
         repo: vanilla-dpup/woof-CE
-        branch: vanilladpup-10.0.x
+        branch: vanilladpup-12.0.x
         workflow: ${{ startsWith(inputs.kernel, 'debian-') && 'dpup-kernel.yml' || (startsWith(inputs.kernel, 'ubuntu-') && 'upup-kernel.yml' || 'kernel-kit.yml') }}
         workflow_conclusion: success
         name: ${{ env.kernel_artifact }}
