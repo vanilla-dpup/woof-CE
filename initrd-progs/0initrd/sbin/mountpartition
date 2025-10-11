@@ -19,7 +19,6 @@ MNT_DEV=/dev/$xdev
 
 IS_MOUNTED=$(mount | grep "^/dev/$xdev " | cut -f 3 -d ' ')
 if [ "$IS_MOUNTED" ] ; then
-  [ ! "$INIT_SCRIPT" ] && echo $IS_MOUNTED
   exit
 fi
 
@@ -44,8 +43,6 @@ case $MNT_FS in
      ;;
 esac
 
-RET=$?
-[ "$RET" = "0" ] && [ ! "$INIT_SCRIPT" ] && echo $MNT_DIR
-exit $RET
+exit $?
 
 ### END ###
