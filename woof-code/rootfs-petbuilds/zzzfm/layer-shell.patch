@@ -1,6 +1,6 @@
-From 3591bf97a4e60c345c2768739725f52d0fb32aef Mon Sep 17 00:00:00 2001
+From 32a08104ce28bbc798a03eace8ae0df907e2740d Mon Sep 17 00:00:00 2001
 From: Dima Krasner <dima@dimakrasner.com>
-Date: Tue, 29 Jul 2025 22:44:41 +0300
+Date: Mon, 13 Oct 2025 13:49:26 +0300
 Subject: [PATCH] add layer-shell support
 
 ---
@@ -9,9 +9,9 @@ Subject: [PATCH] add layer-shell support
  src/desktop/desktop-window.c | 238 +++++++++++++++++++++++++++++------
  src/desktop/desktop.c        |  36 +++++-
  src/desktop/desktop.h        |   1 +
- src/main.c                   |  13 +-
+ src/main.c                   |  21 +++-
  src/pref-dialog.c            |  18 ++-
- 7 files changed, 278 insertions(+), 44 deletions(-)
+ 7 files changed, 286 insertions(+), 44 deletions(-)
 
 diff --git a/configure.ac b/configure.ac
 index 508fa45..8840211 100644
@@ -618,23 +618,38 @@ index eae2cd2..b741353 100644
  void fm_desktop_update_wallpaper( gboolean transparency_changed );
  void fm_desktop_update_colors();
 diff --git a/src/main.c b/src/main.c
-index 6f4eae4..956fcc1 100644
+index 6f4eae4..499dc00 100644
 --- a/src/main.c
 +++ b/src/main.c
-@@ -909,6 +909,12 @@ gboolean delayed_popup( GtkWidget* popup ) {
+@@ -85,6 +85,9 @@ typedef enum{
+ 
+ static gboolean folder_initialized = FALSE;
+ static gboolean desktop_or_deamon_initialized = FALSE;
++#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
++static gulong monitors_changed_id = 0;
++#endif
+ 
+ static int sock;
+ GIOChannel* io_channel = NULL;
+@@ -909,6 +912,17 @@ gboolean delayed_popup( GtkWidget* popup ) {
      return FALSE;
  }
  
 +#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
 +static void on_monitors_changed( GdkScreen *screen, gpointer data ) {
++    if ( monitors_changed_id > 0 ) {
++        g_signal_handler_disconnect( gdk_screen_get_default(), monitors_changed_id );
++        monitors_changed_id = 0;
++    }
 +    fm_restart_desktop_icons();
++    monitors_changed_id = g_signal_connect( gdk_screen_get_default(), "monitors-changed", G_CALLBACK( on_monitors_changed ), NULL );
 +}
 +#endif
 +
  static void init_desktop_or_daemon() {
      init_folder();
  
-@@ -917,8 +923,13 @@ static void init_desktop_or_daemon() {
+@@ -917,8 +931,13 @@ static void init_desktop_or_daemon() {
      signal( SIGINT, (void*)gtk_main_quit );
      signal( SIGTERM, (void*)gtk_main_quit );
  
@@ -642,7 +657,7 @@ index 6f4eae4..956fcc1 100644
 +    if ( desktop ) {
          fm_turn_on_desktop_icons( app_settings.show_wallpaper == 1 &&   app_settings.wallpaper_mode == WPM_TRANSPARENT );
 +#if GTK_CHECK_VERSION (3, 0, 0) && defined(HAVE_LAYER_SHELL)
-+        g_signal_connect( gdk_screen_get_default(), "monitors-changed", G_CALLBACK( on_monitors_changed ), NULL );
++        monitors_changed_id = g_signal_connect( gdk_screen_get_default(), "monitors-changed", G_CALLBACK( on_monitors_changed ), NULL );
 +#endif
 +    }
 +
@@ -708,5 +723,5 @@ index 78c478f..8522033 100644
          gboolean update_icons = FALSE;
          char* old_fontname = app_settings.desk_font ?  pango_font_description_to_string( app_settings.desk_font ) : NULL;
 -- 
-2.50.0
+2.51.0
 
