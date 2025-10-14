@@ -149,7 +149,7 @@ fi
 if [ "$DISTRO_VARIANT" != "mini" -a "$DISTRO_VARIANT" != "barebones" ]; then
 	PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|cups|cups,cups-bsd,printer-driver-cups-pdf,foomatic-db-compressed-ppds,libcups2-dev|exe,dev,doc,nls||deps:yes
-yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2-dev,libcdio-paranoia-dev,libfaad-dev|exe,dev,doc,nls||deps:yes
+yes|deadbeef-deps|libjansson-dev,libmpg123-dev,libcddb2,libcddb2-dev,libcdio-paranoia-dev,libfaad2,libfaad-dev|exe,dev,doc,nls||deps:yes
 yes|ExpenseTracker-deps|libsqlite3-dev|exe,dev,doc,nls||deps:yes
 yes|fastfetch|fastfetch|exe,dev,doc,nls||deps:yes
 yes|fsearch|fsearch|exe,dev,doc,nls||deps:yes
