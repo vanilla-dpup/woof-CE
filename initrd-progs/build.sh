@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 generate_initrd() {
 	rm -rf ZZ_initrd-expanded

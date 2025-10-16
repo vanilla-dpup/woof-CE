@@ -1,3 +1,5 @@
+#!/bin/bash -x
+
 # originally by Iguleder - hacked to DEATH by 01micko
 # see README
 # Compile fatdog style kernel [v3+ - 3.10+ recommended].
