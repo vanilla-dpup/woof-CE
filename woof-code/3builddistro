@@ -36,6 +36,9 @@ for PKG in `chroot rootfs-complete dpkg-query -W -f '${Package}\n' | grep -E -e 
 	chroot rootfs-complete apt-get remove --purge -y $PKG
 done
 
+# remove any unneeded packages
+chroot rootfs-complete apt-get autoremove -y --purge
+
 # reenable package removal or update
 chroot rootfs-complete apt-mark unhold `chroot rootfs-complete apt-mark showhold`
 

@@ -129,9 +129,6 @@ chroot devx apt-get install -y $PKGS
 # create an archive of downloaded packages
 cp -r devx/var/cache/apt/archives ${CACHE_DIR}/
 
-# remove any unneeded packages
-chroot rootfs apt-get autoremove -y --purge
-
 # remove unneeded files
 chroot rootfs apt-get clean
 rm -f rootfs/var/lib/apt/lists/* 2>/dev/null || :
