@@ -127,7 +127,7 @@ The history of this fork and the relationship with other projects is documented 
 
 # Usage
 
-    sudo apt-get install -y --no-install-recommends xz-utils curl ca-certificates debootstrap git
+    sudo apt-get install -y --no-install-recommends cpio xz-utils curl ca-certificates debootstrap git
     sudo ./1download
     sudo ./2buildkernel
     sudo ./3builddistro
