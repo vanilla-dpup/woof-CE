@@ -82,7 +82,7 @@ jobs:
           tag_name: ${{ github.event.inputs.prefix }}-${{ github.event.inputs.version }}${{ github.event.inputs.suffix }}
           fail_on_unmatched_files: true
           files: |
-            *.img.gz
+            *.img
             woof-CE.tar.gz
           draft: true
           prerelease: false
