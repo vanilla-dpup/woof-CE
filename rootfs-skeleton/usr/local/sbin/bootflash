@@ -108,7 +108,7 @@ copy_efilinux_uefi_boot() {
 	local PUPMODE="$3"
 
 	mkdir -p ${HOMEDIR}/EFI/boot
-	cp -f /usr/local/lib/efilinux/efilinux.efi ${HOMEDIR}/EFI/boot/bootx64.efi
+	psnapcp /usr/local/lib/efilinux/efilinux.efi ${HOMEDIR}/EFI/boot/bootx64.efi
 
 	INITRD="initrd=\initrd.zst"
 	[ -f ${SRCPATH}/ucode.cpio ] && INITRD="initrd=\ucode.cpio ${INITRD}"
@@ -447,14 +447,14 @@ EOF
 		;;
 esac
 #-
-cp -fv ${SRCPATH}/vmlinuz /mnt/${PBOOTPART}/
-cp -fv ${SRCPATH}/initrd.zst /mnt/${PBOOTPART}/
-[ -f ${SRCPATH}/ucode.cpio ] && cp -fv ${SRCPATH}/ucode.cpio /mnt/${PBOOTPART}/
+psnapcp ${SRCPATH}/vmlinuz /mnt/${PBOOTPART}/vmlinuz
+psnapcp ${SRCPATH}/initrd.zst /mnt/${PBOOTPART}/initrd.zst
+[ -f ${SRCPATH}/ucode.cpio ] && psnapcp ${SRCPATH}/ucode.cpio /mnt/${PBOOTPART}/ucode.cpio
 #-------------------------
 
 for i in ${FILES2COPY} ; do
 	if [ -f ${SRCPATH}/${i} ] ; then
-		cp -fv ${SRCPATH}/${i} /mnt/${PSAVEPART}/
+		psnapcp ${SRCPATH}/${i} /mnt/${PSAVEPART}/${i}
 	fi
 done
 
