@@ -49,7 +49,10 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (dststat.st_size != srcstat.st_size && ftruncate(dst, srcstat.st_size) < 0) {
+	if (
+		(srcstat.st_size > dststat.st_size && posix_fallocate(dst, dststat.st_size, srcstat.st_size - dststat.st_size) < 0) ||
+		(srcstat.st_size < dststat.st_size && ftruncate(dst, srcstat.st_size) < 0)
+	) {
 		fprintf(stderr, "Failed to set %s size: %s\n", argv[2], strerror(errno));
 		close(dst);
 		close(src);
