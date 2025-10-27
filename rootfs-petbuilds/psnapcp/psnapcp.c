@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 	int src, dst, sync = 0;
 	struct stat srcstat, dststat;
 	struct timeval times[2];
+	ssize_t wrote;
 	unsigned char *srcm, *dstm;
 	off_t off = 0, chunk;
 
@@ -69,6 +70,34 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
+	madvise(srcm, srcstat.st_size, MADV_SEQUENTIAL);
+
+	if (srcstat.st_size > 0 && dststat.st_size == 0) {
+		do {
+			if ((wrote = write(dst, &srcm[off], srcstat.st_size - off)) < 0) {
+				fprintf(stderr, "Failed to write to %s: %s\n", argv[2], strerror(errno));
+				munmap(srcm, srcstat.st_size);
+				close(dst);
+				close(src);
+				return EXIT_FAILURE;
+			}
+
+			off += wrote;
+		} while (off < srcstat.st_size);
+
+		if (fdatasync(dst) < 0) {
+			fprintf(stderr, "Failed to flush changes to disk: %s\n", strerror(errno));
+			munmap(srcm, srcstat.st_size);
+			close(dst);
+			close(src);
+			return EXIT_FAILURE;
+		}
+
+		munmap(srcm, srcstat.st_size);
+
+		goto meta;
+	}
+
 	if ((dstm = mmap(NULL, srcstat.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, dst, 0)) == MAP_FAILED) {
 		fprintf(stderr, "Failed to mmap %s: %s\n", argv[2], strerror(errno));
 		munmap(srcm, srcstat.st_size);
@@ -77,25 +106,18 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	madvise(srcm, srcstat.st_size, MADV_SEQUENTIAL);
 	madvise(dstm, srcstat.st_size, MADV_SEQUENTIAL);
 
-	if (srcstat.st_size > 0 && dststat.st_size == 0) {
-		memcpy(dstm, srcm, srcstat.st_size);
-		sync = 1;
-	}
-	else {
-		do {
-			chunk = srcstat.st_size - off >= CHUNK_SIZE ? CHUNK_SIZE : srcstat.st_size - off;
+	do {
+		chunk = srcstat.st_size - off >= CHUNK_SIZE ? CHUNK_SIZE : srcstat.st_size - off;
 
-			if (memcmp(&srcm[off], &dstm[off], chunk) != 0) {
-				memcpy(&dstm[off], &srcm[off], chunk);
-				sync = 1;
-			}
+		if (memcmp(&srcm[off], &dstm[off], chunk) != 0) {
+			memcpy(&dstm[off], &srcm[off], chunk);
+			sync = 1;
+		}
 
-			off += chunk;
-		} while (off < srcstat.st_size);
-	}
+		off += chunk;
+	} while (off < srcstat.st_size);
 
 	munmap(srcm, srcstat.st_size);
 
