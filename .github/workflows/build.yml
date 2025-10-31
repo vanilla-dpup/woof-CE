@@ -66,7 +66,7 @@ jobs:
     - name: Install dependencies
       run: |
         apt-get update -qq
-        apt-get install -y --no-install-recommends cpio xz-utils curl ca-certificates debootstrap git python3
+        apt-get install -y --no-install-recommends cpio xz-utils curl ca-certificates debootstrap git
     - name: Prepare build environment
       timeout-minutes: 5
       run: |
@@ -98,13 +98,15 @@ jobs:
         tar -C ../buildenv -c -I "gzip -9" -f $GITHUB_WORKSPACE/woof-CE.tar.gz woof-CE
         mv ../buildenv/woof-CE/petbuild-sources ../buildenv/woof-CE/local-repositories .
     - name: Move build output
-      run: mv -f woof-output-*/*.img .
+      run: |
+        for i in `ls woof-output-*/*.img 2>/dev/null`; do gzip -1 $i; done
+        for i in `ls woof-output-*/*.img.gz 2>/dev/null`; do mv -f $i .; done
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
         name: ${{ inputs.artifact }}
         path: |
-          *.img
+          *.img.gz
           woof-CE.tar.gz
         retention-days: ${{ inputs.retention }}
         compression-level: 0

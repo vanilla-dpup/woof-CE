@@ -23,7 +23,6 @@ if [ "$DISTRO_TARGETARCH" = "x86_64" -o "$DISTRO_TARGETARCH" = "x86" ]; then
 	LOOP=`losetup -f --show ${BIOS_IMG_BASE}`
 	chroot rootfs-complete bootflash ${LOOP#/dev/} syslinux ext4 5 /build
 	losetup -d ${LOOP}
-	../support/truncate.py ${BIOS_IMG_BASE}
 	mv -f ${BIOS_IMG_BASE} ../${WOOF_OUTPUT}/
 fi
 
@@ -34,11 +33,6 @@ if [ "$DISTRO_TARGETARCH" = "x86_64" -o "$DISTRO_TARGETARCH" = "arm64" ]; then
 	LOOP=`losetup -f --show ${UEFI_IMG_BASE}`
 	chroot rootfs-complete bootflash ${LOOP#/dev/} efilinux ext4 5 /build
 	losetup -d ${LOOP}
-
-	# drop the backup GPT at the end of the image
-	dd if=/dev/zero bs=512 count=33 seek=$((2097152000 / 512 - 33)) of=${UEFI_IMG_BASE} conv=notrunc
-
-	../support/truncate.py ${UEFI_IMG_BASE}
 
 	mv -f ${UEFI_IMG_BASE} ../${WOOF_OUTPUT}/
 fi
