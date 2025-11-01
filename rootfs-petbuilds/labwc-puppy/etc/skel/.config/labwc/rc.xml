@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 
 <labwc_config>
-  <windowSwitcher show="yes" preview="no" outlines="yes">
+  <windowSwitcher show="yes" style="thumbnail" preview="no" outlines="yes">
     <fields>
       <field content="title" width="100%" />
     </fields>
