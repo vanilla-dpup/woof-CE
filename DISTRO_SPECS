@@ -8,6 +8,8 @@ DISTRO_BINARY_COMPAT='debian'
 DISTRO_FILE_PREFIX='dpup'
 #The version of the distro whose binary packages were used to build this distro:
 DISTRO_COMPAT_VERSION='unstable'
+#The distro version to take the kernel from:
+DISTRO_COMPAT_KERNEL_VERSION='unstable'
 DISTRO_TARGETARCH='x86_64'
 DISTRO_BDRVSFS="bdrv_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"
 DISTRO_PUPPYSFS="puppy_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs"

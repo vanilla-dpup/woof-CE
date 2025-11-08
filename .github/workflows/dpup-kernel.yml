@@ -17,7 +17,15 @@ jobs:
     continue-on-error: ${{ matrix.release == 'unstable' }}
     strategy:
       matrix:
-        release: [testing, unstable]
+        include:
+          - release: unstable
+            kernel-release: unstable
+          - release: unstable
+            kernel-release: trixie
+          - release: unstable
+            kernel-release: bookworm
+          - release: testing
+            kernel-release: testing
     steps:
       - uses: actions/checkout@v4
       - name: Free space
@@ -25,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
       - name: Configure
-        run: sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ DISTRO_SPECS
+        run: sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ -e s/^DISTRO_COMPAT_KERNEL_VERSION=.*/DISTRO_COMPAT_KERNEL_VERSION=${{ matrix.kernel-release }}/ DISTRO_SPECS
       - name: 1download
         run: ./1download
       - name: 2buildkernel
@@ -35,7 +43,7 @@ jobs:
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-kit-output-usrmerge-debian-${{ matrix.release }}-x86_64
+          name: kernel-kit-output-usrmerge-debian-${{ matrix.release }}-${{ matrix.kernel-release }}-x86_64
           path: output
           retention-days: 16
           compression-level: 0
@@ -47,6 +55,9 @@ jobs:
       volumes:
         - /usr:/hostusr
       options: --privileged
+    strategy:
+      matrix:
+        kernel-release: [trixie, bookworm]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,7 +68,7 @@ jobs:
         run: apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
       - name: merge2out
         timeout-minutes: 5
-        run: ./merge2out woof-distro/x86_64/debian/trixie64
+        run: ./merge2out woof-distro/x86_64/debian/trixie && sed -i s/^DISTRO_COMPAT_KERNEL_VERSION=.*/DISTRO_COMPAT_KERNEL_VERSION=${{ matrix.kernel-release }}/ ../woof-out_*/DISTRO_SPECS
       - name: 1download
         run: cd ../woof-out_* && ./1download
       - name: 2buildkernel
@@ -67,7 +78,7 @@ jobs:
       - name: Upload kernel
         uses: actions/upload-artifact@v4
         with:
-          name: kernel-kit-output-usrmerge-debian-trixie-x86_64
+          name: kernel-kit-output-usrmerge-debian-trixie-${{ matrix.kernel-release }}-x86_64
           path: output
           retention-days: 16
           compression-level: 0

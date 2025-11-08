@@ -19,6 +19,7 @@ The history of this fork and the relationship with other projects is documented 
 * Simplified kernel-kit
     * It rebuilds the [Debian](https://www.debian.org/) kernel with minimal customization (see kernel-kit/debian-diffconfig)
     * The firmware picker is gone: fdrv is built from [Debian](https://www.debian.org/) firmware packages
+    * To retain support for old hardware, the kernel and firmware packages can be pinned to those from an older [Debian](https://www.debian.org/) release
     * The kernel is built inside a chroot environment created by `1download`
         * The kernel and third party drivers installed by the user are all built using the same compiler
         * The built distro can rebuild itself

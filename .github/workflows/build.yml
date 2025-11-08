@@ -22,7 +22,7 @@ on:
       compat-distro-version:
         type: string
         required: true
-      kernel:
+      compat-distro-kernel-version:
         type: string
         required: true
       prefix:
@@ -58,8 +58,7 @@ jobs:
         ref: ${{ inputs.ref }}
     - name: Configure
       run: |
-        DISTRO_COMPAT_VERSION=${{ inputs.compat-distro-version }}
-        sed -i -e s/^DISTRO_BINARY_COMPAT=.*/DISTRO_BINARY_COMPAT=${{ inputs.compat-distro }}/ -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${DISTRO_COMPAT_VERSION%64}/ -e s/^DISTRO_TARGETARCH=.*/DISTRO_TARGETARCH=${{ inputs.arch }}/ -e 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' -e s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ -e s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
+        sed -i -e s/^DISTRO_BINARY_COMPAT=.*/DISTRO_BINARY_COMPAT=${{ inputs.compat-distro }}/ -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ inputs.compat-distro-version }}/ -e s/^DISTRO_COMPAT_KERNEL_VERSION=.*/DISTRO_COMPAT_KERNEL_VERSION=${{ inputs.compat-distro-kernel-version }}/ -e s/^DISTRO_TARGETARCH=.*/DISTRO_TARGETARCH=${{ inputs.arch }}/ -e 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' -e s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ -e s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ DISTRO_SPECS
     - name: Set variant
       if: ${{ inputs.variant != '' }}
       run: echo "DISTRO_VARIANT=${{ inputs.variant }}" >> $GITHUB_ENV
@@ -87,7 +86,7 @@ jobs:
         branch: vanilladpup-12.0.x
         workflow: 'dpup-kernel.yml'
         workflow_conclusion: success
-        name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
+        name: kernel-kit-output-usrmerge-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.compat-distro-kernel-version }}-${{ inputs.arch }}
         path: kernel-kit/output
     - name: 3builddistro
       timeout-minutes: 180

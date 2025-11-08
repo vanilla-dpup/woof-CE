@@ -28,11 +28,11 @@ on:
       compat-distro-version:
         description: 'Compatible distro version'
         required: false
-        default: 'trixie64'
-      kernel:
+        default: 'unstable'
+      compat-distro-kernel-version:
         description: 'Kernel version'
         required: false
-        default: 'debian-trixie'
+        default: 'unstable'
       prefix:
         description: 'File name prefix'
         required: false
@@ -60,7 +60,7 @@ jobs:
       arch: ${{ github.event.inputs.arch }}
       compat-distro: ${{ github.event.inputs.compat-distro }}
       compat-distro-version: ${{ github.event.inputs.compat-distro-version }}
-      kernel: ${{ github.event.inputs.kernel }}
+      compat-distro-kernel-version: ${{ github.event.inputs.compat-distro-kernel-version }}
       prefix: ${{ github.event.inputs.prefix }}
       artifact: ${{ github.workflow }}-${{ github.event.inputs.arch }}-${{ github.event.inputs.compat-distro }}-${{ github.event.inputs.compat-distro-version }}-${{ github.run_number }}
       runner: ${{ github.event.inputs.runner }}
