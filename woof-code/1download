@@ -41,49 +41,18 @@ cat /etc/resolv.conf > rootfs/etc/resolv.conf
 [ ! -d ${CACHE_DIR}/archives ] || cp -r ${CACHE_DIR}/archives/* rootfs/var/cache/apt/archives/
 
 # configure the package manager
-case "$DISTRO_BINARY_COMPAT" in
-debian)
-	case "$DISTRO_COMPAT_VERSION" in
-	unstable|sid)
-		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+case "$DISTRO_COMPAT_VERSION" in
+unstable|sid|ceres)
+	cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
 Types: deb
 URIs: ${MIRROR}
 Suites: ${DISTRO_COMPAT_VERSION}
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
 EOF
-		;;
-	*)
-		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
-Types: deb
-URIs: ${MIRROR}
-Suites: ${DISTRO_COMPAT_VERSION} ${DISTRO_COMPAT_VERSION}-updates
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
-
-Types: deb
-URIs: ${MIRROR}-security
-Suites: ${DISTRO_COMPAT_VERSION}-security
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
-EOF
-		;;
-	esac
 	;;
-
-devuan)
-	case "$DISTRO_COMPAT_VERSION" in
-	unstable|ceres)
-		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
-Types: deb
-URIs: ${MIRROR}
-Suites: ${DISTRO_COMPAT_VERSION}
-Components: main contrib non-free non-free-firmware
-Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
-EOF
-		;;
-	*)
-		cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+*)
+	cat << EOF > rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
 Types: deb
 URIs: ${MIRROR}
 Suites: ${DISTRO_COMPAT_VERSION} ${DISTRO_COMPAT_VERSION}-updates
@@ -96,10 +65,48 @@ Suites: ${DISTRO_COMPAT_VERSION}-security
 Components: main contrib non-free non-free-firmware
 Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
 EOF
-		;;
-	esac
 	;;
 esac
+
+if [ "$DISTRO_COMPAT_KERNEL_VERSION" != "$DISTRO_COMPAT_VERSION" ]; then
+	cat << EOF >> rootfs/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources
+
+Types: deb
+URIs: ${MIRROR}
+Suites: ${DISTRO_COMPAT_KERNEL_VERSION} ${DISTRO_COMPAT_KERNEL_VERSION}-updates
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
+
+Types: deb
+URIs: ${MIRROR}-security
+Suites: ${DISTRO_COMPAT_KERNEL_VERSION}-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/${DISTRO_BINARY_COMPAT}-archive-keyring.gpg
+EOF
+
+	cat << EOF > rootfs/etc/apt/preferences.d/zz-${DISTRO_COMPAT_KERNEL_VERSION}-kernel.pref
+Package: src:linux
+Pin: release n=${DISTRO_COMPAT_KERNEL_VERSION}
+Pin-Priority: 1001
+
+Package: linux-image-*
+Pin: release n=${DISTRO_COMPAT_KERNEL_VERSION}
+Pin-Priority: 1001
+
+Package: src:linux-signed-*
+Pin: release n=${DISTRO_COMPAT_KERNEL_VERSION}
+Pin-Priority: 1001
+
+Package: *firmware*
+Pin: release n=${DISTRO_COMPAT_KERNEL_VERSION}
+Pin-Priority: 1001
+
+Package: *-microcode
+Pin: release n=${DISTRO_COMPAT_KERNEL_VERSION}
+Pin-Priority: 1001
+EOF
+fi
+
 rm -f rootfs/etc/apt/sources.list
 cat << EOF > rootfs/etc/apt/apt.conf.d/00puppy
 APT::Install-Recommends "false";

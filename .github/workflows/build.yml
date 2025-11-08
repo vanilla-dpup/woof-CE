@@ -22,7 +22,7 @@ on:
       compat-distro-version:
         type: string
         required: true
-      kernel:
+      compat-distro-kernel-version:
         type: string
         required: true
       prefix:
@@ -73,7 +73,7 @@ jobs:
       run: sudo sed -i 's/^DISTRO_NAME=.*/DISTRO_NAME="${{ inputs.name }}"/' ../woof-out_*/DISTRO_SPECS
     - name: Set version
       if: ${{ inputs.version != '' }}
-      run: sudo sed -i s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ ../woof-out_*/DISTRO_SPECS
+      run: sudo sed -i -e s/^DISTRO_VERSION=.*/DISTRO_VERSION=${{ inputs.version }}/ -e s/^DISTRO_COMPAT_KERNEL_VERSION=.*/DISTRO_COMPAT_KERNEL_VERSION=${{ inputs.compat-distro-kernel-version }}/ ../woof-out_*/DISTRO_SPECS
     - name: Set file name prefix
       if: ${{ inputs.prefix != '' }}
       run: sudo sed -i s/^DISTRO_FILE_PREFIX=.*/DISTRO_FILE_PREFIX=${{ inputs.prefix }}/ ../woof-out_*/DISTRO_SPECS
@@ -84,7 +84,7 @@ jobs:
       run: |
         sudo apt-get update -qq
         sudo apt-get install -y --no-install-recommends debootstrap
-        [ ${{ inputs.compat-distro }} != devuan ] || curl https://git.devuan.org/devuan/debootstrap/raw/branch/master/scripts/ceres | sudo tee /usr/share/debootstrap/scripts/`echo ${{ inputs.compat-distro-version }} | sed s/64$//`
+        [ ${{ inputs.compat-distro }} != devuan ] || curl https://git.devuan.org/devuan/debootstrap/raw/branch/master/scripts/ceres | sudo tee /usr/share/debootstrap/scripts/${{ inputs.compat-distro-version }}
     - name: 1download
       timeout-minutes: 120
       run: |
@@ -97,9 +97,9 @@ jobs:
       with:
         repo: vanilla-dpup/woof-CE
         branch: vanilladpup-12.0.x
-        workflow: ${{ startsWith(inputs.kernel, 'debian-') && 'dpup-kernel.yml' || (startsWith(inputs.kernel, 'ubuntu-') && 'upup-kernel.yml' || 'kernel-kit.yml') }}
+        workflow: 'dpup-kernel.yml'
         workflow_conclusion: success
-        name: kernel-kit-output-usrmerge-${{ inputs.kernel }}-${{ inputs.arch }}
+        name: kernel-kit-output-usrmerge-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.compat-distro-kernel-version }}-${{ inputs.arch }}
         path: output
     - name: Move cached kernel-kit output
       run: sudo mv output ../woof-out_*/kernel-kit/

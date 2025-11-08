@@ -28,7 +28,7 @@ on:
       compat-distro-version:
         description: 'Compatible distro version'
         required: false
-        default: 'trixie64'
+        default: 'trixie'
       kernel:
         description: 'Kernel version'
         required: false

@@ -19,6 +19,7 @@ The history of this fork and the relationship with other projects is documented 
 * Simplified kernel-kit
     * It rebuilds the [Debian](https://www.debian.org/) kernel with minimal customization (see kernel-kit/debian-diffconfigs)
     * The firmware picker is gone: fdrv is built from [Debian](https://www.debian.org/) firmware packages
+    * To retain support for old hardware, the kernel and firmware packages can be pinned to those from an older [Debian](https://www.debian.org/) release
     * The kernel is built inside a chroot environment created by `1download`
         * The kernel and third party drivers installed by the user are all built using the same compiler
         * The built distro can rebuild itself
@@ -114,7 +115,7 @@ The history of this fork and the relationship with other projects is documented 
 * initrd-progs/ contains the initramfs skeleton
     * 0initrd/init is the early init script: it sets up an `overlay` file system and `switch_root`s into it
 * kernel-kit/ contains a tool that builds the kernel
-* woof-distro/x86_64/debian/trixie64/ contains configuration files
+* woof-distro/x86_64/debian/trixie/ contains configuration files
     * A [Debian](https://www.debian.org/) 13 based distro, featuring
         * [labwc](https://labwc.github.io/) with [waybar](https://github.com/Alexays/Waybar) and [zzzfm](https://gitlab.com/antix-contribs/zzzfm) (patched with `wlr-layer-shell` support), or
         * [dwl](https://codeberg.org/dwl/dwl) with the [snail layout](https://codeberg.org/dwl/dwl-patches/src/branch/main/patches/snail), [yambar](https://codeberg.org/dnkl/yambar) and [zzzfm](https://gitlab.com/antix-contribs/zzzfm)
@@ -142,7 +143,7 @@ Or:
 
 Then:
 
-    ./merge2out woof-distro/x86_64/debian/trixie64
+    ./merge2out woof-distro/x86_64/debian/trixie
     cd ../woof-out_*
     ./1download
     ./2buildkernel
