@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: apt-get update -qq && apt-get install -y --no-install-recommends debootstrap
       - name: Configure
-        run: sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ -e s/^DISTRO_COMPAT_KERNEL_VERSION=.*/DISTRO_COMPAT_KERNEL_VERSION=${{ matrix.kernel-release }}/ DISTRO_SPECS
+        run: sed -i -e s/^DISTRO_COMPAT_VERSION=.*/DISTRO_COMPAT_VERSION=${{ matrix.release }}/ -e s/^DISTRO_COMPAT_KERNEL_VERSION=.*/DISTRO_COMPAT_KERNEL_VERSION=${{ matrix.kernel-release }}/ DISTRO_SPECS && echo DISTRO_VARIANT=cli >> $GITHUB_ENV
       - name: 1download
         run: ./1download
       - name: 2buildkernel
