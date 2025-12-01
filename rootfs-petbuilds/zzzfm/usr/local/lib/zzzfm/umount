@@ -3,9 +3,7 @@
 NAME="${1#/dev/}"
 test -n "$NAME"
 [ `id -u` -ne 0 ] && exec pkexec "$0" "$@"
-while read FILE; do
-	sync -f "$FILE"
-	break
-done < <(ls "/mnt/$NAME"/* 2>/dev/null)
-umount -l "/mnt/$NAME"
+cd "/mnt/$NAME"
+umount -l .
+sync -f .
 rmdir "/mnt/$NAME"
