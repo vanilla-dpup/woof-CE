@@ -150,9 +150,6 @@ jobs:
         restore-keys: |
           petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
           petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
-          petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-
-          petbuild-sources-${{ inputs.arch }}-
-          petbuild-sources-
     - name: 3builddistro
       timeout-minutes: 180
       run: |
