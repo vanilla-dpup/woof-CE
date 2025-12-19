@@ -50,14 +50,12 @@ yes|locales|locales|exe,dev,doc,nls>exe||deps:yes
 yes|kmod|kmod|exe,dev,doc,nls||deps:yes
 yes|less|less|exe,dev>null,doc,nls||deps:yes
 yes|libbpf-dev|libbpf-dev|exe,dev,doc,nls||deps:yes
-yes|libc6-dev|libc6-dev|exe,dev,doc,nls||deps:yes
 yes|libargon2-dev|libargon2-dev|exe,dev,doc,nls||deps:yes # needed by pfscrypt
 yes|libfreetype-dev|libfreetype-dev|exe,dev,doc,nls||deps:yes
 yes|libglib2.0-dev|libglib2.0-dev|exe,dev,doc,nls||deps:yes
 yes|libnss-myhostname|libnss-myhostname|exe,dev,doc,nls||deps:yes
 yes|libpam|libpam0g-dev|exe,dev,doc,nls||deps:yes
 yes|librsvg2|librsvg2-bin,librsvg2-common|exe,dev,doc,nls||deps:yes
-yes|libssl-dev|libssl-dev|exe,dev,doc,nls||deps:yes
 yes|libxxhash-dev|libxxhash-dev|exe,dev,doc,nls||deps:yes # needed by pup_advert_blocker
 yes|nftables|nftables|exe,dev,doc,nls||deps:yes # needed by firewall_ng
 yes|parted|parted|exe,dev,doc,nls||deps:yes
@@ -187,29 +185,15 @@ PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|autoconf|autoconf|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|automake|automake,autotools-dev|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|autopoint|autopoint|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|bc|bc|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|binutils|binutils|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|bison|bison|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|bpftool|bpftool|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|ccache|ccache|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|clang|clang|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|dwarves|dwarves|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
-yes|flex|flex|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|g++|g++|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|gcc|gcc|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|gettext|gettext|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|git|git|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|intltool|intltool|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|libelf-dev|libelf-dev|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 yes|libtool|libtool,libtool-bin|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|linux-header|linux-libc-dev|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|linux-source|linux-source|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 yes|llvm|llvm|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|m4|m4|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|make|make|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|meson|meson|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|ninja-build|ninja-build|exe>dev,dev,doc>dev,nls>dev||deps:yes
-yes|patch|patch|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|pkgconf|pkgconf|exe>dev,dev||deps:yes
 yes|unzip|unzip|exe>dev,dev,doc>dev,nls>dev||deps:yes
 "
@@ -224,16 +208,10 @@ if [ "$DISTRO_TARGETARCH" = "x86_64" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
 yes|gnu-efi|gnu-efi|exe>dev,dev,doc>dev,nls>dev||deps:yes
 yes|syslinux|syslinux|exe,dev,doc,nls||deps:yes
-yes|linux-image-amd64|linux-image-amd64|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 "
 elif [ "$DISTRO_TARGETARCH" = "x86" ]; then
     PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|linux-image-686-pae|linux-image-686-pae|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 yes|syslinux|syslinux|exe,dev,doc,nls||deps:yes
-"
-elif [ "$DISTRO_TARGETARCH" = "arm64" ]; then
-    PKGS_SPECS_TABLE="$PKGS_SPECS_TABLE
-yes|linux-image-arm64|linux-image-arm64|exe>dev,dev,doc>dev,nls>dev||deps:yes # kernel-kit
 "
 fi
 

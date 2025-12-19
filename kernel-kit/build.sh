@@ -18,9 +18,15 @@ make clean
 make mrproper
 find . \( -name '*.orig' -o -name '*.rej' -o -name '*~' \) -delete
 
-./scripts/kconfig/merge_config.sh /boot/config-* ../debian-diffconfigs/${DISTRO_COMPAT_KERNEL_VERSION}
+case "$DISTRO_TARGETARCH" in
+x86_64) xzcat /usr/src/linux-config-*/config.amd64_none_amd64.xz > /tmp/base ;;
+arm64) xzcat /usr/src/linux-config-*/config.arm64_none_arm64.xz > /tmp/base ;;
+*) exit 1 ;;
+esac
+
+./scripts/kconfig/merge_config.sh /tmp/base ../debian-diffconfigs/${DISTRO_COMPAT_KERNEL_VERSION}
 # this prints the actual diff, useful for troubleshooting
-./scripts/diffconfig -m /boot/config-* .config
+./scripts/diffconfig -m /tmp/base .config
 
 make olddefconfig
 if [ $? -ne 0 ] ; then

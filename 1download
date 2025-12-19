@@ -135,6 +135,12 @@ cp -a rootfs devx
 PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 -d \| | tr , " "`
 chroot devx apt-get install -y $PKGS
 
+# install kernel build dependencies to devx
+sed 's/^Types:.*/Types: deb-src/g' devx/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}.sources > devx/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}-src.sources
+chroot devx apt-get -o Dir::Etc::SourceList=/etc/apt/sources.list.d/${DISTRO_BINARY_COMPAT}-src.sources update
+chroot devx apt-get install -y --install-recommends linux-source
+chroot devx apt-get build-dep -y --install-recommends linux
+
 # create an archive of downloaded packages
 cp -r devx/var/cache/apt/archives ${CACHE_DIR}/
 
