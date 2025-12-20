@@ -23,25 +23,6 @@ cd sandbox3
 rm -rf rootfs-complete
 cp -a rootfs rootfs-complete
 
-# remove devx packages pulled as dependencies
-for PKG in `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -F "exe>dev" | cut -f 3 -d \| | tr , ' '`; do
-	chroot rootfs-complete apt-get remove --purge -y $PKG
-done
-
-# prevent all explicitly added non-development packages from being removed
-chroot rootfs-complete apt-mark hold `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n' | grep -vE -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'`
-
-# remove development packages
-for PKG in `chroot rootfs-complete dpkg-query -W -f '${Package}\n' | grep -E -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'`; do
-	chroot rootfs-complete apt-get remove --purge -y $PKG
-done
-
-# remove any unneeded packages
-chroot rootfs-complete apt-get autoremove -y --purge
-
-# reenable package removal or update
-chroot rootfs-complete apt-mark unhold `chroot rootfs-complete apt-mark showhold`
-
 # set locale to en_US.UTF-8
 echo "LANG=en_US.UTF-8" >> rootfs-complete/etc/default/locale
 sed -i 's~^# en_US\.UTF-8~en_US.UTF-8~' rootfs-complete/etc/locale.gen
@@ -130,6 +111,19 @@ cat << EOF > rootfs-complete/etc/issue
 $DISTRO_NAME
 
 EOF
+
+# mark all packages for deletion if unused
+chroot rootfs-complete sh -c 'apt-mark auto `apt-mark showmanual`'
+
+# prevent all explicitly added non-development packages from being removed
+chroot rootfs-complete apt-mark manual `echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n' | grep -vE -e '-dev$' -e '-dev-bin$' -e '-devtools$' -e '-headers$'`
+[ "$DISTRO_VARIANT" = "cli" -o "$DISTRO_VARIANT" = "barebones" ] || chroot rootfs-complete apt-mark manual extrepo
+
+# prevent libraries used by petbuilds from being removed
+chroot rootfs-complete apt-mark manual `chroot rootfs-complete dpkg -S $(chroot rootfs-complete realpath $(chroot rootfs-complete sh -c 'ldd /usr/local/bin/* /usr/local/sbin/*' 2>/dev/null | awk '{print $3}' | sort | uniq)) | sed 's/: .*//'`
+
+# remove any unneeded packages
+chroot rootfs-complete apt-get autoremove -y --purge
 
 rm -f rootfs-complete/var/cache/apt/archives/*.deb rootfs-complete/var/cache/apt/archives/partial/*.deb
 rm -rf rootfs-complete/var/lib/apt/lists/*
