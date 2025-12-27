@@ -144,9 +144,6 @@ mount -n -o nosuid,size=10M,mode=0755 -t devtmpfs devtmpfs /dev
 busybox syslogd -C128
 busybox klogd
 
-FREERAM=`free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 4 -d ' '` #w481 110405
-QTRFREERAM=`expr $FREERAM \/ 4`
-
 #===============
 
 #redirect all output to a log file (must do after remount rw)...
@@ -240,7 +237,7 @@ if [ "$SWAPON" = "yes" ];then
  # resize tmpfs
  # this code is meant to increase the size of the tmpfs
  EXTRAALLOCK=$(($EXTRAALLOCK / 2048)) #use half in KiB
- RAMSIZE=$(free | grep -o 'Mem: .*' | tr -s ' ' | cut -f 2 -d ' ')
+ RAMSIZE=$(awk '/^MemTotal:/{print $2}' /proc/meminfo)
  if [ $PUPMODE -eq 12 ]; then
   FREEK=$(($RAMSIZE / 2)) #half of physical.
  else
