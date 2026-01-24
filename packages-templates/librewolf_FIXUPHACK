@@ -15,7 +15,6 @@ defaultPref("dom.ipc.processCount", 4);
 EOF
 
 cat << EOF > pinstall.sh
-chroot . update-alternatives --install /usr/bin/x-www-browser x-www-browser /usr/share/librewolf/librewolf 70
 chroot . run-as-spot xdg-mime default librewolf.desktop text/html
 chroot . run-as-spot xdg-mime default librewolf.desktop application/pdf
 EOF
