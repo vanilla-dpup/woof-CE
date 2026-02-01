@@ -1,10 +1,10 @@
 download() {
-    [ -f yad-0.42.87.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o yad-0.42.87.tar.gz https://github.com/step-/yad/archive/refs/tags/0.42.87.tar.gz
+    [ -f yad-0.42.89.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o yad-0.42.89.tar.gz https://github.com/step-/yad/archive/refs/tags/0.42.89.tar.gz
 }
 
 build() {
-    tar -xzf yad-0.42.87.tar.gz
-    cd yad-0.42.87
+    tar -xzf yad-0.42.89.tar.gz
+    cd yad-0.42.89
     meson --buildtype=release build
     ninja -C build install
 }
