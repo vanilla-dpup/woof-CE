@@ -70,13 +70,19 @@ void exec_child(const struct ucred *cred, char *argv[], char *envp[])
 	int i;
 
 	for (i = 0; envp[i]; ++i) {
-		if (strncmp(envp[i], "PATH=", 5) == 0) {
-			if (setenv("PATH", &envp[i][5], 1) < 0) return;
-			break;
-		}
+		if (putenv(envp[i]) < 0) return;
 	}
 
-	execvpe(argv[0], argv, envp);
+	if (setenv("USER", "root", 1) < 0 ||
+	    setenv("HOME", "/root", 1) < 0 ||
+	    setenv("XDG_DATA_HOME", "/root/.local/share", 1) < 0 ||
+	    setenv("XDG_CONFIG_HOME", "/root/.config", 1) < 0 ||
+	    setenv("XDG_DATA_DIRS", "/usr/share:/usr/local/share", 1) < 0 ||
+	    setenv("XDG_CACHE_HOME", "/root/.cache", 1) < 0 ||
+	    setenv("XDG_STATE_HOME", "/root/.local/state", 1) < 0)
+		return;
+
+	execvp(argv[0], argv);
 }
 
 void run_cmd(const struct ucred *cred, char *buf, const size_t len)
