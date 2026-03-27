@@ -27,7 +27,7 @@ jobs:
           - release: testing
             kernel-release: testing
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Free space
         run: rm -rf /hostusr/local/lib/android /hostusr/share/dotnet /hostusr/local/.ghcup /hostusr/share/swift # increase free space, we don't need these
       - name: Install dependencies
@@ -41,7 +41,7 @@ jobs:
       - name: Move build output
         run: mv kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: kernel-kit-output-usrmerge-debian-${{ matrix.release }}-${{ matrix.kernel-release }}-x86_64
           path: output
@@ -59,7 +59,7 @@ jobs:
       matrix:
         kernel-release: [trixie, bookworm]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: vanilladpup-11.0.x
       - name: Free space
@@ -76,7 +76,7 @@ jobs:
       - name: Move build output
         run: mv ../woof-out_*/kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: kernel-kit-output-usrmerge-debian-trixie-${{ matrix.kernel-release }}-x86_64
           path: output
@@ -98,7 +98,7 @@ jobs:
           - arch: x86
             base: config.i386_none_686-pae.xz
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: vanilladpup-10.0.x
       - name: Free space
@@ -145,7 +145,7 @@ jobs:
           mkdir small-output
           mv `ls output/kernel_sources-*.sfs* output/kbuild-*.sfs* output/*.tar* 2>/dev/null` small-output
       - name: Upload kernel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: kernel-kit-output-usrmerge-debian-bookworm-${{ matrix.arch }}
           path: kernel-kit/small-output
