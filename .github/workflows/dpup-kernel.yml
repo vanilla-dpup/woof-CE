@@ -20,7 +20,7 @@ jobs:
           - release: unstable
             arch: x86_64
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Free space
         run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet # increase free space, we don't need these
       - name: Install dependencies
@@ -35,7 +35,7 @@ jobs:
       - name: Move build output
         run: sudo mv ../woof-out_*/kernel-kit/output $GITHUB_WORKSPACE/
       - name: Upload kernel
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: kernel-kit-output-usrmerge-debian-${{ matrix.release }}-${{ matrix.arch }}
           path: output

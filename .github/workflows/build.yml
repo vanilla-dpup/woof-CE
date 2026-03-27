@@ -46,7 +46,7 @@ jobs:
     - name: Free space
       run: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /usr/local/.ghcup /usr/share/swift # increase free space, we don't need these
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         repository: ${{ inputs.repo }}
         ref: ${{ inputs.ref }}
@@ -54,7 +54,7 @@ jobs:
       run: |
         mkdir -p local-repositories petbuild-sources petbuild-cache petbuild-output
     - name: Get cached local-repositories
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: local-repositories
         key: local-repositories-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
@@ -93,7 +93,7 @@ jobs:
         cd ../woof-out_*
         sudo -E ./1download
     - name: Get cached kernel-kit output
-      uses: dawidd6/action-download-artifact@v6
+      uses: dawidd6/action-download-artifact@v19
       with:
         repo: vanilla-dpup/woof-CE
         branch: vanilladpup-12.0.x
@@ -104,7 +104,7 @@ jobs:
     - name: Move cached kernel-kit output
       run: sudo mv output ../woof-out_*/kernel-kit/
     - name: Get cached petbuild-output
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: petbuild-output
         key: petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
@@ -112,7 +112,7 @@ jobs:
           petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
           petbuild-output-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
     - name: Get cached petbuild-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: petbuild-cache
         key: petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
@@ -120,7 +120,7 @@ jobs:
           petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-
           petbuild-cache-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-
     - name: Get cached petbuild-sources
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: petbuild-sources
         key: petbuild-sources-${{ inputs.arch }}-${{ inputs.compat-distro }}-${{ inputs.compat-distro-version }}-${{ inputs.variant }}-${{ github.sha }}
@@ -149,7 +149,7 @@ jobs:
         sudo mv ../woof-out_*/petbuild-{cache,output} $GITHUB_WORKSPACE/
         sudo chown -R --reference ~ local-repositories petbuild-{sources,cache,output}
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ inputs.artifact }}
         path: |
