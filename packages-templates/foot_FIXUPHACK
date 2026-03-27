@@ -12,7 +12,7 @@ cat << EOF > etc/skel/.config/foot/foot.ini
 [main]
 initial-window-size-chars = 80x24
 font=monospace:size=10
-[colors]
+[colors-dark]
 # https://github.com/lxde/lxterminal/pull/123
 background = 000000
 foreground = ffffff
