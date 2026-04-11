@@ -40,7 +40,8 @@ cp -a ../rootfs-skeleton/* rootfs-complete/
 
 cp -a rootfs-complete/etc/skel/. rootfs-complete/root/
 
-printf 'woofwoof\nwoofwoof\n' | chroot rootfs-complete adduser --comment "" spot
+chroot rootfs-complete adduser --comment "" spot < /dev/null
+echo spot:woofwoof | chroot rootfs-complete chpasswd
 chroot rootfs-complete adduser spot video
 chroot rootfs-complete adduser spot render
 chroot rootfs-complete adduser spot audio
