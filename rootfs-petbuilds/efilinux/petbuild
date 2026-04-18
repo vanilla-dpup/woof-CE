@@ -9,6 +9,8 @@ build() {
     sed -i 's/-j .rel /&-j .rodata /' Makefile
     # fix for binutils 2.45.50.20251125-1
     sed -i 's/--target=/--output-target=/' Makefile
+    # fix for gnu-efi 4.0.4
+    sed -i -e 's~ -lefi ~ \$(shell find \$(LIBDIR) -name libefi.a 2>/dev/null | tail -n1) ~' -e 's~ -lgnuefi ~ \$(shell find \$(LIBDIR) -name libgnuefi.a 2>/dev/null | tail -n1) ~' Makefile
     make
     install -D -m 644 efilinux.efi /usr/local/lib/efilinux/efilinux.efi
 }
