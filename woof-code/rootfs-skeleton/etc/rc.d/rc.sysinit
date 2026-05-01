@@ -263,8 +263,20 @@ if [ $SFSLOCK -eq 1 ]; then
 
 		# copy SFSs to RAM and prioritize frequently-accessed ones
 		for SFS in $DISTRO_PUPPYSFS $DISTRO_ADRVSFS $DISTRO_YDRVSFS $DISTRO_BDRVSFS nlsx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs docx_${DISTRO_FILE_PREFIX}_${DISTRO_VERSION}.sfs $DISTRO_ZDRVSFS $DISTRO_FDRVSFS kbuild-`uname -r`.sfs $EXTRASFSLIST; do
-			BACKF=$(grep -hm1 "/$SFS\$" /sys/devices/virtual/block/*/loop/backing_file)
-			[ -z "$BACKF" ] && continue
+			BACKF=$(grep -Fm1 "/$SFS /" /proc/mounts)
+			if [ -n "$BACKF" ]; then
+				BACKF=$(printf "${BACKF%% *}")
+				case "$BACKF" in
+				/mnt/pdrv/*) BACKF="/initrd/mnt/dev_save/${BACKF#/mnt/pdrv/}" ;;
+				*) BACKF="/initrd/$BACKF" ;;
+				esac
+			else
+				BACKF=$(grep -Fhm1 "/$SFS" /sys/devices/virtual/block/*/loop/backing_file)
+				case "$BACKF" in
+				*/$SFS) ;;
+				*) continue ;;
+				esac
+			fi
 			SFSSIZE=$(du -b "$BACKF" | awk '{print $1}')
 			LOCKED=$(($LOCKED + $SFSSIZE))
 			[ $LOCKED -gt $LOCKLIMIT ] && break

@@ -6,14 +6,14 @@ generate_initrd() {
 	cp -rf 0initrd/* ZZ_initrd-expanded
 	cd ZZ_initrd-expanded
 	cp -aLf /lib*/*-linux-*/ld-linux-*.so.2 lib/
-	for BIN in usr/bin/busybox usr/bin/lsblk usr/local/sbin/pfscrypt usr/sbin/e2fsck usr/sbin/fsck.f2fs usr/sbin/fsck.fat usr/sbin/fsck.exfat usr/sbin/resize2fs; do
+	for BIN in usr/bin/busybox usr/bin/mount usr/bin/lsblk usr/local/sbin/pfscrypt usr/sbin/e2fsck usr/sbin/fsck.f2fs usr/sbin/fsck.fat usr/sbin/fsck.exfat usr/sbin/resize2fs; do
 		cp -af /${BIN} bin/
 		for LIB in `ldd /${BIN} | awk '{print $3}'`; do
 			cp -anLf ${LIB} lib/
 		done
 	done
 	for BIN in `busybox --list`; do
-		ln -s busybox bin/${BIN}
+		[ -e bin/${BIN} ] || ln -s busybox bin/${BIN}
 	done
 
 	cp -f /etc/DISTRO_SPECS .
@@ -22,6 +22,7 @@ generate_initrd() {
 	case "$DISTRO_TARGETARCH" in *64) ln -s lib lib64 ;; esac
 
 	chroot . busybox --help > /dev/null
+	chroot . mount --help > /dev/null
 	chroot . e2fsck -V 2>/dev/null
 	chroot . fsck.fat --help 2>/dev/null
 
