@@ -160,7 +160,6 @@ yes|gimp|gimp|exe,dev,doc,nls||deps:yes
 yes|gparted|gparted|exe,dev,doc,nls||deps:yes
 yes|gtkhash|gtkhash|exe,dev,doc,nls||deps:yes
 yes|libcurl4-gnutls-dev|libcurl4-gnutls-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
-yes|libfuse2t64|libfuse2t64|exe,dev,doc,nls||deps:yes # used by AppImages
 yes|libidn2-dev|libidn2-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
 yes|libmagic-dev|libmagic-dev|exe,dev,doc,nls||deps:yes # dependency of gplaces
 yes|libxml2-dev|libxml2-dev|exe,dev,doc,nls||deps:yes # dependency of fpm2
