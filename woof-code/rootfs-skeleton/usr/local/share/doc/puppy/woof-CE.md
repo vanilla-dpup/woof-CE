@@ -92,6 +92,7 @@ The history of this fork and the relationship with other projects is documented 
     * SFSs are prioritized and lower priority SFSs are not cached when cached SFSs occupy half of available RAM
     * This caching happens in the background while the boot process continues
 * Built-in SFSs use [EROFS](https://docs.kernel.org/filesystems/erofs.html)
+    * Leveraging `CONFIG_EROFS_FS_BACKED_BY_FILE=y` for cache efficiency
     * [Squashfs](https://docs.kernel.org/filesystems/squashfs.html) is supported as an alternative
 * The devx SFS is gone
 
