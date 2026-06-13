@@ -122,9 +122,14 @@ if [ "$DISTRO_VARIANT" != "cli" -a "$DISTRO_VARIANT" != "barebones" ]; then
 	chroot rootfs apt-get update
 fi
 
+# hack for systemd-tmpfiles in nethack-common 3.6.7-4
+mount --bind /proc rootfs/proc
+
 # install all packages
 PKGS=`echo "$PKGS_SPECS_TABLE" | grep ^yes | grep -vF -e "exe>dev" -e "exe>null" | cut -f 3 -d \| | tr , '\n'`
 chroot rootfs apt-get install -y $PKGS
+
+umount -l rootfs/proc
 
 # impersonate Puppy
 install -m 644 ../DISTRO_SPECS rootfs/etc/DISTRO_SPECS
