@@ -32,7 +32,7 @@ MNT_O='noatime'
 
 case $MNT_FS in
   ntfs)
-    mount $MNT_DEV $MNT_DIR -t ntfs3 -o umask=0,noatime,rw,silent 2>/dev/null #default is rw. 130211 add silent.
+    mount $MNT_DEV $MNT_DIR -t ntfs -o umask=0,noatime,rw,silent 2>/dev/null #default is rw. 130211 add silent.
     ;;
   vfat)
     VFAT_OUT_PARAM='noatime,shortname=mixed,quiet,utf8' 
