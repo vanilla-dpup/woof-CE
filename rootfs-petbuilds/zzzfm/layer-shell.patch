@@ -109,7 +109,7 @@ index 0c20943..31e7710 100644
 +#ifdef HAVE_LAYER_SHELL
 +    } else {
 +        gtk_layer_init_for_window( GTK_WINDOW( self ) );
-+        gtk_layer_set_keyboard_mode( GTK_WINDOW( self ), GTK_LAYER_SHELL_KEYBOARD_MODE_NONE );
++        gtk_layer_set_keyboard_mode( GTK_WINDOW( self ), GTK_LAYER_SHELL_KEYBOARD_MODE_ON_DEMAND );
 +        gtk_layer_set_namespace( GTK_WINDOW( self ), "desktop" );
 +        gtk_layer_set_layer( GTK_WINDOW( self ), GTK_LAYER_SHELL_LAYER_BACKGROUND );
 +        gtk_layer_set_anchor( GTK_WINDOW( self ), GTK_LAYER_SHELL_EDGE_LEFT, TRUE );
