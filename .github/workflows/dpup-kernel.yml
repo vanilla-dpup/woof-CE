@@ -22,8 +22,6 @@ jobs:
             kernel-release: unstable
           - release: unstable
             kernel-release: trixie
-          - release: unstable
-            kernel-release: bookworm
           - release: testing
             kernel-release: testing
     steps:
