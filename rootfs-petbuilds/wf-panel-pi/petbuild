@@ -1,0 +1,18 @@
+download() {
+    [ -f rpcc-61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o rpcc-61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz https://github.com/raspberrypi-ui/rpcc/archive/61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz
+    [ -f wf-panel-pi-3b27e09abeb1edd96154e74ce85cac9eba37b49a.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o wf-panel-pi-3b27e09abeb1edd96154e74ce85cac9eba37b49a.tar.gz https://github.com/dimkr/wf-panel-pi/archive/3b27e09abeb1edd96154e74ce85cac9eba37b49a.tar.gz
+}
+
+build() {
+    tar -xzf rpcc-61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz
+    cd rpcc-61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16
+    meson --buildtype=release build
+    ninja -C build install
+
+    tar -C .. -xzf ../wf-panel-pi-3b27e09abeb1edd96154e74ce85cac9eba37b49a.tar.gz
+    cd ../wf-panel-pi-3b27e09abeb1edd96154e74ce85cac9eba37b49a
+    meson --buildtype=release build
+    ninja -C build install
+
+    rm -f /usr/local/share/applications/rpcc.desktop
+}
