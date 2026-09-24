@@ -1,6 +1,6 @@
 download() {
     [ -f rpcc-61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o rpcc-61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz https://github.com/raspberrypi-ui/rpcc/archive/61e56d64cf2f3d44e2922fece30f7bdd6ad7cc16.tar.gz
-    [ -f wf-panel-pi-c039169ef08022e98dbdade0cedaed05ce9b7925.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o wf-panel-pi-c039169ef08022e98dbdade0cedaed05ce9b7925.tar.gz https://github.com/dimkr/wf-panel-pi/archive/c039169ef08022e98dbdade0cedaed05ce9b7925.tar.gz
+    [ -f wf-panel-pi-ff60f44a42b8edc36acacc81c304a0d5105a1bf7.tar.gz ] || curl --fail --location --retry 3 --max-time 60 -o wf-panel-pi-ff60f44a42b8edc36acacc81c304a0d5105a1bf7.tar.gz https://github.com/dimkr/wf-panel-pi/archive/ff60f44a42b8edc36acacc81c304a0d5105a1bf7.tar.gz
 }
 
 build() {
@@ -9,8 +9,8 @@ build() {
     meson --buildtype=release build
     ninja -C build install
 
-    tar -C .. -xzf ../wf-panel-pi-c039169ef08022e98dbdade0cedaed05ce9b7925.tar.gz
-    cd ../wf-panel-pi-c039169ef08022e98dbdade0cedaed05ce9b7925
+    tar -C .. -xzf ../wf-panel-pi-ff60f44a42b8edc36acacc81c304a0d5105a1bf7.tar.gz
+    cd ../wf-panel-pi-ff60f44a42b8edc36acacc81c304a0d5105a1bf7
     meson --buildtype=release build
     ninja -C build install
 

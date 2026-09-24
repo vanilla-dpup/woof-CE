@@ -63,11 +63,11 @@ diff -rupN zzzfm-bc7473cebcf3b4f932d82d82c044c68b8c78de58-orig/src/settings.c zz
 +const gboolean desk_no_single_hover_default = TRUE;
  const gboolean desk_open_mime_default = FALSE;    // howdy    recheck the significance of this
 -const int margin_top_default = 12;
+-const int margin_left_default = 6;
 +const int margin_top_default = 24;
- const int margin_left_default = 6;
++const int margin_left_default = 76;
  const int margin_right_default = 6;
--const int margin_bottom_default = 12;    // howdy  apparently this specifies nim values, which take precedence of er any gtk themes settinss
-+const int margin_bottom_default = 36;    // howdy  apparently this specifies nim values, which take precedence of er any gtk themes settinss
+ const int margin_bottom_default = 12;    // howdy  apparently this specifies nim values, which take precedence of er any gtk themes settinss
  const int margin_pad_default = 6;
  
  /* Default values of interface settings */
